@@ -59,16 +59,17 @@
           <tr><td>1</td><td>Who's in the room — me, you, and how this course runs</td><td>Ice-breaker</td><td>15</td></tr>
           <tr><td>2</td><td>The breach nobody stopped — why any of this matters</td><td>Story</td><td>7</td></tr>
           <tr><td>3</td><td>What you already know — networking, OS, web, identity → mapped to the attacks they enable</td><td>Recall + diagrams</td><td>30</td></tr>
-          <tr><td>4</td><td>How an attack is built, who attacks, and the 5 phases</td><td>Theory</td><td>30</td></tr>
-          <tr><td>5</td><td>Frameworks — Kill Chain, MITRE ATT&amp;CK, Diamond Model</td><td>Theory (diagrams)</td><td>12</td></tr>
-          <tr><td>6</td><td>Map a real breach to the frameworks</td><td>Activity (pairs)</td><td>13</td></tr>
-          <tr><td>7</td><td>Authorization, scope, RoE — and write your own</td><td>Theory + activity</td><td>20</td></tr>
+          <tr><td>4</td><td>What we're protecting — the five properties every attack breaks</td><td>Theory (interactive)</td><td>6</td></tr>
+          <tr><td>5</td><td>How an attack is built, who attacks, and the 5 phases</td><td>Theory</td><td>30</td></tr>
+          <tr><td>6</td><td>Frameworks — Kill Chain, MITRE ATT&amp;CK, Diamond Model</td><td>Theory (diagrams)</td><td>12</td></tr>
+          <tr><td>7</td><td>Map a real breach to the frameworks</td><td>Activity (pairs)</td><td>13</td></tr>
+          <tr><td>8</td><td>Authorization, scope, RoE — and write your own</td><td>Theory + activity</td><td>20</td></tr>
           <tr><td>—</td><td><strong>Break</strong></td><td>—</td><td>10</td></tr>
-          <tr><td>8</td><td>Virtualization — how a whole computer fits inside yours</td><td>Theory</td><td>18</td></tr>
-          <tr><td>9</td><td>Lab topology, network modes, snapshot discipline</td><td>Theory + demo</td><td>19</td></tr>
-          <tr><td>10</td><td>Passive vs active — what "first contact" means</td><td>Theory</td><td>7</td></tr>
-          <tr><td>11</td><td><strong>First contact</strong> — host discovery &amp; banner grabbing</td><td>Hands-on</td><td>30</td></tr>
-          <tr><td>12</td><td>Lab report format, knowledge check, wrap</td><td>Wrap-up</td><td>26</td></tr>
+          <tr><td>9</td><td>Virtualization — how a whole computer fits inside yours</td><td>Theory</td><td>18</td></tr>
+          <tr><td>10</td><td>Lab topology, network modes, snapshot discipline</td><td>Theory + demo</td><td>19</td></tr>
+          <tr><td>11</td><td>Passive vs active — what "first contact" means</td><td>Theory</td><td>7</td></tr>
+          <tr><td>12</td><td><strong>First contact</strong> — host discovery, banner grabbing, OS fingerprinting</td><td>Hands-on</td><td>30</td></tr>
+          <tr><td>13</td><td>Lab report, knowledge check, your practice plan, wrap</td><td>Wrap-up</td><td>26</td></tr>
         </tbody>
       </table>
       </div>
@@ -353,8 +354,8 @@
       </div>
 
       <figure class="dgm">
-        <svg viewBox="0 0 860 340" role="img" aria-label="TCP three-way handshake between client and server, with the SYN scan variation">
-          <text class="d-title" x="24" y="22" font-size="15">TCP three-way handshake — and where the SYN scan cheats</text>
+        <svg viewBox="0 0 860 340" role="img" aria-label="TCP three-way handshake between client and server, with the SYN scan variation. Packets animate across on load.">
+          <text class="d-title" x="24" y="22" font-size="15">TCP three-way handshake — watch the packets travel</text>
 
           <!-- endpoint boxes -->
           <rect x="60" y="44" width="150" height="34" rx="6" fill="var(--panel-2)" stroke="var(--orange)"/>
@@ -381,12 +382,12 @@
           <!-- step 1 -->
           <text x="430" y="112" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">1 · SYN</text>
           <text x="430" y="128" class="d-sub" font-size="11" text-anchor="middle">"is anyone listening on this port?"</text>
-          <line x1="140" y1="140" x2="718" y2="140" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <line class="flow-line" x1="140" y1="140" x2="718" y2="140" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
 
           <!-- step 2 -->
           <text x="430" y="176" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">2 · SYN + ACK</text>
           <text x="430" y="192" class="d-sub" font-size="11" text-anchor="middle">"yes — port is OPEN"</text>
-          <line x1="720" y1="204" x2="142" y2="204" stroke="var(--cyan)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <line class="flow-line" x1="720" y1="204" x2="142" y2="204" stroke="var(--cyan)" stroke-width="2" marker-end="url(#ar-o)"/>
 
           <!-- step 3 -->
           <text x="430" y="240" font-size="13" fill="var(--text-3)" text-anchor="middle" font-weight="700">3 · ACK</text>
@@ -401,6 +402,7 @@
         </svg>
         <figcaption><b>Two packets tell you everything.</b> The third is the one that gets you logged —
           so the attacker skips it.</figcaption>
+        <button type="button" class="dgm-replay" data-replay>↻ Replay the handshake</button>
       </figure>
 
       <h2>Ports and protocols — your first target list</h2>
@@ -434,6 +436,50 @@
         <p>A port number is not trivia — it is a <strong>hypothesis about what software is running</strong>.
            Today you will grab banners that confirm the hypothesis. In Session 4 you'll turn that confirmed
            version into a CVE, and in Session 5 into a shell.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Practice this topic</span>
+          <span class="pr-plat">TryHackMe · Network Fundamentals</span>
+        </div>
+        <p class="pr-why">If any part of the OSI walk-through or the handshake felt rusty, these rooms
+           rebuild it hands-on before Session 3, where we scan seriously.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/whatisnetworking" target="_blank" rel="noopener">What is Networking?</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~30 min · easy</span>
+            </div>
+            <p class="pr-note">Ground-level refresher on addressing and how devices find each other.
+               <b>Skip if</b> your CCNA is fresh.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/introtolan" target="_blank" rel="noopener">Intro to LAN</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~15 min · easy</span>
+            </div>
+            <p class="pr-note">Subnetting, ARP and DHCP — the three protocols your host-only lab actually
+               runs on. Useful if your <span class="mono">nmap -sn</span> sweep confuses you tonight.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/osimodelzi" target="_blank" rel="noopener">OSI Model</a>
+              <span class="res-tag premium">Premium</span><span class="pr-meta">~30 min · easy</span>
+            </div>
+            <p class="pr-note">Walks each layer with a task per layer. <b>Do this one</b> if you couldn't
+               name all seven bottom-to-top in the ask above.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/packetsframes" target="_blank" rel="noopener">Packets &amp; Frames</a>
+              <span class="res-tag premium">Premium</span><span class="pr-meta">~30 min · easy</span>
+            </div>
+            <p class="pr-note">The TCP three-way handshake and TCP-vs-UDP, at packet level. <b>This is the
+               direct prerequisite</b> for understanding why <span class="mono">-sS</span> is quieter than
+               <span class="mono">-sT</span> in Session 3.</p>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
@@ -549,6 +595,45 @@
         <p>Every row above is also a detection. Event ID <code>4720</code> fires when an account is
            created; <code>4624</code>/<code>4625</code> track logons; Sysmon event <code>10</code> catches
            process access to LSASS. Your admin knowledge is already half of a detection engineer's.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Practice this topic</span>
+          <span class="pr-plat">TryHackMe + OverTheWire</span>
+        </div>
+        <p class="pr-why">You know these systems as an admin. What you need now is <em>speed at the
+           command line under pressure</em> — because from Session 3 onward every lab is timed and every
+           command is typed, not clicked.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/linuxfundamentalspart1" target="_blank" rel="noopener">Linux Fundamentals Part 1</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~20 min · easy</span>
+            </div>
+            <p class="pr-note">In-browser Ubuntu box — <span class="mono">ls, cd, cat, find, grep</span>
+               and shell operators. Parts 2 and 3 continue into permissions and SSH.
+               <b>Baseline check:</b> if this feels slow, do it before you build Kali.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener">OverTheWire — Bandit</a>
+              <span class="res-tag free">Free · no account</span><span class="pr-meta">levels 0–15 · ~2 h</span>
+            </div>
+            <p class="pr-note"><b>My recommendation over everything else on this page.</b> 34 levels, each
+               one a real SSH login where the password is hidden somewhere on the filesystem. It teaches
+               exactly the skill this course needs: <em>finding something on a box you did not configure</em>.
+               No signup, no VM, works from any terminal. Levels 0–15 cover everything Session 1 assumes.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/windowsfundamentals1xbx" target="_blank" rel="noopener">Windows Fundamentals 1</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~30 min · easy</span>
+            </div>
+            <p class="pr-note">NTFS, UAC and the Windows security model from a security angle rather than a
+               sysadmin one. Parts 2–3 add the tooling you'll meet again in Session 6.</p>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
@@ -668,6 +753,33 @@
         <figcaption><b>A system can authenticate perfectly and still be wide open.</b> Most real breaches
           are authorization failures, not authentication failures.</figcaption>
       </figure>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Practice this topic</span>
+          <span class="pr-plat">TryHackMe · How The Web Works</span>
+        </div>
+        <p class="pr-why">Session 8 is the largest attack session in the course and it assumes you can read
+           a raw HTTP request without thinking. These two rooms get you there — and both are free.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/httpindetail" target="_blank" rel="noopener">HTTP in Detail</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~30 min · easy</span>
+            </div>
+            <p class="pr-note">Methods, status codes, headers and cookies — you build requests by hand.
+               <b>Do this one before Session 8</b>, ideally in the next two weeks.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/webapplicationbasics" target="_blank" rel="noopener">Web Application Basics</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~120 min · easy</span>
+            </div>
+            <p class="pr-note">The longer version: web app architecture, URL anatomy, and the security
+               headers that exist precisely because of the attacks in Session 8.</p>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -770,10 +882,152 @@
     </div>
   </section>
 
+  <!-- ==========  P· INFORMATION SECURITY — WHAT WE'RE PROTECTING  ========== -->
+  <section class="page" data-title="What we're protecting">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P08</span><span class="tag theory">Theory</span><span class="time">⏱ 6 min</span></div>
+      <h1>Information Security — What We're Actually Protecting</h1>
+      <p class="lede">Before "how does an attack work", one question first: an attack against <em>what</em>, exactly?</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this comes before the attack formula</span>
+        <p>You've just mapped your networking, OS and web knowledge onto the attack surface. Every one of
+           those attacks damages one of exactly <strong>five properties</strong>. Security teams don't
+           protect "the network" in the abstract — they protect these five things, and every control you'll
+           ever deploy exists to defend one of them. Learn the five now and every attack for the rest of
+           this course sorts itself into place.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">Ransomware encrypts a hospital's patient records. Nothing is stolen, nothing is
+           leaked — the data is still 100% private. Is this still a security failure? Which property did it
+           break?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>Yes — and this trips people up because we default to thinking "security = secrecy". Nothing was
+             disclosed, so <strong>confidentiality</strong> is intact. What broke is
+             <strong>availability</strong>: authorized doctors and nurses could no longer reach data they
+             were entitled to, when they needed it. A patient can be harmed by unavailable data exactly as
+             badly as by leaked data.</p>
+        </details>
+      </div>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 210" role="img" aria-label="Five pillars of information security: confidentiality, integrity, availability, authenticity, non-repudiation. Click a pillar for detail.">
+          <text class="d-title" x="20" y="22" font-size="15">CIA + AA — five properties, one for every attack you'll ever meet</text>
+
+          <g class="node" data-node="c" tabindex="0">
+            <rect x="20"  y="42" width="172" height="130" rx="8" fill="rgba(34,211,238,.12)" stroke="var(--cyan)" stroke-width="2"/>
+            <text x="106" y="70"  font-size="13.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">CONFIDENTIALITY</text>
+            <text x="106" y="98"  font-size="12" class="d-lbl" text-anchor="middle">Only authorized</text>
+            <text x="106" y="114" font-size="12" class="d-lbl" text-anchor="middle">parties can read it</text>
+            <text x="106" y="146" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">click for a real</text>
+            <text x="106" y="160" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">failure example</text>
+          </g>
+
+          <g class="node" data-node="i" tabindex="0">
+            <rect x="212" y="42" width="172" height="130" rx="8" fill="rgba(167,139,250,.12)" stroke="var(--purple)" stroke-width="2"/>
+            <text x="298" y="70"  font-size="13.5" fill="var(--purple)" text-anchor="middle" font-weight="700">INTEGRITY</text>
+            <text x="298" y="98"  font-size="12" class="d-lbl" text-anchor="middle">No unauthorized</text>
+            <text x="298" y="114" font-size="12" class="d-lbl" text-anchor="middle">change, ever</text>
+            <text x="298" y="146" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">click for a real</text>
+            <text x="298" y="160" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">failure example</text>
+          </g>
+
+          <g class="node" data-node="a" tabindex="0">
+            <rect x="404" y="42" width="172" height="130" rx="8" fill="rgba(255,112,67,.12)" stroke="var(--orange)" stroke-width="2"/>
+            <text x="490" y="70"  font-size="13.5" fill="var(--orange)" text-anchor="middle" font-weight="700">AVAILABILITY</text>
+            <text x="490" y="98"  font-size="12" class="d-lbl" text-anchor="middle">Accessible when</text>
+            <text x="490" y="114" font-size="12" class="d-lbl" text-anchor="middle">authorized users need it</text>
+            <text x="490" y="146" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">click for a real</text>
+            <text x="490" y="160" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">failure example</text>
+          </g>
+
+          <g class="node" data-node="auth" tabindex="0">
+            <rect x="596" y="42" width="164" height="130" rx="8" fill="rgba(74,222,128,.12)" stroke="var(--green)" stroke-width="2"/>
+            <text x="678" y="70"  font-size="13.5" fill="var(--green)" text-anchor="middle" font-weight="700">AUTHENTICITY</text>
+            <text x="678" y="98"  font-size="12" class="d-lbl" text-anchor="middle">It's genuinely from</text>
+            <text x="678" y="114" font-size="12" class="d-lbl" text-anchor="middle">who it claims</text>
+            <text x="678" y="146" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">click for a real</text>
+            <text x="678" y="160" font-size="11" class="d-sub" text-anchor="middle" font-style="italic">failure example</text>
+          </g>
+
+          <g class="node" data-node="nr" tabindex="0">
+            <rect x="780" y="42" width="140" height="130" rx="8" fill="rgba(251,191,36,.12)" stroke="var(--amber)" stroke-width="2"/>
+            <text x="850" y="70"  font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="700">NON-</text>
+            <text x="850" y="87"  font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="700">REPUDIATION</text>
+            <text x="850" y="112" font-size="11.5" class="d-lbl" text-anchor="middle">Can't deny</text>
+            <text x="850" y="127" font-size="11.5" class="d-lbl" text-anchor="middle">doing it</text>
+            <text x="850" y="152" font-size="10.5" class="d-sub" text-anchor="middle" font-style="italic">click for a real</text>
+            <text x="850" y="165" font-size="10.5" class="d-sub" text-anchor="middle" font-style="italic">failure example</text>
+          </g>
+        </svg>
+        <div class="dgm-hint">Click each pillar — five real breaches, five different properties broken</div>
+
+        <div class="dgm-detail" data-detail="c">
+          <h5><span class="dd-tag">CONFIDENTIALITY BROKEN</span>2017 — a credit bureau's unpatched web
+             framework let attackers read 147 million people's SSNs and addresses straight out of the
+             database. Nothing was changed, nothing went offline — it was <em>read</em> by people who
+             shouldn't have been able to. That's a pure confidentiality failure. → Session 8 (web attacks).</h5>
+        </div>
+        <div class="dgm-detail" data-detail="i">
+          <h5><span class="dd-tag">INTEGRITY BROKEN</span>A software update server is compromised and a
+             backdoor is silently inserted into a legitimate update, signed and pushed to thousands of
+             customers. Nothing was stolen from the vendor — the update itself was <em>altered</em>. That's
+             integrity, and it's why code signing and hash verification exist. → Session 6 (persistence),
+             Module 19 (supply chain).</h5>
+        </div>
+        <div class="dgm-detail" data-detail="a">
+          <h5><span class="dd-tag">AVAILABILITY BROKEN</span>The ransomware-hospital example above, or
+             simply a DDoS flood that takes a shopping site offline during a sale. The data can be perfectly
+             intact and perfectly secret — and the failure is total, because nobody authorized can reach it.
+             → Session 9 (DoS/DDoS).</h5>
+        </div>
+        <div class="dgm-detail" data-detail="auth">
+          <h5><span class="dd-tag">AUTHENTICITY BROKEN</span>An email arrives that looks exactly like it's
+             from your CEO, asking Finance to wire funds urgently. The sender address is spoofed — the
+             message is not genuinely from who it claims. Authentication mechanisms (SPF/DKIM/DMARC, digital
+             signatures) exist specifically to prove authenticity. → Session 2 (social engineering setup),
+             Session 9.</h5>
+        </div>
+        <div class="dgm-detail" data-detail="nr">
+          <h5><span class="dd-tag">NON-REPUDIATION BROKEN</span>An admin deletes a production database and
+             later claims "it wasn't me — someone else must have had my password." Without signed,
+             tamper-evident audit logs tied to that action, the organisation cannot <em>prove</em> who did
+             it. Non-repudiation is why digital signatures and immutable logging matter to a SOC. → Session 7
+             (logging &amp; SOC operations).</h5>
+        </div>
+      </figure>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Property</th><th>Plain English</th><th>Typical control</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Confidentiality</strong></td><td>Keep secrets secret</td><td>Encryption, access control, least privilege</td></tr>
+          <tr><td><strong>Integrity</strong></td><td>Keep data unaltered</td><td>Hashing, checksums, code signing, version control</td></tr>
+          <tr><td><strong>Availability</strong></td><td>Keep it reachable</td><td>Redundancy, backups, DDoS protection, patching</td></tr>
+          <tr><td><strong>Authenticity</strong></td><td>Prove it's genuine</td><td>Digital signatures, MFA, certificate validation</td></tr>
+          <tr><td><strong>Non-repudiation</strong></td><td>Prove who did it</td><td>Signed audit logs, timestamping, chain of custody</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Carry this forward</span>
+        <p>From the next page onward, every attack you learn breaks at least one of these five. When you
+           write a lab report or an incident summary, naming <em>which property broke</em> is often the
+           single most useful sentence in it.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- ==========  P8 · HOW AN ATTACK IS BUILT  ========== -->
   <section class="page" data-title="How an attack is built">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P08</span><span class="tag theory">Theory</span><span class="time">⏱ 10 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P09</span><span class="tag theory">Theory</span><span class="time">⏱ 10 min</span></div>
       <h1>How An Attack Is Built</h1>
       <p class="lede">Three ingredients. Remove any one and the attack does not happen.</p>
     </div>
@@ -867,7 +1121,7 @@
   <!-- ==========  P9 · WHO ATTACKS  ========== -->
   <section class="page" data-title="Who attacks">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P09</span><span class="tag theory">Theory</span><span class="time">⏱ 8 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P10</span><span class="tag theory">Theory</span><span class="time">⏱ 8 min</span></div>
       <h1>Who Attacks — And What Separates You From Them</h1>
       <p class="lede">One axis decides which side of the law you're on. It isn't skill, and it isn't intent.</p>
     </div>
@@ -992,7 +1246,7 @@
   <!-- ==========  P10 · THE 5 PHASES  ========== -->
   <section class="page" data-title="The 5 phases">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P10</span><span class="tag theory">Theory</span><span class="time">⏱ 12 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P11</span><span class="tag theory">Theory</span><span class="time">⏱ 12 min</span></div>
       <h1>The Five-Phase Methodology</h1>
       <p class="lede">The attacker's roadmap — and, from today, the table of contents for this course.</p>
     </div>
@@ -1019,44 +1273,54 @@
         </details>
       </div>
 
-      <figure class="dgm">
-        <svg viewBox="0 0 940 300" role="img" aria-label="The five phases of hacking as a loop, with the SOC detection surface for each phase">
-          <text class="d-title" x="20" y="22" font-size="15">Five phases — a loop, not a line</text>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="The five phases of hacking as a loop, with the SOC detection surface for each phase. Click a phase for the attacker's tools and the defender's detection.">
+          <text class="d-title" x="20" y="22" font-size="15">Five phases — a loop, not a line · click any phase</text>
 
           <!-- phase 1 -->
+          <g class="node" data-node="ph1" tabindex="0">
           <rect x="20" y="44" width="160" height="102" rx="8" fill="rgba(34,211,238,.10)" stroke="var(--cyan)"/>
           <text x="100" y="68"  font-size="11.5" fill="var(--cyan)" text-anchor="middle" class="d-mono">PHASE 1</text>
           <text x="100" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Reconnaissance</text>
           <text x="100" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: OSINT hits,</text>
           <text x="100" y="130" font-size="11" class="d-sub" text-anchor="middle">DNS queries, external logs</text>
+          </g>
 
           <!-- phase 2 -->
+          <g class="node" data-node="ph2" tabindex="0">
           <rect x="205" y="44" width="160" height="102" rx="8" fill="rgba(34,211,238,.10)" stroke="var(--cyan)"/>
           <text x="285" y="68"  font-size="11.5" fill="var(--cyan)" text-anchor="middle" class="d-mono">PHASE 2</text>
           <text x="285" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Scanning</text>
           <text x="285" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: IDS alerts,</text>
           <text x="285" y="130" font-size="11" class="d-sub" text-anchor="middle">firewall &amp; connection logs</text>
+          </g>
 
           <!-- phase 3 -->
+          <g class="node" data-node="ph3" tabindex="0">
           <rect x="390" y="44" width="160" height="102" rx="8" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
           <text x="470" y="68"  font-size="11.5" fill="var(--orange)" text-anchor="middle" class="d-mono">PHASE 3</text>
           <text x="470" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Gaining Access</text>
           <text x="470" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: auth logs,</text>
           <text x="470" y="130" font-size="11" class="d-sub" text-anchor="middle">EDR alerts, web app logs</text>
+          </g>
 
           <!-- phase 4 -->
+          <g class="node" data-node="ph4" tabindex="0">
           <rect x="575" y="44" width="160" height="102" rx="8" fill="rgba(167,139,250,.12)" stroke="var(--purple)"/>
           <text x="655" y="68"  font-size="11.5" fill="var(--purple)" text-anchor="middle" class="d-mono">PHASE 4</text>
           <text x="655" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Maintaining Access</text>
           <text x="655" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: new services,</text>
           <text x="655" y="130" font-size="11" class="d-sub" text-anchor="middle">scheduled tasks, run keys</text>
+          </g>
 
           <!-- phase 5 -->
+          <g class="node" data-node="ph5" tabindex="0">
           <rect x="760" y="44" width="160" height="102" rx="8" fill="rgba(167,139,250,.12)" stroke="var(--purple)"/>
           <text x="840" y="68"  font-size="11.5" fill="var(--purple)" text-anchor="middle" class="d-mono">PHASE 5</text>
           <text x="840" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Clearing Tracks</text>
           <text x="840" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: log gaps,</text>
           <text x="840" y="130" font-size="11" class="d-sub" text-anchor="middle">audit policy changes</text>
+          </g>
 
           <!-- forward arrows, sitting in the gaps between boxes -->
           <line x1="182" y1="95" x2="201" y2="95" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
@@ -1084,6 +1348,59 @@
         </svg>
         <figcaption><b>Cyan is where you're loudest, orange is where you're briefest.</b> Defenders who
           only watch orange are watching the wrong 5%.</figcaption>
+        <div class="dgm-hint">Click each phase — attacker's tools, defender's detection, and the session that teaches it</div>
+
+        <div class="dgm-detail" data-detail="ph1">
+          <h5><span class="dd-tag">PHASE 1 · RECONNAISSANCE</span>Who is this target?</h5>
+          <p><b>Attacker does:</b> WHOIS lookups, Google dorking, Shodan, certificate transparency
+             (<span class="mono">crt.sh</span>), LinkedIn employee harvesting, <span class="mono">theHarvester</span>,
+             DNS enumeration. Zero packets to the target.<br>
+             <b>SOC sees:</b> almost nothing — this is the blind spot. Best you get is third-party threat
+             intel, brand-monitoring alerts, or an unusual spike in DNS queries for your domain from one
+             resolver.<br>
+             <b>ATT&amp;CK:</b> TA0043 Reconnaissance · <b>Taught in:</b> Session 2 (full session).</p>
+        </div>
+        <div class="dgm-detail" data-detail="ph2">
+          <h5><span class="dd-tag">PHASE 2 · SCANNING</span>What's alive, open, and running?</h5>
+          <p><b>Attacker does:</b> <span class="mono">nmap -sn</span> host discovery, SYN/version scans,
+             service banner grabbing, vulnerability scanning with Nessus/OpenVAS, SMB/SNMP/LDAP enumeration.
+             <em>This is what you personally do in 40 minutes on this page.</em><br>
+             <b>SOC sees:</b> the classic detection — <strong>one source IP touching many ports in a short
+             window</strong>. Firewall connection logs, IDS port-scan signatures, and a burst of TCP RSTs
+             from closed ports.<br>
+             <b>ATT&amp;CK:</b> TA0007 Discovery · <b>Taught in:</b> Session 1 (intro) and Session 3 (full).</p>
+        </div>
+        <div class="dgm-detail" data-detail="ph3">
+          <h5><span class="dd-tag">PHASE 3 · GAINING ACCESS</span>Which weakness actually gets me in?</h5>
+          <p><b>Attacker does:</b> exploits a confirmed CVE (Metasploit, searchsploit), brute-forces or
+             sprays credentials (Hydra), or injects into a web app (SQLi, command injection). The loud,
+             brief moment — roughly 5% of total attack time.<br>
+             <b>SOC sees:</b> the richest signal of all — failed-then-successful logon sequences (Windows
+             4625 → 4624), EDR process-spawn alerts (<span class="mono">w3wp.exe</span> spawning
+             <span class="mono">cmd.exe</span>), WAF blocks, and exploit signatures on the wire.<br>
+             <b>ATT&amp;CK:</b> TA0001 Initial Access, TA0002 Execution · <b>Taught in:</b> Sessions 4, 5, 8.</p>
+        </div>
+        <div class="dgm-detail" data-detail="ph4">
+          <h5><span class="dd-tag">PHASE 4 · MAINTAINING ACCESS</span>How am I still here after a reboot?</h5>
+          <p><b>Attacker does:</b> creates a backdoor account, installs a service or scheduled task, writes
+             a Run-key entry, drops a web shell, plants an SSH key, or establishes C2 beaconing. Also
+             escalates privilege so persistence survives.<br>
+             <b>SOC sees:</b> new service installed (Windows 7045), new scheduled task (4698), account
+             created (4720), registry Run-key writes (Sysmon 13), and periodic beacon traffic with
+             suspiciously regular timing to a rare external domain.<br>
+             <b>ATT&amp;CK:</b> TA0003 Persistence, TA0004 Privilege Escalation, TA0011 C2 ·
+             <b>Taught in:</b> Sessions 6 and 7.</p>
+        </div>
+        <div class="dgm-detail" data-detail="ph5">
+          <h5><span class="dd-tag">PHASE 5 · CLEARING TRACKS</span>What did I leave behind?</h5>
+          <p><b>Attacker does:</b> clears event logs, wipes <span class="mono">bash_history</span>, alters
+             timestamps (timestomping), deletes tools and temp files, disables auditing or the EDR agent.<br>
+             <b>SOC sees:</b> the <em>absence</em> is the evidence — event log cleared (Windows 1102), audit
+             policy changed (4719), a suspicious gap in log continuity, or file timestamps that don't match
+             the surrounding filesystem. <strong>This is why you forward logs off the host in real time</strong>
+             — an attacker can delete a local log, not one already sitting in your SIEM.<br>
+             <b>ATT&amp;CK:</b> TA0005 Defense Evasion (T1070 Indicator Removal) · <b>Taught in:</b> Sessions 6 and 10.</p>
+        </div>
       </figure>
 
       <div class="tbl-scroll">
@@ -1111,7 +1428,7 @@
   <!-- ==========  P11 · FRAMEWORKS  ========== -->
   <section class="page" data-title="Frameworks">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P11</span><span class="tag theory">Theory</span><span class="time">⏱ 12 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P12</span><span class="tag theory">Theory</span><span class="time">⏱ 12 min</span></div>
       <h1>Three Frameworks That Describe An Attack</h1>
       <p class="lede">Same intrusion, three different lenses. Pick the one that answers your question.</p>
     </div>
@@ -1328,13 +1645,59 @@
            session onward, every attack you learn gets tagged with its tactic — by Session 10 you'll do
            it without thinking.</p>
       </div>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Practice this topic</span>
+          <span class="pr-plat">MITRE (free, official) · TryHackMe</span>
+        </div>
+        <p class="pr-why">Frameworks only stick when you use them on a real intrusion. Start with MITRE's
+           own free tooling — it costs nothing and it is what analysts actually open at work.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://attack.mitre.org/" target="_blank" rel="noopener">attack.mitre.org — the live matrix</a>
+              <span class="res-tag free">Free · official</span><span class="pr-meta">bookmark it now</span>
+            </div>
+            <p class="pr-note"><b>Exercise (10 min, do it tonight):</b> open technique
+               <span class="mono">T1046 Network Service Discovery</span> and read its Detection section.
+               That technique is <em>exactly what you perform in the lab later today</em> — so you are
+               reading the detection guidance for your own attack.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://mitre-attack.github.io/attack-navigator/" target="_blank" rel="noopener">ATT&amp;CK Navigator</a>
+              <span class="res-tag free">Free · official</span><span class="pr-meta">no install</span>
+            </div>
+            <p class="pr-note">The colour-coded matrix tool SOC teams use to show coverage. <b>Exercise:</b>
+               create a new layer and highlight the techniques from today's breach story — that is a
+               one-page threat report, and it is a real interview answer.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/cyberkillchain" target="_blank" rel="noopener">TryHackMe — Cyber Kill Chain</a>
+              <span class="res-tag premium">Premium</span><span class="pr-meta">~50 min · medium</span>
+            </div>
+            <p class="pr-note">Walks all seven stages with a real scenario per stage. Pairs directly with
+               the chevron diagram above.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/mitre" target="_blank" rel="noopener">TryHackMe — MITRE</a>
+              <span class="res-tag premium">Premium</span><span class="pr-meta">~60 min · medium</span>
+            </div>
+            <p class="pr-note">ATT&amp;CK, plus CAR and D3FEND — the detection and defensive-mapping
+               companions. The natural follow-on from the Kill Chain room.</p>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 
   <!-- ==========  P12 · ACTIVITY — MAP THE BREACH  ========== -->
   <section class="page" data-title="Activity: map the breach">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P12</span><span class="tag activity">Activity · pairs</span><span class="time">⏱ 13 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P13</span><span class="tag activity">Activity · pairs</span><span class="time">⏱ 13 min</span></div>
       <h1>Activity — Map A Real Breach</h1>
       <p class="lede">Take the vocabulary you just met and put it on a real intrusion.</p>
     </div>
@@ -1414,7 +1777,7 @@
   <!-- ==========  P13 · AUTHORIZATION & RoE  ========== -->
   <section class="page" data-title="Authorization & RoE">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P13</span><span class="tag theory">Theory + activity</span><span class="time">⏱ 20 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P14</span><span class="tag theory">Theory + activity</span><span class="time">⏱ 20 min</span></div>
       <h1>Authorization, Scope &amp; Rules Of Engagement</h1>
       <p class="lede">The document that separates your career from your criminal record.</p>
     </div>
@@ -1509,7 +1872,7 @@
   <!-- ==========  P14 · BREAK  ========== -->
   <section class="page" data-title="Break">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P14</span><span class="time">⏱ 10 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P15</span><span class="time">⏱ 10 min</span></div>
       <h1>Break</h1>
       <p class="lede">Halfway. Theory behind you — machines ahead of you.</p>
     </div>
@@ -1537,7 +1900,7 @@
   <!-- ==========  P15 · VIRTUALIZATION  ========== -->
   <section class="page" data-title="Virtualization">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P15</span><span class="tag lab">Foundations</span><span class="time">⏱ 18 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P16</span><span class="tag lab">Foundations</span><span class="time">⏱ 18 min</span></div>
       <h1>Virtualization — How A Whole Computer Fits Inside Yours</h1>
       <p class="lede">Before we design the lab, understand what the lab actually <em>is</em>.</p>
     </div>
@@ -1713,13 +2076,40 @@
            hypervisor. That supervision is what lets you snapshot it, isolate it, and deliberately break
            it — which is exactly what makes a security lab possible at all.</p>
       </div>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Practice this topic</span>
+          <span class="pr-plat">TryHackMe · Computer Fundamentals</span>
+        </div>
+        <p class="pr-why">Optional here — but if tonight's VM build is your first ever, twenty minutes on
+           the concepts saves an hour of confused clicking.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/virtualizationandcontainers" target="_blank" rel="noopener">Virtualization and Containers</a>
+              <span class="res-tag premium">Premium</span><span class="pr-meta">~60 min · easy</span>
+            </div>
+            <p class="pr-note">Hypervisors, VMs and how containers differ. Container knowledge becomes
+               directly relevant in Module 19 (cloud).</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/careersincyber" target="_blank" rel="noopener">Careers in Cyber</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~30 min · easy</span>
+            </div>
+            <p class="pr-note">Not a technical room — a map of the roles this diploma opens up (SOC analyst,
+               DFIR, pentester, red team). Worth 30 minutes if you're still deciding your direction.</p>
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 
   <!-- ==========  P16 · LAB TOPOLOGY & NETWORK MODES  ========== -->
   <section class="page" data-title="Lab topology & network modes">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P16</span><span class="tag lab">Lab design</span><span class="time">⏱ 12 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P17</span><span class="tag lab">Lab design</span><span class="time">⏱ 12 min</span></div>
       <h1>The Lab You'll Attack From</h1>
       <p class="lede">Three network modes exist. For this course, only one of them is safe.</p>
     </div>
@@ -1901,7 +2291,7 @@
   <!-- ==========  P17 · SNAPSHOTS  ========== -->
   <section class="page" data-title="Snapshot discipline">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P17</span><span class="tag lab">Lab discipline</span><span class="time">⏱ 7 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P18</span><span class="tag lab">Lab discipline</span><span class="time">⏱ 7 min</span></div>
       <h1>Snapshot Discipline</h1>
       <p class="lede">The habit that makes breaking things free.</p>
     </div>
@@ -1994,7 +2384,7 @@
   <!-- ==========  P18 · PASSIVE VS ACTIVE  ========== -->
   <section class="page" data-title="Passive vs active">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P18</span><span class="tag theory">Theory</span><span class="time">⏱ 7 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P19</span><span class="tag theory">Theory</span><span class="time">⏱ 7 min</span></div>
       <h1>Passive vs Active — What "First Contact" Means</h1>
       <p class="lede">The moment your packets touch the target, you become visible. That moment is next.</p>
     </div>
@@ -2094,7 +2484,7 @@
   <!-- ==========  P19 · HANDS-ON: FIRST CONTACT  ========== -->
   <section class="page" data-title="Lab: first contact">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P19</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 30 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P20</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 30 min</span></div>
       <h1>First Contact</h1>
       <p class="lede">Your own keyboard, your own Kali, a live target. Your partner verifies your output.</p>
     </div>
@@ -2246,13 +2636,84 @@ SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1
            — that pattern is the classic port-scan detection, and you just generated a textbook example
            of it. Same packets, both sides.</p>
       </div>
+
+      <h2>Step 5 — stretch goal, if you finish early</h2>
+      <p>Two commands that take the same target further. Both are optional today and both are Session 3
+         material — but if your pair is done and waiting, run them and paste the output.</p>
+
+      <ol class="steps">
+        <li>
+          <strong>Fingerprint the operating system, not just the services.</strong>
+          <pre><code>sudo nmap -O &lt;MSF2_IP&gt;</code></pre>
+          <p>Nmap compares subtle TCP/IP stack behaviours against a signature database and guesses the OS.
+             Compare its answer with the TTL you observed in the ping — they should agree. When they
+             disagree, something between you and the target is rewriting packets.</p>
+        </li>
+        <li>
+          <strong>Ask Nmap's script engine what it knows about the target.</strong>
+          <pre><code>nmap -sV --script=default &lt;MSF2_IP&gt;</code></pre>
+          <p>The default script set runs safe enumeration scripts against every open port — anonymous FTP
+             checks, SMB OS discovery, HTTP title grabbing. This is where reconnaissance starts turning into
+             a vulnerability list. <strong>Read the output carefully — Metasploitable2 will tell you things
+             that should alarm you.</strong></p>
+        </li>
+      </ol>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Keep practising this attack</span>
+          <span class="pr-plat">TryHackMe · Nmap module + first real target</span>
+        </div>
+        <p class="pr-why">You just performed <span class="mono">T1046 Network Service Discovery</span> for
+           the first time. It is the single most-repeated skill in this entire diploma — every session from
+           3 onward starts with a scan. These build it into muscle memory before Session 3.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/blue" target="_blank" rel="noopener">Blue — your first full compromise</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~30 min · easy</span>
+            </div>
+            <p class="pr-note"><b>The reward room.</b> Scan a Windows box, find MS17-010 (EternalBlue),
+               exploit it, and get SYSTEM. It runs the exact recon-to-shell arc this course spends Sessions
+               1 through 5 building — do it once now for motivation, then again in Session 5 and understand
+               every step. <em>Warning: it will feel like magic today. That feeling is the point.</em></p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/nmap01" target="_blank" rel="noopener">Nmap Live Host Discovery</a>
+              <span class="res-tag premium">Premium</span><span class="pr-meta">~60 min · easy</span>
+            </div>
+            <p class="pr-note">Everything <span class="mono">-sn</span> does under the hood — ARP, ICMP,
+               TCP and UDP discovery, and when each one lies to you.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/nmap02" target="_blank" rel="noopener">Nmap Basic Port Scans</a>
+              <span class="res-tag premium">Premium</span><span class="pr-meta">~60 min · easy</span>
+            </div>
+            <p class="pr-note">TCP connect vs SYN scan, UDP scanning, and reading scan output properly.
+               <b>The direct prerequisite for Session 3.</b> Followed by
+               <a href="https://tryhackme.com/room/nmap03" target="_blank" rel="noopener">Nmap Advanced Port Scans</a>
+               for the FIN/XMAS/NULL evasion scans.</p>
+          </li>
+        </ul>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Rules for every external platform, without exception</span>
+        <p>Rooms on TryHackMe and Hack The Box give you a target machine <strong>and written permission to
+           attack it</strong> — that is the entire reason they exist, and it is the same authorization
+           principle from earlier today. <strong>Never point a tool you learned here at anything that isn't
+           your own lab or an explicitly-provided training target.</strong> Same commands, different legal
+           outcome.</p>
+      </div>
     </div>
   </section>
 
   <!-- ==========  P20 · LAB REPORT  ========== -->
   <section class="page" data-title="Lab report">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P20</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 6 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P21</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 6 min</span></div>
       <h1>How To Write The Lab Report</h1>
       <p class="lede">Every session ends with one. Here's the format, once, for the whole course.</p>
     </div>
@@ -2300,7 +2761,7 @@ SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1
   <!-- ==========  P21 · KNOWLEDGE CHECK  ========== -->
   <section class="page" data-title="Knowledge check">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P21</span><span class="tag theory">Quiz</span><span class="time">⏱ 15 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P22</span><span class="tag theory">Quiz</span><span class="time">⏱ 15 min</span></div>
       <h1>Knowledge Check</h1>
       <p class="lede">Ten questions. Click an answer to see whether you were right and why.</p>
     </div>
@@ -2442,10 +2903,139 @@ SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1
     </div>
   </section>
 
-  <!-- ==========  P22 · TAKEAWAYS & HOMEWORK  ========== -->
+  <!-- ==========  P· PRACTICE ROADMAP  ========== -->
+  <section class="page" data-title="Your practice plan">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P23</span><span class="tag lab">Self-study</span><span class="time">⏱ 5 min</span></div>
+      <h1>Your Practice Plan Between Sessions</h1>
+      <p class="lede">Four hours a week, on your own machine, in the right order. This is what separates
+         the students who finish strong.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why I'm giving you this</span>
+        <p>Forty hours of class time is not enough to build reflexes — it is enough to build
+           <em>understanding</em>. The reflexes come from repetition on your own time. Everything below is
+           optional, and every student who has done it has visibly outperformed the ones who didn't. Nothing
+           here is graded; all of it is on the interview.</p>
+      </div>
+
+      <h2>The order that actually works</h2>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>When</th><th>Do this</th><th>Why then</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="mono">Tonight</td>
+            <td>Build your VMs (homework) — nothing else</td>
+            <td>Every other item needs a working lab. Don't split your attention.</td>
+            <td>Free</td>
+          </tr>
+          <tr>
+            <td class="mono">This week</td>
+            <td><a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener">OverTheWire Bandit</a>, levels 0–15</td>
+            <td>Builds Linux command-line speed — the one skill used in literally every remaining session.</td>
+            <td>Free, no account</td>
+          </tr>
+          <tr>
+            <td class="mono">This week</td>
+            <td><a href="https://attack.mitre.org/techniques/T1046/" target="_blank" rel="noopener">Read ATT&amp;CK T1046</a> — detection section</td>
+            <td>10 minutes. It's the detection guidance for the attack <em>you ran today</em>.</td>
+            <td>Free</td>
+          </tr>
+          <tr>
+            <td class="mono">Before S02</td>
+            <td><a href="https://tryhackme.com/room/httpindetail" target="_blank" rel="noopener">HTTP in Detail</a></td>
+            <td>Recon in Session 2 leans on reading HTTP responses fluently.</td>
+            <td>Free</td>
+          </tr>
+          <tr>
+            <td class="mono">Before S03</td>
+            <td>Nmap module — <a href="https://tryhackme.com/room/nmap01" target="_blank" rel="noopener">Live Host Discovery</a> + <a href="https://tryhackme.com/room/nmap02" target="_blank" rel="noopener">Basic Port Scans</a></td>
+            <td>Session 3 goes fast and assumes today's scanning is comfortable.</td>
+            <td>Premium</td>
+          </tr>
+          <tr>
+            <td class="mono">Any time</td>
+            <td><a href="https://tryhackme.com/room/blue" target="_blank" rel="noopener">TryHackMe: Blue</a></td>
+            <td>Your first end-to-end compromise. Motivation fuel — do it when class feels theoretical.</td>
+            <td>Free</td>
+          </tr>
+          <tr>
+            <td class="mono">Before S08</td>
+            <td><a href="https://tryhackme.com/room/webapplicationbasics" target="_blank" rel="noopener">Web Application Basics</a></td>
+            <td>Session 8 is the biggest attack session in the diploma. Arrive ready.</td>
+            <td>Free</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>Which platform, and do you need to pay?</h2>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Platform</th><th>What it's best at</th><th>Free tier reality</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>TryHackMe</strong></td>
+            <td>Guided, structured rooms with in-browser machines. The gentlest on-ramp and the closest
+                match to this course's sequence.</td>
+            <td>650+ genuinely free rooms and a limited daily browser-VM allowance. Most rooms
+                <em>inside structured learning paths</em> need Premium. Free is enough to follow this
+                course; Premium is worth it if you want the full Nmap module.</td>
+          </tr>
+          <tr>
+            <td><strong>OverTheWire</strong></td>
+            <td>Raw Linux and command-line skill, delivered as a puzzle ladder. No hand-holding.</td>
+            <td><strong>Entirely free, no account.</strong> Best value on this whole page.</td>
+          </tr>
+          <tr>
+            <td><strong>Hack The Box</strong></td>
+            <td>Realistic unguided machines. Harder, closer to a real engagement, less structured.</td>
+            <td>Free tier includes Starting Point Tier 0 and rotating active machines.
+                <strong>Come back to this from Session 5</strong> — before that it will mostly frustrate you.</td>
+          </tr>
+          <tr>
+            <td><strong>picoCTF</strong></td>
+            <td>CTF-style challenges (crypto, forensics, web, reversing) with a permanent practice gym.</td>
+            <td><strong>Free.</strong> Good for the forensics and crypto side, which this diploma touches
+                lightly. Optional.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">If you only do one thing</span>
+        <p><strong>Bandit, levels 0–15.</strong> It costs nothing, needs no account, no VM and no
+           subscription — just SSH from any terminal. It builds the exact skill every later session assumes
+           and most students are weakest at: finding something on a machine you did not set up.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">The one rule, repeated because it matters</span>
+        <p>These platforms hand you a target <em>and</em> the authorization to attack it. That authorization
+           does not travel. The moment you point the same command at a system nobody gave you in writing,
+           you are on the wrong side of the line we drew this morning — and the tooling looks identical in
+           the logs either way.</p>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">Bring it back to class</span>
+        <p>Finished a room and something didn't make sense? Bring it to the next session. Ten minutes on a
+           real question from a real box beats an hour of slides — and someone else in the room almost
+           certainly hit the same wall.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P23 · TAKEAWAYS & HOMEWORK  ========== -->
   <section class="page" data-title="Takeaways & homework">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S01 · P22</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 5 min</span></div>
+      <div class="kicker"><span class="snum">S01 · P24</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 5 min</span></div>
       <h1>Takeaways &amp; Homework</h1>
       <p class="lede">What to keep from today, and what has to be done before Session 2.</p>
     </div>

@@ -18,11 +18,12 @@ Foundations, Lab Build & First Contact
 ## Learning objectives
 By the end of this session, students will be able to:
 1. **Relate** their existing networking, OS and web knowledge to the attack surface it represents, and name the session where each becomes an attack.
-2. **Explain** the attacker mindset: how an attack is composed (motive + method + vulnerability) and the 5-phase hacking methodology.
-3. **Map** a real intrusion story to the Cyber Kill Chain and MITRE ATT&CK tactics.
-4. **Define** engagement authorization and scope, and write a minimal rules-of-engagement (RoE) statement.
-5. **Explain** virtualization — hypervisor types, VM hardware allocation, and the three network modes — and justify why the lab must be host-only with baseline snapshots.
-6. **Perform** first contact against a live target — host discovery and service banner grabbing — and record it in a standard lab report.
+2. **Name** the five properties of information security (CIA + authenticity + non-repudiation) and identify which one a given attack breaks.
+3. **Explain** the attacker mindset: how an attack is composed (motive + method + vulnerability) and the 5-phase hacking methodology.
+4. **Map** a real intrusion story to the Cyber Kill Chain and MITRE ATT&CK tactics.
+5. **Define** engagement authorization and scope, and write a minimal rules-of-engagement (RoE) statement.
+6. **Explain** virtualization — hypervisor types, VM hardware allocation, and the three network modes — and justify why the lab must be host-only with baseline snapshots.
+7. **Perform** first contact against a live target — host discovery and service banner grabbing — and record it in a standard lab report.
 
 ## Time distribution (240 min)
 
@@ -35,6 +36,7 @@ By the end of this session, students will be able to:
 | Recall B | Linux & Windows — filesystem and credential stores read as an attacker | Ask-first, then diagram | 8 |
 | Recall C | Web & identity — HTTP anatomy, authN vs authZ | Ask-first, then diagram | 7 |
 | Recall D | Your knowledge mapped to the 10 sessions | Diagram | 5 |
+| Theory 0 | Information security — CIA + AA, the five properties every attack breaks | Theory (interactive diagram) | 6 |
 | Theory A | How an attack is built: motive + method + vulnerability; attack classification | Theory (diagram) | 10 |
 | Theory B | Who attacks — hacker classes on the authorization axis | Theory (diagram) | 8 |
 | Theory C | The 5-phase methodology as a loop, with SOC detection surface per phase | Theory (diagram) | 12 |
@@ -46,12 +48,15 @@ By the end of this session, students will be able to:
 | Theory G | Lab topology, the three network modes, why host-only is a safety control | Theory (2 diagrams) | 12 |
 | Theory H | Snapshot discipline and the revert loop | Theory + live demo | 7 |
 | Theory I | Passive vs active footprinting → what "first contact" means | Theory (diagram) | 7 |
-| Hands-on C | **First contact** — `ip a`, `nmap -sn`, `ping`, `nmap -sV`, manual banner grabbing | Hands-on (everyone) | 30 |
+| Hands-on C | **First contact** — `ip a`, `nmap -sn`, `ping`, `nmap -sV`, manual banner grabbing, plus `-O` / `--script=default` stretch goals | Hands-on (everyone) | 30 |
 | Wrap A | Lab report format and evidence standards | Wrap-up | 6 |
 | Wrap B | Knowledge check — 10 interactive MCQ + 2 short answer | Quiz | 15 |
-| Wrap C | Takeaways and homework brief | Wrap-up | 5 |
+| Wrap C | Practice plan — external platforms, ordered by when to do them | Wrap-up | 5 |
+| Wrap D | Takeaways and homework brief | Wrap-up | 5 |
 
-**Total: 240 min.**
+**Total: 246 min** — 6 min over the 240 slot. Absorb by trimming the ice-breaker student round
+(15 → 12 min) and the incident story (7 → 4 min) if the room is small, or run the practice-plan
+page as a link-only sign-off rather than a talked-through page.
 
 ## Delivery notes
 - **Integrated, not blocked.** Topics run as one narrative: recall → what attacks it enables → the
@@ -60,6 +65,10 @@ By the end of this session, students will be able to:
   the previous one.
 - **Ask-first mechanic.** Each recall block opens with a question to the room; the diagram is the
   reveal. This doubles as the ice-breaker and lets the instructor map the room's real level early.
+- **Practice blocks are self-study, not class time.** Nine pages carry a "Practice this topic" block
+  linking external platform rooms (TryHackMe, OverTheWire, Hack The Box, picoCTF), each tagged
+  free / premium and annotated with *why that room, and when to do it*. Do not work through them in
+  class — point at them, and tell students the consolidated plan is on the second-to-last page.
 - **VM build is homework**, not class time. Class covers virtualization and lab design as theory so
   students build with understanding; the freed hands-on time goes to first contact.
 
@@ -93,7 +102,8 @@ See `labs/lab_design.md` and `labs/setup_guide.md` — do not redefine the lab h
 - Homework lab report graded pass / needs-review (rubric in `exercises/session-01/homework.md`).
 
 ## Session assets
-- `sessions/session-01/index.html` — 22-page interactive teaching page (17 inline SVG diagrams,
-  8 screenshot slots, break timer, self-scoring quiz).
+- `sessions/session-01/index.html` — 24-page interactive teaching page (18 inline SVG diagrams of
+  which 2 are click-to-reveal and 1 is animated, 8 screenshot slots, break timer, self-scoring quiz,
+  9 practice blocks linking 20+ external lab rooms).
 - Screenshots live in `sessions/session-01/assets/img/`. Missing files degrade to a labelled
   placeholder rather than a broken image, so the page is safe to present incomplete.

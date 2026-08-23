@@ -238,6 +238,56 @@ pre code{background:none;border:none;padding:0;color:#c9d1d9;font-size:13px;line
 .dgm .d-sub{fill:var(--text-3);font-size:11px}
 .dgm .d-mono{font-family:var(--mono)}
 
+/* ---------- interactive diagrams (click-to-reveal) ---------- */
+.dgm.interactive svg [data-node]{cursor:pointer}
+.dgm.interactive svg [data-node] rect,
+.dgm.interactive svg [data-node] polygon{transition:filter .15s,transform .15s;transform-origin:center;transform-box:fill-box}
+.dgm.interactive svg [data-node]:hover rect,
+.dgm.interactive svg [data-node]:hover polygon{filter:brightness(1.25);transform:scale(1.015)}
+.dgm.interactive svg [data-node].active rect,
+.dgm.interactive svg [data-node].active polygon{filter:brightness(1.4);stroke-width:3}
+.dgm-hint{font-size:11.5px;color:var(--text-3);text-align:center;margin-top:8px;letter-spacing:.2px}
+.dgm-hint::before{content:"👆 "}
+.dgm-detail{display:none;margin-top:14px;border:1px solid var(--line-soft);border-left:3px solid var(--red);
+  background:var(--panel-2);border-radius:var(--radius-sm);padding:14px 16px}
+.dgm-detail.open{display:block;animation:dgmIn .18s ease-out}
+.dgm-detail h5{margin:0 0 6px;color:#fff;font-size:13.5px}
+.dgm-detail p{margin:0;font-size:13.5px;color:var(--text-2)}
+.dgm-detail .dd-tag{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:.5px;margin-right:8px}
+@keyframes dgmIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- animated / replayable diagrams ---------- */
+.dgm-replay{display:block;margin:12px auto 0;font-family:var(--mono);font-size:12px;color:var(--cyan);
+  background:transparent;border:1px solid var(--cyan);border-radius:20px;padding:5px 16px;cursor:pointer}
+.dgm-replay:hover{background:rgba(34,211,238,.1)}
+.dgm.animate-run .flow-line{stroke-dasharray:8 6;animation:flowdash 1.1s linear 3}
+.dgm.animate-run .flow-pulse{animation:flowpop .55s ease-out both}
+@keyframes flowdash{to{stroke-dashoffset:-56}}
+@keyframes flowpop{0%{opacity:0}15%{opacity:1}100%{opacity:1}}
+
+/* ---------- practice / resource cards ---------- */
+.res-tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.4px;padding:2px 8px;
+  border-radius:10px;border:1px solid;text-transform:uppercase;white-space:nowrap}
+.res-tag.free{color:var(--green);border-color:rgba(74,222,128,.5);background:rgba(74,222,128,.08)}
+.res-tag.freetier{color:var(--cyan);border-color:rgba(34,211,238,.5);background:rgba(34,211,238,.08)}
+.res-tag.premium{color:var(--amber);border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.08)}
+
+/* practice block — external platform rooms tied to the topic on this page */
+.practice{border:1px solid var(--line);border-left:3px solid var(--green);background:rgba(74,222,128,.045);
+  border-radius:var(--radius-sm);padding:16px 18px;margin:22px 0}
+.practice-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.practice-h .pr-t{color:var(--green);font-size:11.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+.practice-h .pr-plat{font-family:var(--mono);font-size:11px;color:var(--text-3)}
+.practice>p.pr-why{margin:0 0 14px;font-size:13.5px;color:var(--text-2)}
+.practice ul.pr-list{list-style:none;padding:0;margin:0}
+.practice ul.pr-list>li{border-top:1px solid var(--line);padding:11px 0 11px 0;margin:0}
+.practice ul.pr-list>li:first-child{border-top:none;padding-top:2px}
+.pr-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:3px}
+.pr-row a{font-weight:600;font-size:14.5px}
+.pr-meta{font-family:var(--mono);font-size:11px;color:var(--text-4);white-space:nowrap}
+.pr-note{margin:0;font-size:13px;color:var(--text-3);line-height:1.6}
+.pr-note b{color:var(--text-2)}
+
 /* screenshot slots — render a labelled placeholder until the file exists */
 .shot{margin:22px 0;background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
 .shot img{display:block;width:100%;border-radius:var(--radius-sm);border:1px solid var(--line-soft);background:var(--panel-2)}

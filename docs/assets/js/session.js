@@ -19,6 +19,8 @@
     wireTimers();
     wireMCQ();
     wireShots();
+    wireInteractiveDiagrams();
+    wireReplay();
 
     var start = parseInt((location.hash || '').replace('#p', ''), 10);
     go(isNaN(start) ? 0 : start - 1, true);
@@ -197,6 +199,41 @@
           }
         });
       });
+    });
+  }
+
+  /* ---------- interactive diagrams (click a node, reveal its detail panel) ---------- */
+  function wireInteractiveDiagrams() {
+    document.querySelectorAll('.dgm.interactive').forEach(function (dgm) {
+      var nodes = dgm.querySelectorAll('[data-node]');
+      if (!nodes.length) return;
+      nodes.forEach(function (node) {
+        node.addEventListener('click', function () {
+          var key = node.getAttribute('data-node');
+          var already = node.classList.contains('active');
+          nodes.forEach(function (n) { n.classList.remove('active'); });
+          dgm.querySelectorAll('.dgm-detail').forEach(function (d) { d.classList.remove('open'); });
+          if (already) return; // clicking the active node again just closes it
+          node.classList.add('active');
+          var panel = dgm.querySelector('.dgm-detail[data-detail="' + key + '"]');
+          if (panel) panel.classList.add('open');
+        });
+      });
+    });
+  }
+
+  /* ---------- replayable animated diagrams ---------- */
+  function wireReplay() {
+    document.querySelectorAll('[data-replay]').forEach(function (btn) {
+      var dgm = btn.closest('.dgm');
+      if (!dgm) return;
+      btn.addEventListener('click', function () { replay(dgm); });
+      replay(dgm); // play once on load
+      function replay(el) {
+        el.classList.remove('animate-run');
+        void el.offsetWidth; // restart CSS animation
+        el.classList.add('animate-run');
+      }
     });
   }
 
