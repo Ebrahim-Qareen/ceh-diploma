@@ -1,0 +1,12 @@
+# Raw source PDFs and vendor training material never belong in a public repo
+# (size + copyright). Keep it local only.
+Resources/
+
+# Any real student/VM credentials that ever land here — placeholders only
+# belong in labs/vm_notes/, never real values.
+labs/vm_notes/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+_publish.zip

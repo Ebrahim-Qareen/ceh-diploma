@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 01 — Foundations, Lab Build &amp; First Contact | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 1 — attacker mindset, frameworks, authorization, virtualization, lab build and first contact against a live target.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s01">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 01</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 01 · Pages</h5>
+    <ol id="sessionNav"></ol>
+  </aside>
+
+  <article>
+
+  <!-- ==========  P1 · COVER  ========== -->
+  <section class="page" data-title="Welcome">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01</span><span class="tag theory">Foundations</span><span class="time">⏱ 4 hours</span></div>
+      <h1>Foundations, Lab Build &amp; First Contact</h1>
+      <p class="lede">Day one of thinking like an attacker — and the day you send your first
+         authorised packets at a live target.</p>
+    </div>
+    <div class="content">
+      <div class="oneline">Everything you already know — networks, Windows, Linux, web — is about to
+        become a weapon. Today we turn your engineering knowledge into attacker leverage.</div>
+
+      <h2>Today's agenda</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Who's in the room — me, you, and how this course runs</td><td>Ice-breaker</td><td>15</td></tr>
+          <tr><td>2</td><td>The breach nobody stopped — why any of this matters</td><td>Story</td><td>7</td></tr>
+          <tr><td>3</td><td>What you already know — networking, OS, web, identity → mapped to the attacks they enable</td><td>Recall + diagrams</td><td>30</td></tr>
+          <tr><td>4</td><td>How an attack is built, who attacks, and the 5 phases</td><td>Theory</td><td>30</td></tr>
+          <tr><td>5</td><td>Frameworks — Kill Chain, MITRE ATT&amp;CK, Diamond Model</td><td>Theory (diagrams)</td><td>12</td></tr>
+          <tr><td>6</td><td>Map a real breach to the frameworks</td><td>Activity (pairs)</td><td>13</td></tr>
+          <tr><td>7</td><td>Authorization, scope, RoE — and write your own</td><td>Theory + activity</td><td>20</td></tr>
+          <tr><td>—</td><td><strong>Break</strong></td><td>—</td><td>10</td></tr>
+          <tr><td>8</td><td>Virtualization — how a whole computer fits inside yours</td><td>Theory</td><td>18</td></tr>
+          <tr><td>9</td><td>Lab topology, network modes, snapshot discipline</td><td>Theory + demo</td><td>19</td></tr>
+          <tr><td>10</td><td>Passive vs active — what "first contact" means</td><td>Theory</td><td>7</td></tr>
+          <tr><td>11</td><td><strong>First contact</strong> — host discovery &amp; banner grabbing</td><td>Hands-on</td><td>30</td></tr>
+          <tr><td>12</td><td>Lab report format, knowledge check, wrap</td><td>Wrap-up</td><td>26</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box note">
+        <span class="box-t">One rule for today</span>
+        <p>Nothing here is taught as an isolated topic. Every idea connects to the one before it and
+           sets up the one after. If you ever lose the thread, stop me — the thread <em>is</em> the lesson.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Before we start</span>
+        <p>Your VMs do not need to be built yet. We cover virtualization and the lab design together
+           this session; the actual build is tonight's homework, so today's class time goes to
+           understanding and to your first live attack.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P2 · WHO'S IN THE ROOM  ========== -->
+  <section class="page" data-title="Who's in the room">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P02</span><span class="tag activity">Ice-breaker</span><span class="time">⏱ 15 min</span></div>
+      <h1>Who's In The Room</h1>
+      <p class="lede">Before the first command, we should know each other. This matters more than it sounds.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why we start here</span>
+        <p>Offensive security is taught badly when the instructor doesn't know what the room already
+           knows. Ten minutes now saves ten hours of me explaining things you learned two courses ago —
+           or skipping things you needed. So: who am I, who are you, and what do you already carry.</p>
+      </div>
+
+      <h2>Your instructor</h2>
+
+      <div class="bio">
+        <img class="bio-photo" src="../assets/img/instructor.png" alt="Ebrahim Mohamed Ahmed">
+        <div>
+          <h3>Ebrahim Mohamed Ahmed</h3>
+          <p class="bio-role">SOC Analyst (Tier 1 &amp; 2) · Detection Engineer · Cybersecurity Instructor</p>
+          <p class="bio-meta">Cairo, Egypt · linkedin.com/in/EbrahimMohamed</p>
+
+          <ul>
+            <li><strong>My day job is the one you're training for.</strong> I run Tier 1 and Tier 2 SOC
+                operations — 24/7 monitoring across multiple client environments, triaging alerts for SQLi,
+                XSS, SSRF, brute-force, web shells and scanning, and deciding what's a real incident and
+                what's noise.</li>
+            <li><strong>I don't just read alerts — I write the rules that raise them.</strong> Custom PCRE2
+                detection rules, SOAR playbooks for automated enrichment and blocking, WAF rulesets, and
+                threat hunts. One recent hunt ran 73 IOCs across 11 categories into a full ATT&amp;CK-mapped
+                report for a client.</li>
+            <li><strong>I work both sides of the line — which is exactly why I teach this course.</strong>
+                My background is offensive: web, infrastructure, Active Directory and wireless penetration
+                testing. I use it to attack my own detection rules and find out where they fail. Every
+                attack you learn here, I have run against something I was also defending.</li>
+            <li><strong>Teaching is the other half of what I do.</strong> I deliver SOC, incident response,
+                digital forensics and penetration testing programmes here at ITGate and at ADA Egypt — and
+                I build the labs myself, from the firewall and domain controller up to the attack scripts
+                that generate the alerts.</li>
+            <li><strong>I'm still a student too.</strong> Currently working through INE eTHP, eCIR and eCDFP,
+                CompTIA Security+ and Microsoft SC-300. Nobody in this field is ever finished.</li>
+          </ul>
+
+          <p class="bio-close">Why that matters to you: this course is not theory I read in a book last
+             week. It is <em>what I do on Monday morning</em> — and what I want you to be able to do by
+             Session 10.</p>
+        </div>
+      </div>
+
+      <h2>Now you</h2>
+      <p>Around the room, thirty seconds each. Three questions only:</p>
+      <ol>
+        <li><strong>Your name</strong>, and what you do right now — student, working in IT, switching careers.</li>
+        <li><strong>Which of the three prior courses felt strongest to you</strong> — networking, Linux, or Windows? There is no wrong answer and I am not testing you; I am building a map of the room.</li>
+        <li><strong>Why CEH?</strong> SOC analyst, penetration testing, curiosity, your employer sent you — all valid.</li>
+      </ol>
+
+      <h2>Your pair</h2>
+      <p>From today you work in <strong>pairs</strong>, assigned randomly. Understand exactly what the
+         pair is and is not:</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>The pair IS</th><th>The pair is NOT</th></tr></thead>
+        <tbody>
+          <tr><td>A peer-check unit — you verify each other's lab is really working</td><td>A way to split the work</td></tr>
+          <tr><td>A rubber duck — explain your problem out loud before asking me</td><td>One person typing while the other watches</td></tr>
+          <tr><td>A cross-reader — you read each other's lab report before submitting</td><td>A shared submission</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">The rule that does not bend</span>
+        <p><strong>Every student builds their own VMs and personally runs every attack on their own
+           Kali.</strong> If you watched your partner do it, you did not do it. In an interview nobody
+           asks what your partner can do.</p>
+      </div>
+
+      <h2>How this course runs</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Thing</th><th>How it works</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Format</strong></td><td>Short theory, then straight to your keyboard. No four-hour lectures.</td></tr>
+          <tr><td><strong>Lab</strong></td><td>You build it, on your own laptop, and it stays yours after the course.</td></tr>
+          <tr><td><strong>Homework</strong></td><td>A short lab report every session — what you did, what worked, what broke.</td></tr>
+          <tr><td><strong>Assessment</strong></td><td>A 10-question quiz each session. No midterm, no final exam.</td></tr>
+          <tr><td><strong>Mistakes</strong></td><td>Graded as learning. The "what went wrong" section of your report is required, not optional.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P3 · INCIDENT HOOK  ========== -->
+  <section class="page" data-title="The breach nobody stopped">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P03</span><span class="tag offensive">Story</span><span class="time">⏱ 7 min</span></div>
+      <h1>The Breach Nobody Stopped</h1>
+      <p class="lede">Every headline breach started with something somebody could have noticed.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why we start with a story</span>
+        <p>You will spend this course learning attacks. It is easy to learn them as tricks. This story
+           is here so that every technique you meet from now on has a place to live — a moment in a real
+           intrusion where somebody used it, and a moment where somebody could have caught it.</p>
+      </div>
+
+      <p>A mid-size company is compromised in January. The attacker phishes one employee, cracks their
+         VPN password, and spends <strong>six months</strong> moving quietly between servers. Customer
+         databases are copied out through encrypted tunnels. In July, a partner company calls to say the
+         data is for sale. That phone call is how the breach is discovered.</p>
+
+      <p>Here is the uncomfortable part: <strong>every single step left evidence.</strong></p>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>What the attacker did</th><th>What it left behind</th><th>Who could have seen it</th></tr></thead>
+        <tbody>
+          <tr><td>Researched employees online</td><td>Nothing on the company network</td><td>Nobody — this is the point of passive recon</td></tr>
+          <tr><td>Sent the phishing email</td><td>Mail gateway log entry</td><td>Email security team</td></tr>
+          <tr><td>Brute-forced the VPN password</td><td>Hundreds of failed-login events</td><td>SOC — this is a textbook alert</td></tr>
+          <tr><td>Moved between servers</td><td>Unusual NTLM authentication patterns</td><td>SOC — lateral movement detection</td></tr>
+          <tr><td>Copied the databases out</td><td>Outbound traffic volume spike</td><td>Network monitoring</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">The lesson</span>
+        <p>Attacks are rarely invisible. They are usually just <strong>unwatched</strong>. Four of the
+           five steps above were sitting in a log file that nobody read. To defend, you first have to
+           know what the attacker does at each step — the noise it makes, the trace it leaves.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss with your pair · 2 min</span>
+        <p class="ask-q">In this story, which failed first — the technology or the people?</p>
+        <details>
+          <summary>What most people miss</summary>
+          <p>Both answers are defensible, which is the point. The technology <em>worked</em> — it logged
+             everything faithfully. What failed was that no human had been given the job, the training,
+             or the tooling to read those logs and connect them. That job is the one most of you are
+             training for.</p>
+        </details>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">Where this course takes you</span>
+        <p>Every phase of this attack maps to a phase of the methodology you'll learn in twenty minutes.
+           By Session 10 you'll be able to name every technique this attacker used, the log source that
+           recorded it, and the detection that should have fired.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P4 · RECALL — NETWORKING  ========== -->
+  <section class="page" data-title="Recall: Networking">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P04</span><span class="tag recall">Recall</span><span class="time">⏱ 10 min</span></div>
+      <h1>What You Already Know — Networking</h1>
+      <p class="lede">You learned this as an engineer. Today it becomes a map of where attacks live.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why we're going back over CCNA</span>
+        <p>We are <strong>not</strong> re-teaching networking. Every item below you already know. What
+           you have never done is look at the same diagram and ask "where would I attack this?" That
+           shift — same knowledge, attacker's question — is the whole of Session 1.</p>
+      </div>
+
+      <h2>The stack, re-read as a target</h2>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">Name the seven OSI layers, bottom to top. Then: at which layer does a phishing
+           email actually succeed?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>Physical, Data Link, Network, Transport, Session, Presentation, Application. Phishing
+             succeeds at <strong>Layer 8</strong> — the human. There is no Layer 8 in the OSI model, and
+             that is exactly the joke: the model stops one layer short of where most breaches begin.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 400" role="img" aria-label="OSI layers mapped to the attack that lives at each layer and the session that teaches it">
+          <text class="d-title" x="24" y="22" font-size="15">The OSI stack — and the attack that lives at each layer</text>
+
+          <rect x="24"  y="38" width="150" height="26" rx="5" fill="var(--panel-2)"/>
+          <rect x="182" y="38" width="480" height="26" rx="5" fill="var(--panel-2)"/>
+          <rect x="670" y="38" width="226" height="26" rx="5" fill="var(--panel-2)"/>
+          <text class="d-sub" x="34"  y="56" font-size="11" fill="var(--red)" letter-spacing="1">LAYER</text>
+          <text class="d-sub" x="192" y="56" font-size="11" fill="var(--red)" letter-spacing="1">WHAT AN ATTACKER DOES HERE</text>
+          <text class="d-sub" x="680" y="56" font-size="11" fill="var(--red)" letter-spacing="1">TAUGHT IN</text>
+
+          <!-- L7 -->
+          <rect x="24"  y="72" width="150" height="38" rx="5" fill="rgba(230,57,70,.14)" stroke="rgba(230,57,70,.4)"/>
+          <text class="d-lbl" x="36" y="96" font-size="13.5" fill="#fff">7 · Application</text>
+          <text class="d-lbl" x="192" y="96" font-size="13.5">SQL injection, XSS, command injection, phishing payloads</text>
+          <text class="d-mono" x="680" y="96" font-size="12" fill="var(--green)">S08 · S09</text>
+
+          <!-- L6 -->
+          <rect x="24"  y="116" width="150" height="38" rx="5" fill="rgba(230,57,70,.11)" stroke="rgba(230,57,70,.3)"/>
+          <text class="d-lbl" x="36" y="140" font-size="13.5" fill="#fff">6 · Presentation</text>
+          <text class="d-lbl" x="192" y="140" font-size="13.5">Weak TLS, certificate abuse, encoding to evade filters</text>
+          <text class="d-mono" x="680" y="140" font-size="12" fill="var(--green)">S08 · S10</text>
+
+          <!-- L5 -->
+          <rect x="24"  y="160" width="150" height="38" rx="5" fill="rgba(167,139,250,.12)" stroke="rgba(167,139,250,.35)"/>
+          <text class="d-lbl" x="36" y="184" font-size="13.5" fill="#fff">5 · Session</text>
+          <text class="d-lbl" x="192" y="184" font-size="13.5">Session hijacking — stealing a valid cookie or token</text>
+          <text class="d-mono" x="680" y="184" font-size="12" fill="var(--green)">S09</text>
+
+          <!-- L4 -->
+          <rect x="24"  y="204" width="150" height="38" rx="5" fill="rgba(255,112,67,.13)" stroke="rgba(255,112,67,.38)"/>
+          <text class="d-lbl" x="36" y="228" font-size="13.5" fill="#fff">4 · Transport</text>
+          <text class="d-lbl" x="192" y="228" font-size="13.5">Port scanning — SYN, FIN, XMAS, NULL, ACK scans</text>
+          <text class="d-mono" x="680" y="228" font-size="12" fill="var(--green)">S01 · S03</text>
+
+          <!-- L3 -->
+          <rect x="24"  y="248" width="150" height="38" rx="5" fill="rgba(34,211,238,.12)" stroke="rgba(34,211,238,.35)"/>
+          <text class="d-lbl" x="36" y="272" font-size="13.5" fill="#fff">3 · Network</text>
+          <text class="d-lbl" x="192" y="272" font-size="13.5">Host discovery sweeps, IP spoofing, routing manipulation</text>
+          <text class="d-mono" x="680" y="272" font-size="12" fill="var(--green)">S01 · S03</text>
+
+          <!-- L2 -->
+          <rect x="24"  y="292" width="150" height="38" rx="5" fill="rgba(34,211,238,.10)" stroke="rgba(34,211,238,.3)"/>
+          <text class="d-lbl" x="36" y="316" font-size="13.5" fill="#fff">2 · Data Link</text>
+          <text class="d-lbl" x="192" y="316" font-size="13.5">ARP poisoning, MAC flooding, DHCP starvation — the MITM layer</text>
+          <text class="d-mono" x="680" y="316" font-size="12" fill="var(--green)">S09</text>
+
+          <!-- L1 -->
+          <rect x="24"  y="336" width="150" height="38" rx="5" fill="rgba(251,191,36,.11)" stroke="rgba(251,191,36,.32)"/>
+          <text class="d-lbl" x="36" y="360" font-size="13.5" fill="#fff">1 · Physical</text>
+          <text class="d-lbl" x="192" y="360" font-size="13.5">Rogue access points, cable taps, evil-twin Wi-Fi</text>
+          <text class="d-mono" x="680" y="360" font-size="12" fill="var(--green)">S10</text>
+        </svg>
+        <figcaption><b>Read it as a target list.</b> Nothing on the left is new to you. Everything in the
+          middle is a session of this course.</figcaption>
+      </figure>
+
+      <h2>The handshake you'll spend Session 3 abusing</h2>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">Walk me through the TCP three-way handshake. Then tell me: if I send only the
+           first packet and never reply, what have I learned — and what has the target logged?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>SYN → SYN/ACK → ACK. If you send SYN and the target answers SYN/ACK, the port is
+             <strong>open</strong> — and if you then walk away instead of sending the final ACK, the
+             connection was never completed, so many applications never log it. That is a
+             <strong>SYN scan</strong> (<code>nmap -sS</code>), and it is the default scan in Session 3
+             precisely because it is quieter than a full connection.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 860 340" role="img" aria-label="TCP three-way handshake between client and server, with the SYN scan variation">
+          <text class="d-title" x="24" y="22" font-size="15">TCP three-way handshake — and where the SYN scan cheats</text>
+
+          <!-- endpoint boxes -->
+          <rect x="60" y="44" width="150" height="34" rx="6" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text x="135" y="66" font-size="13.5" fill="var(--orange)" text-anchor="middle" font-weight="700">ATTACKER</text>
+          <rect x="650" y="44" width="150" height="34" rx="6" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text x="725" y="66" font-size="13.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">TARGET</text>
+
+          <!-- lifelines -->
+          <line x1="135" y1="82" x2="135" y2="300" stroke="var(--line-soft)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <line x1="725" y1="82" x2="725" y2="300" stroke="var(--line-soft)" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <defs>
+            <marker id="ar-o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--orange)"/>
+            </marker>
+            <marker id="ar-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--cyan)"/>
+            </marker>
+            <marker id="ar-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--text-3)"/>
+            </marker>
+          </defs>
+
+          <!-- step 1 -->
+          <text x="430" y="112" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">1 · SYN</text>
+          <text x="430" y="128" class="d-sub" font-size="11" text-anchor="middle">"is anyone listening on this port?"</text>
+          <line x1="140" y1="140" x2="718" y2="140" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+
+          <!-- step 2 -->
+          <text x="430" y="176" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">2 · SYN + ACK</text>
+          <text x="430" y="192" class="d-sub" font-size="11" text-anchor="middle">"yes — port is OPEN"</text>
+          <line x1="720" y1="204" x2="142" y2="204" stroke="var(--cyan)" stroke-width="2" marker-end="url(#ar-o)"/>
+
+          <!-- step 3 -->
+          <text x="430" y="240" font-size="13" fill="var(--text-3)" text-anchor="middle" font-weight="700">3 · ACK</text>
+          <text x="430" y="256" class="d-sub" font-size="11" text-anchor="middle">connection established — and logged by the application</text>
+          <line x1="140" y1="268" x2="718" y2="268" stroke="var(--text-3)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar-g)"/>
+
+          <!-- annotation, placed clear of every line -->
+          <rect x="150" y="286" width="560" height="34" rx="6" fill="rgba(255,112,67,.10)" stroke="rgba(255,112,67,.4)"/>
+          <text x="430" y="308" font-size="12.5" fill="var(--orange)" text-anchor="middle">
+            A SYN scan stops after step 2 — it learns the port is open without ever completing the connection.
+          </text>
+        </svg>
+        <figcaption><b>Two packets tell you everything.</b> The third is the one that gets you logged —
+          so the attacker skips it.</figcaption>
+      </figure>
+
+      <h2>Ports and protocols — your first target list</h2>
+
+      <div class="ask">
+        <span class="ask-t">Rapid fire — call them out</span>
+        <p class="ask-q">21 · 22 · 23 · 25 · 53 · 80 · 139/445 · 389 · 3389 — name the service for each.</p>
+        <details>
+          <summary>Reveal, with the attacker's note</summary>
+          <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Port</th><th>Service</th><th>Why an attacker cares</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">21</td><td>FTP</td><td>Often anonymous login; banner leaks exact version</td></tr>
+              <tr><td class="mono">22</td><td>SSH</td><td>Brute-force target; banner leaks OS and version</td></tr>
+              <tr><td class="mono">23</td><td>Telnet</td><td>Cleartext credentials — a gift on a sniffed network</td></tr>
+              <tr><td class="mono">25</td><td>SMTP</td><td>User enumeration via VRFY/EXPN; open relay abuse</td></tr>
+              <tr><td class="mono">53</td><td>DNS</td><td>Zone transfer can dump the entire internal name space</td></tr>
+              <tr><td class="mono">80 / 443</td><td>HTTP / HTTPS</td><td>The largest attack surface in the course — all of Session 8</td></tr>
+              <tr><td class="mono">139 / 445</td><td>NetBIOS / SMB</td><td>Share enumeration, null sessions, and the classic Windows exploits</td></tr>
+              <tr><td class="mono">389</td><td>LDAP</td><td>Directory enumeration — users, groups, the whole domain structure</td></tr>
+              <tr><td class="mono">3389</td><td>RDP</td><td>Brute-force and credential-stuffing target on Windows</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </details>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Carry this forward</span>
+        <p>A port number is not trivia — it is a <strong>hypothesis about what software is running</strong>.
+           Today you will grab banners that confirm the hypothesis. In Session 4 you'll turn that confirmed
+           version into a CVE, and in Session 5 into a shell.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P5 · RECALL — OPERATING SYSTEMS  ========== -->
+  <section class="page" data-title="Recall: Operating systems">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P05</span><span class="tag recall">Recall</span><span class="time">⏱ 8 min</span></div>
+      <h1>What You Already Know — Linux &amp; Windows</h1>
+      <p class="lede">You administered these systems. Now look at the same files and ask what they give away.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">The shift in one sentence</span>
+        <p>As an admin you learned where things are so you could <em>configure</em> them. As an attacker
+           you learn where things are so you can <em>read them when you shouldn't be able to</em>. Same
+           paths, different intent.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">On Linux — where are user accounts stored, and where are the password hashes?
+           Why are they in two different files?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p><code>/etc/passwd</code> holds accounts and is <strong>world-readable</strong>;
+             <code>/etc/shadow</code> holds the hashes and is readable only by root. They were split
+             precisely so that any process able to read account names could not also read hashes. Which
+             tells you the attacker's goal immediately: get <code>/etc/shadow</code>. That is Session 6.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 336" role="img" aria-label="Linux filesystem locations and why an attacker targets each">
+          <text class="d-title" x="24" y="22" font-size="15">The Linux filesystem, read by an attacker</text>
+
+          <!-- root node -->
+          <rect x="24" y="40" width="54" height="28" rx="5" fill="rgba(230,57,70,.15)" stroke="var(--red)"/>
+          <text x="51" y="59" font-size="14" fill="var(--red)" text-anchor="middle" class="d-mono" font-weight="700">/</text>
+
+          <!-- trunk -->
+          <line x1="51" y1="68" x2="51" y2="308" stroke="var(--line-soft)" stroke-width="1.5"/>
+
+          <!-- children: stub + box + note, all on their own row -->
+          <line x1="51" y1="90" x2="96" y2="90" stroke="var(--line-soft)" stroke-width="1.5"/>
+          <rect x="96" y="76" width="150" height="28" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="108" y="95" font-size="13" class="d-mono" fill="var(--cyan)">/etc/passwd</text>
+          <text x="264" y="95" font-size="13" class="d-lbl">Every username on the box — world-readable</text>
+
+          <line x1="51" y1="126" x2="96" y2="126" stroke="var(--line-soft)" stroke-width="1.5"/>
+          <rect x="96" y="112" width="150" height="28" rx="5" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text x="108" y="131" font-size="13" class="d-mono" fill="var(--orange)">/etc/shadow</text>
+          <text x="264" y="131" font-size="13" class="d-lbl">Password hashes — root only. The prize.</text>
+
+          <line x1="51" y1="162" x2="96" y2="162" stroke="var(--line-soft)" stroke-width="1.5"/>
+          <rect x="96" y="148" width="150" height="28" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="108" y="167" font-size="13" class="d-mono" fill="var(--cyan)">/home/&lt;user&gt;</text>
+          <text x="264" y="167" font-size="13" class="d-lbl">SSH keys, bash history, credentials in scripts</text>
+
+          <line x1="51" y1="198" x2="96" y2="198" stroke="var(--line-soft)" stroke-width="1.5"/>
+          <rect x="96" y="184" width="150" height="28" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="108" y="203" font-size="13" class="d-mono" fill="var(--cyan)">/var/log</text>
+          <text x="264" y="203" font-size="13" class="d-lbl">Evidence of the intrusion — phase 5 target</text>
+
+          <line x1="51" y1="234" x2="96" y2="234" stroke="var(--line-soft)" stroke-width="1.5"/>
+          <rect x="96" y="220" width="150" height="28" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="108" y="239" font-size="13" class="d-mono" fill="var(--cyan)">/tmp</text>
+          <text x="264" y="239" font-size="13" class="d-lbl">World-writable — where payloads get dropped</text>
+
+          <line x1="51" y1="270" x2="96" y2="270" stroke="var(--line-soft)" stroke-width="1.5"/>
+          <rect x="96" y="256" width="150" height="28" rx="5" fill="var(--panel-2)" stroke="var(--purple)"/>
+          <text x="108" y="275" font-size="13" class="d-mono" fill="var(--purple)">SUID binaries</text>
+          <text x="264" y="275" font-size="13" class="d-lbl">Run as their owner, not you — the privesc road</text>
+
+          <line x1="51" y1="306" x2="96" y2="306" stroke="var(--line-soft)" stroke-width="1.5"/>
+          <rect x="96" y="292" width="150" height="28" rx="5" fill="var(--panel-2)" stroke="var(--purple)"/>
+          <text x="108" y="311" font-size="13" class="d-mono" fill="var(--purple)">cron jobs</text>
+          <text x="264" y="311" font-size="13" class="d-lbl">Scheduled root execution — persistence and privesc</text>
+        </svg>
+        <figcaption><b>Orange is the target, purple is the route.</b> Sessions 5 and 6 are spent turning
+          the purple rows into the orange one.</figcaption>
+      </figure>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">On Windows — where do credentials actually live, and which process holds them
+           in memory while a user is logged in?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>On disk: the <strong>SAM</strong> database for local accounts, and <strong>NTDS.dit</strong>
+             on a domain controller for domain accounts. In memory: <strong>LSASS</strong>. This is
+             exactly why Mimikatz reads LSASS memory rather than any file — Session 6.</p>
+        </details>
+      </div>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>You knew it as</th><th>An attacker uses it to</th><th>Session</th></tr></thead>
+        <tbody>
+          <tr><td>NTFS permissions &amp; ACLs</td><td>Find files a low-privilege user can write but a service runs</td><td class="mono">S06</td></tr>
+          <tr><td>The registry</td><td>Plant persistence in Run keys; read stored credentials</td><td class="mono">S06 · S07</td></tr>
+          <tr><td>Services &amp; scheduled tasks</td><td>Persist across reboots; escalate via weak service permissions</td><td class="mono">S06</td></tr>
+          <tr><td>SAM / NTDS.dit / LSASS</td><td>Dump hashes for cracking or pass-the-hash</td><td class="mono">S04 · S06</td></tr>
+          <tr><td>NTLM &amp; Kerberos</td><td>Relay, poison, or crack the authentication itself</td><td class="mono">S04</td></tr>
+          <tr><td>Event logs</td><td><em>Defender:</em> detect all of the above. <em>Attacker:</em> clear them.</td><td class="mono">S06 · S07</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>Every row above is also a detection. Event ID <code>4720</code> fires when an account is
+           created; <code>4624</code>/<code>4625</code> track logons; Sysmon event <code>10</code> catches
+           process access to LSASS. Your admin knowledge is already half of a detection engineer's.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P6 · RECALL — WEB & IDENTITY  ========== -->
+  <section class="page" data-title="Recall: Web & identity">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P06</span><span class="tag recall">Recall</span><span class="time">⏱ 7 min</span></div>
+      <h1>What You Already Know — Web &amp; Identity</h1>
+      <p class="lede">The two ideas that carry the largest attack surface in the entire course.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why these two together</span>
+        <p>Session 8 is the biggest attack session in the course, and almost every attack in it is a
+           failure of one of two things: the web server trusting input it should not have trusted, or the
+           application confusing <em>who you are</em> with <em>what you may do</em>. Get these two ideas
+           straight now and Session 8 becomes easy.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">In an HTTP request, name three places a user can put data. Now: which of them
+           does the server trust?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>URL path, query string, headers (including cookies), and the body — all four are
+             user-controlled. The correct answer to the second question is <strong>none of them</strong>.
+             Every single injection attack in Session 8 exists because a developer trusted one of these
+             anyway.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 330" role="img" aria-label="Anatomy of an HTTP request and response, marking which parts are attacker-controlled">
+          <text class="d-title" x="24" y="22" font-size="15">HTTP — every orange line is attacker-controlled</text>
+
+          <!-- request panel -->
+          <rect x="24" y="40" width="368" height="256" rx="8" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text x="208" y="62" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">REQUEST — from the attacker</text>
+          <line x1="40" y1="72" x2="376" y2="72" stroke="var(--line-soft)"/>
+          <text x="40" y="96"  class="d-mono" font-size="12.5" fill="var(--orange)">POST /login?next=/admin HTTP/1.1</text>
+          <text x="40" y="118" class="d-sub"  font-size="11">method · path · query string</text>
+          <text x="40" y="146" class="d-mono" font-size="12.5" fill="var(--orange)">Host: shop.example.com</text>
+          <text x="40" y="168" class="d-mono" font-size="12.5" fill="var(--orange)">Cookie: session=a1b2c3...</text>
+          <text x="40" y="190" class="d-mono" font-size="12.5" fill="var(--orange)">User-Agent: Mozilla/5.0</text>
+          <text x="40" y="212" class="d-sub"  font-size="11">headers — all forgeable</text>
+          <text x="40" y="244" class="d-mono" font-size="12.5" fill="var(--orange)">user=admin&amp;pass=' OR 1=1--</text>
+          <text x="40" y="266" class="d-sub"  font-size="11">body — where injection usually lands</text>
+
+          <!-- response panel -->
+          <rect x="508" y="40" width="368" height="256" rx="8" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text x="692" y="62" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">RESPONSE — from the server</text>
+          <line x1="524" y1="72" x2="860" y2="72" stroke="var(--line-soft)"/>
+          <text x="524" y="96"  class="d-mono" font-size="12.5" fill="var(--cyan)">HTTP/1.1 302 Found</text>
+          <text x="524" y="118" class="d-sub"  font-size="11">status code — leaks success vs failure</text>
+          <text x="524" y="146" class="d-mono" font-size="12.5" fill="var(--cyan)">Set-Cookie: session=NEW...</text>
+          <text x="524" y="168" class="d-mono" font-size="12.5" fill="var(--cyan)">Server: Apache/2.4.29</text>
+          <text x="524" y="190" class="d-sub"  font-size="11">headers — leak software and version</text>
+          <text x="524" y="222" class="d-mono" font-size="12.5" fill="var(--cyan)">&lt;html&gt; ... &lt;/html&gt;</text>
+          <text x="524" y="244" class="d-sub"  font-size="11">body — where XSS gets reflected back</text>
+
+          <!-- arrows in the clear gap between panels -->
+          <line x1="400" y1="130" x2="500" y2="130" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <line x1="500" y1="206" x2="400" y2="206" stroke="var(--cyan)"   stroke-width="2" marker-end="url(#ar-c)"/>
+          <text x="450" y="122" font-size="11" fill="var(--orange)" text-anchor="middle">send</text>
+          <text x="450" y="198" font-size="11" fill="var(--cyan)"   text-anchor="middle">reply</text>
+
+          <text x="450" y="318" class="d-sub" font-size="11.5" text-anchor="middle">
+            Session 8 attacks each orange line in turn. Today you read the response headers to fingerprint the server.
+          </text>
+        </svg>
+        <figcaption><b>Nothing on the left is trustworthy.</b> Every field is typed by whoever sent the
+          request — including you, in Session 8.</figcaption>
+      </figure>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">Authentication and authorization — give me the difference in one sentence each.
+           Then: which one fails in an IDOR vulnerability?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>Authentication proves <em>who you are</em>; authorization decides <em>what you may do</em>.
+             In an IDOR the user is perfectly authenticated — they really are user 1001 — but the app
+             never checks whether user 1001 may open invoice 1002. <strong>Authorization</strong> is what
+             failed. Session 8.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 250" role="img" aria-label="Authentication versus authorization, and the attacks that break each">
+          <text class="d-title" x="24" y="22" font-size="15">Two different questions — two different families of attack</text>
+
+          <!-- authN -->
+          <rect x="24" y="42" width="410" height="186" rx="8" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text x="229" y="68" font-size="14" fill="var(--cyan)" text-anchor="middle" font-weight="700">AUTHENTICATION</text>
+          <text x="229" y="90" font-size="13" fill="#fff" text-anchor="middle">"Who are you?"</text>
+          <rect x="52" y="106" width="354" height="34" rx="5" fill="rgba(34,211,238,.10)"/>
+          <text x="229" y="128" font-size="12.5" class="d-lbl" text-anchor="middle">Password · hash · token · certificate · biometric</text>
+          <text x="52" y="164" font-size="12" fill="var(--orange)" font-weight="700">Broken by:</text>
+          <text x="52" y="184" font-size="12.5" class="d-lbl">Password cracking, brute force, hash relay,</text>
+          <text x="52" y="202" font-size="12.5" class="d-lbl">credential stuffing, pass-the-hash</text>
+          <text x="52" y="220" font-size="11.5" class="d-mono" fill="var(--green)">→ Session 4</text>
+
+          <!-- authZ -->
+          <rect x="466" y="42" width="410" height="186" rx="8" fill="var(--panel-2)" stroke="var(--purple)"/>
+          <text x="671" y="68" font-size="14" fill="var(--purple)" text-anchor="middle" font-weight="700">AUTHORIZATION</text>
+          <text x="671" y="90" font-size="13" fill="#fff" text-anchor="middle">"What may you do?"</text>
+          <rect x="494" y="106" width="354" height="34" rx="5" fill="rgba(167,139,250,.10)"/>
+          <text x="671" y="128" font-size="12.5" class="d-lbl" text-anchor="middle">Permissions · roles · groups · ACLs · policies</text>
+          <text x="494" y="164" font-size="12" fill="var(--orange)" font-weight="700">Broken by:</text>
+          <text x="494" y="184" font-size="12.5" class="d-lbl">IDOR, privilege escalation, path traversal,</text>
+          <text x="494" y="202" font-size="12.5" class="d-lbl">token abuse, SUID abuse</text>
+          <text x="494" y="220" font-size="11.5" class="d-mono" fill="var(--green)">→ Sessions 6 &amp; 8</text>
+        </svg>
+        <figcaption><b>A system can authenticate perfectly and still be wide open.</b> Most real breaches
+          are authorization failures, not authentication failures.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ==========  P7 · COURSE MAP  ========== -->
+  <section class="page" data-title="Your knowledge → this course">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P07</span><span class="tag recall">Recall</span><span class="time">⏱ 5 min</span></div>
+      <h1>Your Knowledge, Mapped To This Course</h1>
+      <p class="lede">One picture: everything you walked in with, and where each piece gets used.</p>
+    </div>
+    <div class="content">
+
+      <div class="oneline">You are not starting from zero. You are starting from three completed courses —
+        and every one of them is load-bearing for something we do in the next forty hours.</div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 430" role="img" aria-label="Prior course knowledge grouped into four blocks, each listing the CEH sessions where it is used">
+          <text class="d-title" x="24" y="22" font-size="15">What you bring · where it gets used</text>
+
+          <!-- CCNA -->
+          <rect x="24" y="40" width="428" height="176" rx="8" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text x="44" y="66" font-size="14" fill="var(--cyan)" font-weight="700">CCNA · Networking</text>
+          <text x="44" y="92"  font-size="12.5" class="d-lbl">TCP flags &amp; the handshake</text>
+          <text x="352" y="92"  font-size="11.5" class="d-mono" fill="var(--green)">S01 · S03</text>
+          <text x="44" y="114" font-size="12.5" class="d-lbl">Ports, protocols &amp; services</text>
+          <text x="352" y="114" font-size="11.5" class="d-mono" fill="var(--green)">S01 · S03</text>
+          <text x="44" y="136" font-size="12.5" class="d-lbl">Subnetting &amp; CIDR</text>
+          <text x="352" y="136" font-size="11.5" class="d-mono" fill="var(--green)">S01 · S03</text>
+          <text x="44" y="158" font-size="12.5" class="d-lbl">ARP, DHCP, DNS</text>
+          <text x="352" y="158" font-size="11.5" class="d-mono" fill="var(--green)">S02 · S09</text>
+          <text x="44" y="180" font-size="12.5" class="d-lbl">Switching &amp; routing</text>
+          <text x="352" y="180" font-size="11.5" class="d-mono" fill="var(--green)">S09</text>
+          <text x="44" y="202" font-size="12.5" class="d-lbl">Wireless fundamentals</text>
+          <text x="352" y="202" font-size="11.5" class="d-mono" fill="var(--green)">S10</text>
+
+          <!-- Linux -->
+          <rect x="468" y="40" width="428" height="176" rx="8" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text x="488" y="66" font-size="14" fill="var(--green)" font-weight="700">Linux</text>
+          <text x="488" y="92"  font-size="12.5" class="d-lbl">Shell, pipes &amp; text processing</text>
+          <text x="796" y="92"  font-size="11.5" class="d-mono" fill="var(--green)">every lab</text>
+          <text x="488" y="114" font-size="12.5" class="d-lbl">Filesystem hierarchy</text>
+          <text x="796" y="114" font-size="11.5" class="d-mono" fill="var(--green)">S06</text>
+          <text x="488" y="136" font-size="12.5" class="d-lbl">Permissions, SUID &amp; sticky bit</text>
+          <text x="796" y="136" font-size="11.5" class="d-mono" fill="var(--green)">S06</text>
+          <text x="488" y="158" font-size="12.5" class="d-lbl">Users, groups &amp; sudo</text>
+          <text x="796" y="158" font-size="11.5" class="d-mono" fill="var(--green)">S04 · S06</text>
+          <text x="488" y="180" font-size="12.5" class="d-lbl">cron &amp; systemd services</text>
+          <text x="796" y="180" font-size="11.5" class="d-mono" fill="var(--green)">S06 · S07</text>
+          <text x="488" y="202" font-size="12.5" class="d-lbl">Package management</text>
+          <text x="796" y="202" font-size="11.5" class="d-mono" fill="var(--green)">S01 setup</text>
+
+          <!-- Windows -->
+          <rect x="24" y="232" width="428" height="176" rx="8" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text x="44" y="258" font-size="14" fill="var(--red)" font-weight="700">MCSA · Windows</text>
+          <text x="44" y="284" font-size="12.5" class="d-lbl">NTFS permissions &amp; ACLs</text>
+          <text x="352" y="284" font-size="11.5" class="d-mono" fill="var(--green)">S06</text>
+          <text x="44" y="306" font-size="12.5" class="d-lbl">Registry</text>
+          <text x="352" y="306" font-size="11.5" class="d-mono" fill="var(--green)">S06 · S07</text>
+          <text x="44" y="328" font-size="12.5" class="d-lbl">Services &amp; scheduled tasks</text>
+          <text x="352" y="328" font-size="11.5" class="d-mono" fill="var(--green)">S06 · S07</text>
+          <text x="44" y="350" font-size="12.5" class="d-lbl">NTLM &amp; Kerberos auth</text>
+          <text x="352" y="350" font-size="11.5" class="d-mono" fill="var(--green)">S04</text>
+          <text x="44" y="372" font-size="12.5" class="d-lbl">Active Directory structure</text>
+          <text x="352" y="372" font-size="11.5" class="d-mono" fill="var(--green)">S04 · S06</text>
+          <text x="44" y="394" font-size="12.5" class="d-lbl">Event logs &amp; auditing</text>
+          <text x="352" y="394" font-size="11.5" class="d-mono" fill="var(--green)">S06 · S07</text>
+
+          <!-- Web & identity -->
+          <rect x="468" y="232" width="428" height="176" rx="8" fill="var(--panel-2)" stroke="var(--purple)"/>
+          <text x="488" y="258" font-size="14" fill="var(--purple)" font-weight="700">Web &amp; Identity</text>
+          <text x="488" y="284" font-size="12.5" class="d-lbl">HTTP methods &amp; status codes</text>
+          <text x="796" y="284" font-size="11.5" class="d-mono" fill="var(--green)">S08</text>
+          <text x="488" y="306" font-size="12.5" class="d-lbl">Cookies &amp; sessions</text>
+          <text x="796" y="306" font-size="11.5" class="d-mono" fill="var(--green)">S08 · S09</text>
+          <text x="488" y="328" font-size="12.5" class="d-lbl">SQL basics</text>
+          <text x="796" y="328" font-size="11.5" class="d-mono" fill="var(--green)">S08</text>
+          <text x="488" y="350" font-size="12.5" class="d-lbl">AuthN vs AuthZ</text>
+          <text x="796" y="350" font-size="11.5" class="d-mono" fill="var(--green)">S04 · S06 · S08</text>
+          <text x="488" y="372" font-size="12.5" class="d-lbl">Hashing vs encryption</text>
+          <text x="796" y="372" font-size="11.5" class="d-mono" fill="var(--green)">S04 · S10</text>
+          <text x="488" y="394" font-size="12.5" class="d-lbl">Certificates &amp; TLS</text>
+          <text x="796" y="394" font-size="11.5" class="d-mono" fill="var(--green)">S02 · S10</text>
+        </svg>
+        <figcaption><b>Every green badge is a session you're already partly prepared for.</b> Nothing in
+          this course is built on knowledge you don't have.</figcaption>
+      </figure>
+
+      <div class="box tip">
+        <span class="box-t">If a row felt shaky</span>
+        <p>That is useful information, not a problem — you now know exactly which prior-course notes to
+           reopen before that session arrives. Note the two shakiest rows in the back of your lab report.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Key takeaway</span>
+        <p>Ethical hacking is not a new body of knowledge. It is <strong>your existing knowledge, asked a
+           different question</strong>: not "how do I make this work?" but "what happens if I make it work
+           the wrong way?"</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P8 · HOW AN ATTACK IS BUILT  ========== -->
+  <section class="page" data-title="How an attack is built">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P08</span><span class="tag theory">Theory</span><span class="time">⏱ 10 min</span></div>
+      <h1>How An Attack Is Built</h1>
+      <p class="lede">Three ingredients. Remove any one and the attack does not happen.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Where this comes from</span>
+        <p>You've just mapped what you know onto the attack surface. The obvious next question is: what
+           actually turns a surface into an attack? Not every weakness gets exploited, and not every
+           motivated attacker succeeds. Three things have to line up.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">A company has an unpatched server on the internet for two years and nothing
+           happens. Then one day it's ransomwared. The server didn't change. What did?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>Something arrived that wasn't there before: either a <strong>motive</strong> (the company
+             got big enough, or a ransomware crew started scanning that sector) or a
+             <strong>method</strong> (a public exploit was released for that version). The
+             vulnerability was constant. That's the formula below.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 290" role="img" aria-label="An attack equals motive plus method plus vulnerability">
+          <text class="d-title" x="24" y="22" font-size="15">The formula behind every attack in this course</text>
+
+          <rect x="24" y="46" width="248" height="120" rx="8" fill="rgba(255,112,67,.10)" stroke="var(--orange)"/>
+          <text x="148" y="74"  font-size="14"   fill="var(--orange)" text-anchor="middle" font-weight="700">MOTIVE</text>
+          <text x="148" y="98"  font-size="12.5" class="d-lbl" text-anchor="middle">Why they act</text>
+          <text x="148" y="122" font-size="12"   class="d-sub" text-anchor="middle">Money · ideology · revenge</text>
+          <text x="148" y="142" font-size="12"   class="d-sub" text-anchor="middle">espionage · curiosity</text>
+
+          <text x="292" y="116" font-size="26" fill="var(--text-3)" text-anchor="middle">+</text>
+
+          <rect x="312" y="46" width="248" height="120" rx="8" fill="rgba(230,57,70,.10)" stroke="var(--red)"/>
+          <text x="436" y="74"  font-size="14"   fill="var(--red)" text-anchor="middle" font-weight="700">METHOD  (TTP)</text>
+          <text x="436" y="98"  font-size="12.5" class="d-lbl" text-anchor="middle">How they do it</text>
+          <text x="436" y="122" font-size="12"   class="d-sub" text-anchor="middle">Phishing · exploitation</text>
+          <text x="436" y="142" font-size="12"   class="d-sub" text-anchor="middle">lateral movement · exfil</text>
+
+          <text x="580" y="116" font-size="26" fill="var(--text-3)" text-anchor="middle">+</text>
+
+          <rect x="600" y="46" width="248" height="120" rx="8" fill="rgba(34,211,238,.10)" stroke="var(--cyan)"/>
+          <text x="724" y="74"  font-size="14"   fill="var(--cyan)" text-anchor="middle" font-weight="700">VULNERABILITY</text>
+          <text x="724" y="98"  font-size="12.5" class="d-lbl" text-anchor="middle">The weakness used</text>
+          <text x="724" y="122" font-size="12"   class="d-sub" text-anchor="middle">Unpatched CVE · weak password</text>
+          <text x="724" y="142" font-size="12"   class="d-sub" text-anchor="middle">misconfiguration · a human</text>
+
+          <line x1="436" y1="172" x2="436" y2="206" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+
+          <rect x="204" y="212" width="464" height="52" rx="8" fill="rgba(230,57,70,.16)" stroke="var(--red)" stroke-width="2"/>
+          <text x="436" y="244" font-size="16" fill="#fff" text-anchor="middle" font-weight="700">A SUCCESSFUL ATTACK</text>
+        </svg>
+        <figcaption><b>All three, or nothing.</b> This is not academic — it is where every defensive
+          control you'll ever deploy plugs in.</figcaption>
+      </figure>
+
+      <div class="box defender-view">
+        <span class="box-t">Where the defender has leverage</span>
+        <p>You cannot change an attacker's <strong>motive</strong> — that is outside your network. But
+           you can remove the <strong>vulnerability</strong> (patch, harden, train) and you can detect the
+           <strong>method</strong> (monitor, alert, hunt). <strong>Two of the three legs are yours.</strong>
+           That is the entire business case for a SOC.</p>
+      </div>
+
+      <h2>Attack classification — how the attacker reaches you</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Class</th><th>What it means</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Passive</strong></td><td>Observe without altering anything</td><td>Sniffing traffic, OSINT collection</td></tr>
+          <tr><td><strong>Active</strong></td><td>Interact with and change the target</td><td>Port scanning, exploitation, defacement</td></tr>
+          <tr><td><strong>Close-in</strong></td><td>Physical proximity to the target</td><td>Shoulder surfing, rogue USB, evil-twin Wi-Fi</td></tr>
+          <tr><td><strong>Insider</strong></td><td>Carried out by someone already trusted</td><td>Disgruntled admin copying the customer database</td></tr>
+          <tr><td><strong>Distribution</strong></td><td>Tampering before the target ever receives it</td><td>Backdoored software update, supply-chain compromise</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Key takeaway</span>
+        <p>Today you will perform an <strong>active</strong> attack — the target will know you were there.
+           In Session 2 you'll do the <strong>passive</strong> version, where it cannot.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P9 · WHO ATTACKS  ========== -->
+  <section class="page" data-title="Who attacks">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P09</span><span class="tag theory">Theory</span><span class="time">⏱ 8 min</span></div>
+      <h1>Who Attacks — And What Separates You From Them</h1>
+      <p class="lede">One axis decides which side of the law you're on. It isn't skill, and it isn't intent.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this comes before any tool</span>
+        <p>In twenty minutes you will run a scan. That exact command, run against the wrong IP address,
+           is a criminal offence in most of the world. Before you touch a keyboard you need to know
+           precisely what makes it legal — because nothing about the command itself does.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">A white hat and a black hat run the identical <code>nmap</code> command against
+           the identical server. Same tool, same flags, same result. What is different?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>One of them has a <strong>signed piece of paper</strong>. That is the entire difference.
+             Not skill, not intent, not the tool, not whether damage occurred. The packets are
+             identical — the authorization is not.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 300" role="img" aria-label="Hacker classes positioned on a single axis of authorization">
+          <text class="d-title" x="24" y="22" font-size="15">The only axis that matters: do you have permission?</text>
+
+          <!-- the three actors -->
+          <rect x="40" y="46" width="220" height="104" rx="8" fill="rgba(74,222,128,.10)" stroke="var(--green)"/>
+          <text x="150" y="74"  font-size="14"   fill="var(--green)" text-anchor="middle" font-weight="700">WHITE HAT</text>
+          <text x="150" y="98"  font-size="12.5" class="d-lbl" text-anchor="middle">Written scope, signed by</text>
+          <text x="150" y="116" font-size="12.5" class="d-lbl" text-anchor="middle">the system owner</text>
+          <text x="150" y="138" font-size="12"   class="d-sub" text-anchor="middle">This is what you are training to be</text>
+
+          <rect x="340" y="46" width="220" height="104" rx="8" fill="rgba(251,191,36,.10)" stroke="var(--amber)"/>
+          <text x="450" y="74"  font-size="14"   fill="var(--amber)" text-anchor="middle" font-weight="700">GREY HAT</text>
+          <text x="450" y="98"  font-size="12.5" class="d-lbl" text-anchor="middle">No permission, but</text>
+          <text x="450" y="116" font-size="12.5" class="d-lbl" text-anchor="middle">claims good intent</text>
+          <text x="450" y="138" font-size="12"   class="d-sub" text-anchor="middle">Still on the wrong side of the line</text>
+
+          <rect x="640" y="46" width="220" height="104" rx="8" fill="rgba(255,112,67,.10)" stroke="var(--orange)"/>
+          <text x="750" y="74"  font-size="14"   fill="var(--orange)" text-anchor="middle" font-weight="700">BLACK HAT</text>
+          <text x="750" y="98"  font-size="12.5" class="d-lbl" text-anchor="middle">No permission,</text>
+          <text x="750" y="116" font-size="12.5" class="d-lbl" text-anchor="middle">malicious intent</text>
+          <text x="750" y="138" font-size="12"   class="d-sub" text-anchor="middle">Criminal</text>
+
+          <!-- ticks down to the axis -->
+          <line x1="150" y1="150" x2="150" y2="196" stroke="var(--green)"  stroke-width="1.5" stroke-dasharray="3 3"/>
+          <line x1="450" y1="150" x2="450" y2="196" stroke="var(--amber)"  stroke-width="1.5" stroke-dasharray="3 3"/>
+          <line x1="750" y1="150" x2="750" y2="196" stroke="var(--orange)" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+          <!-- the axis -->
+          <defs>
+            <linearGradient id="authgrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="var(--green)"/>
+              <stop offset="48%"  stop-color="var(--amber)"/>
+              <stop offset="100%" stop-color="var(--orange)"/>
+            </linearGradient>
+          </defs>
+          <rect x="40" y="198" width="820" height="12" rx="6" fill="url(#authgrad)" opacity=".75"/>
+          <circle cx="150" cy="204" r="7" fill="var(--green)"  stroke="var(--bg-alt)" stroke-width="2"/>
+          <circle cx="450" cy="204" r="7" fill="var(--amber)"  stroke="var(--bg-alt)" stroke-width="2"/>
+          <circle cx="750" cy="204" r="7" fill="var(--orange)" stroke="var(--bg-alt)" stroke-width="2"/>
+
+          <!-- axis end labels, well clear of the markers -->
+          <text x="40"  y="236" font-size="12.5" fill="var(--green)"  font-weight="700">AUTHORIZED</text>
+          <text x="860" y="236" font-size="12.5" fill="var(--orange)" font-weight="700" text-anchor="end">UNAUTHORIZED</text>
+
+          <!-- legal band, on its own row -->
+          <rect x="40" y="252" width="820" height="34" rx="6" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="450" y="274" font-size="12.5" class="d-lbl" text-anchor="middle">
+            The law reads your position on this axis — never your intentions.
+          </text>
+        </svg>
+        <figcaption><b>Grey sits closer to black than to white.</b> "I was only looking" has convicted a
+          lot of people.</figcaption>
+      </figure>
+
+      <h2>The full cast</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Class</th><th>Authorized?</th><th>What drives them</th></tr></thead>
+        <tbody>
+          <tr><td class="cast-name"><img class="cast-ico" src="assets/img/cast/white-hat.png" alt=""><strong>White hat</strong></td><td style="color:var(--green)">Yes — signed scope</td><td>Paid to find weaknesses before criminals do</td></tr>
+          <tr><td class="cast-name"><img class="cast-ico" src="assets/img/cast/black-hat.png" alt=""><strong>Black hat</strong></td><td style="color:var(--orange)">No</td><td>Money, damage, or intelligence</td></tr>
+          <tr><td class="cast-name"><img class="cast-ico" src="assets/img/cast/grey-hat.png" alt=""><strong>Grey hat</strong></td><td style="color:var(--orange)">No</td><td>Finds bugs uninvited; may or may not disclose</td></tr>
+          <tr><td class="cast-name"><img class="cast-ico" src="assets/img/cast/script-kiddie.png" alt=""><strong>Script kiddie</strong></td><td style="color:var(--orange)">No</td><td>Runs other people's tools without understanding them</td></tr>
+          <tr><td class="cast-name"><img class="cast-ico" src="assets/img/cast/hacktivist.png" alt=""><strong>Hacktivist</strong></td><td style="color:var(--orange)">No</td><td>Political or social cause — defacement, leaks, DDoS</td></tr>
+          <tr><td class="cast-name"><img class="cast-ico" src="assets/img/cast/state-sponsored.png" alt=""><strong>State-sponsored</strong></td><td>Authorized by their own government</td><td>Espionage and sabotage, with real budget and patience</td></tr>
+          <tr><td class="cast-name"><svg class="cast-ico" viewBox="0 0 30 30" role="img" aria-label="APT icon">
+                <rect x="2" y="2" width="26" height="26" rx="7" fill="rgba(230,57,70,.15)" stroke="var(--red)" stroke-width="1.5"/>
+                <path d="M6,15 Q15,7 24,15 Q15,23 6,15 Z" fill="none" stroke="var(--red)" stroke-width="1.6"/>
+                <circle cx="15" cy="15" r="3" fill="var(--red)"/>
+              </svg><strong>APT</strong></td><td style="color:var(--orange)">No</td><td>Advanced Persistent Threat — not a person, a <em>pattern</em>: quiet, long-term access to one target, often for months. Usually state-linked or well-funded organised crime; speed is never the point</td></tr>
+          <tr><td class="cast-name"><svg class="cast-ico" viewBox="0 0 30 30" role="img" aria-label="Suicide hacker icon">
+                <rect x="2" y="2" width="26" height="26" rx="7" fill="rgba(251,191,36,.12)" stroke="var(--amber)" stroke-width="1.5"/>
+                <path d="M15,7 L25,23 L5,23 Z" fill="none" stroke="var(--amber)" stroke-width="1.6" stroke-linejoin="round"/>
+                <line x1="15" y1="12.5" x2="15" y2="17.5" stroke="var(--amber)" stroke-width="1.6" stroke-linecap="round"/>
+                <circle cx="15" cy="20" r="1" fill="var(--amber)"/>
+              </svg><strong>Suicide hacker</strong></td><td style="color:var(--orange)">No</td><td>Accepts getting caught; acts for the cause anyway</td></tr>
+          <tr><td class="cast-name"><svg class="cast-ico" viewBox="0 0 30 30" role="img" aria-label="Insider icon">
+                <rect x="2" y="2" width="26" height="26" rx="7" fill="rgba(34,211,238,.12)" stroke="var(--cyan)" stroke-width="1.5"/>
+                <circle cx="12" cy="13" r="4.2" fill="none" stroke="var(--cyan)" stroke-width="1.6"/>
+                <line x1="15" y1="16" x2="23" y2="24" stroke="var(--cyan)" stroke-width="1.6" stroke-linecap="round"/>
+                <line x1="18.3" y1="19.3" x2="20.6" y2="17" stroke="var(--cyan)" stroke-width="1.4" stroke-linecap="round"/>
+                <line x1="20.6" y1="21.6" x2="22.9" y2="19.3" stroke="var(--cyan)" stroke-width="1.4" stroke-linecap="round"/>
+              </svg><strong>Insider</strong></td><td>Has legitimate access, abuses it</td><td>Grievance, money, or coercion — and the hardest to detect</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">The misconception that gets people arrested</span>
+        <p>"Grey hat is fine because there's no malice." It is not. No authorization means potentially
+           illegal <em>regardless</em> of intent. The scanner does not know your motives — and neither
+           does the log file that recorded you.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P10 · THE 5 PHASES  ========== -->
+  <section class="page" data-title="The 5 phases">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P10</span><span class="tag theory">Theory</span><span class="time">⏱ 12 min</span></div>
+      <h1>The Five-Phase Methodology</h1>
+      <p class="lede">The attacker's roadmap — and, from today, the table of contents for this course.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the spine of everything</span>
+        <p>You now know what an attack is made of and who carries it out. What you don't yet have is the
+           <em>order</em>. Attackers do not improvise — they follow a sequence, and so does this course.
+           From here on, every session you attend is one of these five phases.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">Of the total time an attacker spends on a target, what percentage do you think
+           goes on the actual exploit?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>Roughly <strong>five percent</strong>. Around 80% is reconnaissance and scanning — patient,
+             quiet, mostly-legal-looking information gathering. The exploit is a brief, loud moment. This
+             is the single most common misconception about hacking, and it has a direct defensive
+             consequence: if your detection only fires on exploitation, you are watching the 5% and
+             missing the 80%.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 940 300" role="img" aria-label="The five phases of hacking as a loop, with the SOC detection surface for each phase">
+          <text class="d-title" x="20" y="22" font-size="15">Five phases — a loop, not a line</text>
+
+          <!-- phase 1 -->
+          <rect x="20" y="44" width="160" height="102" rx="8" fill="rgba(34,211,238,.10)" stroke="var(--cyan)"/>
+          <text x="100" y="68"  font-size="11.5" fill="var(--cyan)" text-anchor="middle" class="d-mono">PHASE 1</text>
+          <text x="100" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Reconnaissance</text>
+          <text x="100" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: OSINT hits,</text>
+          <text x="100" y="130" font-size="11" class="d-sub" text-anchor="middle">DNS queries, external logs</text>
+
+          <!-- phase 2 -->
+          <rect x="205" y="44" width="160" height="102" rx="8" fill="rgba(34,211,238,.10)" stroke="var(--cyan)"/>
+          <text x="285" y="68"  font-size="11.5" fill="var(--cyan)" text-anchor="middle" class="d-mono">PHASE 2</text>
+          <text x="285" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Scanning</text>
+          <text x="285" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: IDS alerts,</text>
+          <text x="285" y="130" font-size="11" class="d-sub" text-anchor="middle">firewall &amp; connection logs</text>
+
+          <!-- phase 3 -->
+          <rect x="390" y="44" width="160" height="102" rx="8" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="470" y="68"  font-size="11.5" fill="var(--orange)" text-anchor="middle" class="d-mono">PHASE 3</text>
+          <text x="470" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Gaining Access</text>
+          <text x="470" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: auth logs,</text>
+          <text x="470" y="130" font-size="11" class="d-sub" text-anchor="middle">EDR alerts, web app logs</text>
+
+          <!-- phase 4 -->
+          <rect x="575" y="44" width="160" height="102" rx="8" fill="rgba(167,139,250,.12)" stroke="var(--purple)"/>
+          <text x="655" y="68"  font-size="11.5" fill="var(--purple)" text-anchor="middle" class="d-mono">PHASE 4</text>
+          <text x="655" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Maintaining Access</text>
+          <text x="655" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: new services,</text>
+          <text x="655" y="130" font-size="11" class="d-sub" text-anchor="middle">scheduled tasks, run keys</text>
+
+          <!-- phase 5 -->
+          <rect x="760" y="44" width="160" height="102" rx="8" fill="rgba(167,139,250,.12)" stroke="var(--purple)"/>
+          <text x="840" y="68"  font-size="11.5" fill="var(--purple)" text-anchor="middle" class="d-mono">PHASE 5</text>
+          <text x="840" y="90"  font-size="13.5" fill="#fff" text-anchor="middle" font-weight="700">Clearing Tracks</text>
+          <text x="840" y="114" font-size="11" class="d-sub" text-anchor="middle">Detect via: log gaps,</text>
+          <text x="840" y="130" font-size="11" class="d-sub" text-anchor="middle">audit policy changes</text>
+
+          <!-- forward arrows, sitting in the gaps between boxes -->
+          <line x1="182" y1="95" x2="201" y2="95" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <line x1="367" y1="95" x2="386" y2="95" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <line x1="552" y1="95" x2="571" y2="95" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <line x1="737" y1="95" x2="756" y2="95" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+
+          <!-- return arc, routed well below every box and its own label -->
+          <path d="M 840 148 L 840 232 L 100 232 L 100 150" fill="none" stroke="var(--red)"
+                stroke-width="2" stroke-dasharray="7 5" marker-end="url(#ar-r)"/>
+          <defs>
+            <marker id="ar-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/>
+            </marker>
+          </defs>
+          <text x="470" y="224" font-size="12" fill="var(--red)" text-anchor="middle">
+            attackers loop back — new host, new credentials, recon starts again
+          </text>
+
+          <!-- time-spent band -->
+          <rect x="20" y="250" width="900" height="34" rx="6" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="470" y="272" font-size="12.5" class="d-lbl" text-anchor="middle">
+            Time actually spent:  phases 1–2 ≈ 80%   ·   phase 3 ≈ 5%   ·   phases 4–5 ≈ 15%
+          </text>
+        </svg>
+        <figcaption><b>Cyan is where you're loudest, orange is where you're briefest.</b> Defenders who
+          only watch orange are watching the wrong 5%.</figcaption>
+      </figure>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Phase</th><th>The attacker's question</th><th>Where you learn it</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1 · Reconnaissance</strong></td><td>Who is this target, and what's already public?</td><td class="mono">S02</td></tr>
+          <tr><td><strong>2 · Scanning</strong></td><td>What's alive, what ports are open, what's running?</td><td class="mono">S01 (intro) · S03</td></tr>
+          <tr><td><strong>3 · Gaining Access</strong></td><td>Which weakness actually gets me in?</td><td class="mono">S04 · S05 · S08</td></tr>
+          <tr><td><strong>4 · Maintaining Access</strong></td><td>How do I still be here after a reboot?</td><td class="mono">S06 · S07</td></tr>
+          <tr><td><strong>5 · Clearing Tracks</strong></td><td>What did I leave behind, and can I remove it?</td><td class="mono">S06 · S10</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">SOC analyst view</span>
+        <p>Every phase produces artefacts — logs, packets, file changes. Your job is to catch the
+           attacker before phase 5, because phase 5 is where your evidence goes. The earlier you catch
+           them, the cheaper the incident.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P11 · FRAMEWORKS  ========== -->
+  <section class="page" data-title="Frameworks">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P11</span><span class="tag theory">Theory</span><span class="time">⏱ 12 min</span></div>
+      <h1>Three Frameworks That Describe An Attack</h1>
+      <p class="lede">Same intrusion, three different lenses. Pick the one that answers your question.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why a shared vocabulary matters</span>
+        <p>The five phases are the attacker's own mental model. Frameworks are how <em>defenders</em>
+           describe the same events to each other. When you write a report or sit an interview, nobody
+           says "they were in phase three" — they say "Initial Access, T1566". These three frameworks are
+           that language.</p>
+      </div>
+
+      <h2>1 · The Cyber Kill Chain — the narrative lens</h2>
+      <p>Built by Lockheed Martin. It tells the story of an intrusion <strong>in order</strong>, and its
+         defensive value is structural: the attacker must succeed at <em>every</em> stage, while you only
+         need to break <em>one</em>.</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 1060 250" role="img" aria-label="The seven stages of the Cyber Kill Chain as a left-to-right chevron flow">
+          <text class="d-title" x="22" y="22" font-size="15">Cyber Kill Chain — break any single link and the chain fails</text>
+
+          <!-- stage 1 (flat left edge) -->
+          <polygon points="22,46 148,46 162,96 148,146 22,146" fill="rgba(34,211,238,.12)" stroke="var(--cyan)"/>
+          <text x="88" y="74" font-size="11" class="d-mono" fill="var(--cyan)" text-anchor="middle">01</text>
+          <text x="88" y="98" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">Recon</text>
+          <text x="88" y="120" font-size="10.5" class="d-sub" text-anchor="middle">research target</text>
+
+          <polygon points="167,46 293,46 307,96 293,146 167,146 181,96" fill="rgba(34,211,238,.12)" stroke="var(--cyan)"/>
+          <text x="238" y="74" font-size="11" class="d-mono" fill="var(--cyan)" text-anchor="middle">02</text>
+          <text x="238" y="98" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">Weaponize</text>
+          <text x="238" y="120" font-size="10.5" class="d-sub" text-anchor="middle">build payload</text>
+
+          <polygon points="312,46 438,46 452,96 438,146 312,146 326,96" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="383" y="74" font-size="11" class="d-mono" fill="var(--orange)" text-anchor="middle">03</text>
+          <text x="383" y="98" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">Deliver</text>
+          <text x="383" y="120" font-size="10.5" class="d-sub" text-anchor="middle">email · USB · web</text>
+
+          <polygon points="457,46 583,46 597,96 583,146 457,146 471,96" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="528" y="74" font-size="11" class="d-mono" fill="var(--orange)" text-anchor="middle">04</text>
+          <text x="528" y="98" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">Exploit</text>
+          <text x="528" y="120" font-size="10.5" class="d-sub" text-anchor="middle">trigger the flaw</text>
+
+          <polygon points="602,46 728,46 742,96 728,146 602,146 616,96" fill="rgba(167,139,250,.12)" stroke="var(--purple)"/>
+          <text x="673" y="74" font-size="11" class="d-mono" fill="var(--purple)" text-anchor="middle">05</text>
+          <text x="673" y="98" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">Install</text>
+          <text x="673" y="120" font-size="10.5" class="d-sub" text-anchor="middle">drop persistence</text>
+
+          <polygon points="747,46 873,46 887,96 873,146 747,146 761,96" fill="rgba(167,139,250,.12)" stroke="var(--purple)"/>
+          <text x="818" y="74" font-size="11" class="d-mono" fill="var(--purple)" text-anchor="middle">06</text>
+          <text x="818" y="98" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">C2</text>
+          <text x="818" y="120" font-size="10.5" class="d-sub" text-anchor="middle">phone home</text>
+
+          <polygon points="892,46 1032,46 1032,146 892,146 906,96" fill="rgba(230,57,70,.14)" stroke="var(--red)"/>
+          <text x="966" y="74" font-size="11" class="d-mono" fill="var(--red)" text-anchor="middle">07</text>
+          <text x="966" y="94" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">Actions on</text>
+          <text x="966" y="110" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">Objectives</text>
+          <text x="966" y="130" font-size="10.5" class="d-sub" text-anchor="middle">steal · encrypt</text>
+
+          <rect x="22" y="176" width="1010" height="52" rx="8" fill="rgba(74,222,128,.08)" stroke="rgba(74,222,128,.4)"/>
+          <text x="527" y="198" font-size="13" fill="var(--green)" text-anchor="middle" font-weight="700">THE DEFENDER'S ADVANTAGE</text>
+          <text x="527" y="218" font-size="12.5" class="d-lbl" text-anchor="middle">
+            The attacker must clear all seven. You only have to stop one — and the further left you stop it, the less it costs you.
+          </text>
+        </svg>
+        <figcaption><b>Left to right is also cheapest to most expensive.</b> Catching it at Deliver is an
+          email filter; catching it at stage 7 is a breach notification.</figcaption>
+      </figure>
+
+      <h2>2 · MITRE ATT&amp;CK — the precision lens</h2>
+      <p>Where the Kill Chain gives you seven broad stages, ATT&amp;CK gives you <strong>14 tactics</strong>
+         (the <em>why</em>) containing hundreds of <strong>techniques</strong> (the <em>how</em>), each with
+         a stable ID. This is the vocabulary of real SOC reporting.</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 400" role="img" aria-label="MITRE ATT and CK structure: 14 tactics containing techniques containing sub-techniques">
+          <text class="d-title" x="22" y="22" font-size="15">ATT&amp;CK is a hierarchy — tactic, then technique, then sub-technique</text>
+
+          <text x="22" y="48" font-size="11.5" class="d-mono" fill="var(--red)" letter-spacing="1">14 TACTICS — THE ATTACKER'S GOAL</text>
+
+          <!-- tactics row 1 -->
+          <rect x="22"  y="58" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="82"  y="78" font-size="10" class="d-lbl" text-anchor="middle">Reconnaissance</text>
+          <rect x="148" y="58" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="208" y="78" font-size="10" class="d-lbl" text-anchor="middle">Resource Dev</text>
+          <rect x="274" y="58" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="334" y="78" font-size="10" class="d-lbl" text-anchor="middle">Initial Access</text>
+          <rect x="400" y="58" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="460" y="78" font-size="10" class="d-lbl" text-anchor="middle">Execution</text>
+          <rect x="526" y="58" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="586" y="78" font-size="10" class="d-lbl" text-anchor="middle">Persistence</text>
+          <rect x="652" y="58" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="712" y="78" font-size="10" class="d-lbl" text-anchor="middle">Priv Escalation</text>
+          <rect x="778" y="58" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="838" y="78" font-size="10" class="d-lbl" text-anchor="middle">Defense Evasion</text>
+
+          <!-- tactics row 2 — highlighted chip is first, so its drill-down runs straight down a clear column -->
+          <rect x="22"  y="94" width="120" height="30" rx="5" fill="rgba(230,57,70,.20)" stroke="var(--red)" stroke-width="2"/>
+          <text x="82"  y="114" font-size="10" fill="#fff" text-anchor="middle" font-weight="700">Credential Access</text>
+          <rect x="148" y="94" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="208" y="114" font-size="10" class="d-lbl" text-anchor="middle">Discovery</text>
+          <rect x="274" y="94" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="334" y="114" font-size="10" class="d-lbl" text-anchor="middle">Lateral Movement</text>
+          <rect x="400" y="94" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="460" y="114" font-size="10" class="d-lbl" text-anchor="middle">Collection</text>
+          <rect x="526" y="94" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="586" y="114" font-size="10" class="d-lbl" text-anchor="middle">Command &amp; Control</text>
+          <rect x="652" y="94" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="712" y="114" font-size="10" class="d-lbl" text-anchor="middle">Exfiltration</text>
+          <rect x="778" y="94" width="120" height="30" rx="5" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="838" y="114" font-size="10" class="d-lbl" text-anchor="middle">Impact</text>
+
+          <!-- drill-down arrow in the empty left column -->
+          <line x1="82" y1="126" x2="82" y2="166" stroke="var(--red)" stroke-width="2" marker-end="url(#ar-r)"/>
+          <text x="106" y="152" font-size="11.5" class="d-sub">one tactic contains many techniques</text>
+
+          <text x="22" y="192" font-size="11.5" class="d-mono" fill="var(--orange)" letter-spacing="1">TECHNIQUES — HOW THE GOAL IS ACHIEVED</text>
+
+          <rect x="22"  y="202" width="284" height="44" rx="6" fill="rgba(255,112,67,.10)" stroke="var(--orange)"/>
+          <text x="38"  y="222" font-size="12" class="d-mono" fill="var(--orange)">T1003</text>
+          <text x="38"  y="238" font-size="12" class="d-lbl">OS Credential Dumping</text>
+          <rect x="318" y="202" width="284" height="44" rx="6" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="334" y="222" font-size="12" class="d-mono" fill="var(--text-3)">T1110</text>
+          <text x="334" y="238" font-size="12" class="d-lbl">Brute Force</text>
+          <rect x="614" y="202" width="284" height="44" rx="6" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="630" y="222" font-size="12" class="d-mono" fill="var(--text-3)">T1555</text>
+          <text x="630" y="238" font-size="12" class="d-lbl">Credentials from Password Stores</text>
+
+          <line x1="82" y1="248" x2="82" y2="288" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <text x="106" y="274" font-size="11.5" class="d-sub">a technique may split into sub-techniques</text>
+
+          <text x="22" y="314" font-size="11.5" class="d-mono" fill="var(--purple)" letter-spacing="1">SUB-TECHNIQUES — THE EXACT METHOD</text>
+
+          <rect x="22"  y="324" width="284" height="40" rx="6" fill="rgba(167,139,250,.10)" stroke="var(--purple)"/>
+          <text x="38"  y="349" font-size="12" class="d-mono" fill="var(--purple)">T1003.001 · LSASS Memory</text>
+          <rect x="318" y="324" width="284" height="40" rx="6" fill="rgba(167,139,250,.10)" stroke="var(--purple)"/>
+          <text x="334" y="349" font-size="12" class="d-mono" fill="var(--purple)">T1003.002 · SAM database</text>
+          <rect x="614" y="324" width="284" height="40" rx="6" fill="rgba(167,139,250,.10)" stroke="var(--purple)"/>
+          <text x="630" y="349" font-size="12" class="d-mono" fill="var(--purple)">T1003.003 · NTDS.dit</text>
+
+          <text x="460" y="388" font-size="12" class="d-sub" text-anchor="middle">
+            You met all three of these files twenty minutes ago, in the Windows recall. That is Session 6.
+          </text>
+        </svg>
+        <figcaption><b>This is why ATT&amp;CK won.</b> "They dumped credentials" is an argument;
+          "T1003.001" is a fact everyone can look up.</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <img src="assets/img/mitre-attack-matrix.webp" alt="The MITRE ATT&amp;CK Enterprise matrix on attack.mitre.org">
+        <figcaption>The real thing, at <span class="mono">attack.mitre.org</span> — columns are tactics,
+          cells are techniques. Bookmark it now; you will use it in every remaining session.</figcaption>
+      </figure>
+
+      <h2>3 · The Diamond Model — the attribution lens</h2>
+      <p>Every intrusion event has four features, and they are linked: an <strong>adversary</strong> uses a
+         <strong>capability</strong> over some <strong>infrastructure</strong> against a
+         <strong>victim</strong>. Its power is pivoting — learn one vertex and you can hunt the others.</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 700 420" role="img" aria-label="The Diamond Model with adversary, capability, infrastructure and victim at four vertices">
+          <text class="d-title" x="20" y="22" font-size="15">Diamond Model — four vertices, six relationships</text>
+
+          <!-- relationship lines drawn first; the filled vertex boxes sit on top of them -->
+          <g stroke="var(--line-soft)" stroke-width="1.6">
+            <line x1="350" y1="80" x2="110" y2="220"/>
+            <line x1="350" y1="80" x2="590" y2="220"/>
+            <line x1="110" y1="220" x2="350" y2="360"/>
+            <line x1="590" y1="220" x2="350" y2="360"/>
+          </g>
+          <g stroke="var(--red)" stroke-width="1.6" stroke-dasharray="6 4">
+            <line x1="350" y1="80" x2="350" y2="360"/>
+            <line x1="110" y1="220" x2="590" y2="220"/>
+          </g>
+
+          <!-- adversary -->
+          <rect x="250" y="48" width="200" height="64" rx="8" fill="var(--panel)" stroke="var(--orange)" stroke-width="2"/>
+          <text x="350" y="74" font-size="13.5" fill="var(--orange)" text-anchor="middle" font-weight="700">ADVERSARY</text>
+          <text x="350" y="96" font-size="11.5" class="d-sub" text-anchor="middle">who is doing this</text>
+
+          <!-- capability -->
+          <rect x="10" y="188" width="200" height="64" rx="8" fill="var(--panel)" stroke="var(--red)" stroke-width="2"/>
+          <text x="110" y="214" font-size="13.5" fill="var(--red)" text-anchor="middle" font-weight="700">CAPABILITY</text>
+          <text x="110" y="236" font-size="11.5" class="d-sub" text-anchor="middle">malware, exploit, tool</text>
+
+          <!-- infrastructure -->
+          <rect x="490" y="188" width="200" height="64" rx="8" fill="var(--panel)" stroke="var(--cyan)" stroke-width="2"/>
+          <text x="590" y="214" font-size="13.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">INFRASTRUCTURE</text>
+          <text x="590" y="236" font-size="11.5" class="d-sub" text-anchor="middle">C2 servers, domains, IPs</text>
+
+          <!-- victim -->
+          <rect x="250" y="328" width="200" height="64" rx="8" fill="var(--panel)" stroke="var(--green)" stroke-width="2"/>
+          <text x="350" y="354" font-size="13.5" fill="var(--green)" text-anchor="middle" font-weight="700">VICTIM</text>
+          <text x="350" y="376" font-size="11.5" class="d-sub" text-anchor="middle">who is being hit</text>
+        </svg>
+        <figcaption><b>Pivoting is the point.</b> One malicious IP address (infrastructure) leads to every
+          other victim it talked to, and to the malware it served.</figcaption>
+      </figure>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Framework</th><th>Answers</th><th>Use it when</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cyber Kill Chain</strong></td><td>What happened, in what order?</td><td>Briefing management; deciding where to place a control</td></tr>
+          <tr><td><strong>MITRE ATT&amp;CK</strong></td><td>Exactly which technique was used?</td><td>Writing detections, reports, and threat-hunting hypotheses</td></tr>
+          <tr><td><strong>Diamond Model</strong></td><td>Who did it, using what, against whom?</td><td>Threat intelligence and pivoting to find related activity</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">Why this matters for your career</span>
+        <p>Job adverts say "map findings to MITRE ATT&amp;CK". Reports cite technique IDs. From this
+           session onward, every attack you learn gets tagged with its tactic — by Session 10 you'll do
+           it without thinking.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P12 · ACTIVITY — MAP THE BREACH  ========== -->
+  <section class="page" data-title="Activity: map the breach">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P12</span><span class="tag activity">Activity · pairs</span><span class="time">⏱ 13 min</span></div>
+      <h1>Activity — Map A Real Breach</h1>
+      <p class="lede">Take the vocabulary you just met and put it on a real intrusion.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you're practising</span>
+        <p>Not memorisation — <em>translation</em>. Given a plain-English description of what someone did,
+           you name the Kill Chain stage and the ATT&amp;CK tactic. This is literally the first task of a
+           SOC analyst writing up a case.</p>
+      </div>
+
+      <div class="box note">
+        <span class="box-t">The scenario</span>
+        <p>An attacker researches a company's employees on LinkedIn and finds the IT administrator's
+           email address. They build a Word document containing a macro that downloads a reverse shell,
+           and email it to the administrator as a "security audit report". The administrator opens it,
+           the macro runs, and the attacker receives a shell on the administrator's workstation. The
+           attacker installs a persistent backdoor as a Windows service. The backdoor connects out to an
+           attacker-controlled server over HTTPS every thirty minutes. Over the following two weeks the
+           attacker moves to the domain controller, dumps credentials, and exfiltrates the customer
+           database through that same channel.</p>
+      </div>
+
+      <p><strong>In your pair, fill this in.</strong> One of you argues for an answer, the other has to
+         either agree or propose a better one — do not just split the rows.</p>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>What the attacker did</th><th>Kill Chain stage</th><th>ATT&amp;CK tactic</th></tr></thead>
+        <tbody>
+          <tr><td>Researched employees on LinkedIn</td><td></td><td></td></tr>
+          <tr><td>Built a macro document with a reverse shell</td><td></td><td></td></tr>
+          <tr><td>Emailed it to the administrator</td><td></td><td></td></tr>
+          <tr><td>Administrator opened it; the macro executed</td><td></td><td></td></tr>
+          <tr><td>Installed a backdoor as a Windows service</td><td></td><td></td></tr>
+          <tr><td>Backdoor called home over HTTPS every 30 min</td><td></td><td></td></tr>
+          <tr><td>Moved to the DC, dumped creds, exfiltrated data</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Debrief together — do not open this until you've tried</span>
+        <p class="ask-q">Suggested answers</p>
+        <details>
+          <summary>Show the mapping</summary>
+          <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Action</th><th>Kill Chain</th><th>ATT&amp;CK</th></tr></thead>
+            <tbody>
+              <tr><td>LinkedIn research</td><td>Reconnaissance</td><td>Reconnaissance — T1593 Search Open Websites</td></tr>
+              <tr><td>Built the macro document</td><td>Weaponization</td><td>Resource Development — T1587 Develop Capabilities</td></tr>
+              <tr><td>Emailed the document</td><td>Delivery</td><td>Initial Access — T1566 Phishing</td></tr>
+              <tr><td>Macro executed</td><td>Exploitation</td><td>Execution — T1204 User Execution, T1059 Scripting</td></tr>
+              <tr><td>Backdoor as a service</td><td>Installation</td><td>Persistence — T1543 Create/Modify System Process</td></tr>
+              <tr><td>HTTPS callbacks</td><td>Command &amp; Control</td><td>C2 — T1071 Application Layer Protocol</td></tr>
+              <tr><td>DC, creds, exfil</td><td>Actions on Objectives</td><td>Lateral Movement T1021 · Credential Access T1003 · Exfiltration T1041</td></tr>
+            </tbody>
+          </table>
+          </div>
+          <p><strong>The row worth arguing about</strong> is the last one — it is three tactics, not one.
+             Real intrusions do not map one-to-one, and noticing that is the actual skill.</p>
+        </details>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">Now flip it</span>
+        <p>Pick any one row and name the log source that would have caught it. Mail gateway for the
+           phishing. Sysmon process-creation for the macro. Service-installation event <code>7045</code>
+           for the backdoor. Proxy logs for the beacon. Every attack row has a detection row — that is
+           the entire discipline.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P13 · AUTHORIZATION & RoE  ========== -->
+  <section class="page" data-title="Authorization & RoE">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P13</span><span class="tag theory">Theory + activity</span><span class="time">⏱ 20 min</span></div>
+      <h1>Authorization, Scope &amp; Rules Of Engagement</h1>
+      <p class="lede">The document that separates your career from your criminal record.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the last thing before the break</span>
+        <p>After the break we build the lab, and then you attack something. Everything up to now has been
+           understanding. This page is the one <em>rule</em>, and it is not negotiable — so it goes
+           immediately before the point where you get your hands on a tool.</p>
+      </div>
+
+      <div class="oneline">The legal difference between a penetration tester and a criminal is a
+        <strong>signed scope and rules of engagement</strong>. Same command, same packets — completely
+        different outcome.</div>
+
+      <h2>The three parts of permission</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Component</th><th>What it fixes</th><th>Example from your own lab</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Scope</strong></td><td><em>What</em> you may test — IPs, domains, applications</td><td><code>192.168.56.0/24</code>, and nothing else</td></tr>
+          <tr><td><strong>Rules of Engagement</strong></td><td><em>How</em> you may test — techniques, timing, forbidden actions</td><td>No DoS, no attacks against the academy network, class hours only</td></tr>
+          <tr><td><strong>Authorization</strong></td><td><em>Who</em> signed — and they must actually own the system</td><td>You own your VMs, so you are the signing authority</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">The misconception that ends careers</span>
+        <p>"It's only a scan — scanning isn't illegal." Unauthorized scanning is reconnaissance, it is
+           logged, and in most jurisdictions it is an offence. Authorization is not the paperwork you do
+           afterwards. It is <strong>step zero</strong>, before any tool is launched.</p>
+      </div>
+
+      <h2>Your scope for this entire course</h2>
+      <div class="box lab-box">
+        <span class="box-t">Course rules of engagement — read this twice</span>
+        <p><strong>In scope:</strong> the virtual machines you personally built, on your own host-only
+           network, on your own laptop. That is <code>192.168.56.0/24</code> and nothing else.</p>
+        <p><strong>Out of scope:</strong> the academy network and its Wi-Fi. The internet. Any website,
+           however "test-looking". Your classmate's laptop. Your employer's systems. Your own router.</p>
+        <p><strong>The test:</strong> if you cannot point at the machine and say "I built that, it is
+           mine, it is on my isolated network" — it is out of scope.</p>
+      </div>
+
+      <h2>The legal picture</h2>
+      <ul>
+        <li>Unauthorized access to a computer system is a criminal offence in effectively every
+            jurisdiction — the Computer Fraud and Abuse Act in the US, the Computer Misuse Act in the UK,
+            Law 175/2018 in Egypt.</li>
+        <li><strong>Intent is not a defence.</strong> "I was only testing" without a signed scope is an
+            admission, not an excuse.</li>
+        <li>Sector regulation stacks on top — PCI-DSS for card data, HIPAA for health data, GDPR for
+            personal data of EU residents.</li>
+        <li>Real engagements also carry liability clauses, insurance, and an NDA. The signed scope is one
+            document in a stack.</li>
+      </ul>
+
+      <hr>
+
+      <h2>Activity — write your own RoE</h2>
+      <p><strong>Individually, 10 minutes.</strong> Write a one-page rules-of-engagement document for
+         your own class lab — something you could hand to a manager and say "this is exactly what I am
+         permitted to do".</p>
+
+      <ol class="steps">
+        <li><strong>Scope.</strong> The exact IP range and the exact machines that are in it.</li>
+        <li><strong>Out of scope.</strong> Name the specific things you will not touch. Be explicit about the academy network.</li>
+        <li><strong>Permitted techniques.</strong> What categories of testing you may perform.</li>
+        <li><strong>Prohibited actions.</strong> Denial of service, destroying data, attacking anything you did not build.</li>
+        <li><strong>Time window.</strong> When testing may happen.</li>
+        <li><strong>Authorization.</strong> Who approved it, and on what basis they had the right to.</li>
+      </ol>
+
+      <div class="box tip">
+        <span class="box-t">Peer check — swap with your partner</span>
+        <p>Check three things in theirs: did they explicitly exclude the academy network? Did they define
+           a time window? Is there a clear prohibited-actions section, or did they only write what they
+           <em>can</em> do? Most first drafts miss the third.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Key takeaway</span>
+        <p>This document is also your first piece of <strong>evidence</strong>. Keep it — every lab report
+           in this course is written on the assumption that the work in it was authorised, and this is
+           the page that says so.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P14 · BREAK  ========== -->
+  <section class="page" data-title="Break">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P14</span><span class="time">⏱ 10 min</span></div>
+      <h1>Break</h1>
+      <p class="lede">Halfway. Theory behind you — machines ahead of you.</p>
+    </div>
+    <div class="content">
+      <div class="timer-card" data-timer="10">
+        <div class="timer-ring">
+          <svg viewBox="0 0 120 120"><circle class="timer-ring-bg" cx="60" cy="60" r="54"/><circle class="timer-ring-fill" cx="60" cy="60" r="54"/></svg>
+          <div class="timer-display">10:00</div>
+        </div>
+        <h3>Break Time</h3>
+        <p class="timer-note">Press start when the break begins.</p>
+        <div class="timer-btns">
+          <button class="btn primary" data-act="start">▶ Start break</button>
+          <button class="btn" data-act="reset">↺ Reset</button>
+        </div>
+      </div>
+      <div class="box note">
+        <span class="box-t">When we come back</span>
+        <p>Virtualization — how an entire second computer fits inside the one in front of you — then the
+           lab design, and then you send your first authorised packets at a live target.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P15 · VIRTUALIZATION  ========== -->
+  <section class="page" data-title="Virtualization">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P15</span><span class="tag lab">Foundations</span><span class="time">⏱ 18 min</span></div>
+      <h1>Virtualization — How A Whole Computer Fits Inside Yours</h1>
+      <p class="lede">Before we design the lab, understand what the lab actually <em>is</em>.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why we cover this before the lab design</span>
+        <p>You are about to build four computers on one laptop, deliberately fill two of them with
+           security holes, and attack them — safely. None of that is obvious. It works because of
+           virtualization, and if you understand the mechanism, every lab decision in the next forty
+           hours will make sense instead of being a recipe you follow.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">You open "This PC" and see a C: drive and a D: drive — but you only bought one
+           hard disk. What happened?</p>
+        <details>
+          <summary>Reveal — and why it matters</summary>
+          <p>Partitioning. One piece of physical hardware, presented to the operating system as two
+             separate things. <strong>A virtual machine is the same idea, scaled up to the entire
+             computer</strong> — one set of real hardware, presented as several complete machines. If you
+             accept that a disk can be split, you already accept how a VM works.</p>
+        </details>
+      </div>
+
+      <h2>What a virtual machine actually is</h2>
+      <p>A virtual machine is a <strong>complete computer implemented in software</strong>. It has a CPU,
+         RAM, a disk, and a network card — all of which are portions of your real hardware, handed out and
+         supervised by a program called a <strong>hypervisor</strong>. The guest operating system inside
+         has no idea; as far as Kali Linux is concerned, it is running on a real PC.</p>
+
+      <div class="box tip">
+        <span class="box-t">Why this is the only sane way to learn offensive security</span>
+        <ul>
+          <li><strong>Isolation</strong> — deliberately vulnerable machines never touch a real network.</li>
+          <li><strong>Snapshots</strong> — break something completely, roll back in thirty seconds.</li>
+          <li><strong>Cost</strong> — four machines, one laptop, no hardware budget.</li>
+          <li><strong>Realism</strong> — real operating systems, real network traffic, real exploits.</li>
+        </ul>
+      </div>
+
+      <h2>The two kinds of hypervisor</h2>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 350" role="img" aria-label="Type 2 hosted hypervisor compared with Type 1 bare metal hypervisor as layer stacks">
+          <text class="d-title" x="22" y="22" font-size="15">Where the hypervisor sits decides everything else</text>
+
+          <!-- ===== TYPE 2 ===== -->
+          <text x="230" y="52" font-size="13.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">TYPE 2 · HOSTED</text>
+          <text x="230" y="72" font-size="11.5" class="d-sub" text-anchor="middle">VMware Workstation · VirtualBox — what you will use</text>
+
+          <rect x="40" y="86" width="120" height="48" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="100" y="106" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">Kali</text>
+          <text x="100" y="122" font-size="10" class="d-sub" text-anchor="middle">guest VM</text>
+          <rect x="170" y="86" width="120" height="48" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="230" y="106" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">Metasploitable</text>
+          <text x="230" y="122" font-size="10" class="d-sub" text-anchor="middle">guest VM</text>
+          <rect x="300" y="86" width="120" height="48" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="360" y="106" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">Windows</text>
+          <text x="360" y="122" font-size="10" class="d-sub" text-anchor="middle">guest VM</text>
+
+          <rect x="40" y="140" width="380" height="46" rx="6" fill="rgba(34,211,238,.14)" stroke="var(--cyan)" stroke-width="2"/>
+          <text x="230" y="168" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">HYPERVISOR  (VMware Workstation)</text>
+
+          <rect x="40" y="192" width="380" height="46" rx="6" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="230" y="220" font-size="13" class="d-lbl" text-anchor="middle">HOST OS  (your Windows)</text>
+
+          <rect x="40" y="244" width="380" height="46" rx="6" fill="var(--panel)" stroke="var(--text-4)"/>
+          <text x="230" y="272" font-size="13" class="d-lbl" text-anchor="middle">PHYSICAL HARDWARE  (your laptop)</text>
+
+          <!-- ===== TYPE 1 ===== -->
+          <text x="690" y="52" font-size="13.5" fill="var(--green)" text-anchor="middle" font-weight="700">TYPE 1 · BARE METAL</text>
+          <text x="690" y="72" font-size="11.5" class="d-sub" text-anchor="middle">VMware ESXi · Hyper-V — data centres and servers</text>
+
+          <rect x="500" y="138" width="120" height="48" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="560" y="158" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">Server VM</text>
+          <text x="560" y="174" font-size="10" class="d-sub" text-anchor="middle">guest</text>
+          <rect x="630" y="138" width="120" height="48" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="690" y="158" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">Server VM</text>
+          <text x="690" y="174" font-size="10" class="d-sub" text-anchor="middle">guest</text>
+          <rect x="760" y="138" width="120" height="48" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="820" y="158" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">Server VM</text>
+          <text x="820" y="174" font-size="10" class="d-sub" text-anchor="middle">guest</text>
+
+          <rect x="500" y="192" width="380" height="46" rx="6" fill="rgba(74,222,128,.14)" stroke="var(--green)" stroke-width="2"/>
+          <text x="690" y="220" font-size="13" fill="var(--green)" text-anchor="middle" font-weight="700">HYPERVISOR  (ESXi)</text>
+
+          <rect x="500" y="244" width="380" height="46" rx="6" fill="var(--panel)" stroke="var(--text-4)"/>
+          <text x="690" y="272" font-size="13" class="d-lbl" text-anchor="middle">PHYSICAL HARDWARE  (the server)</text>
+
+          <!-- comparison band -->
+          <rect x="40" y="304" width="840" height="34" rx="6" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="460" y="326" font-size="12.5" class="d-lbl" text-anchor="middle">
+            Type 1 has one less layer — so it is faster. Type 2 runs on the laptop you already own — so it is what we use.
+          </text>
+        </svg>
+        <figcaption><b>Count the layers.</b> That single extra layer is the whole difference in
+          performance, cost, and who uses which.</figcaption>
+      </figure>
+
+      <h2>Step 0 — does your CPU even support this?</h2>
+      <p>Virtualization needs a hardware feature: <strong>Intel VT-x</strong> or <strong>AMD-V</strong>.
+         Without it VMs either refuse to start or run unusably slowly. It is very often disabled by
+         default in BIOS, and this is the single most common reason a student's lab build fails.</p>
+
+      <ol class="steps">
+        <li><strong>Open Task Manager</strong> — <code>Ctrl + Shift + Esc</code></li>
+        <li><strong>Performance tab → CPU</strong></li>
+        <li><strong>Look at the bottom right for "Virtualization"</strong>
+          <div class="verify">
+            <h4>✓ What you should see</h4>
+            <ul>
+              <li><strong>Virtualization: Enabled</strong> — you are ready to build tonight</li>
+              <li><strong>Virtualization: Disabled</strong> — reboot into BIOS/UEFI and enable Intel VT-x or AMD-V, then check again</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <figure class="shot">
+        <img src="assets/img/taskmgr-virtualization.png" alt="Task Manager Performance tab showing CPU virtualization enabled">
+        <figcaption>Task Manager → Performance → CPU. Check this <strong>tonight, before</strong> you download anything.</figcaption>
+      </figure>
+
+      <div class="box warn">
+        <span class="box-t">Also check for a conflict</span>
+        <p>On Windows, Hyper-V, WSL2, Docker Desktop and Credential Guard all claim the virtualization
+           extensions and can stop VMware from working. If VMware complains that VT-x is unavailable even
+           though Task Manager says Enabled, one of those is holding it.</p>
+      </div>
+
+      <h2>Your tool: VMware Workstation</h2>
+      <p>We standardise on <strong>VMware Workstation</strong> for this course. VirtualBox is a perfectly
+         good free alternative and everything you learn transfers — but the instructions, screenshots and
+         network names in this course are VMware's, so mixing tools will cost you time.</p>
+
+      <figure class="shot">
+        <img src="assets/img/vmware-welcome.jpg" alt="VMware Workstation Pro product banner">
+        <figcaption>Download <strong>VMware Workstation Pro</strong> from the official Broadcom site — it is free for
+          personal use. Once installed, the three things you will use constantly are the <strong>library</strong>
+          sidebar (all your VMs), <strong>Create a New Virtual Machine</strong>, and <strong>Open a Virtual
+          Machine</strong> for a downloaded appliance like Metasploitable2.</figcaption>
+      </figure>
+
+      <h2>The hardware settings that matter</h2>
+      <p>Every VM has virtual hardware you allocate from the real machine. You do not need all of it — you
+         need these five.</p>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Setting</th><th>What it controls</th><th>For this course</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Memory (RAM)</strong></td><td>How much RAM the VM may use</td><td>Kali 4 GB (2 GB minimum). Metasploitable2 512 MB — it is from 2008.</td></tr>
+          <tr><td><strong>Processors</strong></td><td>CPU cores given to the VM</td><td>2 cores for Kali, 1 for targets. Never allocate all your real cores.</td></tr>
+          <tr><td><strong>Hard disk</strong></td><td>The VM's virtual drive</td><td>Kali 40 GB+. Growing a disk later is easy; shrinking is painful.</td></tr>
+          <tr><td><strong>Network adapter</strong></td><td>How the VM reaches other machines</td><td><strong>Host-only.</strong> The next page explains why this one is not optional.</td></tr>
+          <tr><td><strong>USB controller</strong></td><td>Passing physical USB devices through</td><td>Needed in Session 10 for a Wi-Fi adapter. Leave enabled.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">The allocation mistake everyone makes once</span>
+        <p>Your host OS still needs RAM and cores to run. If you have 8 GB total and give Kali 6 GB, both
+           machines crawl. Rule of thumb: <strong>never hand out more than half your physical RAM across
+           all running VMs at once</strong> — and you rarely need more than two running together.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Key takeaway</span>
+        <p>A VM is a real operating system running on portions of real hardware, supervised by a
+           hypervisor. That supervision is what lets you snapshot it, isolate it, and deliberately break
+           it — which is exactly what makes a security lab possible at all.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P16 · LAB TOPOLOGY & NETWORK MODES  ========== -->
+  <section class="page" data-title="Lab topology & network modes">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P16</span><span class="tag lab">Lab design</span><span class="time">⏱ 12 min</span></div>
+      <h1>The Lab You'll Attack From</h1>
+      <p class="lede">Three network modes exist. For this course, only one of them is safe.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Following on from virtualization</span>
+        <p>You now know a VM gets a virtual network adapter. The single most important decision you make
+           tonight is <em>what that adapter is plugged into</em> — because one of the machines you are
+           about to build is deliberately, catastrophically insecure.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">Metasploitable2 is a Linux machine built in 2008 with unpatched services and
+           default passwords, intentionally. What happens if it gets a public IP address?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>It is compromised — typically within minutes, by automated scanners that never sleep. And
+             once it is, the attacker is inside <em>your</em> network, on <em>your</em> internet
+             connection, doing things attributed to <em>you</em>. This is not hypothetical; it is the
+             standard outcome.</p>
+        </details>
+      </div>
+
+      <h2>The three network modes</h2>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Comparison of NAT, bridged and host-only virtual network modes">
+          <text class="d-title" x="20" y="22" font-size="15">Three ways to plug in a VM — only one is safe for this course</text>
+
+          <!-- ===== BRIDGED ===== -->
+          <rect x="20" y="40" width="290" height="238" rx="8" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="165" y="66" font-size="13.5" fill="var(--text-2)" text-anchor="middle" font-weight="700">BRIDGED</text>
+          <rect x="90" y="80" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--text-4)"/>
+          <text x="165" y="100" font-size="11.5" class="d-lbl" text-anchor="middle">INTERNET</text>
+          <line x1="165" y1="110" x2="165" y2="142" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="90" y="144" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="165" y="164" font-size="11.5" fill="var(--cyan)" text-anchor="middle">HOST PC</text>
+          <line x1="165" y1="174" x2="165" y2="206" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="90" y="208" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="165" y="228" font-size="11.5" fill="var(--orange)" text-anchor="middle">VM</text>
+          <text x="165" y="258" font-size="11" class="d-sub" text-anchor="middle">VM reaches the internet</text>
+          <text x="165" y="272" font-size="11" class="d-sub" text-anchor="middle">through the host's address</text>
+
+          <!-- ===== NAT ===== -->
+          <rect x="325" y="40" width="290" height="238" rx="8" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="470" y="66" font-size="13.5" fill="var(--text-2)" text-anchor="middle" font-weight="700">NAT</text>
+          <rect x="395" y="80" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--text-4)"/>
+          <text x="470" y="100" font-size="11.5" class="d-lbl" text-anchor="middle">INTERNET / LAN</text>
+          <line x1="470" y1="110" x2="470" y2="142" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="395" y="144" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="164" font-size="11.5" fill="var(--cyan)" text-anchor="middle">HOST PC</text>
+          <rect x="395" y="208" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="228" font-size="11.5" fill="var(--orange)" text-anchor="middle">VM</text>
+          <!-- direct path bypassing the host, routed down the left gutter -->
+          <path d="M 395 223 L 355 223 L 355 95 L 391 95" fill="none" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <text x="470" y="258" font-size="11" class="d-sub" text-anchor="middle">VM gets its own address on</text>
+          <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">your real network — exposed</text>
+
+          <!-- ===== HOST-ONLY ===== -->
+          <rect x="630" y="40" width="290" height="238" rx="8" fill="rgba(74,222,128,.07)" stroke="var(--green)" stroke-width="2"/>
+          <text x="775" y="66" font-size="13.5" fill="var(--green)" text-anchor="middle" font-weight="700">HOST-ONLY ✓</text>
+          <rect x="700" y="80" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--text-4)" opacity=".45"/>
+          <text x="775" y="100" font-size="11.5" class="d-sub" text-anchor="middle">INTERNET</text>
+          <!-- blocked segment: dashed line with an X, placed in clear space -->
+          <line x1="775" y1="112" x2="775" y2="140" stroke="var(--orange)" stroke-width="2" stroke-dasharray="4 4"/>
+          <line x1="766" y1="117" x2="784" y2="135" stroke="var(--orange)" stroke-width="2.5"/>
+          <line x1="784" y1="117" x2="766" y2="135" stroke="var(--orange)" stroke-width="2.5"/>
+          <rect x="700" y="144" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="775" y="164" font-size="11.5" fill="var(--cyan)" text-anchor="middle">HOST PC</text>
+          <line x1="775" y1="174" x2="775" y2="206" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="700" y="208" width="150" height="30" rx="5" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="775" y="228" font-size="11.5" fill="var(--green)" text-anchor="middle">VM</text>
+          <text x="775" y="258" font-size="11" class="d-sub" text-anchor="middle">VM talks only to the host and</text>
+          <text x="775" y="272" font-size="11" class="d-sub" text-anchor="middle">other VMs — never outward</text>
+        </svg>
+        <figcaption><b>Host-only is a safety control, not a preference.</b> The orange cross is the entire
+          reason this course can hand you a vulnerable machine.</figcaption>
+      </figure>
+
+      <h3>Where to set it — step 1: the network itself</h3>
+      <figure class="shot">
+        <img src="assets/img/vmware-network-editor.png" alt="VMware Edit menu open on Virtual Network Editor, with the editor window showing a virtual network's type, subnet and DHCP settings">
+        <figcaption>VMware → <strong>Edit</strong> → <strong>Virtual Network Editor</strong>. This is the panel that
+          defines each virtual network's <strong>Type</strong>, <strong>Subnet Address</strong> and DHCP.</figcaption>
+      </figure>
+
+      <div class="box warn">
+        <span class="box-t">Read the screenshot carefully — it is not yet set up for this course</span>
+        <p>The example above shows a network of type <strong>NAT</strong> on a different subnet, from another lab.
+           That is <em>not</em> what you want. For this course you need a network whose
+           <strong>Type is Host-only</strong>, on <code>192.168.56.0/24</code>, with DHCP enabled — normally
+           <code>VMnet1</code>. Select it in the list, choose
+           <em>"Host-only (connect VMs internally in a private network)"</em>, set the subnet, and click
+           <strong>Apply</strong>. You may need <strong>Change Settings</strong> for administrator rights first.</p>
+      </div>
+
+      <h3>Step 2: point each VM at that network</h3>
+      <figure class="shot">
+        <img src="assets/img/vmware-network-adapter.png" alt="VMware Virtual Machine Settings with Network Adapter selected, showing the network connection radio buttons">
+        <figcaption>Per VM: <strong>Settings</strong> → <strong>Network Adapter</strong> → the
+          <strong>Network connection</strong> radio group on the right.</figcaption>
+      </figure>
+
+      <div class="box warn">
+        <span class="box-t">Again — the example shows the wrong choice</span>
+        <p>The screenshot has <em>Custom: Specific virtual network</em> pointing at another lab's NAT segment.
+           For your CEH lab, select either <strong>Host-only</strong>, or <em>Custom</em> pointing at your
+           <strong>host-only VMnet1</strong>. Do this <strong>before the first power-on</strong> of any target
+           machine — especially Metasploitable2.</p>
+      </div>
+
+      <h2>Your topology</h2>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 400" role="img" aria-label="Lab topology: four virtual machines on an isolated host-only network inside the student laptop, with no internet path">
+          <text class="d-title" x="20" y="22" font-size="15">Your lab — four machines, one isolated network, no way out</text>
+
+          <!-- internet, outside and cut off -->
+          <rect x="340" y="36" width="220" height="36" rx="6" fill="var(--panel)" stroke="var(--text-4)" opacity=".5"/>
+          <text x="450" y="59" font-size="12" class="d-sub" text-anchor="middle">THE INTERNET</text>
+          <line x1="450" y1="74" x2="450" y2="98" stroke="var(--orange)" stroke-width="2" stroke-dasharray="4 4"/>
+          <line x1="441" y1="79" x2="459" y2="93" stroke="var(--orange)" stroke-width="2.5"/>
+          <line x1="459" y1="79" x2="441" y2="93" stroke="var(--orange)" stroke-width="2.5"/>
+          <text x="580" y="92" font-size="11.5" fill="var(--orange)">no route in or out</text>
+
+          <!-- host container -->
+          <rect x="20" y="104" width="860" height="266" rx="10" fill="rgba(34,211,238,.04)" stroke="var(--cyan)" stroke-dasharray="7 5"/>
+          <text x="40" y="128" font-size="12" fill="var(--cyan)" font-weight="700">YOUR LAPTOP — HOST MACHINE</text>
+
+          <!-- VM row -->
+          <rect x="46" y="142" width="188" height="56" rx="7" fill="rgba(255,112,67,.12)" stroke="var(--orange)" stroke-width="2"/>
+          <text x="140" y="164" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">KALI-ATK01</text>
+          <text x="140" y="182" font-size="10.5" class="d-sub" text-anchor="middle">attacker · you work here</text>
+
+          <rect x="250" y="142" width="188" height="56" rx="7" fill="rgba(74,222,128,.10)" stroke="var(--green)" stroke-width="2"/>
+          <text x="344" y="164" font-size="12.5" fill="#fff" text-anchor="middle" font-weight="700">METASPLOITABLE2</text>
+          <text x="344" y="182" font-size="10.5" class="d-sub" text-anchor="middle">target · today's victim</text>
+
+          <rect x="454" y="142" width="188" height="56" rx="7" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="548" y="164" font-size="12.5" class="d-lbl" text-anchor="middle" font-weight="700">WIN10-TGT01</text>
+          <text x="548" y="182" font-size="10.5" class="d-sub" text-anchor="middle">target · from Session 3</text>
+
+          <rect x="658" y="142" width="188" height="56" rx="7" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="752" y="164" font-size="12.5" class="d-lbl" text-anchor="middle" font-weight="700">WINSRV19-TGT01</text>
+          <text x="752" y="182" font-size="10.5" class="d-sub" text-anchor="middle">target · from Session 3</text>
+
+          <!-- drops to the switch bar -->
+          <line x1="140" y1="198" x2="140" y2="234" stroke="var(--line-soft)" stroke-width="2"/>
+          <line x1="344" y1="198" x2="344" y2="234" stroke="var(--line-soft)" stroke-width="2"/>
+          <line x1="548" y1="198" x2="548" y2="234" stroke="var(--line-soft)" stroke-width="2"/>
+          <line x1="752" y1="198" x2="752" y2="234" stroke="var(--line-soft)" stroke-width="2"/>
+
+          <!-- the virtual switch -->
+          <rect x="46" y="234" width="800" height="44" rx="7" fill="rgba(34,211,238,.14)" stroke="var(--cyan)" stroke-width="2"/>
+          <text x="446" y="253" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">VMnet1 — virtual switch, host-only</text>
+          <text x="446" y="270" font-size="11.5" class="d-mono" fill="var(--text-2)" text-anchor="middle">192.168.56.0/24</text>
+
+          <!-- host adapter -->
+          <line x1="446" y1="278" x2="446" y2="304" stroke="var(--line-soft)" stroke-width="2"/>
+          <rect x="326" y="304" width="240" height="44" rx="7" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text x="446" y="323" font-size="12" fill="var(--cyan)" text-anchor="middle">Host adapter on VMnet1</text>
+          <text x="446" y="339" font-size="10.5" class="d-sub" text-anchor="middle">so you can reach the lab from Windows too</text>
+        </svg>
+        <figcaption><b>Everything lives inside the dashed line.</b> Two machines tonight; the two grey
+          ones join in time for Session 3.</figcaption>
+      </figure>
+
+      <div class="box warn">
+        <span class="box-t">Verify before you power on</span>
+        <p>Check the adapter setting <strong>before</strong> the first boot of Metasploitable2, not after.
+           A vulnerable machine that briefly appeared on a real network has to be assumed compromised —
+           you would delete it and rebuild.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P17 · SNAPSHOTS  ========== -->
+  <section class="page" data-title="Snapshot discipline">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P17</span><span class="tag lab">Lab discipline</span><span class="time">⏱ 7 min</span></div>
+      <h1>Snapshot Discipline</h1>
+      <p class="lede">The habit that makes breaking things free.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this earns its own page</span>
+        <p>You will destroy machines in this course — that is the point. Snapshots are what turn
+           "destroyed the lab, lost the evening" into "reverted, thirty seconds". Students who skip this
+           lose a session's work at some stage. Every single time.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">You exploit a target in Session 5 and leave a backdoor on it. Session 6 starts.
+           Why is that a problem?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p>Because you no longer know whether what you find in Session 6 is a <em>real</em> finding or
+             the mess you made last week. Your results become unrepeatable and your lab report becomes
+             fiction. Investigation requires a <strong>known-good starting state</strong> — the same
+             reason a SOC images a compromised host before touching it.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 240" role="img" aria-label="Snapshot workflow timeline: baseline snapshot, attack, revert back to baseline">
+          <text class="d-title" x="20" y="22" font-size="15">The loop you repeat before every single lab</text>
+
+          <!-- timeline -->
+          <line x1="70" y1="120" x2="830" y2="120" stroke="var(--line-soft)" stroke-width="3"/>
+
+          <!-- 1 build -->
+          <circle cx="130" cy="120" r="9" fill="var(--cyan)" stroke="var(--bg-alt)" stroke-width="3"/>
+          <text x="130" y="70" font-size="12.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">1 · Clean build</text>
+          <text x="130" y="90" font-size="11" class="d-sub" text-anchor="middle">OS installed, network verified</text>
+
+          <!-- 2 snapshot -->
+          <circle cx="360" cy="120" r="9" fill="var(--green)" stroke="var(--bg-alt)" stroke-width="3"/>
+          <text x="360" y="70" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="700">2 · Take snapshot</text>
+          <text x="360" y="90" font-size="11" class="d-mono" fill="var(--text-2)" text-anchor="middle">baseline-clean</text>
+
+          <!-- 3 attack -->
+          <circle cx="590" cy="120" r="9" fill="var(--orange)" stroke="var(--bg-alt)" stroke-width="3"/>
+          <text x="590" y="70" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">3 · Run the lab</text>
+          <text x="590" y="90" font-size="11" class="d-sub" text-anchor="middle">exploit, break, experiment freely</text>
+
+          <!-- 4 revert -->
+          <circle cx="800" cy="120" r="9" fill="var(--red)" stroke="var(--bg-alt)" stroke-width="3"/>
+          <text x="800" y="70" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="700">4 · Revert</text>
+          <text x="800" y="90" font-size="11" class="d-sub" text-anchor="middle">back to known-good</text>
+
+          <!-- return arc, well below the axis and its own label -->
+          <path d="M 800 132 L 800 186 L 360 186 L 360 132" fill="none" stroke="var(--red)" stroke-width="2"
+                stroke-dasharray="7 5" marker-end="url(#ar-r)"/>
+          <text x="580" y="178" font-size="12" fill="var(--red)" text-anchor="middle">
+            revert returns you to step 2 — repeat before every lab
+          </text>
+
+          <rect x="70" y="202" width="760" height="30" rx="6" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text x="450" y="222" font-size="12.5" class="d-lbl" text-anchor="middle">
+            Take the baseline snapshot while the machine is powered OFF — the file is smaller and the restore is cleaner.
+          </text>
+        </svg>
+        <figcaption><b>Steps 3 and 4 repeat forever.</b> Step 2 happens once per machine, tonight.</figcaption>
+      </figure>
+
+      <figure class="shot">
+        <img src="assets/img/vmware-snapshot.png" alt="VMware Snapshot Manager showing a baseline-clean snapshot">
+        <figcaption>VM → Snapshot → <strong>Take Snapshot</strong>. Name it exactly
+          <span class="mono">baseline-clean</span> on every machine, so the instruction "revert to baseline" is unambiguous.</figcaption>
+      </figure>
+
+      <div class="box tip">
+        <span class="box-t">Prove it works — do this tonight</span>
+        <p>After taking the snapshot, boot Kali, run <code>touch /tmp/snapshot-test</code>, then revert.
+           If the file is gone, your snapshot works. If it is still there, you reverted the wrong machine
+           — better to discover that now than in Session 6.</p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The professional parallel</span>
+        <p>Reverting to a known-good state before investigating is exactly what incident responders do
+           when they image a host before analysis. You are learning a real operational habit, not a lab
+           convenience.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P18 · PASSIVE VS ACTIVE  ========== -->
+  <section class="page" data-title="Passive vs active">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P18</span><span class="tag theory">Theory</span><span class="time">⏱ 7 min</span></div>
+      <h1>Passive vs Active — What "First Contact" Means</h1>
+      <p class="lede">The moment your packets touch the target, you become visible. That moment is next.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">The last idea before your hands move</span>
+        <p>Everything you do to a target falls on one side of a line: either the target can tell you were
+           there, or it cannot. You need to know which side you are on <em>before</em> you press enter —
+           because it decides whether you get caught.</p>
+      </div>
+
+      <div class="ask">
+        <span class="ask-t">Discuss first</span>
+        <p class="ask-q">I look up a company's DNS records, read their job adverts, and search their
+           certificates on <span class="mono">crt.sh</span>. How many entries appear in their logs?</p>
+        <details>
+          <summary>Reveal</summary>
+          <p><strong>Zero.</strong> You never contacted them — you asked third parties about them. That is
+             passive reconnaissance, and it is essentially undetectable by the target. It is also
+             Session 2, in full.</p>
+        </details>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 900 280" role="img" aria-label="Passive reconnaissance leaves no trace on the target while active reconnaissance is logged">
+          <text class="d-title" x="20" y="22" font-size="15">Same goal, two very different risk profiles</text>
+
+          <!-- PASSIVE -->
+          <rect x="20" y="42" width="410" height="222" rx="8" fill="rgba(74,222,128,.06)" stroke="var(--green)"/>
+          <text x="225" y="68" font-size="13.5" fill="var(--green)" text-anchor="middle" font-weight="700">PASSIVE — Session 2</text>
+
+          <rect x="46" y="88" width="130" height="40" rx="6" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="111" y="113" font-size="12" fill="var(--orange)" text-anchor="middle">YOU</text>
+          <line x1="180" y1="108" x2="266" y2="108" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="270" y="88" width="136" height="40" rx="6" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="338" y="106" font-size="11.5" fill="var(--green)" text-anchor="middle">THIRD PARTIES</text>
+          <text x="338" y="121" font-size="10" class="d-sub" text-anchor="middle">Google · Shodan · WHOIS</text>
+
+          <!-- blocked direct path -->
+          <path d="M 111 130 L 111 176 L 266 176" fill="none" stroke="var(--text-4)" stroke-width="2" stroke-dasharray="5 4"/>
+          <line x1="180" y1="169" x2="196" y2="183" stroke="var(--text-4)" stroke-width="2.5"/>
+          <line x1="196" y1="169" x2="180" y2="183" stroke="var(--text-4)" stroke-width="2.5"/>
+          <rect x="270" y="156" width="136" height="40" rx="6" fill="var(--panel)" stroke="var(--text-4)" opacity=".6"/>
+          <text x="338" y="181" font-size="12" class="d-sub" text-anchor="middle">TARGET</text>
+
+          <rect x="46" y="214" width="360" height="34" rx="6" fill="rgba(74,222,128,.12)" stroke="rgba(74,222,128,.4)"/>
+          <text x="226" y="236" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="700">0 log entries on the target</text>
+
+          <!-- ACTIVE -->
+          <rect x="470" y="42" width="410" height="222" rx="8" fill="rgba(255,112,67,.06)" stroke="var(--orange)"/>
+          <text x="675" y="68" font-size="13.5" fill="var(--orange)" text-anchor="middle" font-weight="700">ACTIVE — today, and Session 3</text>
+
+          <rect x="496" y="88" width="130" height="40" rx="6" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="561" y="113" font-size="12" fill="var(--orange)" text-anchor="middle">YOU</text>
+          <line x1="630" y1="108" x2="716" y2="108" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <rect x="720" y="88" width="136" height="40" rx="6" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="788" y="113" font-size="12" fill="var(--orange)" text-anchor="middle">TARGET</text>
+
+          <text x="675" y="152" font-size="11.5" class="d-sub" text-anchor="middle">nmap · ping · banner grab</text>
+          <text x="675" y="178" font-size="11.5" class="d-sub" text-anchor="middle">every packet arrives with your source IP</text>
+
+          <rect x="496" y="214" width="360" height="34" rx="6" fill="rgba(255,112,67,.12)" stroke="rgba(255,112,67,.4)"/>
+          <text x="676" y="236" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">connection logs · IDS alerts · firewall drops</text>
+        </svg>
+        <figcaption><b>You are about to cross from left to right.</b> That crossing is what "first
+          contact" means.</figcaption>
+      </figure>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th></th><th>Passive</th><th>Active</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Definition</strong></td><td>Gather information without touching the target</td><td>Send packets to the target</td></tr>
+          <tr><td><strong>Examples</strong></td><td>OSINT, Google dorks, Shodan, WHOIS, LinkedIn</td><td>Ping sweep, port scan, banner grab, zone transfer</td></tr>
+          <tr><td><strong>Detection risk</strong></td><td>Effectively none</td><td>High — this is what an IDS exists to catch</td></tr>
+          <tr><td><strong>Where you learn it</strong></td><td>Session 2</td><td><strong>Today</strong>, then Session 3</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view</span>
+        <p>Good attackers exhaust passive recon before making first contact. Every packet you send is a
+           chance to be caught — so you send as few as possible, as late as possible.</p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">SOC analyst view</span>
+        <p>You <em>cannot</em> detect passive recon — nothing reaches you. Your visibility begins at first
+           contact: the first SYN, the first DNS lookup, the first connection attempt. That is precisely
+           why IDS placement and network monitoring matter — they are your earliest possible tripwire.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P19 · HANDS-ON: FIRST CONTACT  ========== -->
+  <section class="page" data-title="Lab: first contact">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P19</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 30 min</span></div>
+      <h1>First Contact</h1>
+      <p class="lede">Your own keyboard, your own Kali, a live target. Your partner verifies your output.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you're about to do, and why in this order</span>
+        <p>Three questions, answered in sequence, each narrowing the last: <strong>who is alive?</strong>
+           → <strong>what is open?</strong> → <strong>what exactly is running?</strong> That progression
+           is the whole of reconnaissance, and everything in Session 3 is a deeper version of it.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Scope check — say it out loud before you type</span>
+        <p>Target: <strong>your own Metasploitable2, on your own host-only network</strong>. If your
+           <code>nmap</code> command contains any address outside <code>192.168.56.0/24</code>, stop.</p>
+      </div>
+
+      <div class="box lab-box">
+        <span class="box-t">If your VMs aren't built yet</span>
+        <p>Pair up with someone whose lab is running and watch this block, then run every command
+           yourself tonight after the build and record it in your report. You are not exempt — you are
+           time-shifted.</p>
+      </div>
+
+      <h2>Step 1 — where am I?</h2>
+      <ol class="steps">
+        <li>
+          <strong>Confirm your own address on the host-only network.</strong>
+          <pre><code>ip a</code></pre>
+          <p>Look for an interface — usually <code>eth0</code> — carrying a <code>192.168.56.x</code>
+             address. This is your source IP: the address that will appear in every log entry you are
+             about to generate.</p>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>An interface shows an address in <code>192.168.56.0/24</code></li>
+              <li>If it shows <code>10.x</code> or <code>172.x</code> instead, your adapter is on NAT — shut down, switch it to VMnet1, boot again</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — who else is alive?</h2>
+      <ol class="steps">
+        <li>
+          <strong>Sweep the subnet for live hosts.</strong>
+          <pre><code>sudo nmap -sn 192.168.56.0/24</code></pre>
+          <p>The <code>-sn</code> flag means "ping scan, no port scan" — it answers only <em>who is
+             there</em>. On a local subnet this is largely ARP-based, which is fast and very reliable.</p>
+          <p>Note the IP address that is not your Kali and not the host adapter. <strong>That is your
+             target.</strong> Write it down — it is <code>&lt;MSF2_IP&gt;</code> for the rest of today.</p>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Metasploitable2 appears as "Host is up"</li>
+              <li>Its MAC address shows a VMware vendor prefix — confirming it's a VM, not a stray real device</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Confirm you can actually reach it.</strong>
+          <pre><code>ping -c 3 &lt;MSF2_IP&gt;</code></pre>
+          <p>Three replies. Note the <strong>TTL</strong> — around 64 suggests Linux, around 128 suggests
+             Windows. Your first piece of OS fingerprinting, free, from a ping.</p>
+        </li>
+      </ol>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view</span>
+        <p>A <code>-sn</code> sweep is about as quiet as active scanning gets — no ports are touched. But
+           it is not silent: the ARP and ICMP traffic is still there for anyone watching the segment.
+           "Quieter" is never "invisible".</p>
+      </div>
+
+      <h2>Step 3 — what is open, and what is running?</h2>
+      <ol class="steps">
+        <li>
+          <strong>Scan the most common ports, with version detection.</strong>
+          <pre><code>nmap -sV --top-ports 20 &lt;MSF2_IP&gt;</code></pre>
+          <p><code>-sV</code> does not just report "port 21 is open" — it talks to the service and reports
+             what it claims to be. Expect something close to:</p>
+          <pre><code>PORT    STATE SERVICE  VERSION
+21/tcp  open  ftp      vsftpd 2.3.4
+22/tcp  open  ssh      OpenSSH 4.7p1 Debian 8ubuntu1
+23/tcp  open  telnet   Linux telnetd
+25/tcp  open  smtp     Postfix smtpd
+80/tcp  open  http     Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X
+445/tcp open  netbios-ssn Samba smbd 3.X - 4.X</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>At least five open ports returned</li>
+              <li>Each has a version string, not just a service name</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 4 — banner grabbing by hand</h2>
+      <p>Nmap did this for you. Now do it yourself, so you understand what it actually did — connect
+         directly to a service and read what it volunteers.</p>
+
+      <ol class="steps">
+        <li>
+          <strong>Connect to three services with netcat and record what each says.</strong>
+          <pre><code># FTP
+nc -nv &lt;MSF2_IP&gt; 21
+
+# SSH
+nc -nv &lt;MSF2_IP&gt; 22
+
+# SMTP
+nc -nv &lt;MSF2_IP&gt; 25</code></pre>
+          <p>Expect banners along these lines:</p>
+          <pre><code>220 (vsFTPd 2.3.4)
+SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1
+220 metasploitable.localdomain ESMTP Postfix (Ubuntu)</code></pre>
+          <p>Press <code>Ctrl+C</code> to close each connection. Copy all three banners
+             <strong>verbatim</strong> into your lab report — retyping introduces errors, and the exact
+             version string is the whole value.</p>
+          <div class="verify">
+            <h4>✓ Success criteria for this block</h4>
+            <ul>
+              <li><code>nmap -sn</code> found Metasploitable2</li>
+              <li><code>ping</code> returned 3 of 3 replies</li>
+              <li><code>nmap -sV</code> returned at least 5 ports with versions</li>
+              <li><code>nc</code> returned at least 3 raw banners, pasted into your report</li>
+              <li>Your partner has looked at your terminal and confirmed the above</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you actually just learned</span>
+        <p>A banner gives you two things: the <strong>service</strong> and its <strong>exact version</strong>.
+           Take <code>vsftpd 2.3.4</code> — that specific version shipped with a backdoor. In Session 4
+           you will look that up as a CVE, and in Session 5 you will use it to get a shell.
+           <strong>Today's output is Session 5's input.</strong></p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip — 60 seconds, no tools</span>
+        <p>Everything you just ran generated log entries on that target: connection attempts on ports you
+           touched, TCP resets on ports you didn't, and three completed sessions from netcat. If you were
+           the analyst, the signal is <strong>one source IP touching many ports in a short window</strong>
+           — that pattern is the classic port-scan detection, and you just generated a textbook example
+           of it. Same packets, both sides.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P20 · LAB REPORT  ========== -->
+  <section class="page" data-title="Lab report">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P20</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 6 min</span></div>
+      <h1>How To Write The Lab Report</h1>
+      <p class="lede">Every session ends with one. Here's the format, once, for the whole course.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why we write these at all</span>
+        <p>Two reasons, and neither is bureaucracy. First: writing down what you did is how you find out
+           whether you understood it. Second: reporting <em>is</em> the job — a penetration test that
+           isn't written up delivered nothing, and a SOC investigation that isn't documented never
+           happened.</p>
+      </div>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Section</th><th>What goes in it</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Objective</strong></td><td>One sentence — what were you trying to prove you could do?</td></tr>
+          <tr><td><strong>Environment</strong></td><td>Table: VM name, OS, IP, role. Anyone should be able to rebuild your setup from it.</td></tr>
+          <tr><td><strong>Steps &amp; commands</strong></td><td>Every command with its real output. <strong>Paste, don't retype.</strong></td></tr>
+          <tr><td><strong>Evidence</strong></td><td>Terminal output or screenshots that prove the result — not a claim that it worked.</td></tr>
+          <tr><td><strong>What went wrong</strong></td><td><strong>Required.</strong> At least one thing that failed first time, and how you fixed it.</td></tr>
+          <tr><td><strong>What I learned</strong></td><td>One paragraph in your own words.</td></tr>
+          <tr><td><strong>SOC angle</strong></td><td>One sentence — as an analyst, what would you look for to detect what you just did?</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">"What went wrong" is not a trap</span>
+        <p>An empty "what went wrong" section reads as either you didn't try anything hard, or you're
+           hiding something. Reports are graded <strong>pass / needs-review</strong> — a documented
+           failure you diagnosed is worth more than a clean run you can't explain.</p>
+      </div>
+
+      <div class="box lab-box">
+        <span class="box-t">Start it now</span>
+        <p>You already have the material: your <code>ip a</code> output, the <code>nmap -sn</code> sweep,
+           the <code>-sV</code> results and three raw banners. Open the template and paste them in
+           <em>before</em> the terminal scrollback is gone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P21 · KNOWLEDGE CHECK  ========== -->
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P21</span><span class="tag theory">Quiz</span><span class="time">⏱ 15 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Ten questions. Click an answer to see whether you were right and why.</p>
+    </div>
+    <div class="content">
+
+      <div class="q mcq" data-correct="b" data-why="Remove any one of the three and the attack does not happen — which is exactly where defensive controls plug in.">
+        <p><span class="qn">Q1</span> An attack is best described as the combination of which three elements?</p>
+        <ul class="opts">
+          <li data-opt="a">Tool + target + time</li>
+          <li data-opt="b">Motive + method + vulnerability</li>
+          <li data-opt="c">Exploit + payload + shell</li>
+          <li data-opt="d">Recon + scanning + access</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="And it is a loop, not a line — attackers return to reconnaissance every time they land on a new host.">
+        <p><span class="qn">Q2</span> Put the five hacking phases in the correct order.</p>
+        <ul class="opts">
+          <li data-opt="a">Scanning → Recon → Access → Clearing Tracks → Maintaining Access</li>
+          <li data-opt="b">Recon → Scanning → Gaining Access → Maintaining Access → Clearing Tracks</li>
+          <li data-opt="c">Recon → Gaining Access → Scanning → Clearing Tracks → Maintaining Access</li>
+          <li data-opt="d">Scanning → Gaining Access → Recon → Maintaining Access → Clearing Tracks</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="Not skill, not intent, not whether damage occurred. The packets are identical; the paperwork is not.">
+        <p><span class="qn">Q3</span> A white hat and a black hat run the identical nmap scan. What is the only thing that differs?</p>
+        <ul class="opts">
+          <li data-opt="a">The tool version</li>
+          <li data-opt="b">The time of day</li>
+          <li data-opt="c">Written authorization and scope</li>
+          <li data-opt="d">Whether the scan succeeds</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="Weaponization is building the payload; Delivery is getting it to the victim. Sending the email is Delivery — ATT&amp;CK tactic Initial Access, T1566.">
+        <p><span class="qn">Q4</span> In the Cyber Kill Chain, emailing a malicious attachment to a victim is which stage?</p>
+        <ul class="opts">
+          <li data-opt="a">Reconnaissance</li>
+          <li data-opt="b">Weaponization</li>
+          <li data-opt="c">Delivery</li>
+          <li data-opt="d">Actions on Objectives</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="Type 1 runs straight on the hardware with no host OS beneath it — one less layer, which is why data centres use it and your laptop does not.">
+        <p><span class="qn">Q5</span> What distinguishes a Type 1 hypervisor from a Type 2?</p>
+        <ul class="opts">
+          <li data-opt="a">Type 1 only runs Linux guests</li>
+          <li data-opt="b">Type 1 runs directly on the hardware; Type 2 runs on top of a host OS</li>
+          <li data-opt="c">Type 1 cannot take snapshots</li>
+          <li data-opt="d">Type 1 is free, Type 2 is commercial</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="Metasploitable2 is deliberately vulnerable. On a real network it is compromised within minutes — and then the attacker is inside your network, on your connection.">
+        <p><span class="qn">Q6</span> Why must the lab VMs sit on a host-only network?</p>
+        <ul class="opts">
+          <li data-opt="a">It is faster than NAT</li>
+          <li data-opt="b">Kali requires it</li>
+          <li data-opt="c">To isolate deliberately vulnerable targets from the real network and internet</li>
+          <li data-opt="d">To give the targets internet access</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="Your lab is the entire scope of this course. The academy network is somebody else's production system — scanning it is out of scope and potentially criminal.">
+        <p><span class="qn">Q7</span> Which of these is <em>out of scope</em> for this course?</p>
+        <ul class="opts">
+          <li data-opt="a">Scanning your own Metasploitable2 VM</li>
+          <li data-opt="b">Grabbing banners inside your own host-only lab</li>
+          <li data-opt="c">Scanning the academy's production Wi-Fi</li>
+          <li data-opt="d">Reverting your target to a baseline snapshot</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="-sn is a host-discovery sweep with no port scan. -sV scans and fingerprints services; nc grabs one banner; ping tests a single host, not a range.">
+        <p><span class="qn">Q8</span> Which command performs host discovery across a subnet without a port scan?</p>
+        <ul class="opts">
+          <li data-opt="a"><code>nmap -sV &lt;ip&gt;</code></li>
+          <li data-opt="b"><code>nmap -sn &lt;cidr&gt;</code></li>
+          <li data-opt="c"><code>nc -nv &lt;ip&gt; 21</code></li>
+          <li data-opt="d"><code>ping -c 3 &lt;ip&gt;</code></li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="a" data-why="Passive recon never touches the target, so there is nothing for it to log. Detection only becomes possible at first contact.">
+        <p><span class="qn">Q9</span> Roughly how many entries does passive reconnaissance create in the target's logs?</p>
+        <ul class="opts">
+          <li data-opt="a">None — the target is never contacted</li>
+          <li data-opt="b">One per query</li>
+          <li data-opt="c">The same as an nmap scan</li>
+          <li data-opt="d">It depends on the firewall</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="d" data-why="Banner grabbing gives you the service and its exact version — and an exact version can be matched to a known CVE, which is the input to Sessions 4 and 5.">
+        <p><span class="qn">Q10</span> You run <code>nc -nv &lt;ip&gt; 21</code> and see <code>220 (vsFTPd 2.3.4)</code>. Why does this matter?</p>
+        <ul class="opts">
+          <li data-opt="a">It proves the host is Linux</li>
+          <li data-opt="b">It shows the firewall is misconfigured</li>
+          <li data-opt="c">It confirms you have authorization</li>
+          <li data-opt="d">The exact version can be matched to a known CVE and exploit</li>
+        </ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="quiz-score" id="quizScore">Answered <b>0</b> / 10</div>
+
+      <h2>Short answer — discuss, don't click</h2>
+
+      <div class="q">
+        <p><span class="qn">S1</span> An attacker creates a new local administrator account for persistence. Name the ATT&amp;CK tactic, and one log source that would catch it.</p>
+        <details>
+          <summary>Show answer</summary>
+          <p><strong>Persistence.</strong> Detect via Windows Security event <code>4720</code> (account
+             created) — or <code>4732</code> if they added it to the Administrators group — plus EDR
+             telemetry. You met this file and this tactic in the Windows recall block.</p>
+        </details>
+      </div>
+
+      <div class="q">
+        <p><span class="qn">S2</span> You're about to start an attack lab on Metasploitable2. What is the first thing you do, and why?</p>
+        <details>
+          <summary>Show answer</summary>
+          <p>Revert to the <code>baseline-clean</code> snapshot. Without a known-good starting state you
+             cannot tell your findings apart from last week's damage — your results stop being repeatable
+             and your report stops being true.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P22 · TAKEAWAYS & HOMEWORK  ========== -->
+  <section class="page" data-title="Takeaways & homework">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S01 · P22</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 5 min</span></div>
+      <h1>Takeaways &amp; Homework</h1>
+      <p class="lede">What to keep from today, and what has to be done before Session 2.</p>
+    </div>
+    <div class="content">
+
+      <h2>The eight things worth keeping</h2>
+      <ul class="takeaways">
+        <li>Everything you already knew — OSI, TCP, Linux paths, Windows internals, HTTP — is <strong>the attack surface</strong>. Same knowledge, different question.</li>
+        <li><strong>Attack = Motive + Method + Vulnerability.</strong> Two of those three are the defender's to remove.</li>
+        <li>The five phases are a <strong>loop</strong>, and roughly 80% of attacker time is phases 1–2. Detection that only watches exploitation watches the wrong 5%.</li>
+        <li>The Kill Chain is a defender's advantage: the attacker must clear every stage, you only need to break one.</li>
+        <li><strong>ATT&amp;CK is the industry's shared language.</strong> Tactic = why, technique = how, and both have IDs you can cite.</li>
+        <li><strong>Authorization is the only legal difference</strong> between what you do and what a criminal does — and it is step zero, not paperwork.</li>
+        <li>Host-only networking is a <strong>safety control.</strong> Snapshots make breaking things free.</li>
+        <li>A banner gives you service <em>and</em> exact version — the input to vulnerability analysis in Session 4.</li>
+      </ul>
+
+      <h2>Homework — due before Session 2</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>#</th><th>Task</th><th>What you submit</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="mono">1</td>
+            <td><strong>Check virtualization support</strong> — Task Manager → Performance → CPU. If disabled, enable Intel VT-x / AMD-V in BIOS. <em>Do this first; everything else depends on it.</em></td>
+            <td>Screenshot showing "Virtualization: Enabled"</td>
+          </tr>
+          <tr>
+            <td class="mono">2</td>
+            <td><strong>Build KALI-ATK01 and METASPLOITABLE2</strong> on VMnet1 host-only, following <code>labs/setup_guide.md</code>. Verify the adapter <em>before</em> first power-on.</td>
+            <td>Screenshot of both VMs running, and <code>ip a</code> from each</td>
+          </tr>
+          <tr>
+            <td class="mono">3</td>
+            <td><strong>Take <code>baseline-clean</code> snapshots</strong> on both machines while powered off, then prove the revert works with the <code>/tmp/snapshot-test</code> check.</td>
+            <td>Screenshot of Snapshot Manager on both VMs</td>
+          </tr>
+          <tr>
+            <td class="mono">4</td>
+            <td><strong>Run first contact yourself</strong> — the full Step 1–4 sequence from today against your own Metasploitable2.</td>
+            <td>Pasted terminal output, including 3 raw banners</td>
+          </tr>
+          <tr>
+            <td class="mono">5</td>
+            <td><strong>Build WIN10-TGT01 and WINSRV19-TGT01</strong> on the same host-only network with baseline snapshots. Needed from Session 3 — start now, they take time.</td>
+            <td>Screenshot of both VMs on VMnet1</td>
+          </tr>
+          <tr>
+            <td class="mono">6</td>
+            <td><strong>Write the lab report</strong> using the template — every section filled, including "what went wrong" and the SOC angle.</td>
+            <td>Completed lab report (Markdown or PDF)</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>What "done" looks like</h3>
+      <div class="split">
+        <figure class="shot" style="margin:0">
+          <img src="assets/img/kali-desktop.png" alt="Kali Linux desktop after first boot">
+          <figcaption>KALI-ATK01 — you should reach this desktop.</figcaption>
+        </figure>
+        <figure class="shot" style="margin:0">
+          <img src="assets/img/metasploitable-login.png" alt="Metasploitable2 console login banner">
+          <figcaption>METASPLOITABLE2 — a console login banner, no desktop. That is correct.</figcaption>
+        </figure>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Do task 1 tonight, not on the weekend</span>
+        <p>If virtualization is disabled and your BIOS is locked by an employer's policy, you need to know
+           now — not the evening before Session 3. Tell me immediately if you hit this and we will sort
+           out an alternative.</p>
+      </div>
+
+      <div class="box note">
+        <span class="box-t">How this is graded</span>
+        <p><strong>Pass / needs-review.</strong> Four criteria: every section filled; real commands with
+           real pasted output; an honest "what went wrong"; and a SOC angle showing you thought about
+           detection. Mistakes cost nothing. Blank sections do.</p>
+      </div>
+
+      <h2>Next session</h2>
+      <div class="box soc">
+        <span class="box-t">Session 2 — Footprinting &amp; Reconnaissance</span>
+        <p>Today you crossed into <strong>active</strong>. Next session we go back over the line and stay
+           there: Google dorks, Shodan, WHOIS, certificate transparency, theHarvester, DNS recon and
+           subdomain discovery — building a complete picture of a target that never learns you were
+           looking. Everything phase 1 of the methodology promised.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  NAV  ========== -->
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">—</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">—</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">←</span> <span class="kbd">→</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>ITGate Academy · CEH Diploma · Session 01</span>
+    <span class="mono">Primary reference: EC-Council CEH 312-50</span>
+  </div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>

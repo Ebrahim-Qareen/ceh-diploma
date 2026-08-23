@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEH Diploma — ITGate Academy</title>
+<meta name="description" content="Certified Ethical Hacker (CEH) diploma — attacker mindset, reconnaissance, scanning, exploitation, web and network attacks, built on a local VM lab. ITGate Academy.">
+<link rel="stylesheet" href="assets/css/ceh.css">
+<link rel="icon" href="assets/img/itgate-logo.jpg">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH Diploma</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="#sessions" class="active">Sessions</a>
+      <a href="#lab">Lab</a>
+      <a href="#resources">Resources</a>
+      <a href="#about">About</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Certified Ethical Hacker · EC-Council 312-50</div>
+    <h1>Think like the attacker.<br><span>Defend like an analyst.</span></h1>
+    <p>A 40-hour hands-on diploma that takes you from your first authorised packet to a full
+       exploitation chain — every attack run personally, on a lab you build yourself, with the
+       detection angle taught beside every technique.</p>
+
+    <div class="stats">
+      <div class="stat"><b>10</b><span>Sessions</span></div>
+      <div class="stat"><b>40</b><span>Hours</span></div>
+      <div class="stat"><b>4</b><span>Lab machines</span></div>
+      <div class="stat"><b>20</b><span>CEH chapters</span></div>
+      <div class="stat"><b>100%</b><span>Hands-on</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap section" id="sessions">
+  <h2 class="sec">Course Roadmap</h2>
+  <p class="sec-desc">The course follows the attacker's own methodology, in order. Colours mark the five arcs:
+     <span style="color:var(--red)">Foundations</span> ·
+     <span style="color:var(--cyan)">Recon &amp; Scanning</span> ·
+     <span style="color:var(--orange)">Gaining Access</span> ·
+     <span style="color:var(--purple)">Post-Exploitation</span> ·
+     <span style="color:var(--green)">Applications &amp; Networks</span>.</p>
+
+  <div class="grid">
+
+    <a class="card p-found" href="session-01/index.html">
+      <div class="card-top"><span class="snum">S01</span><h3>Foundations, Lab Build &amp; First Contact</h3></div>
+      <p>Who you already are as an engineer, and who you're about to become. How attacks are built, what makes them legal, virtualization and the lab — then your first authorised packets at a live target.</p>
+      <div class="card-meta">
+        <span class="tag theory">Foundations</span>
+        <span class="tag recall">Prior-knowledge recap</span>
+        <span class="tag lab">First contact</span>
+        <span class="status done">Delivered</span>
+      </div>
+    </a>
+
+    <a class="card p-recon" href="session-02/index.html">
+      <div class="card-top"><span class="snum">S02</span><h3>Footprinting &amp; Reconnaissance</h3></div>
+      <p>Build the target picture without touching it — Google dorks, Shodan, WHOIS, certificate transparency, theHarvester, DNS recon and subdomain discovery.</p>
+      <div class="card-meta">
+        <span class="tag offensive">OSINT</span>
+        <span class="tag">Shodan · dorks</span>
+        <span class="tag">DNS recon</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-recon" href="session-03/index.html">
+      <div class="card-top"><span class="snum">S03</span><h3>Scanning &amp; Enumeration</h3></div>
+      <p>TCP flags and every scan type, Nmap timing and NSE, then pull the target apart service by service — SMB, SNMP, SMTP, LDAP, NFS, FTP.</p>
+      <div class="card-meta">
+        <span class="tag offensive">Nmap</span>
+        <span class="tag">Scan types</span>
+        <span class="tag">Enumeration</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-access" href="session-04/index.html">
+      <div class="card-top"><span class="snum">S04</span><h3>System Hacking I — Vulnerability Analysis &amp; Password Attacks</h3></div>
+      <p>Turn a version string into an exploit: CVE, CVSS, searchsploit, Nessus. Then break authentication — NTLM, Kerberos, hashcat, John, hydra and Responder.</p>
+      <div class="card-meta">
+        <span class="tag offensive">CVE · CVSS</span>
+        <span class="tag">Hash cracking</span>
+        <span class="tag">Responder</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-access" href="session-05/index.html">
+      <div class="card-top"><span class="snum">S05</span><h3>System Hacking II — Exploitation, Shells &amp; Payloads</h3></div>
+      <p>The manual exploitation workflow, msfvenom payload generation, bind versus reverse shells, and buffer overflow to remote code execution.</p>
+      <div class="card-meta">
+        <span class="tag offensive">Metasploit</span>
+        <span class="tag">msfvenom</span>
+        <span class="tag">Buffer overflow</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-post" href="session-06/index.html">
+      <div class="card-top"><span class="snum">S06</span><h3>System Hacking III — Privilege Escalation &amp; CTF Capstone</h3></div>
+      <p>From user to root and user to SYSTEM — linpeas, SUID, GTFOBins, cron, winPEAS, Mimikatz, token abuse — then prove the whole chain on capstone machines.</p>
+      <div class="card-meta">
+        <span class="tag offensive">Privesc</span>
+        <span class="tag">Mimikatz</span>
+        <span class="tag activity">CTF capstone</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-post" href="session-07/index.html">
+      <div class="card-top"><span class="snum">S07</span><h3>Malware Threats &amp; Analysis</h3></div>
+      <p>Malware classification, static analysis with strings and VirusTotal, dynamic analysis in a sandbox, and building then detecting your own backdoor.</p>
+      <div class="card-meta">
+        <span class="tag offensive">Trojans</span>
+        <span class="tag defensive">Static · dynamic</span>
+        <span class="tag">Sandbox</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-web" href="session-08/index.html">
+      <div class="card-top"><span class="snum">S08</span><h3>Web Application Hacking &amp; SQL Injection</h3></div>
+      <p>HTTP and Burp, web enumeration, then the attacks themselves — XSS, file upload, command injection, IDOR, and SQL injection from manual to sqlmap.</p>
+      <div class="card-meta">
+        <span class="tag offensive">OWASP</span>
+        <span class="tag">Burp Suite</span>
+        <span class="tag">SQLi · XSS</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-net" href="session-09/index.html">
+      <div class="card-top"><span class="snum">S09</span><h3>Sniffing, MITM, Session Hijacking, Social Engineering &amp; DoS</h3></div>
+      <p>Own the wire — ARP and DNS poisoning, machine-in-the-middle with Wireshark and ettercap, steal live sessions, then the human layer and denial of service.</p>
+      <div class="card-meta">
+        <span class="tag offensive">MITM</span>
+        <span class="tag">Wireshark</span>
+        <span class="tag">Phishing · DoS</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+    <a class="card p-net" href="session-10/index.html">
+      <div class="card-top"><span class="snum">S10</span><h3>Evasion, Wireless &amp; Emerging Tech</h3></div>
+      <p>Get past what's watching — IDS, firewalls and honeypots — then wireless attacks with the aircrack-ng suite, and an overview sweep of mobile, IoT/OT and cloud.</p>
+      <div class="card-meta">
+        <span class="tag offensive">Evasion</span>
+        <span class="tag">aircrack-ng</span>
+        <span class="tag">Mobile · IoT · Cloud</span>
+        <span class="status soon">Planned</span>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<section class="wrap section-sm" id="lab">
+  <h2 class="sec">Your Attack Lab</h2>
+  <p class="sec-desc">One isolated environment you build yourself in Session 1 and keep for the whole course —
+     and afterwards. Everything runs locally; nothing you attack ever touches a real network.</p>
+  <div class="tiles">
+    <a class="tile" href="../labs/lab_design.md">
+      <span class="ico">🖧</span>
+      <h4>Lab Design &amp; Topology</h4>
+      <p>Machines, specs, the host-only network, and which session introduces each target.</p>
+    </a>
+    <a class="tile" href="../labs/setup_guide.md">
+      <span class="ico">⚙️</span>
+      <h4>Setup Guide</h4>
+      <p>Step-by-step VM build with a verification check at every stage, plus troubleshooting.</p>
+    </a>
+    <a class="tile" href="session-01/index.html#p14">
+      <span class="ico">💿</span>
+      <h4>Virtualization Primer</h4>
+      <p>Hypervisor types, VM hardware settings, and the three network modes explained.</p>
+    </a>
+    <a class="tile" href="session-01/index.html#p18">
+      <span class="ico">🎯</span>
+      <h4>First Contact Lab</h4>
+      <p>Host discovery and banner grabbing — your first authorised packets at a live target.</p>
+    </a>
+  </div>
+</section>
+
+<section class="wrap section-sm" id="resources">
+  <h2 class="sec">Resources</h2>
+  <p class="sec-desc">Reference material supporting every session. New items are added as the course grows.</p>
+  <div class="tiles">
+    <a class="tile" href="../exercises/session-01/lab_report_template.md">
+      <span class="ico">📄</span>
+      <h4>Lab Report Template</h4>
+      <p>The format every session's homework follows, with a filled example to compare against.</p>
+    </a>
+    <a class="tile" href="../design/topic_map.md">
+      <span class="ico">🗺️</span>
+      <h4>Topic Map</h4>
+      <p>Every topic, its source chapter, its prerequisites and the session it belongs to.</p>
+    </a>
+    <a class="tile" href="https://attack.mitre.org/" target="_blank" rel="noopener">
+      <span class="ico">🔗</span>
+      <h4>MITRE ATT&amp;CK</h4>
+      <p>The tactic and technique reference used from Session 1 onwards.</p>
+    </a>
+    <a class="tile" href="https://www.exploit-db.com/" target="_blank" rel="noopener">
+      <span class="ico">🧪</span>
+      <h4>Exploit-DB</h4>
+      <p>The public exploit database behind <span class="mono">searchsploit</span>, used from Session 4.</p>
+    </a>
+  </div>
+</section>
+
+<section class="wrap section-sm" id="about">
+  <h2 class="sec">About This Course</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+    <div class="card" style="cursor:default;border-left-color:var(--red)">
+      <h3 style="margin-bottom:8px">Who it is for</h3>
+      <p style="margin:0">Students who have completed MCSA, Linux and CCNA and want to move into offensive
+         security or a SOC analyst role. We never re-teach networking or operating system basics —
+         we turn what you already know into attacker leverage.</p>
+    </div>
+    <div class="card" style="cursor:default;border-left-color:var(--cyan)">
+      <h3 style="margin-bottom:8px">How it works</h3>
+      <p style="margin:0">Short theory, then straight into your own keyboard. Every student personally runs
+         every attack — no session is spent watching. You work in pairs as a peer-check unit, and every
+         session ends with a written lab report.</p>
+    </div>
+    <div class="card" style="cursor:default;border-left-color:var(--green)">
+      <h3 style="margin-bottom:8px">What you leave with</h3>
+      <p style="margin:0">A working attack lab, hands-on experience with every technique on the CEH
+         syllabus, a folder of your own lab reports — and the detection angle for each attack, which is
+         what a SOC interview actually asks about.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>ITGate Academy · CEH Diploma · Your gate to the world</span>
+    <span class="mono">Primary reference: EC-Council CEH 312-50</span>
+  </div>
+</footer>
+
+</body>
+</html>
