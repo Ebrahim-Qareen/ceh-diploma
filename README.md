@@ -12,6 +12,15 @@ design, instructor and student materials.
   plus its own assets.
 - `design/topic_map.md` — the single source of truth for which topic goes
   in which session.
+- `design/design_system.md` — the shared visual/interaction component
+  reference every session page is built from: colour tokens, callout boxes,
+  diagram rules, interactive/animated mechanics, and the pre-publish
+  verification checklist. **Read before building any session page.**
+- `design/practice_platforms.md` — verified external lab rooms
+  (TryHackMe / OverTheWire / HTB / picoCTF) with confirmed access tiers,
+  used by the "Practice this topic" blocks.
+- `docs/session-XX/build_log.md` — per-session build history, verification
+  results, and open items.
 - `labs/` — lab topology and the student VM setup guide.
 - `exercises/` — per-session homework, quizzes, and activities.
 - `knowledge_base/` — condensed study notes per CEH module.
