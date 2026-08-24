@@ -70,10 +70,36 @@ with no signup, no VM, no subscription.
 exact arc Sessions 1–5 build. Free, and worth assigning early precisely because it
 will feel like magic before students understand it.
 
-### Candidates for Session 2 (footprinting/recon) — NOT YET VERIFIED
-Verify each before use: `passiverecon`, `activerecon`, `googledorking`,
-`ohsint`, `searchlightosint`, `redteamrecon`, `shodan`, `dnsindetail`,
-`contentdiscovery`, `subdomainenumeration`, `sublist3r`.
+### Footprinting & Reconnaissance (Session 2) — verified live 2026-08-24
+
+Verified by fetching each room logged-out (a premium room states *"only available for
+Premium or Max subscribers"*; reading a room while logged in proves nothing about tier).
+
+| Room | Slug | Tier | Time | Use |
+|---|---|---|---|---|
+| **Passive Reconnaissance** | `passiverecon` | **Free** | ~60 min · easy | **Best free companion to S2.** whois→RDAP, dig vs nslookup + TTL, DNSDumpster, crt.sh `%.domain`, Shodan. Uses `tryhackme.com` as its example target |
+| **Active Reconnaissance** | `activerecon` | **Free** | ~60 min · easy | The active half: browser dev tools, ping/TTL, traceroute, telnet, netcat. Do before Session 3 |
+| **Google Dorking** | `googledorking` | **Free** | ~45 min · easy | Crawler→index→robots→sitemap model, then operators. Note: still teaches `cache:` (retired by Google Sep 2024). Legal dork target: `googledorking.cmnatic.co.uk` |
+| **DNS in Detail** | `dnsindetail` | **Free** | ~45 min · easy | Hierarchy + record types; prereq for the DNS-recon lab |
+| **Shodan.io** | `shodan` | **Free** | ~45 min · easy | ASN pivoting, Shodan dorking, Monitor. Honest that CVE search / some features need a paid account |
+| **OhSINT** | `ohsint` | **Free** | ~60 min · easy | Pure OSINT challenge — how much one image leaks. Homework |
+| **Sakura Room** | `sakura` | **Free** | ~45 min · easy | Best free OSINT investigation on the platform. Homework |
+| **Searchlight — IMINT** | `searchlightosint` | **Free** | — · easy | Image-intelligence OSINT. Homework |
+| Red Team Recon | `redteamrecon` | **Premium** | ~120 min | Recon-ng + Maltego. Excellent; needs subscription — optional, not required |
+| Content Discovery | `contentdiscovery` | **Premium** | ~30 min | Directory brute-force — Lab 7 covers it free |
+| Subdomain Enumeration | `subdomainenumeration` | **Premium** | ~30 min | Subdomain brute-force — Lab 7 covers it free |
+| WebOSINT | `webosint` | **Premium** | — | — |
+
+⚠️ **Dead slugs (do not use):** `sublist3r` and `windowsuserfundamentals` both return
+"the room you tried to access doesn't exist."
+
+**Nmap rooms** (`nmap01`–`nmap03`, `nmap`) are **Premium** — see the Scanning section;
+they belong to Session 3, not Session 2.
+
+**Non-THM targets used in Session 2 labs (verified authorised):**
+- `zonetransfer.me` (DigiNinja) — published for zone-transfer training. NS: `nsztm1.digi.ninja`, `nsztm2.digi.ninja`.
+- `scanme.nmap.org` — "authorized to scan… a few scans in a day is fine."
+- `crt.sh`, `sitereport.netcraft.com`, `exploit-db.com/google-hacking-database` — free, public, no account for basic use (crt.sh is frequently 502 — have the `curl|jq` fallback and `subfinder` ready).
 
 ## Standing rule for students
 

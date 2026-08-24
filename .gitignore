@@ -14,3 +14,6 @@ _s1update.zip
 _stage/
 _docs_update.zip
 _stage2/
+
+# session-scratch (undeletable via bridge)
+docs/session-02/_wtest.txt

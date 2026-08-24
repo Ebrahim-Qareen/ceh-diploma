@@ -22,11 +22,23 @@ decision):
   syllabus/web research, not the source deck. Recommend sourcing the official
   PDFs before finalizing Session 9-10 depth.
 - No continuity target across Sessions 1-6 — each session currently uses a
-  fresh, unrelated lab target. Running one persistent fictional target
-  company through Recon (S2) → Scan/Enumerate (S3) → Vuln Analysis/Creds (S4)
-  → Exploit (S5) → Privesc (S6) would reinforce the kill-chain framing taught
-  in Session 1. Not built into any session doc yet — a delivery-style choice
-  for the instructor, not a topic-map change.
+  fresh, unrelated lab target. Running one persistent target through Recon
+  (S2) → Scan/Enumerate (S3) → Vuln Analysis/Creds (S4) → Exploit (S5) →
+  Privesc (S6) would reinforce the kill-chain framing taught in Session 1.
+  **Partly actioned (2026-08-24):** Session 2 adopts `tryhackme.com` as a
+  single carry-through target for all *passive* recon (legal against any
+  public domain), producing a ranked recon report that is explicitly framed
+  as Session 3's scan-list input. Active recon in S2 still uses authorised
+  stand-ins (`zonetransfer.me`, `scanme.nmap.org`, the local `ceh-lab.local`
+  zone) because you cannot lawfully send packets at `tryhackme.com`. A single
+  continuity target that can be *attacked* end to end (S3→S6) still needs an
+  instructor-owned domain or a dedicated lab company — unchanged open item.
+
+- Currency corrections surfaced while building Session 2 (do not change
+  sequencing, but the instructor deck / older courseware is wrong on them):
+  WHOIS→RDAP for gTLDs (ICANN, 28 Jan 2025); Google `cache:` operator retired
+  (Sep 2024); recon tool rot (Sublist3r, Photon dormant; knockpy/ffuf/wfuzz
+  current). Captured on the Session 2 page and in its student guide.
 
 Audience baseline: students arrive with **MCSA + Linux + CCNA**. No topic here
 re-teaches networking, TCP/IP, Windows admin, or Linux basics — those are
