@@ -10,10 +10,13 @@ What was built, what changed, and what is still open. Rationale for each decisio
 
 ## Current state
 
-- **29 pages**, ~265 KB single HTML file at `docs/session-02/index.html`
+- **29 pages**, ~285 KB single HTML file at `docs/session-02/index.html`
 - **~24 hand-authored inline SVG diagrams** — **13 click-to-reveal**, **8 animated with replay**
 - **9 screenshot slots** — 6 filled with our own captures, 2 labelled placeholders (crt.sh was 502; hunter.io needs login)
 - **6 practice blocks** linking verified external rooms; consolidated practice-plan page
+- **Active targets switched to the Acunetix vulnweb family** (`testphp.vulnweb.com` web/dir, `vulnweb.com` subdomains) — the local `ceh-lab.local` lab is now an OPTIONAL offline alternative, not required (instructor hasn't built it). Log-reading defender exercise adapted to a throwaway local `python3 -m http.server`
+- **Expanded "more authorized practice targets" table** on P22 (vulnweb siblings · demo.testfire.net · ginandjuice.shop · brokencrystals.com · google-gruyere · hackthissite · scanme · zonetransfer + structured platforms)
+- **P22 brute-force tool reference** — per-tool cheatsheets (subfinder/amass/knockpy/ffuf/gobuster/feroxbuster/dirsearch/dirb/wfuzz/dnsenum/fierce/dnsrecon), wordlists table, decision guide; real legal target `testphp.vulnweb.com` for directory work
 - Break timer, 10-question self-scoring quiz + 2 short-answer, sidebar nav, progress bar, keyboard nav
 - Full 7-doc package + a lab recon-target script
 - Not yet published to GitHub (awaiting review)

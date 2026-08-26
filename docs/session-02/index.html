@@ -319,14 +319,14 @@
             <td>The site states: <em>"You are authorized to scan this machine with Nmap or other port scanners… a few scans in a day is fine."</em></td>
           </tr>
           <tr>
-            <td>Subdomain brute-force</td>
-            <td><span class="mono">ceh-lab.local</span> — our own DNS zone, inside the lab</td>
-            <td>We built it. It is on your host-only network and answers only to you.</td>
+            <td>Subdomain enumeration &amp; brute-force</td>
+            <td><span class="mono">vulnweb.com</span></td>
+            <td>Acunetix publishes the vulnweb family expressly for testing security tools; a light subdomain scan discovers its real subdomains (testphp, testasp, …).</td>
           </tr>
           <tr>
-            <td>Directory brute-force · crawling</td>
-            <td>Your Metasploitable2, <span class="mono">192.168.56.0/24</span></td>
-            <td>Your VM, your network, your machine.</td>
+            <td>Directory brute-force · crawling · fingerprinting</td>
+            <td><span class="mono">testphp.vulnweb.com</span></td>
+            <td>Acunetix's deliberately-vulnerable site — its home page invites you to "use it to test other tools and your manual hacking skills as well."</td>
           </tr>
         </tbody>
       </table>
@@ -485,7 +485,7 @@
              <b>What it gives an attacker:</b> a curated list of the paths the owner considers sensitive
              enough to hide — often the fastest route to an admin panel. <b>Note the amber path:</b> it goes
              straight from their server to you, skipping the index, which is why fetching it counts as
-             <em>active</em> recon. We do that in Lab 6, against our own lab target.</p>
+             <em>active</em> recon. We do that in Lab 6, against the authorised <span class="mono">testphp.vulnweb.com</span>.</p>
         </div>
         <figcaption><b>robots.txt does not block anyone.</b> It is a text file asking well-behaved crawlers not
           to index a path — and a perfectly reliable inventory of the paths the owner considers sensitive.
@@ -2167,7 +2167,7 @@ theHarvester -h | sed -n '/-b SOURCE/,/^$/p'</code></pre>
           <tr><td><strong>Tools</strong></td><td>crt.sh, <span class="mono">subfinder</span>, <span class="mono">amass -passive</span>, theHarvester</td><td><span class="mono">knockpy</span>, <span class="mono">amass</span> active mode, <span class="mono">ffuf</span> in DNS mode</td></tr>
           <tr><td><strong>Finds</strong></td><td>Anything that got a certificate or was seen resolving</td><td>Names nobody ever certified — internal-only, wildcard-hidden</td></tr>
           <tr><td><strong>Detectable</strong></td><td>No</td><td><strong>Yes</strong> — a flood of NXDOMAIN at their authoritative servers</td></tr>
-          <tr><td><strong>Authorisation</strong></td><td>Not required</td><td><strong>Required.</strong> Lab 7, lab targets only</td></tr>
+          <tr><td><strong>Authorisation</strong></td><td>Not required</td><td><strong>Required.</strong> Lab 7, authorised targets only</td></tr>
           <tr><td><strong>ATT&amp;CK</strong></td><td>T1596.001 / T1596.003</td><td>T1595.003 Wordlist Scanning</td></tr>
         </tbody>
       </table>
@@ -2209,7 +2209,7 @@ amass enum -passive -d tryhackme.com</code></pre>
         <span class="box-t">Notice what just happened to the scope</span>
         <p>Wappalyzer loads the target's page in your browser. <span class="mono">whatweb</span> sends HTTP
            requests to the target. <strong>Both are active.</strong> They belong on the other side of the line,
-           and in Lab 4 we point them at our own lab host, not at the client. Netcraft is the passive
+           and in Lab 4 we point them at <span class="mono">testphp.vulnweb.com</span>, not at the client. Netcraft is the passive
            substitute — this is exactly the kind of substitution a good tester makes without being told.</p>
       </div>
 
@@ -2243,37 +2243,24 @@ amass enum -passive -d tryhackme.com</code></pre>
       <div class="box intro">
         <span class="box-t">What you are about to do</span>
         <p>Run two aggregators, merge their output with your own crt.sh list, resolve the whole thing through
-           a public resolver, and produce the master host table. You also stand up the lab target that
-           Labs 6 and 7 need.</p>
+           a public resolver, and produce the master host table. Then fingerprint a real authorised target.</p>
       </div>
 
       <div class="box warn">
         <span class="box-t">Scope check</span>
         <p>Steps 1–4 are passive against <span class="mono">tryhackme.com</span>: aggregators query third
            parties, and resolution goes to <span class="mono">1.1.1.1</span>. Step 5 is
-           <strong>active</strong> and runs only against <span class="mono">recon.ceh-lab.local</span> on your
-           own host-only network. Do not point <span class="mono">whatweb</span> at the client. Ever.</p>
+           <strong>active</strong> and runs only against <span class="mono">testphp.vulnweb.com</span> — Acunetix's
+           authorised test site. Do not point <span class="mono">whatweb</span> at the client. Ever.</p>
       </div>
 
-      <h2>Step 0 — stand up the lab target (once, ~60 seconds)</h2>
-      <ol class="steps">
-        <li>
-          <strong>Run the lab recon-target script on your Kali box.</strong>
-          <pre><code>cd ~/ceh-lab
-sudo ./lab_recon_target.sh up</code></pre>
-          <p>This creates a small local DNS zone (<span class="mono">ceh-lab.local</span>) and a web root on
-             your Kali machine, both reachable only from your host-only network. It is the authorised target
-             for every active technique in the rest of today.</p>
-          <div class="verify">
-            <h4>✓ Verification</h4>
-            <ul>
-              <li><span class="mono">dig +short recon.ceh-lab.local</span> returns an address</li>
-              <li><span class="mono">curl -s http://recon.ceh-lab.local/ | head -5</span> returns HTML</li>
-              <li>The script printed <span class="mono">LAB TARGET READY</span></li>
-            </ul>
-          </div>
-        </li>
-      </ol>
+      <div class="box lab-box">
+        <span class="box-t">No setup — the active targets are already live</span>
+        <p>Step 5 (and Labs 6–7) run against the <strong>Acunetix vulnweb family</strong>
+           (<span class="mono">vulnweb.com</span>, <span class="mono">testphp.vulnweb.com</span>) — real sites
+           Acunetix publishes for testing tools. Nothing to build; just confirm you can reach them:
+           <span class="mono">curl -s http://testphp.vulnweb.com/ | head -5</span> should return HTML.</p>
+      </div>
 
       <h2>Step 1 — theHarvester, with sources you chose</h2>
       <ol class="steps">
@@ -2358,12 +2345,12 @@ grep -c DEAD resolved_hosts.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 5 — fingerprint, on the lab target only</h2>
+      <h2>Step 5 — fingerprint the authorised target</h2>
       <ol class="steps">
         <li>
-          <strong>Now cross the line, deliberately and on a host you own.</strong>
-          <pre><code>whatweb -a 1 http://recon.ceh-lab.local/
-whatweb -a 3 http://recon.ceh-lab.local/</code></pre>
+          <strong>Now cross the line, deliberately, on Acunetix's authorised test site.</strong>
+          <pre><code>whatweb -a 1 http://testphp.vulnweb.com/
+whatweb -a 3 http://testphp.vulnweb.com/</code></pre>
           <p><span class="mono">-a 1</span> is a passive-style single request; <span class="mono">-a 3</span> is
              aggressive and sends many more. Run both and <strong>compare how much more you learn versus how
              much more noise you make</strong> — that trade is the entire discipline of active recon, and you
@@ -2485,7 +2472,7 @@ whatweb -a 3 http://recon.ceh-lab.local/</code></pre>
       <div class="box note">
         <span class="box-t">The rule for the rest of the session</span>
         <p>Zone transfer → <span class="mono">zonetransfer.me</span>. Route tracing → <span class="mono">scanme.nmap.org</span>.
-           Crawling, fingerprinting and brute-force → your own lab. The client,
+           Crawling, fingerprinting and brute-force → the Acunetix vulnweb targets. The client,
            <span class="mono">tryhackme.com</span>, receives nothing from us for the rest of the day.</p>
       </div>
     </div>
@@ -3072,7 +3059,7 @@ dig axfr @1.1.1.1 zonetransfer.me</code></pre>
         <span class="box-t">This is loud, and one tool here has rotted</span>
         <p>A crawl is <em>hundreds to thousands of requests</em> to the target — the noisiest thing you do all
            day, and unmistakable in an access log. It only ever runs against an authorised target; in Lab 6
-           that is your own lab host. And note the tooling: <strong>Photon's last release was v1.3.0 in
+           that is <span class="mono">testphp.vulnweb.com</span>. And note the tooling: <strong>Photon's last release was v1.3.0 in
            2019.</strong> It still runs, but it is unmaintained — use it, and keep
            <span class="mono">katana</span> or <span class="mono">gospider</span> (both current) in mind as
            the maintained alternatives. Same standing lesson as Sublist3r: check the release date.</p>
@@ -3084,9 +3071,9 @@ traceroute scanme.nmap.org
 tcptraceroute scanme.nmap.org 443     # when ICMP is filtered
 mtr -rwc 10 scanme.nmap.org           # continuous, with per-hop loss stats
 
-# Photon — crawl your OWN lab host, not the client
+# Photon — crawl an AUTHORISED target (testphp.vulnweb.com), not the client
 pip install photon
-python3 photon.py -u http://recon.ceh-lab.local -l 2 -t 10 -o photon_out
+python3 photon.py -u http://testphp.vulnweb.com -l 2 -t 10 -o photon_out
 #   -l  crawl depth      -t  threads      -o  output directory</code></pre>
 
       <h3>How to read the output</h3>
@@ -3136,7 +3123,7 @@ python3 photon.py -u http://recon.ceh-lab.local -l 2 -t 10 -o photon_out
 
       <div class="box intro">
         <span class="box-t">What you are about to do</span>
-        <p>Trace the route to a host that permits it, then crawl your own lab target and read its
+        <p>Trace the route to a host that permits it, then crawl the authorised <span class="mono">testphp.vulnweb.com</span> and read its
            <span class="mono">robots.txt</span> — experiencing directly why fetching that file is active and
            reading it in a search index was not.</p>
       </div>
@@ -3144,8 +3131,8 @@ python3 photon.py -u http://recon.ceh-lab.local -l 2 -t 10 -o photon_out
       <div class="box warn">
         <span class="box-t">Scope check</span>
         <p>Traceroute → <span class="mono">scanme.nmap.org</span>, which authorises "a few scans in a day".
-           Crawl and <span class="mono">robots.txt</span> → <span class="mono">recon.ceh-lab.local</span> on
-           your own network. Do not crawl the client, and do not hammer scanme — one trace is enough.</p>
+           Crawl and <span class="mono">robots.txt</span> → <span class="mono">testphp.vulnweb.com</span> (Acunetix's
+           authorised test site). Do not crawl the client, and do not hammer scanme — one trace is enough.</p>
       </div>
 
       <h2>Step 1 — trace the path to an authorised host</h2>
@@ -3171,11 +3158,11 @@ tcptraceroute scanme.nmap.org 443</code></pre>
       <h2>Step 2 — fetch robots.txt, and feel the line you crossed</h2>
       <ol class="steps">
         <li>
-          <strong>Request the file directly from your lab host.</strong>
-          <pre><code>curl -s http://recon.ceh-lab.local/robots.txt
-curl -s http://recon.ceh-lab.local/sitemap.xml</code></pre>
+          <strong>Request the file directly from the target.</strong>
+          <pre><code>curl -s http://testphp.vulnweb.com/robots.txt
+curl -s http://testphp.vulnweb.com/sitemap.xml</code></pre>
           <p>In Lab 1 you read a robots.txt through Google's index and left no trace. This time you fetched it
-             yourself — and that request is now a line in the lab host's access log. Same file, opposite side
+             yourself — and that request is now a line in that server's access log. Same file, opposite side
              of the passive/active line. Record which disallowed paths the file reveals.</p>
           <div class="verify">
             <h4>✓ Verification</h4>
@@ -3187,11 +3174,11 @@ curl -s http://recon.ceh-lab.local/sitemap.xml</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — crawl the lab host</h2>
+      <h2>Step 3 — crawl the target</h2>
       <ol class="steps">
         <li>
           <strong>Map the site and mine the by-products.</strong>
-          <pre><code>python3 photon.py -u http://recon.ceh-lab.local -l 2 -t 10 -o photon_out
+          <pre><code>python3 photon.py -u http://testphp.vulnweb.com -l 2 -t 10 -o photon_out
 ls photon_out/
 cat photon_out/urls.txt | wc -l</code></pre>
           <p>Open the output directory and read the <em>by-product</em> files, not the URL list. Which files
@@ -3213,7 +3200,7 @@ cat photon_out/urls.txt | wc -l</code></pre>
       <div class="box tip">
         <span class="box-t">If Photon will not install</span>
         <p>It is a 2019 tool on modern Python — dependency friction is expected. Fall back to
-           <span class="mono">katana -u http://recon.ceh-lab.local -d 2</span> (ships current in Kali) and note
+           <span class="mono">katana -u http://testphp.vulnweb.com -d 2</span> (ships current in Kali) and note
            in your report that you substituted a maintained crawler. Recognising when a tool has rotted and
            swapping it cleanly <em>is</em> the skill.</p>
       </div>
@@ -3235,7 +3222,7 @@ cat photon_out/urls.txt | wc -l</code></pre>
         <p>Aggregation and certificate logs find everything that was <em>recorded</em> somewhere. Brute-force
            is what remains: names that were never certified, never linked, never leaked — you find them by
            generating candidates and asking whether each one exists. It is the loudest, most detectable thing
-           you do, which is why it comes last and only against a lab target.</p>
+           you do, which is why it comes last and only against an authorised target.</p>
       </div>
 
       <figure class="dgm interactive">
@@ -3310,6 +3297,9 @@ cat photon_out/urls.txt | wc -l</code></pre>
             <tr><td class="mono">Sublist3r</td><td>Subdomain</td><td>v1.1, 2020, Py2-era — dormant</td><td>Name only</td></tr>
             <tr><td class="mono">gobuster</td><td>Directory</td><td>Current, fast (Go)</td><td>Yes</td></tr>
             <tr><td class="mono">ffuf</td><td>Both</td><td>Current, fastest, most flexible</td><td>Yes</td></tr>
+            <tr><td class="mono">feroxbuster</td><td>Directory</td><td>Current (Rust) — recursive by default</td><td>Yes</td></tr>
+            <tr><td class="mono">dirsearch</td><td>Directory</td><td>Current (Python) — good defaults</td><td>Yes</td></tr>
+            <tr><td class="mono">dnsenum / fierce / dnsrecon</td><td>Subdomain / DNS</td><td>Ship in Kali; dnsrecon best-maintained</td><td>Exam + use</td></tr>
             <tr><td class="mono">dirb</td><td>Directory</td><td>Unmaintained since ~2014; ships in Kali</td><td>Exam tool</td></tr>
             <tr><td class="mono">DirBuster</td><td>Directory</td><td>Legacy Java — effectively dead</td><td>No</td></tr>
             <tr><td class="mono">wfuzz</td><td>Directory / fuzzing</td><td>v3.1.1, Jan 2026 — alive</td><td>Yes</td></tr>
@@ -3318,16 +3308,275 @@ cat photon_out/urls.txt | wc -l</code></pre>
         </div>
       </div>
 
-      <h3>Real syntax</h3>
-      <pre><code># SUBDOMAIN — DNS namespace, against the lab zone you built
-knockpy recon.ceh-lab.local
-ffuf -u http://recon.ceh-lab.local -H "Host: FUZZ.ceh-lab.local" \
-     -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -mc 200,301,403
+      <h3>The tools — real commands &amp; per-tool cheatsheets</h3>
 
-# SUBDIRECTORY — URL path, against the lab web root
-gobuster dir -u http://recon.ceh-lab.local -w /usr/share/wordlists/dirb/common.txt
-ffuf -u http://recon.ceh-lab.local/FUZZ -w /usr/share/wordlists/dirb/common.txt -mc 200,301,403
-dirb http://recon.ceh-lab.local        # the classic — slow, still works</code></pre>
+      <div class="box warn">
+        <span class="box-t">Your legal targets for this section — read before you run anything</span>
+        <ul>
+          <li><strong>Directory / content discovery → <span class="mono">http://testphp.vulnweb.com</span></strong>.
+              Acunetix publishes this and its siblings as deliberately-vulnerable sites and says on its own
+              home page they are <em>"intended to help you test Acunetix… you can use it to test other tools
+              and your manual hacking skills as well."</em> That sentence is your written authorization.</li>
+          <li><strong>Subdomain enumeration → <span class="mono">vulnweb.com</span>.</strong> The apex has a
+              handful of real subdomains (<span class="mono">testphp</span>, <span class="mono">testasp</span>,
+              <span class="mono">testaspnet</span>, <span class="mono">testhtml5</span>, <span class="mono">rest</span>)
+              to discover — part of the same Acunetix tool-testing estate. <strong>Passive</strong> enumeration
+              (<span class="mono">subfinder</span>, <span class="mono">crt.sh</span>) is legal against
+              <em>any</em> domain; <strong>active brute-force</strong> stays on vulnweb or a domain you own.</li>
+        </ul>
+        <p><strong>The one rule that never changes:</strong> passive tooling → any domain; active brute-force
+          → an authorized target only. Brute-forcing a stranger's DNS or web server is a prosecuted attack, no
+          matter how "passive" it feels.</p>
+      </div>
+
+      <h4>More authorized practice targets — bookmark these</h4>
+      <p>vulnweb is the default here, but it goes down sometimes. These are all <strong>online, deliberately
+         vulnerable, and explicitly provided for you to test tools against</strong> — so you always have a
+         fallback and a variety of stacks to fingerprint:</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Target</th><th>What / stack</th><th>Good for</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">testphp / testasp / testaspnet / testhtml5 / rest<br>.vulnweb.com</td><td>Acunetix — PHP, classic ASP, ASP.NET, HTML5, REST API</td><td>Directory &amp; content discovery, stack fingerprinting, params</td></tr>
+          <tr><td class="mono">demo.testfire.net</td><td>IBM/Watchfire "AltoroMutual" — a fake bank (JSP)</td><td>Dir discovery, login/app testing; long-standing and stable</td></tr>
+          <tr><td class="mono">ginandjuice.shop</td><td>PortSwigger's deliberately-vulnerable shop</td><td>Modern web app; content discovery, params for Session 8</td></tr>
+          <tr><td class="mono">brokencrystals.com</td><td>Modern single-page vulnerable app (many CVE classes)</td><td>Crawling, API/endpoint discovery</td></tr>
+          <tr><td class="mono">google-gruyere.appspot.com</td><td>Google's "Gruyere" web-security codelab</td><td>Beginner web-vuln practice (Google says "feel free to hack")</td></tr>
+          <tr><td class="mono">hackthissite.org</td><td>Long-running legal hacking-practice missions</td><td>Guided challenges (account, in-browser)</td></tr>
+          <tr><td class="mono">scanme.nmap.org</td><td>Nmap's authorized scan target</td><td>Host discovery / light scanning &amp; traceroute (a few/day)</td></tr>
+          <tr><td class="mono">zonetransfer.me</td><td>DigiNinja's zone-transfer training domain</td><td>DNS records &amp; AXFR (Lab 5)</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="pr-note"><b>For structured, fully-authorized practice</b> (accounts, in-browser labs, no target
+         to find): <b>PortSwigger Web Security Academy</b> (free), <b>TryHackMe</b> / <b>Hack The Box</b>,
+         <b>OWASP Juice Shop</b> (run it yourself), <b>Root-Me</b>, <b>OverTheWire</b>, <b>picoCTF</b>, and
+         <b>VulnHub</b> (download a VM to your own lab). See the practice-plan page for the ordered list.</p>
+
+      <h4>Wordlists — the ammunition every tool below needs</h4>
+      <p>A brute-force tool is only as good as its list. On Kali they live under
+         <span class="mono">/usr/share/wordlists</span> and <span class="mono">/usr/share/seclists</span>
+         (install the big collection with <span class="mono">sudo apt install seclists</span>). The list you
+         pick matters more than the tool you pick.</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Wordlist</th><th>For</th><th>When</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">seclists/Discovery/DNS/subdomains-top1million-5000.txt</td><td>Subdomains</td><td>Fast first pass — the 5k most common names</td></tr>
+          <tr><td class="mono">seclists/Discovery/DNS/subdomains-top1million-110000.txt</td><td>Subdomains</td><td>Thorough pass when the 5k came up thin</td></tr>
+          <tr><td class="mono">wordlists/dirb/common.txt</td><td>Directories</td><td>~4600 entries — the quick default</td></tr>
+          <tr><td class="mono">seclists/Discovery/Web-Content/directory-list-2.3-medium.txt</td><td>Directories</td><td>~220k — the standard serious dir list</td></tr>
+          <tr><td class="mono">seclists/Discovery/Web-Content/raft-*-files.txt</td><td>Files</td><td>Real filenames seen in the wild, by extension</td></tr>
+          <tr><td><strong>your own list</strong></td><td>Subdomains</td><td><strong>The convention you extracted from crt.sh today beats any generic list</strong> — see Lab 7</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- ===================== PART A: SUBDOMAINS ===================== -->
+      <h4>Part A — Subdomain enumeration (left of the dot)</h4>
+
+      <h5><span class="mono">subfinder</span> — passive, fast, the modern default</h5>
+      <pre><code>sudo apt install -y subfinder                 # or: go install .../subfinder/v2@latest
+subfinder -d tryhackme.com -all -silent -o subs.txt
+#   -d       target domain (passive — legal on any domain)
+#   -all     use every passive source it knows
+#   -silent  print only results, no banner (clean for piping)
+#   -o FILE  write results to a file</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">-d / -dL</td><td>One domain / a file of domains</td></tr>
+        <tr><td class="mono">-all</td><td>Query every source (slower, more complete)</td></tr>
+        <tr><td class="mono">-silent</td><td>Results only — ideal for <span class="mono">| httpx</span> or <span class="mono">| dnsx</span></td></tr>
+        <tr><td class="mono">-recursive</td><td>Re-run against found subdomains</td></tr>
+        <tr><td class="mono">-o / -oJ</td><td>Output to file / JSON</td></tr>
+      </tbody></table>
+      </div>
+
+      <h5><span class="mono">amass</span> — deepest coverage, passive <em>and</em> active</h5>
+      <pre><code>sudo apt install -y amass
+amass enum -passive -d tryhackme.com -o amass_passive.txt    # legal on any domain
+amass enum -active  -d vulnweb.com -brute                  # ACTIVE — vulnweb / owned only
+#   enum       the enumeration subcommand
+#   -passive   read third-party sources only (no packets to target)
+#   -active    resolve + optionally brute (touches DNS — authorized targets only)
+#   -brute     turn on the brute-force resolver</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">-passive</td><td>OSINT sources only — the safe default</td></tr>
+        <tr><td class="mono">-active</td><td>Resolves names / cert-grabs — authorized targets only</td></tr>
+        <tr><td class="mono">-brute</td><td>Add wordlist brute-forcing</td></tr>
+        <tr><td class="mono">-w FILE</td><td>Wordlist for the brute pass</td></tr>
+        <tr><td class="mono">-df FILE</td><td>Domains-from-file</td></tr>
+      </tbody></table>
+      </div>
+
+      <h5><span class="mono">knockpy</span> — purpose-built subdomain brute-force (v8, async)</h5>
+      <pre><code>pip install knockpy
+knockpy vulnweb.com                          # ACTIVE brute — vulnweb / owned only
+knockpy vulnweb.com -w mylist.txt --json     # your own wordlist, JSON output
+#   &lt;domain&gt;      the zone to brute-force
+#   -w FILE       wordlist of candidate names
+#   --json        machine-readable output for your report</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">-w FILE</td><td>Candidate-name wordlist</td></tr>
+        <tr><td class="mono">--json</td><td>JSON report (drop into your recon report)</td></tr>
+        <tr><td class="mono">-t N</td><td>Timeout per query</td></tr>
+        <tr><td class="mono">--recon</td><td>Also pull passive sources first</td></tr>
+      </tbody></table>
+      </div>
+
+      <h5><span class="mono">ffuf</span> (vhost / DNS mode) — the Swiss-army knife, also does subdomains</h5>
+      <pre><code># DNS-name brute (does the name resolve at all?)
+ffuf -w seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+     -u http://vulnweb.com -H "Host: FUZZ.vulnweb.com" -mc 200,301,302,403
+#   FUZZ    the placeholder ffuf substitutes each word into
+#   -H      forge the Host header → find name-based virtual hosts
+#   -mc     match these HTTP codes (filter out the noise)</code></pre>
+      <p class="pr-note"><b>Why the Host-header trick:</b> many subdomains are <em>virtual hosts</em> on one
+         IP — the DNS name may not resolve, but the web server serves different content when you send its
+         <span class="mono">Host:</span> header. ffuf finds those; a pure DNS tool misses them.</p>
+
+      <h5><span class="mono">dnsenum</span> · <span class="mono">fierce</span> · <span class="mono">dnsrecon</span> — the classic trio (know for the exam)</h5>
+      <pre><code>dnsenum vulnweb.com                                  # whois + records + zone-transfer try + brute
+fierce --domain vulnweb.com                          # focused subdomain brute + nearby-IP scan
+dnsrecon -d vulnweb.com -t brt -D mylist.txt         # -t brt = brute-force mode, -D = wordlist
+#   dnsrecon -t axfr  →  the zone-transfer test you used in Lab 5</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Tool</th><th>Best at</th><th>State</th></tr></thead><tbody>
+        <tr><td class="mono">dnsenum</td><td>All-in-one: records, AXFR try, brute, Google scrape</td><td>Ships in Kali; dated but works</td></tr>
+        <tr><td class="mono">fierce</td><td>Subdomain brute + scanning the neighbouring IPs it finds</td><td>Rewritten in Py3 — fine</td></tr>
+        <tr><td class="mono">dnsrecon</td><td>Scriptable: <span class="mono">-t std/axfr/brt/srv</span></td><td>Maintained — your go-to CLI</td></tr>
+      </tbody></table>
+      </div>
+
+      <!-- ===================== PART B: DIRECTORIES ===================== -->
+      <h4>Part B — Directory &amp; content discovery (right of the slash)</h4>
+      <p>All commands below run against the <strong>authorized</strong>
+         <span class="mono">http://testphp.vulnweb.com</span>. If it is down, swap in a sibling (<span class="mono">testasp</span>/<span class="mono">testaspnet</span>/<span class="mono">testhtml5</span><span class="mono">.vulnweb.com</span>) or another authorised site from the box above.</p>
+
+      <h5><span class="mono">gobuster dir</span> — fast, simple, the reliable default</h5>
+      <pre><code>sudo apt install -y gobuster
+gobuster dir -u http://testphp.vulnweb.com -w /usr/share/wordlists/dirb/common.txt \
+     -x php,txt,bak -t 50 -o gobuster.txt
+#   dir        directory-mode (gobuster also has dns / vhost / fuzz modes)
+#   -u URL     the target
+#   -w FILE    wordlist
+#   -x EXT     also try these file extensions on every word
+#   -t N       threads (50 is a sane, polite-ish default)
+#   -o FILE    save output</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">-x php,txt,bak</td><td>Append extensions — turns <span class="mono">admin</span> into <span class="mono">admin.php</span> too</td></tr>
+        <tr><td class="mono">-s / -b</td><td>Status codes to show / to blacklist</td></tr>
+        <tr><td class="mono">-t N</td><td>Threads (speed vs noise)</td></tr>
+        <tr><td class="mono">-k</td><td>Ignore TLS cert errors</td></tr>
+        <tr><td class="mono">-r</td><td>Follow redirects</td></tr>
+        <tr><td class="mono">gobuster dns</td><td>Same tool, subdomain mode: <span class="mono">gobuster dns -d vulnweb.com -w …</span></td></tr>
+      </tbody></table>
+      </div>
+
+      <h5><span class="mono">ffuf</span> — fastest and most flexible; the one to master</h5>
+      <pre><code>ffuf -u http://testphp.vulnweb.com/FUZZ -w /usr/share/wordlists/dirb/common.txt \
+     -mc 200,301,302,403 -e .php,.txt -o ffuf.json
+#   -u ...FUZZ   FUZZ is where each word is injected (path, param, header — anywhere)
+#   -mc          match codes; -fc filters codes; -fs filters by size
+#   -e           extensions to append
+#   -o           output (JSON by default with -of)</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">-mc / -ms / -ml</td><td>Match by code / size / lines</td></tr>
+        <tr><td class="mono">-fc / -fs / -fw</td><td><strong>Filter out</strong> by code / size / words — the key to killing false positives</td></tr>
+        <tr><td class="mono">-e .php,.bak</td><td>Extensions to append</td></tr>
+        <tr><td class="mono">-recursion</td><td>Dig into every directory it finds</td></tr>
+        <tr><td class="mono">-mc all -fc 404</td><td>The pro idiom: show everything <em>except</em> 404</td></tr>
+      </tbody></table>
+      </div>
+      <p class="pr-note"><b>The one ffuf skill that matters:</b> a soft-404 site returns
+         <span class="mono">200</span> for everything. Run once, see the common response size, then
+         <span class="mono">-fs &lt;that size&gt;</span> to filter it out. Filtering, not matching, is what makes
+         ffuf accurate.</p>
+
+      <h5><span class="mono">feroxbuster</span> — recursive by default, brilliant for deep trees</h5>
+      <pre><code>sudo apt install -y feroxbuster
+feroxbuster -u http://testphp.vulnweb.com -w /usr/share/wordlists/dirb/common.txt \
+     -x php -d 3 -o ferox.txt
+#   -u URL   target
+#   -x php   extensions
+#   -d N     max recursion DEPTH — it auto-dives into found directories
+#   -o FILE  output</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">-d N</td><td>Recursion depth — its headline feature</td></tr>
+        <tr><td class="mono">-x php,html</td><td>Extensions</td></tr>
+        <tr><td class="mono">-C 404 / -s 200</td><td>Filter / show status codes</td></tr>
+        <tr><td class="mono">--extract-links</td><td>Also parse the page for links to feed back in</td></tr>
+        <tr><td class="mono">-r</td><td>Follow redirects</td></tr>
+      </tbody></table>
+      </div>
+
+      <h5><span class="mono">dirsearch</span> — sensible defaults, great report output</h5>
+      <pre><code>sudo apt install -y dirsearch          # or: git clone .../maurosoria/dirsearch
+dirsearch -u http://testphp.vulnweb.com -e php,txt,bak -x 404,403 --format=plain -o ds.txt
+#   -u URL          target
+#   -e EXT          extensions (dirsearch bakes %EXT% into its default list)
+#   -x CODES        exclude these status codes
+#   --format / -o   report format + file</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">-e php,asp</td><td>Extensions injected into <span class="mono">%EXT%</span> in its wordlist</td></tr>
+        <tr><td class="mono">-x 403,404</td><td>Exclude noise codes</td></tr>
+        <tr><td class="mono">-r</td><td>Recursive</td></tr>
+        <tr><td class="mono">-t N</td><td>Threads</td></tr>
+        <tr><td class="mono">--format=json</td><td>Report format for your evidence</td></tr>
+      </tbody></table>
+      </div>
+
+      <h5><span class="mono">dirb</span> — the classic (unmaintained, but it is the exam's tool)</h5>
+      <pre><code>dirb http://testphp.vulnweb.com /usr/share/wordlists/dirb/common.txt -X .php,.bak
+#   URL then WORDLIST as positional args (note: opposite order to most tools)
+#   -X    file extensions to try
+#   -r    non-recursive     -z N   add a delay between requests (be polite)</code></pre>
+      <p class="pr-note"><b>Why still teach it:</b> it ships in Kali, needs zero flags to get going, and the
+         CEH exam names it. It is slow and single-threaded — fine for a small target, painful for a big one.
+         Know it; reach for <span class="mono">ffuf</span> or <span class="mono">gobuster</span> in real work.</p>
+
+      <h5><span class="mono">wfuzz</span> — fuzz <em>anything</em>, not just paths (alive: v3.1.1, 2026)</h5>
+      <pre><code>wfuzz -w /usr/share/wordlists/dirb/common.txt --hc 404 http://testphp.vulnweb.com/FUZZ
+# fuzz a parameter value instead of a path:
+wfuzz -w nums.txt --hc 404 "http://testphp.vulnweb.com/listproducts.php?cat=FUZZ"
+#   FUZZ    placeholder — put it in the path, a parameter, a header, POST data…
+#   --hc    hide these response codes   --hh N  hide by char count</code></pre>
+      <div class="tbl-scroll">
+      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+        <tr><td class="mono">--hc / --hl / --hw / --hh</td><td>Hide by code / lines / words / chars</td></tr>
+        <tr><td class="mono">--sc / --sl …</td><td>Show-only equivalents</td></tr>
+        <tr><td class="mono">-d "a=FUZZ"</td><td>Fuzz POST data</td></tr>
+        <tr><td class="mono">-H "X: FUZZ"</td><td>Fuzz a header</td></tr>
+      </tbody></table>
+      </div>
+      <p class="pr-note"><b>DirBuster</b> (the old Java GUI) is <strong>effectively dead</strong> — you will see
+         it named in courseware and older writeups, but there is no reason to launch it over
+         <span class="mono">ffuf</span>/<span class="mono">feroxbuster</span>. Recognise the name; do not use it.</p>
+
+      <!-- ===================== DECISION GUIDE ===================== -->
+      <h4>Which tool, when — the 10-second decision</h4>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>You want to…</th><th>Reach for</th><th>Because</th></tr></thead>
+        <tbody>
+          <tr><td>Find subdomains without touching the target</td><td class="mono">subfinder</td><td>Fast, passive, legal on any domain</td></tr>
+          <tr><td>The most complete subdomain picture</td><td class="mono">amass</td><td>Deepest sources; passive + active in one tool</td></tr>
+          <tr><td>Brute-force a zone you're authorized on</td><td class="mono">knockpy</td><td>Purpose-built, async, JSON output</td></tr>
+          <tr><td>Find virtual hosts DNS won't show</td><td class="mono">ffuf -H Host:</td><td>Forges the Host header</td></tr>
+          <tr><td>A quick directory pass</td><td class="mono">gobuster dir</td><td>Fast, simple, reliable</td></tr>
+          <tr><td>Accuracy on a soft-404 / weird site</td><td class="mono">ffuf</td><td>Best filtering (<span class="mono">-fs</span>/<span class="mono">-fc</span>)</td></tr>
+          <tr><td>Deep, recursive directory trees</td><td class="mono">feroxbuster</td><td>Recurses automatically</td></tr>
+          <tr><td>Fuzz a parameter, header or POST body</td><td class="mono">wfuzz</td><td>Fuzzes anything, not just paths</td></tr>
+          <tr><td>Pass the CEH exam question</td><td class="mono">dirb / DirBuster</td><td>The tools the syllabus still names</td></tr>
+        </tbody>
+      </table>
+      </div>
 
       <div class="box defender-view">
         <span class="box-t">SOC analyst view — the flip, and both are detectable</span>
@@ -3361,41 +3610,43 @@ dirb http://recon.ceh-lab.local        # the classic — slow, still works</code
     <div class="page-head">
       <div class="kicker"><span class="snum">S02 · P23</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 16 min</span></div>
       <h1>Lab 7 — Guess What Was Never Published</h1>
-      <p class="lede">Both brute-forces, on the lab zone you built — and proof that a smart wordlist beats a big one.</p>
+      <p class="lede">Both brute-forces, on Acunetix's authorised vulnweb targets — and proof that a smart wordlist beats a big one.</p>
     </div>
     <div class="content">
 
       <div class="box intro">
         <span class="box-t">What you are about to do</span>
-        <p>Run subdomain brute-force against your local zone and directory brute-force against your local web
-           root, then read the status codes properly. The headline experiment: your convention-derived
-           wordlist versus a generic one.</p>
+        <p>Run subdomain brute-force against <span class="mono">vulnweb.com</span> and directory brute-force against
+           <span class="mono">testphp.vulnweb.com</span>, then read the status codes properly. The headline
+           experiment: your convention-derived wordlist versus a generic one.</p>
       </div>
 
       <div class="box warn">
         <span class="box-t">Scope check — this is the loudest block of the day</span>
-        <p>Everything here targets <span class="mono">ceh-lab.local</span> / <span class="mono">recon.ceh-lab.local</span>
-           on your own host-only network. Brute-forcing a third party's DNS or web server is thousands of
-           unsolicited requests and is prosecuted as an attack. There is <strong>no authorised external target
-           for this technique today</strong> — the lab zone is the only place it runs.</p>
+        <p>Everything here targets the <strong>Acunetix vulnweb family</strong>
+           (<span class="mono">vulnweb.com</span> / <span class="mono">testphp.vulnweb.com</span>), published for
+           testing security tools. Brute-forcing <em>any other</em> third party's DNS or web server is thousands of
+           unsolicited requests and is prosecuted as an attack — so outside these authorised targets, this
+           technique only ever runs against a domain you own.</p>
       </div>
 
       <h2>Step 1 — subdomain brute-force with knockpy</h2>
       <ol class="steps">
         <li>
-          <strong>Point the maintained tool at your lab zone.</strong>
-          <pre><code>knockpy recon.ceh-lab.local
-# or the whole zone
-knockpy ceh-lab.local</code></pre>
-          <p>knockpy generates candidate names, asks your lab DNS server whether each resolves, and reports the
-             hits. Watch your DNS server's log at the same time (the setup script tails it) and see the
-             <span class="mono">NXDOMAIN</span> answers stack up — that is the exact signal a defender alerts
-             on.</p>
+          <strong>Point the maintained tool at the apex domain.</strong>
+          <pre><code>knockpy vulnweb.com
+# with your own wordlist + JSON for the report
+knockpy vulnweb.com -w ~/my_convention_list.txt --json</code></pre>
+          <p>knockpy generates candidate names and asks public DNS whether each resolves. It surfaces the real
+             vulnweb subdomains (<span class="mono">testphp</span>, <span class="mono">testasp</span>,
+             <span class="mono">testaspnet</span>, <span class="mono">testhtml5</span>, <span class="mono">rest</span>)
+             among many misses — and a flood of <span class="mono">NXDOMAIN</span> is the exact signal a
+             defender alerts on (you generate it for yourself in Step 4).</p>
           <div class="verify">
             <h4>✓ Verification</h4>
             <ul>
-              <li>knockpy reports the hidden subdomains the lab zone contains</li>
-              <li>You watched <span class="mono">NXDOMAIN</span> responses appear in the DNS log for the misses</li>
+              <li>knockpy reports several real <span class="mono">*.vulnweb.com</span> subdomains</li>
+              <li>You can describe the <span class="mono">NXDOMAIN</span> pattern the misses would create in a DNS log</li>
             </ul>
           </div>
         </li>
@@ -3406,11 +3657,11 @@ knockpy ceh-lab.local</code></pre>
         <li>
           <strong>Run the convention-derived list you drafted, then a generic one.</strong>
           <pre><code># your list from the crt.sh / zone-transfer convention (~30 names)
-ffuf -u http://recon.ceh-lab.local -H "Host: FUZZ.ceh-lab.local" \
+ffuf -u http://testphp.vulnweb.com -H "Host: FUZZ.vulnweb.com" \
      -w ~/my_convention_list.txt -mc 200,301,403
 
 # a generic 5000-word list
-ffuf -u http://recon.ceh-lab.local -H "Host: FUZZ.ceh-lab.local" \
+ffuf -u http://testphp.vulnweb.com -H "Host: FUZZ.vulnweb.com" \
      -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -mc 200,301,403</code></pre>
           <p>Compare: how many hits did each find, and how many <em>requests</em> did each cost to find them?
              The point you should be able to state afterwards: recon earlier in the day (crt.sh, the zone dump)
@@ -3429,9 +3680,9 @@ ffuf -u http://recon.ceh-lab.local -H "Host: FUZZ.ceh-lab.local" \
       <h2>Step 3 — directory brute-force, and read the codes</h2>
       <ol class="steps">
         <li>
-          <strong>Enumerate paths on the lab web root with two tools.</strong>
-          <pre><code>gobuster dir -u http://recon.ceh-lab.local -w /usr/share/wordlists/dirb/common.txt
-dirb http://recon.ceh-lab.local        # the exam's tool, for comparison</code></pre>
+          <strong>Enumerate paths on <span class="mono">testphp.vulnweb.com</span> with two tools.</strong>
+          <pre><code>gobuster dir -u http://testphp.vulnweb.com -w /usr/share/wordlists/dirb/common.txt
+dirb http://testphp.vulnweb.com        # the exam's tool, for comparison</code></pre>
           <p>Do not just collect <span class="mono">200</span>s. For every hit, record the <strong>status
              code</strong> and what it means: which paths are readable (<span class="mono">200</span>), which
              redirect (<span class="mono">301/302</span>), and — most importantly — which are
@@ -3448,23 +3699,27 @@ dirb http://recon.ceh-lab.local        # the exam's tool, for comparison</code><
         </li>
       </ol>
 
-      <h2>Step 4 — watch your own noise</h2>
+      <h2>Step 4 — watch your own noise (on a server you control)</h2>
       <ol class="steps">
         <li>
-          <strong>Look at what you just generated in the target's logs.</strong>
-          <pre><code># the setup script exposes the lab web log
-tail -n 40 ~/ceh-lab/logs/access.log</code></pre>
-          <p>This is the other half of every technique in this course. You made a mess in a log; now read it as
-             the analyst who has to catch you. What is the tell — the User-Agent, the request rate, the
-             404 pattern? Write the one-line detection rule you would deploy.</p>
+          <strong>You cannot read Acunetix's logs — so generate the signal against your own throwaway server.</strong>
+          <pre><code># terminal 1 — a disposable web server on your Kali, logging to the screen
+mkdir -p /tmp/n &amp;&amp; cd /tmp/n &amp;&amp; python3 -m http.server 8000
+
+# terminal 2 — point the same tool at it for a few seconds
+gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</code></pre>
+          <p>Watch the <span class="mono">404</span> burst scroll up terminal 1 in real time — one source, a
+             tool <span class="mono">User-Agent</span>, requests faster than any human. That is exactly what a
+             SOC analyst sees. Write the one-line detection rule you would deploy for it. (The DNS side is the
+             same idea: the Step 1 misses would show as an <span class="mono">NXDOMAIN</span> spike.)</p>
           <div class="verify">
             <h4>✓ Success criteria for Lab 7</h4>
             <ul>
-              <li>Both brute-forces run against the lab target only</li>
+              <li>Both brute-forces run against the authorised vulnweb targets only</li>
               <li>The smart-vs-generic wordlist result recorded with numbers</li>
               <li>Directory results carry status codes, with guarded paths flagged</li>
               <li>One detection rule written from reading your own noise in the log</li>
-              <li>Section 7 of the report complete; nothing in your history brute-forced a real third party</li>
+              <li>Section 7 of the report complete; nothing in your history brute-forced anything outside the authorised vulnweb targets</li>
             </ul>
           </div>
         </li>

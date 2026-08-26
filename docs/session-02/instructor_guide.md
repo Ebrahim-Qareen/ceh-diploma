@@ -12,10 +12,9 @@ doc: Instructor Guide
 
 ## Pre-class checklist
 
-- [ ] **Stand up the lab recon target on your Kali** before class:
-      `sudo ./scripts/lab_recon_target.sh up` — then confirm
-      `dig +short recon.ceh-lab.local` answers and `curl -s http://recon.ceh-lab.local/` returns HTML.
-      This is the authorised target for Labs 4, 6 and 7.
+- [ ] **Confirm the active targets are reachable** before class: `curl -s http://testphp.vulnweb.com/ | head`
+      returns HTML. Labs 4/6/7 use the **Acunetix vulnweb family** (`testphp.vulnweb.com`, `vulnweb.com`) — live
+      and authorised, nothing to build. *(Optional: `scripts/lab_recon_target.sh` builds a local offline zone.)*
 - [ ] Internet reachable from the machine you demo on — the passive blocks query public third parties.
 - [ ] Confirm on your Kali: `dig`, `whois`, `theHarvester`, `subfinder`, `knockpy`, `gobuster`, `dirb`,
       `whatweb`, `traceroute`. Install anything missing tonight, not in front of the room
@@ -101,8 +100,8 @@ weakest of forty-one hosts" point — click each host row (each is a different f
 different technique from today).
 
 ### Lab 4 — Automate the sweep (16 min)
-**Step 0 stands up the lab target** (`sudo ./scripts/lab_recon_target.sh up`) — do this with them, it is
-needed for Labs 6 and 7. The `whatweb -a 1` vs `-a 3` comparison at the end is the whole active-recon
+**No setup needed** — Labs 4/6/7 use the live Acunetix vulnweb sites; just confirm reachability first. The
+`whatweb -a 1` vs `-a 3` comparison at the end is the whole active-recon
 discipline in miniature: more data costs more noise. Make sure no active command in anyone's history
 points at the client.
 
@@ -125,13 +124,13 @@ function-revealing hostnames and TXT records is the skill, not the host count.
 
 ### Page 20 + Lab 6 — Route tracing & crawling (18 min)
 Traceroute against `scanme.nmap.org` (authorised, a few probes/day — do not hammer it). Crawling and
-robots.txt against the **lab target**. The teaching beat in Lab 6 Step 2: fetching robots.txt yourself is
+robots.txt against **testphp.vulnweb.com**. The teaching beat in Lab 6 Step 2: fetching robots.txt yourself is
 *active* (it's in the lab's access log), whereas reading it via Google in Lab 1 was passive — same file,
 opposite side of the line. Photon is a 2019 tool; if it won't install, `katana` is the maintained fallback.
 
 ### Page 22 + Lab 7 — Brute-force (23 min)
 The **subdomain-vs-subdirectory diagram** is interactive — left of the dot is DNS, right of the slash is a
-web server. Lab 7 runs both against the lab zone (no external target for this — brute-forcing a stranger is
+web server. Lab 7 runs both against the authorised Acunetix vulnweb sites (brute-forcing a stranger is
 prosecuted). The headline experiment is **smart wordlist vs generic**: the convention students extracted
 from crt.sh earlier beats a 5000-word list, which is the entire argument for doing passive recon first.
 Step 4 has them read their own noise in the access log and write the detection rule — most of this class

@@ -27,12 +27,17 @@ Host-only network: 192.168.56.0/24 (adjust if it collides with existing labs)
 | WINSRV19-TGT01 | Windows Server 2019 | 2 | 4 GB | 40 GB | Target — enumeration, AD-adjacent services |
 | METASPLOITABLE2 | Metasploitable2 | 1 | 1 GB | 10 GB | Target — classic vulnerable services |
 
-## Session 2 addition — local recon target (`ceh-lab.local`)
+## Optional — local recon target (`ceh-lab.local`) for offline use
 
-Session 2 needs an **authorised target for active recon** (subdomain/directory
-brute-force and crawling against a stranger is a prosecuted attack). Rather than a
-new VM, this is a lightweight service stood up **on KALI-ATK01 itself**, reachable
-only on the host-only network:
+> **Not required.** Session 2 active recon now runs against the **Acunetix vulnweb
+> family** (`http://testphp.vulnweb.com` for directory/content/crawl/fingerprint,
+> `vulnweb.com` for subdomain enumeration) — live, authorised, no setup. This local
+> target is kept only as an **optional offline alternative** for classrooms without
+> internet access.
+
+If you want a fully offline target you control, `scripts/lab_recon_target.sh` stands
+up a lightweight service **on KALI-ATK01 itself**, reachable only on the host-only
+network:
 
 - **DNS zone `ceh-lab.local`** served by `dnsmasq` — a handful of published hosts
   and several *unpublished* ones, so subdomain brute-force has something to find and
@@ -62,7 +67,7 @@ reuses a VM, so labs don't interfere with each other.
 | WIN10-TGT01 | Session 1 (build) | Target from Session 3 onward |
 | WINSRV19-TGT01 | Session 1 (build) | Target from Session 3 onward |
 | METASPLOITABLE2 | Session 1 (build) | Target from Session 2 onward |
-| `ceh-lab.local` (on Kali) | Session 2 | Local DNS+web recon target via `scripts/lab_recon_target.sh` — not a VM |
+| `ceh-lab.local` (on Kali) | Session 2 (optional) | OPTIONAL offline recon target via `scripts/lab_recon_target.sh`; Session 2 uses the live Acunetix vulnweb sites by default — not a VM |
 
 Sessions 6 (privesc/capstone) and 8 (web app) may need additional
 deliberately-vulnerable targets (the source material's named CTF boxes —

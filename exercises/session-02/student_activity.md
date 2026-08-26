@@ -40,7 +40,7 @@ defender could detect it**.
 | 2 | `dig axfr @nsztm1.digi.ninja zonetransfer.me` |
 | 3 | Searching `%.tryhackme.com` on crt.sh |
 | 4 | `curl http://tryhackme.com/robots.txt` |
-| 5 | `knockpy ceh-lab.local` |
+| 5 | `knockpy vulnweb.com` |
 | 6 | Reading a target employee's public LinkedIn profile |
 | 7 | `whatweb -a 3 https://tryhackme.com` |
 
@@ -48,15 +48,15 @@ defender could detect it**.
 one assigned to an authorised target, and the "detectable?" column correct — note that #1, #3 and #6 are
 **not** detectable by the target because a third party (or nobody) receives them, while #2, #4, #5 and #7
 are. (#4 and #7 against `tryhackme.com` as written are **not authorised** — the correct answer names the
-lab target or flags them as out of scope.)
+authorised target or flags them as out of scope.)
 
 **Answer key (instructor):**
 1. Passive — query goes to Cloudflare's resolver; not detectable by target.
 2. Active — packet to `zonetransfer.me`'s authoritative NS (authorised training zone); detectable (AXFR in DNS log).
 3. Passive — query goes to crt.sh/CT logs; not detectable.
-4. Active — packet to the web server; **as written, against the client, out of scope** → run against the lab target; detectable (access log).
-5. Active — DNS queries to the lab zone (authorised lab); detectable (NXDOMAIN spike).
+4. Active — packet to the web server; **as written, against the client, out of scope** → run against `testphp.vulnweb.com`; detectable (access log).
+5. Active — DNS queries to `vulnweb.com` (authorised); detectable (NXDOMAIN spike).
 6. Passive — reading a public page; not detectable (LinkedIn's view metrics aside, the target org can't see it).
-7. Active — HTTP requests to the target; **against the client, out of scope** → lab target only; detectable (access log, tool User-Agent).
+7. Active — HTTP requests to the target; **against the client, out of scope** → `testphp.vulnweb.com` only; detectable (access log, tool User-Agent).
 
 **Time box:** 35 min total for both. Turn in with your recon report.

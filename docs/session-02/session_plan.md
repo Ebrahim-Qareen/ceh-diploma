@@ -23,7 +23,7 @@ By the end of this session, students will be able to:
 5. **Read** a WHOIS/RDAP record and DNS records (incl. SPF/DMARC) as intelligence, and explain the 2025 WHOIS→RDAP transition.
 6. **Derive** an organisation's email/username convention from one confirmed address plus public data (T1589), and explain how it feeds Session 4.
 7. **Perform** active DNS reconnaissance including a live zone transfer, and route tracing and web crawling against authorised targets (T1590/T1595).
-8. **Distinguish** subdomain from subdirectory brute-force, run both against a lab target, and read the status codes.
+8. **Distinguish** subdomain from subdirectory brute-force, run both against authorised targets, and read the status codes.
 9. **Assemble** the findings into a ranked recon report — the session deliverable and Session 3's input.
 10. **State**, for each technique, the SOC detection angle (or explain why it is undetectable) and the countermeasure.
 
@@ -40,11 +40,11 @@ By the end of this session, students will be able to:
 | **Lab 3** | Registration data + derive the email convention | Hands-on (everyone) | 10 |
 | Break | — | — | 10 |
 | theHarvester · subdomains · stack | Aggregation, passive vs brute-force, fingerprinting, tool rot | Theory (interactive) | 16 |
-| **Lab 4** | Automate the sweep + stand up the lab target | Hands-on (everyone) | 16 |
+| **Lab 4** | Automate the sweep + fingerprint a real target | Hands-on (everyone) | 16 |
 | Crossing the line · DNS & zone transfer | Passive→active, DNS record map, AXFR misconfiguration | Theory (interactive + animated) | 13 |
 | **Lab 5** | DNS record sweep + a live zone transfer | Hands-on (everyone) | 16 |
 | Route tracing & crawling | TTL trick, Photon, tool rot | Theory (interactive) | 8 |
-| **Lab 6** | Traceroute + robots.txt + crawl the lab target | Hands-on (everyone) | 10 |
+| **Lab 6** | Traceroute + robots.txt + crawl a real target | Hands-on (everyone) | 10 |
 | Subdomain vs subdirectory | Two namespaces, tool-state table | Theory (interactive) | 7 |
 | **Lab 7** | Both brute-forces + smart-vs-generic wordlist | Hands-on (everyone) | 16 |
 | Countermeasures | The three-layer defensive doctrine | Defender (interactive) | 7 |
@@ -64,7 +64,7 @@ knowledge_base file for the rest.
 ## Delivery notes
 - **One target, followed all the way down.** `tryhackme.com` carries every passive block, so students
   watch one picture assemble rather than seeing twelve disconnected demos. Active techniques switch to
-  authorised stand-ins (`zonetransfer.me`, `scanme.nmap.org`, the lab zone) — say the authorization
+  authorised stand-ins (`zonetransfer.me`, `scanme.nmap.org`, the Acunetix vulnweb sites) — say the authorization
   basis out loud each time.
 - **Method before syntax.** Every tool page gives what-it-is / why-it-exists / **the method** / real
   syntax / how-to-read-the-output / what-it-feeds / SOC flip. A student who memorises
@@ -89,8 +89,10 @@ knowledge_base file for the rest.
 ## Tools / VMs needed
 See `labs/lab_design.md` and `labs/setup_guide.md`.
 - **In class:** KALI-ATK01 for the active labs; a browser (Kali's or the laptop's) for the passive OSINT.
-- **Lab target:** `scripts/lab_recon_target.sh` stands up the local `ceh-lab.local` DNS zone + web root on
-  Kali for Labs 4/6/7 (host-only only — no external target for brute-force).
+- **Active targets (Labs 4/6/7):** the Acunetix **vulnweb family** — `http://testphp.vulnweb.com` (directory/
+  content/crawl/fingerprint) and `vulnweb.com` (subdomain enumeration). Live, authorised, no setup. Zone
+  transfer uses `zonetransfer.me`; route tracing uses `scanme.nmap.org`. *Optional:* `scripts/lab_recon_target.sh`
+  builds a local offline zone if the internet isn't available.
 - **API keys:** none required. Shodan free (≈50 queries/mo, limited filters), hunter.io free (50
   credits/mo), DNSDumpster free (50 req/day) — all used within free tiers; say so before the labs.
 
@@ -103,4 +105,4 @@ section across the eight labs and assembled in Lab 8. It is Session 3's scan lis
   build time — a real, and teachable, example of the service's flakiness) and `hunterio-domain-search`
   (needs a logged-in account; left for the instructor to capture without exposing account details).
   The page is safe to project without them.
-- The lab DNS zone (`ceh-lab.local`) is new to `labs/lab_design.md` this session — see the update there.
+- Active recon uses the live Acunetix vulnweb family (no local lab needed); `scripts/lab_recon_target.sh` + its `labs/lab_design.md` section are kept as an optional offline alternative.
