@@ -65,9 +65,9 @@
         Session 4 is where you get the keys: match a version to a known weakness, then crack, spray, poison and
         roast your way to a working credential — every step loud in the auth logs, so every step carries its SOC flip.</div>
 
-      <h2>Today's agenda</h2>
+      <h2><span class="h-t">Today's agenda</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:12%"><col style="width:59%"><col style="width:17%"><col style="width:12%"></colgroup>
         <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
         <tbody>
           <tr><td>1</td><td>Where we left off — the target profile becomes today's ammunition</td><td>Theory</td><td>8</td></tr>
@@ -200,12 +200,12 @@
            what it writes to the log and you can catch it every day. That second skill is the tier-1-into-tier-2 SOC job.</p>
       </div>
 
-      <h2>Where today sits on ATT&amp;CK</h2>
+      <h2><span class="h-t">Where today sits on ATT&amp;CK</span></h2>
       <p>Session 3 lived in <strong>Discovery</strong>. Today we move into <strong>Credential Access</strong> — the
          tactic every technique below belongs to — and hand off to <strong>Lateral Movement / Exploitation</strong> at
          the end. (IDs verified against the live ATT&amp;CK matrix.)</p>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:28%"><col style="width:47%"><col style="width:25%"></colgroup>
         <thead><tr><th>Tactic</th><th>Technique (today)</th><th>Where in this session</th></tr></thead>
         <tbody>
           <tr><td>TA0007 Discovery</td><td>Vulnerability scanning (part of active scanning)</td><td>Half A — vuln analysis</td></tr>
@@ -324,11 +324,11 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
            you're firing exploits blind.</p>
       </div>
 
-      <h2>What a vulnerability actually is</h2>
+      <h2><span class="h-t">What a vulnerability actually is</span></h2>
       <p>A <strong>vulnerability</strong> is a weakness that can be exploited — from a missing patch, a
          misconfiguration, an insecure design, or a careless user. Two terms students conflate:</p>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:26%"><col style="width:42%"><col style="width:32%"></colgroup>
         <thead><tr><th>Term</th><th>What it is</th><th>Stops at</th></tr></thead>
         <tbody>
           <tr><td><strong>Vulnerability assessment</strong></td><td>Finding weaknesses — scanning, version matching, scoring</td><td><em>Finding</em>. No exploitation.</td></tr>
@@ -339,7 +339,7 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
       <p>Today is the bridge: Half A is assessment (find + score + confirm an exploit exists); the labs then cross into
          exploitation only where you have authorisation and a working credential. Session 5 does the full exploitation.</p>
 
-      <h2>The vulnerability funnel</h2>
+      <h2><span class="h-t">The vulnerability funnel</span></h2>
       <p>Every finding runs the same pipeline. It <em>narrows</em>: a box has dozens of services, a handful have known
          CVEs, fewer have a public exploit, and one is your best way in. Click each stage.</p>
 
@@ -415,9 +415,9 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
            answers <em>which</em> question keeps you out of vendor marketing and inside authoritative data.</p>
       </div>
 
-      <h2>The research sources</h2>
+      <h2><span class="h-t">The research sources</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:20%"><col style="width:22%"><col style="width:58%"></colgroup>
         <thead><tr><th>Source</th><th>URL</th><th>Answers</th></tr></thead>
         <tbody>
           <tr><td><strong>NIST NVD</strong></td><td class="mono">nvd.nist.gov</td><td>The CVE with its CVSS score, vector, and affected versions. Your first stop.</td></tr>
@@ -429,7 +429,7 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
       </table>
       </div>
 
-      <h2>CVSS — read the vector, not the number</h2>
+      <h2><span class="h-t">CVSS — read the vector, not the number</span></h2>
       <p>The <strong>Common Vulnerability Scoring System</strong> maps a vulnerability to <strong>0–10</strong>. The
          number sets the severity band; the <strong>vector string</strong> behind it tells you whether <em>you</em> can
          use it right now.</p>
@@ -471,7 +471,7 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
       </figure>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:20%"><col style="width:13%"><col style="width:16%"><col style="width:16%"><col style="width:16%"><col style="width:19%"></colgroup>
         <thead><tr><th>Score</th><th>0.0</th><th>0.1–3.9</th><th>4.0–6.9</th><th>7.0–8.9</th><th>9.0–10.0</th></tr></thead>
         <tbody><tr><td><strong>Severity</strong></td><td>None</td><td>Low</td><td>Medium</td><td>High</td><td>Critical</td></tr></tbody>
       </table>
@@ -527,9 +527,9 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
         <div class="dgm-detail" data-detail="nv"><h5><span class="dd-tag">LOUD</span>Asking the target is an event</h5><p><b>nmap --script vuln sends real, often malformed probes.</b> The service logs the connections (WFP 5156, service logs) and IDS rules fire on the known script signatures. The instant "is this known?" becomes "is <em>this host</em> vulnerable?", it's detectable — map it to T1595 Active Scanning.</p></div>
       </figure>
 
-      <h2 class="mono" style="color:#ff7043">searchsploit — the 7-part frame</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">searchsploit — the 7-part frame</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <tbody>
           <tr><td style="width:150px"><strong>What it is</strong></td><td>A command-line search over a local, offline copy of the Exploit-DB archive (ships in Kali as <span class="mono">exploitdb</span>).</td></tr>
           <tr><td><strong>Why it exists</strong></td><td>To answer "is there a public exploit for this?" in seconds, offline, without browsing to a website or tipping anyone off.</td></tr>
@@ -550,7 +550,7 @@ vsftpd 2.3.4 - Backdoor Command Execution  | unix/remote/17491.rb (Metasploit)
       </table>
       </div>
 
-      <h2 class="mono" style="color:#ff7043">nmap --script vuln — the target answers</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">nmap --script vuln — the target answers</span></h2>
       <p>The NSE <span class="mono">vuln</span> category asks the service directly whether it is vulnerable — the fast
          way to turn a port into a confirmed CVE without a full scanner.</p>
       <pre><code>nmap -sV --script vuln 192.168.56.X                     # broad — all vuln scripts
@@ -598,7 +598,7 @@ nmap -p445 --script smb-vuln-ms17-010 192.168.56.107   # targeted — is Win7 Et
            You build the "way in" column of your access plan. You do <strong>not</strong> fire anything.</p>
       </div>
 
-      <h2>Step 1 — searchsploit your profile (Metasploitable2)</h2>
+      <h2><span class="h-t">Step 1 — searchsploit your profile (Metasploitable2)</span></h2>
       <ol class="steps">
         <li>
           <strong>Search each version you enumerated</strong>, exact product + version.
@@ -617,7 +617,7 @@ searchsploit -m unix/remote/16320.rb   # mirror the Samba one to read it</code><
         </li>
       </ol>
 
-      <h2>Step 2 — ask the Windows 7 target directly (the CVE→exploit bridge)</h2>
+      <h2><span class="h-t">Step 2 — ask the Windows 7 target directly (the CVE→exploit bridge)</span></h2>
       <ol class="steps">
         <li>
           <strong>Confirm MS17-010 with NSE</strong> — this is the one CVE you'll actually fire in Session 5.
@@ -635,7 +635,7 @@ searchsploit -m unix/remote/16320.rb   # mirror the Samba one to read it</code><
         </li>
       </ol>
 
-      <h2>Step 3 — the practice range (read versions as leads)</h2>
+      <h2><span class="h-t">Step 3 — the practice range (read versions as leads)</span></h2>
       <ol class="steps">
         <li>
           <strong>On Kioptrix 1</strong>, the old versions <em>are</em> the exploit map — practise reading them.
@@ -652,7 +652,7 @@ searchsploit samba 2.2         # → trans2open remote overflow
         </li>
       </ol>
 
-      <h2>Step 4 — the deliberate failure case</h2>
+      <h2><span class="h-t">Step 4 — the deliberate failure case</span></h2>
       <div class="box warn">
         <span class="box-t">A hit is not a guarantee — read before you believe</span>
         <p>Search <span class="mono">samba 3.0.20</span> and you'll see several exploits. Now check the version on
@@ -706,9 +706,9 @@ searchsploit samba 2.2         # → trans2open remote overflow
         <div class="dgm-detail" data-detail="wayin"><h5><span class="dd-tag">STAGE 4</span>Ways in</h5><p><b>The handful that are real, reachable, and have a working exploit.</b> These go in the access plan. A scanner rarely surfaces these at the top — the judgement that finds them is the skill you're being paid for.</p></div>
       </figure>
 
-      <h2 class="mono" style="color:#ff7043">Nessus Essentials — the 7-part frame</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">Nessus Essentials — the 7-part frame</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <tbody>
           <tr><td style="width:150px"><strong>What it is</strong></td><td>Tenable's vulnerability scanner. <strong>Nessus Essentials</strong> is the free tier — the industry-standard tool you'll meet on the job.</td></tr>
           <tr><td><strong>Why it exists</strong></td><td>To scan a network, fingerprint every service, map each to known CVEs via a huge plugin feed, score them, and produce a remediation report — in one pass.</td></tr>
@@ -730,12 +730,12 @@ searchsploit samba 2.2         # → trans2open remote overflow
            you quote them.</strong></p>
       </div>
 
-      <h2 class="mono" style="color:#ff7043">Greenbone / GVM — the FOSS alternative</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">Greenbone / GVM — the FOSS alternative</span></h2>
       <p>The open-source option. Note the naming correction: <strong>"OpenVAS" is now the scanner engine inside the
          Greenbone Vulnerability Management (GVM) framework</strong> — the product is Greenbone/GVM, OpenVAS is a
          component of it.</p>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:18%"><col style="width:40%"><col style="width:42%"></colgroup>
         <thead><tr><th></th><th>Nessus Essentials</th><th>Greenbone / GVM</th></tr></thead>
         <tbody>
           <tr><td>Licence</td><td>Free tier, 5 IPs</td><td>Fully open source, no IP cap</td></tr>
@@ -773,7 +773,7 @@ searchsploit samba 2.2         # → trans2open remote overflow
            the job is only as good as your ability to question it.</p>
       </div>
 
-      <h2>Follow along</h2>
+      <h2><span class="h-t">Follow along</span></h2>
       <ol class="steps">
         <li>
           <strong>Watch the scan run</strong> and note the shape of the output.
@@ -837,13 +837,13 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
            has learned authentication. So we build the mechanism first, then hang the tools on it.</p>
       </div>
 
-      <h2>Authentication in one line</h2>
+      <h2><span class="h-t">Authentication in one line</span></h2>
       <p>Authentication is proving you are who you claim to be — with something you know (password), have (token, key),
          or are (biometric). Passwords are the weak link, and the rule is universal: <strong>passwords are stored
          hashed, never in plaintext.</strong> Everything today is about getting at, or abusing, those stored or
          in-transit secrets.</p>
 
-      <h2>Hashing vs encryption vs encoding</h2>
+      <h2><span class="h-t">Hashing vs encryption vs encoding</span></h2>
       <p>Students conflate these constantly, and the whole session depends on the difference.</p>
 
       <figure class="dgm">
@@ -912,9 +912,9 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
            capturing a challenge-response off the wire.</p>
       </div>
 
-      <h2>Where Windows credentials live</h2>
+      <h2><span class="h-t">Where Windows credentials live</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:17%"><col style="width:35%"><col style="width:30%"><col style="width:18%"></colgroup>
         <thead><tr><th>Store</th><th>Holds</th><th>Attack (ATT&amp;CK)</th><th>Today</th></tr></thead>
         <tbody>
           <tr><td><span class="mono">SAM</span> (local)</td><td>Local account NT hashes, per machine</td><td>SAM dumping — T1003.002</td><td>Lab 3</td></tr>
@@ -925,7 +925,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
       </table>
       </div>
 
-      <h2>NTLM challenge-response — press play</h2>
+      <h2><span class="h-t">NTLM challenge-response — press play</span></h2>
       <p>NTLM authenticates without sending the password <em>or</em> the NT hash across the network. Watch what actually
          travels — because that's what Responder captures.</p>
 
@@ -989,7 +989,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
            Learn the flow and AS-REP roasting and Kerberoasting stop being magic.</p>
       </div>
 
-      <h2>The ticket flow — press play</h2>
+      <h2><span class="h-t">The ticket flow — press play</span></h2>
       <p>Kerberos uses a trusted third party, the <strong>KDC</strong> (Key Distribution Center, running on the DC), and
          tickets instead of passwords. Three exchanges:</p>
 
@@ -1136,7 +1136,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
         <div class="dgm-detail" data-detail="pth"><h5><span class="dd-tag">SHORTCUT</span>Pass-the-hash (T1550.002)</h5><p><b>You don't always need the plaintext.</b> NTLM authenticates <em>with the hash</em> — so an NT hash <em>is</em> the credential. Feed it straight to <span class="mono">nxc ... -H &lt;hash&gt;</span> or <span class="mono">psexec</span> and authenticate without ever cracking. The whole reason a strong password doesn't save a machine once its hash leaks. Lab 6.</p></div>
       </figure>
 
-      <h2>The hash-cracking pipeline</h2>
+      <h2><span class="h-t">The hash-cracking pipeline</span></h2>
       <p>Every offline crack is the same four steps. Get any one wrong (usually the mode) and it silently fails.</p>
       <figure class="dgm interactive">
         <svg viewBox="0 0 940 130" role="img" aria-label="Hash-cracking pipeline: obtain the hash, identify its type and hashcat mode, apply a wordlist plus rules or a mask, and recover the plaintext. Click each step.">
@@ -1205,9 +1205,9 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
            helpers. Learn the method once; it's identical.</p>
       </div>
 
-      <h2 class="mono" style="color:#ff7043">hashcat — the 7-part frame</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">hashcat — the 7-part frame</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <tbody>
           <tr><td style="width:150px"><strong>What it is</strong></td><td>A GPU-accelerated offline password recovery tool. Mode-driven: <span class="mono">-m</span> selects the hash type.</td></tr>
           <tr><td><strong>Why it exists</strong></td><td>Because a stolen hash has no lockout and no rate limit — the only limits are your hardware and your wordlist. hashcat maxes both.</td></tr>
@@ -1224,9 +1224,9 @@ hashcat -m 1000  sam.txt --show                           # print cracked result
       </table>
       </div>
 
-      <h2>The modes you need today — memorise these four</h2>
+      <h2><span class="h-t">The modes you need today — memorise these four</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:15%"><col style="width:35%"><col style="width:50%"></colgroup>
         <thead><tr><th><span class="mono">-m</span></th><th>Hash</th><th>Where it came from</th></tr></thead>
         <tbody>
           <tr><td class="mono">1000</td><td>NTLM (NT hash)</td><td>SAM dump, NTDS.dit — Lab 3, Lab 6</td></tr>
@@ -1237,7 +1237,7 @@ hashcat -m 1000  sam.txt --show                           # print cracked result
       </table>
       </div>
 
-      <h2 class="mono" style="color:#ff7043">John the Ripper (jumbo) — the same job, CPU-first</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">John the Ripper (jumbo) — the same job, CPU-first</span></h2>
       <pre><code>unshadow passwd.txt shadow.txt > unshadowed.txt     # merge /etc/passwd + /etc/shadow
 john --wordlist=/usr/share/wordlists/rockyou.txt unshadowed.txt
 john --show unshadowed.txt                           # print cracked
@@ -1270,7 +1270,7 @@ john --show unshadowed.txt                           # print cracked
            Both feed the access plan. This is <strong>offline</strong> — the targets see nothing once you have the hash.</p>
       </div>
 
-      <h2>Step 1 — dump and crack the Windows SAM (Win7 / Win10)</h2>
+      <h2><span class="h-t">Step 1 — dump and crack the Windows SAM (Win7 / Win10)</span></h2>
       <ol class="steps">
         <li>
           <strong>Dump the local SAM</strong> with secretsdump (uses a local admin credential).
@@ -1306,7 +1306,7 @@ hashcat -m 1000 sam.txt --show      # → labuser:Summer2024 , helpdesk:Password
         </li>
       </ol>
 
-      <h2>Step 2 — crack Linux <span class="mono">/etc/shadow</span> (Metasploitable2)</h2>
+      <h2><span class="h-t">Step 2 — crack Linux <span class="mono">/etc/shadow</span> (Metasploitable2)</span></h2>
       <ol class="steps">
         <li>
           <strong>Merge and crack with John.</strong>
@@ -1324,7 +1324,7 @@ john --show unshadowed.txt          # → msfadmin:msfadmin , user:user ...</cod
         </li>
       </ol>
 
-      <h2>Step 3 — the deliberate failure: the wrong wordlist</h2>
+      <h2><span class="h-t">Step 3 — the deliberate failure: the wrong wordlist</span></h2>
       <div class="box warn">
         <span class="box-t">"Exhausted" is not "uncrackable"</span>
         <p>Run <span class="mono">hashcat -m 1000 sam.txt rockyou.txt</span> with <em>no</em> rules against a slightly
@@ -1359,9 +1359,9 @@ john --show unshadowed.txt          # → msfadmin:msfadmin , user:user ...</cod
            technique built specifically to slip between them.</p>
       </div>
 
-      <h2 class="mono" style="color:#ff7043">hydra — the 7-part frame</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">hydra — the 7-part frame</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <tbody>
           <tr><td style="width:150px"><strong>What it is</strong></td><td>A fast online brute-forcer that speaks many protocols (SSH, FTP, RDP, SMB, HTTP forms…).</td></tr>
           <tr><td><strong>Why it exists</strong></td><td>To test a live service's credentials at speed — where you can't get the hash, you attack the login directly.</td></tr>
@@ -1376,7 +1376,7 @@ hydra -l admin -P pass; medusa -h host -u user -P list -M ssh   # medusa = the s
       </table>
       </div>
 
-      <h2 class="mono" style="color:#ff7043">netexec (nxc) — spraying &amp; pass-the-hash at scale</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">netexec (nxc) — spraying &amp; pass-the-hash at scale</span></h2>
       <p>The maintained successor to CrackMapExec. It authenticates one credential against many hosts (or many accounts
          on one host) over SMB/WinRM/LDAP/MSSQL — the natural spray and pass-the-hash tool.</p>
       <pre><code>nxc smb 192.168.56.10 -u users.txt -p 'Autumn2025!' --continue-on-success   # SPRAY: 1 pw, many users
@@ -1435,7 +1435,7 @@ nxc smb 192.168.56.0/24 -u a.fahmy -p 'Autumn2025!'                          # w
            If your VM dies, the <span class="mono">saved/lab4_4625.evtx</span> fallback lets you still do Lab 7.</p>
       </div>
 
-      <h2>Step 1 — build the user list</h2>
+      <h2><span class="h-t">Step 1 — build the user list</span></h2>
       <ol class="steps">
         <li>
           <strong>Use the users you already enumerated</strong> (LDAP in Session 3, or the profile).
@@ -1450,7 +1450,7 @@ EOF</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — spray one password across all of them</h2>
+      <h2><span class="h-t">Step 2 — spray one password across all of them</span></h2>
       <ol class="steps">
         <li>
           <strong>One password, one attempt each</strong> — stays under lockout.
@@ -1476,7 +1476,7 @@ EOF</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — the deliberate failure: trip the lockout</h2>
+      <h2><span class="h-t">Step 3 — the deliberate failure: trip the lockout</span></h2>
       <div class="box warn">
         <span class="box-t">Now do it the wrong way, on purpose</span>
         <p>Point a <em>brute-force</em> at one account: <span class="mono">nxc smb 192.168.56.10 -u m.said -p rockyou.txt</span>.
@@ -1511,7 +1511,7 @@ EOF</code></pre>
            joined in Session 3.</p>
       </div>
 
-      <h2>How it works — one picture</h2>
+      <h2><span class="h-t">How it works — one picture</span></h2>
       <figure class="dgm">
         <svg viewBox="0 0 940 330" role="img" aria-label="A victim's DNS lookup fails, it falls back to an LLMNR broadcast asking who owns a name, the attacker running Responder answers first claiming to be that host, the victim authenticates to the attacker and sends its NetNTLMv2 response, which the attacker captures and cracks offline.">
           <!-- actors -->
@@ -1550,9 +1550,9 @@ EOF</code></pre>
            mistypes a share or looks up a name that doesn't resolve.</figcaption>
       </figure>
 
-      <h2 class="mono" style="color:#ff7043">Responder — the 7-part frame</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">Responder — the 7-part frame</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <tbody>
           <tr><td style="width:150px"><strong>What it is</strong></td><td>A Kali tool that answers LLMNR, NBT-NS and mDNS queries, impersonating the requested host to harvest authentication.</td></tr>
           <tr><td><strong>Why it exists</strong></td><td>Because Windows still falls back to trust-nobody broadcast name resolution, and a captured NetNTLMv2 is a crackable (or relayable) credential.</td></tr>
@@ -1600,7 +1600,7 @@ EOF</code></pre>
            that's fine here. Save <span class="mono">/usr/share/responder/logs/</span>; the fallback is <span class="mono">saved/lab5_netntlmv2.txt</span>.</p>
       </div>
 
-      <h2>Step 1 — start Responder</h2>
+      <h2><span class="h-t">Step 1 — start Responder</span></h2>
       <ol class="steps">
         <li>
           <pre><code>sudo responder -I eth0 -wv
@@ -1609,7 +1609,7 @@ EOF</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — trigger a lookup from Win10</h2>
+      <h2><span class="h-t">Step 2 — trigger a lookup from Win10</span></h2>
       <ol class="steps">
         <li>
           <strong>On the Win10 member</strong>, access a share name that doesn't resolve (a real user's typo).
@@ -1630,7 +1630,7 @@ EOF</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — crack it (mode 5600, not 1000)</h2>
+      <h2><span class="h-t">Step 3 — crack it (mode 5600, not 1000)</span></h2>
       <ol class="steps">
         <li>
           <pre><code>hashcat -m 5600 netntlm.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
@@ -1670,9 +1670,9 @@ hashcat -m 5600 netntlm.txt --show</code></pre>
            tilts. And pass-the-hash shows that a strong password doesn't save a machine whose hash has leaked.</p>
       </div>
 
-      <h2 class="mono" style="color:#ff7043">Impacket — the 7-part frame</h2>
+      <h2 class="mono" style="color:#ff7043"><span class="h-t">Impacket — the 7-part frame</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <tbody>
           <tr><td style="width:150px"><strong>What it is</strong></td><td>A Python suite of AD/Windows-protocol tools. In Kali the commands are prefixed <span class="mono">impacket-</span>. Maintained by <strong>Fortra</strong> (formerly SecureAuth).</td></tr>
           <tr><td><strong>Why it exists</strong></td><td>To speak Kerberos, SMB and MSRPC as a raw client — so you can request tickets, dump secrets, and run commands without a Windows box.</td></tr>
@@ -1688,7 +1688,7 @@ impacket-psexec       ceh.lab/m.said@192.168.56.20                    # SYSTEM s
       </table>
       </div>
 
-      <h2>Pass-the-hash — the hash <em>is</em> the credential</h2>
+      <h2><span class="h-t">Pass-the-hash — the hash <em>is</em> the credential</span></h2>
       <p>You don't always need the plaintext. Because NTLM authenticates <em>with the hash</em>, a stolen NT hash logs you
          in directly — no cracking step.</p>
       <figure class="dgm">
@@ -1742,7 +1742,7 @@ impacket-psexec       ceh.lab/m.said@192.168.56.20                    # SYSTEM s
            <span class="mono">saved/lab6_krb5tgs.txt</span>.</p>
       </div>
 
-      <h2>Step 1 — roast every SPN</h2>
+      <h2><span class="h-t">Step 1 — roast every SPN</span></h2>
       <ol class="steps">
         <li>
           <strong>Request the service tickets</strong> with a low-priv domain credential.
@@ -1765,7 +1765,7 @@ impacket-psexec       ceh.lab/m.said@192.168.56.20                    # SYSTEM s
         </li>
       </ol>
 
-      <h2>Step 2 — crack the weak one (mode 13100)</h2>
+      <h2><span class="h-t">Step 2 — crack the weak one (mode 13100)</span></h2>
       <ol class="steps">
         <li>
           <pre><code>hashcat -m 13100 spn.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
@@ -1780,7 +1780,7 @@ hashcat -m 13100 spn.txt --show    # → svc_backup:&lt;its weak password&gt;</c
         </li>
       </ol>
 
-      <h2>Step 3 — the honest failure case</h2>
+      <h2><span class="h-t">Step 3 — the honest failure case</span></h2>
       <div class="box warn">
         <span class="box-t">The ticket that never cracks</span>
         <p><span class="mono">svc_sql</span> was seeded with a long random password. Its ticket roasts exactly the same
@@ -1790,7 +1790,7 @@ hashcat -m 13100 spn.txt --show    # → svc_backup:&lt;its weak password&gt;</c
            "roastable, not cracked (strong password)."</p>
       </div>
 
-      <h2>Step 4 — you don't always need to crack (pass-the-hash + a shell)</h2>
+      <h2><span class="h-t">Step 4 — you don't always need to crack (pass-the-hash + a shell)</span></h2>
       <ol class="steps">
         <li>
           <strong>Use a dumped hash directly</strong>, and get an interactive shell with a working credential.
@@ -1874,7 +1874,7 @@ evil-winrm -i 192.168.56.20 -u svc_backup -p '&lt;cracked&gt;'  # interactive Po
            is why authentication is where detection pays off most.</figcaption>
       </figure>
 
-      <h2>Where each credential lives — click a target</h2>
+      <h2><span class="h-t">Where each credential lives — click a target</span></h2>
       <p>The same workflow, a different store per OS. This is the map behind everything today.</p>
       <figure class="dgm interactive">
         <svg viewBox="0 0 940 150" role="img" aria-label="Where each credential lives per target: Metasploitable2, Kioptrix and Stapler in /etc/shadow; Windows 7 and Windows 10 in the SAM and LSASS; the domain controller in NTDS.dit and Kerberos.">
@@ -1923,7 +1923,7 @@ evil-winrm -i 192.168.56.20 -u svc_backup -p '&lt;cracked&gt;'  # interactive Po
            — but you generated the real thing an hour ago; use yours.</p>
       </div>
 
-      <h2>Step 1 — identify the attack from evidence alone</h2>
+      <h2><span class="h-t">Step 1 — identify the attack from evidence alone</span></h2>
       <ol class="steps">
         <li>
           <strong>Read the log without looking at your commands.</strong> Which attack was this?
@@ -1942,7 +1942,7 @@ Get-WinEvent -FilterHashtable @{LogName='Security';Id=4625} |
         </li>
       </ol>
 
-      <h2>Step 2 — write the rule (your choice of language)</h2>
+      <h2><span class="h-t">Step 2 — write the rule (your choice of language)</span></h2>
       <p>The cleanest signature is <strong>password spraying</strong>: many distinct accounts, one source, one password,
          short window. Here is a <strong>worked Sigma rule</strong>; then complete <em>one</em> of the SPL or KQL
          skeletons — your choice.</p>
@@ -2047,9 +2047,9 @@ tags:
            you confirmed and the credentials you took. This is the single most important artefact you carry into Session 5.</p>
       </div>
 
-      <h2>The template — one block per host</h2>
+      <h2><span class="h-t">The template — one block per host</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <thead><tr><th>Field</th><th>Example</th></tr></thead>
         <tbody>
           <tr><td>Host / IP · role</td><td><span class="mono">192.168.56.107</span> · WIN7-TGT01 (legacy)</td></tr>
@@ -2123,7 +2123,7 @@ tags:
            the one distinction that decides whether your exploit even connects back.</p>
       </div>
 
-      <h2>Bind vs reverse — the distinction that matters</h2>
+      <h2><span class="h-t">Bind vs reverse — the distinction that matters</span></h2>
       <figure class="dgm interactive">
         <svg viewBox="0 0 940 150" role="img" aria-label="A bind shell has the attacker connect inbound to a port opened on the target, usually blocked by the firewall; a reverse shell has the target connect outbound to the attacker's listener, which bypasses inbound firewall rules. Click each.">
           <g class="node" data-node="bind" tabindex="0">
@@ -2235,7 +2235,7 @@ tags:
         <div class="mcq-fb"></div>
       </div>
 
-      <h2>Short answer</h2>
+      <h2><span class="h-t">Short answer</span></h2>
       <div class="q">
         <p><span class="qn">Q11</span>In one sentence, why is the NetNTLMv2 you capture with Responder cracked with a different hashcat mode than the NT hash you dump from the SAM?</p>
         <details><summary>Model answer</summary><p>They are different artefacts of the same account — the NT hash (mode 1000) is the stored secret, while NetNTLMv2 (mode 5600) is a keyed challenge-response computed from it, so each has its own format and mode.</p></details>
@@ -2285,9 +2285,9 @@ tags:
            <span class="mono">responder</span> (both private). Our local lab covers all of them for free.</p>
       </div>
 
-      <h2>Local practice range — you already own these</h2>
+      <h2><span class="h-t">Local practice range — you already own these</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <thead><tr><th>Machine</th><th>What to practise (today's skills)</th></tr></thead>
         <tbody>
           <tr><td><strong>Metasploitable 3</strong> (Win)</td><td>Weak "Star Wars" accounts (<span class="mono">vagrant</span>, <span class="mono">leia_organa</span>…) — a perfect <strong>password-spray</strong> and <strong>SAM hash-crack</strong> target.</td></tr>

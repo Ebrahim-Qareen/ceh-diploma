@@ -52,9 +52,9 @@
         touch it. Scanning is the loudest thing an attacker does, and the most commonly detected stage of a
         real intrusion — so every technique today comes with the log line it leaves behind.</div>
 
-      <h2>Today's agenda</h2>
+      <h2><span class="h-t">Today's agenda</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:13%"><col style="width:58%"><col style="width:17%"><col style="width:12%"></colgroup>
         <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
         <tbody>
           <tr><td>1</td><td>Where the recon report becomes a scan list · why scanning is loud</td><td>Theory</td><td>8</td></tr>
@@ -122,7 +122,7 @@
            there.</p>
       </div>
 
-      <h2>Recon was invisible. This is not.</h2>
+      <h2><span class="h-t">Recon was invisible. This is not.</span></h2>
       <p>Hold onto the difference, because it is the spine of the whole session. In Session 2 every technique
          was <em>passive</em> — you read indexes, certificate logs and registration records that a third party
          had already collected. The target's logs stayed empty. You could footprint a company for a week and
@@ -175,13 +175,13 @@
            -A</span> in seconds. Teaching you the flags without teaching you that would be teaching a myth.</p>
       </div>
 
-      <h2>Where this sits in ATT&amp;CK</h2>
+      <h2><span class="h-t">Where this sits in ATT&amp;CK</span></h2>
       <p>Session 2 lived in <strong>TA0043 Reconnaissance</strong>. Today we move into the target itself.
          Active scanning still has a foot in Reconnaissance, but enumeration is <strong>TA0007
          Discovery</strong> — the tactic that describes an attacker already in contact with the systems,
          mapping what is there.</p>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:42%"><col style="width:42%"><col style="width:16%"></colgroup>
         <thead><tr><th>Today's action</th><th>ATT&amp;CK technique</th><th>ID</th></tr></thead>
         <tbody>
           <tr><td>Sending scans at IP ranges</td><td>Active Scanning</td><td class="mono">T1595</td></tr>
@@ -223,7 +223,7 @@
            Lab 2 when half the room is silently stuck.</p>
       </div>
 
-      <h2>The check</h2>
+      <h2><span class="h-t">The check</span></h2>
       <ol class="steps">
         <li>
           <strong>Power on all four VMs and confirm the network adapter.</strong> Every VM's adapter must be
@@ -265,9 +265,9 @@
            firewall off; the point is to learn to scan past it.</p>
       </div>
 
-      <h2>If a target really is missing — the 60-second triage</h2>
+      <h2><span class="h-t">If a target really is missing — the 60-second triage</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:30%"><col style="width:30%"><col style="width:40%"></colgroup>
         <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
         <tbody>
           <tr><td>VM not in the sweep at all, no IP shown in its console</td><td>Adapter is NAT/Bridged, or VM is suspended not started</td><td>Set adapter to Host-only; fully power on (not resume from a bad state)</td></tr>
@@ -625,7 +625,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
            throughout.</p>
       </div>
 
-      <h2>Step 1 — the honest sweep (ARP, on your segment)</h2>
+      <h2><span class="h-t">Step 1 — the honest sweep (ARP, on your segment)</span></h2>
       <ol class="steps">
         <li>
           <strong>Let nmap use ARP automatically on the local segment.</strong>
@@ -645,7 +645,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — the lying sweep (ICMP only)</h2>
+      <h2><span class="h-t">Step 2 — the lying sweep (ICMP only)</span></h2>
       <ol class="steps">
         <li>
           <strong>Force ICMP echo and forbid ARP, the way an internet scan behaves.</strong>
@@ -671,7 +671,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
            <strong>never conclude "dead" from ICMP alone</strong>.</p>
       </div>
 
-      <h2>Step 3 — scan it anyway (<span class="mono">-Pn</span>)</h2>
+      <h2><span class="h-t">Step 3 — scan it anyway (<span class="mono">-Pn</span>)</span></h2>
       <ol class="steps">
         <li>
           <strong>Take the Windows host ICMP called dead, and skip discovery entirely.</strong>
@@ -733,7 +733,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
            obvious, including ones invented after you finish this course.</p>
       </div>
 
-      <h2>The reflex you must know cold</h2>
+      <h2><span class="h-t">The reflex you must know cold</span></h2>
       <p>TCP has a fixed handshake: <strong>SYN → SYN/ACK → ACK</strong>. That is the law the target's stack
          obeys. Scanning weaponises the first half of it.</p>
 
@@ -773,9 +773,9 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
           historically quieter than a full connect, and why it was called <em>half-open</em>.</figcaption>
       </figure>
 
-      <h2>The reflexes, in one table</h2>
+      <h2><span class="h-t">The reflexes, in one table</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:20%"><col style="width:23%"><col style="width:33%"><col style="width:24%"></colgroup>
         <thead><tr><th>Port state</th><th>Reflex to a SYN</th><th>Reflex to a FIN/NULL/Xmas</th><th>Reflex to an ACK</th></tr></thead>
         <tbody>
           <tr><td><strong>Open</strong></td><td>SYN/ACK</td><td><em>silence</em></td><td>RST</td></tr>
@@ -1002,7 +1002,7 @@ sudo nmap -sU -sV -p 161 192.168.56.102
         <p>Metasploitable2 on your host-only network. Its many open ports make the clearest capture.</p>
       </div>
 
-      <h2>Step 1 — start the capture</h2>
+      <h2><span class="h-t">Step 1 — start the capture</span></h2>
       <ol class="steps">
         <li>
           <strong>Open Wireshark on Kali, capture on the host-only interface, and set a filter.</strong>
@@ -1017,7 +1017,7 @@ ip.addr == 192.168.56.102 and tcp</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — the three scans, one at a time</h2>
+      <h2><span class="h-t">Step 2 — the three scans, one at a time</span></h2>
       <ol class="steps">
         <li>
           <strong>SYN, then connect, then Xmas — save each capture under its own name.</strong>
@@ -1038,7 +1038,7 @@ sudo nmap -sX -p 22,80,443,445 192.168.56.102     # save as lab2_xmas.pcap</code
         </li>
       </ol>
 
-      <h2>Step 3 — line them up (the money shot)</h2>
+      <h2><span class="h-t">Step 3 — line them up (the money shot)</span></h2>
       <figure class="dgm interactive">
         <svg viewBox="0 0 920 250" role="img" aria-label="Three columns comparing the first packets of a SYN, connect and Xmas scan to port 80. Click each column.">
           <text class="d-title" x="20" y="24" font-size="14">The same open port (80), three scans — click each column</text>
@@ -1131,9 +1131,9 @@ sudo nmap -sX -p 22,80,443,445 192.168.56.102     # save as lab2_xmas.pcap</code
            timing decides whether your scan finishes before the class ends or trips every alarm on the way.</p>
       </div>
 
-      <h2>Timing — the <span class="mono">-T</span> dial</h2>
+      <h2><span class="h-t">Timing — the <span class="mono">-T</span> dial</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:17%"><col style="width:21%"><col style="width:62%"></colgroup>
         <thead><tr><th>Template</th><th>Name</th><th>Use when</th></tr></thead>
         <tbody>
           <tr><td class="mono">-T0 / -T1</td><td>paranoid / sneaky</td><td>Evading IDS — one packet every few seconds to minutes. Very slow, deliberately under the detection threshold</td></tr>
@@ -1149,7 +1149,7 @@ sudo nmap -sX -p 22,80,443,445 192.168.56.102     # save as lab2_xmas.pcap</code
          or lower — not for politeness, but because <span class="mono">-T4/-T5</span> is a screaming siren in
          any IDS.</p>
 
-      <h2>The current workflow: breadth, then depth</h2>
+      <h2><span class="h-t">The current workflow: breadth, then depth</span></h2>
       <p>The dated approach is one giant <span class="mono">nmap -A -p-</span> against everything. The modern
          real-world workflow splits the job in two, because a single tool doing both is slow at the first part:</p>
 
@@ -1249,7 +1249,7 @@ sudo nmap -sC -sV -p <ports> 192.168.56.102</code></pre>
 
       <div class="box warn"><span class="box-t">Scope</span><p>Metasploitable2, your host-only network.</p></div>
 
-      <h2>Step 1 — breadth</h2>
+      <h2><span class="h-t">Step 1 — breadth</span></h2>
       <ol class="steps">
         <li>
           <strong>Find every open TCP port fast.</strong>
@@ -1266,7 +1266,7 @@ sudo nmap -sS -p- -T4 192.168.56.102 -oG breadth.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — depth on only those ports</h2>
+      <h2><span class="h-t">Step 2 — depth on only those ports</span></h2>
       <ol class="steps">
         <li>
           <strong>Point nmap's deep probes at the open set.</strong>
@@ -1283,7 +1283,7 @@ sudo nmap -sS -p- -T4 192.168.56.102 -oG breadth.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — trip the failures on purpose</h2>
+      <h2><span class="h-t">Step 3 — trip the failures on purpose</span></h2>
       <ol class="steps">
         <li>
           <strong>Failure A — the version guess that lies.</strong> Somewhere in your output a port will be
@@ -1382,9 +1382,9 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
            which log, with which Event ID, is precisely what a tier-1 analyst is paid to recognise.</p>
       </div>
 
-      <h2>The consolidated SOC flip — scan type by scan type</h2>
+      <h2><span class="h-t">The consolidated SOC flip — scan type by scan type</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table style="min-width:792px"><colgroup><col style="width:15%"><col style="width:28%"><col style="width:24%"><col style="width:33%"></colgroup>
         <thead><tr><th>Attacker action</th><th>What the target sees</th><th>Where it's logged</th><th>The tell</th></tr></thead>
         <tbody>
           <tr><td>ARP host sweep</td><td>Flood of who-has broadcasts from one MAC</td><td>NIDS on the segment · <span class="mono">arpwatch</span></td><td>Dozens of ARP requests, one source, seconds</td></tr>
@@ -1406,7 +1406,7 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
            the <em>pattern</em> of touching everything is what gives a scan away.</p>
       </div>
 
-      <h2>Defensive countermeasures (what the blue team does about it)</h2>
+      <h2><span class="h-t">Defensive countermeasures (what the blue team does about it)</span></h2>
       <ul>
         <li><strong>Rate-limit and alert</strong> on connection attempts per source (firewall, IDS threshold).</li>
         <li><strong>Drop, don't reject</strong> — a firewall that silently drops gives the attacker
@@ -1637,9 +1637,9 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
         </ul>
       </div>
 
-      <h2>The seven-part frame — SMB enumeration</h2>
+      <h2><span class="h-t">The seven-part frame — SMB enumeration</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <tbody>
           <tr><td><strong>What it is</strong></td><td>Querying the SMB/CIFS service for shares, users, groups, OS and domain info</td></tr>
           <tr><td><strong>Why it exists</strong></td><td>By hand you'd script dozens of <span class="mono">rpcclient</span> and <span class="mono">smbclient</span> queries; the tools batch them</td></tr>
@@ -1715,7 +1715,7 @@ nmap --script smb-enum-shares,smb-enum-users,smb-os-discovery -p445 192.168.56.1
 
       <div class="box warn"><span class="box-t">Scope</span><p>Metasploitable2 and your Windows targets, host-only network. Both are yours.</p></div>
 
-      <h2>Step 1 — the rich target (Metasploitable2)</h2>
+      <h2><span class="h-t">Step 1 — the rich target (Metasploitable2)</span></h2>
       <ol class="steps">
         <li>
           <strong>Full anonymous enumeration.</strong>
@@ -1733,7 +1733,7 @@ smbclient -L //192.168.56.102/ -N</code></pre>
         </li>
       </ol>
 
-      <h2>Step 1b — the legacy target (Windows 7) — where the textbook still works</h2>
+      <h2><span class="h-t">Step 1b — the legacy target (Windows 7) — where the textbook still works</span></h2>
       <ol class="steps">
         <li>
           <strong>Same command, against Windows 7.</strong>
@@ -1752,7 +1752,7 @@ nmap -p445 --script smb-protocols,smb-vuln-ms17-010 192.168.56.X</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — the hardened target (modern Windows)</h2>
+      <h2><span class="h-t">Step 2 — the hardened target (modern Windows)</span></h2>
       <ol class="steps">
         <li>
           <strong>Exactly the same command, against Win10 / WinSrv.</strong>
@@ -1771,7 +1771,7 @@ nxc smb 192.168.56.X</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — what still works: authenticated</h2>
+      <h2><span class="h-t">Step 3 — what still works: authenticated</span></h2>
       <ol class="steps">
         <li>
           <strong>Re-run with a lab credential (given to you for this lab).</strong>
@@ -1836,7 +1836,7 @@ nxc smb 192.168.56.X</code></pre>
            against them, and the page is honest about the fact that a stock box doesn't ship this way.</p>
       </div>
 
-      <h2>SNMP — the config-leak protocol (UDP 161)</h2>
+      <h2><span class="h-t">SNMP — the config-leak protocol (UDP 161)</span></h2>
       <div class="split">
         <div>
           <h3>The method</h3>
@@ -1880,7 +1880,7 @@ nmap -sU -p161 --script snmp-info,snmp-processes 192.168.56.X</code></pre>
         <figcaption><b>The MIB tree.</b> Each branch is an OID; a read community string unlocks the lot.</figcaption>
       </figure>
 
-      <h2>LDAP — enumerate the directory itself (TCP 389/636)</h2>
+      <h2><span class="h-t">LDAP — enumerate the directory itself (TCP 389/636)</span></h2>
       <div class="split">
         <div>
           <h3>The method</h3>
@@ -1956,7 +1956,7 @@ nxc ldap 192.168.56.X -u '&lt;USER&gt;' -p '&lt;PASS&gt;' --users</code></pre>
 
       <div class="box warn"><span class="box-t">Scope</span><p><span class="mono">WINSRV19-TGT01</span> on your host-only network — your DC.</p></div>
 
-      <h2>Part A — SNMP</h2>
+      <h2><span class="h-t">Part A — SNMP</span></h2>
       <ol class="steps">
         <li>
           <strong>Confirm 161/udp is open, then find the community string.</strong>
@@ -1985,7 +1985,7 @@ snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.25.4.2.1.2  # p
         </li>
       </ol>
 
-      <h2>Part B — LDAP</h2>
+      <h2><span class="h-t">Part B — LDAP</span></h2>
       <ol class="steps">
         <li>
           <strong>Find the naming context, then enumerate.</strong>
@@ -2046,7 +2046,7 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
       </div>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:11%"><col style="width:12%"><col style="width:39%"><col style="width:38%"></colgroup>
         <thead><tr><th>Service</th><th>Port</th><th>What it leaks</th><th>Tool / command</th></tr></thead>
         <tbody>
           <tr><td><strong>NFS</strong></td><td>2049 / 111</td><td>Exported directories you can mount without auth</td><td><span class="mono">showmount -e &lt;ip&gt;</span> → <span class="mono">mount -t nfs</span></td></tr>
@@ -2087,7 +2087,7 @@ ffuf -u http://192.168.56.102/FUZZ -w /usr/share/wordlists/dirb/common.txt</code
         </div>
       </div>
 
-      <h2>The manual skill: read the banner yourself</h2>
+      <h2><span class="h-t">The manual skill: read the banner yourself</span></h2>
       <p>Behind every automated enumerator is one move — open a raw connection and read what the service
          announces. When a tool gives an ambiguous answer (remember Lab 3's <span class="mono">tcpwrapped</span>),
          this is how you get the truth:</p>
@@ -2223,7 +2223,7 @@ nc -nv 192.168.56.102 25</code></pre>
       </div>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:13%"><col style="width:28%"><col style="width:59%"></colgroup>
         <thead><tr><th>Service</th><th>What let you in</th><th>The fix</th></tr></thead>
         <tbody>
           <tr><td>SMB</td><td>SMBv1 / null sessions</td><td>Disable SMBv1 (default now); require signing; deny anonymous enumeration (<span class="mono">RestrictAnonymous</span>)</td></tr>
@@ -2279,7 +2279,7 @@ nc -nv 192.168.56.102 25</code></pre>
            thing an hour ago; use yours.</p>
       </div>
 
-      <h2>Step 1 — identify the scan from evidence alone</h2>
+      <h2><span class="h-t">Step 1 — identify the scan from evidence alone</span></h2>
       <ol class="steps">
         <li>
           <strong>Open the capture and answer, without looking at your nmap command:</strong> what scan type
@@ -2300,7 +2300,7 @@ tshark -r lab2_syn.pcap -Y 'tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0' -T fie
         </li>
       </ol>
 
-      <h2>Step 2 — write the rule (your choice of language)</h2>
+      <h2><span class="h-t">Step 2 — write the rule (your choice of language)</span></h2>
       <p>The pattern to encode is the one under every scan today: <strong>one source touching many distinct
          ports (or hosts) inside a short window</strong>. Here is a <strong>worked Sigma rule</strong>. Then
          complete <em>one</em> of the SPL or KQL skeletons — your choice.</p>
@@ -2399,9 +2399,9 @@ SecurityEvent
            important artefact you carry into Session 4.</p>
       </div>
 
-      <h2>The template — one block per host</h2>
+      <h2><span class="h-t">The template — one block per host</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <thead><tr><th>Field</th><th>Example</th></tr></thead>
         <tbody>
           <tr><td>Host / IP</td><td><span class="mono">192.168.56.102</span> · METASPLOITABLE2</td></tr>
@@ -2747,7 +2747,7 @@ enum4linux -a &lt;ip&gt;  →  peter, RNunemaker, elly, kathy, tim,
       </div>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:10%"><col style="width:20%"><col style="width:17%"><col style="width:10%"><col style="width:43%"></colgroup>
         <thead><tr><th>#</th><th>Room</th><th>Platform</th><th>Tier</th><th>Teaches</th></tr></thead>
         <tbody>
           <tr><td>1</td><td><a href="https://tryhackme.com/room/furthernmap" target="_blank" rel="noopener">Nmap</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>Every scan type, NSE, evasion flags — the whole scanning half</td></tr>
@@ -2796,7 +2796,7 @@ enum4linux -a &lt;ip&gt;  →  peter, RNunemaker, elly, kathy, tim,
     </div>
     <div class="content">
 
-      <h2>The seven things to keep</h2>
+      <h2><span class="h-t">The seven things to keep</span></h2>
       <ul class="takeaways">
         <li><strong>Scanning is loud.</strong> It's the most commonly detected stage of an intrusion — every technique leaves a log.</li>
         <li><strong>Learn the reflexes, not the flags.</strong> Open answers SYNs and ignores stealth flags; closed RSTs everything; filtered stays silent. Every scan type falls out of that.</li>

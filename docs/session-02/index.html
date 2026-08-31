@@ -51,9 +51,9 @@
       <div class="oneline">Last session you sent packets at a target and it saw you. Today you learn to
         build the same picture — and a much bigger one — without the target ever knowing you exist.</div>
 
-      <h2>Today's agenda</h2>
+      <h2><span class="h-t">Today's agenda</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:13%"><col style="width:56%"><col style="width:18%"><col style="width:13%"></colgroup>
         <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
         <tbody>
           <tr><td>1</td><td>The recon funnel, the engagement brief, and the rules for today</td><td>Theory</td><td>15</td></tr>
@@ -128,7 +128,7 @@
       </div>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:22%"><col style="width:33%"><col style="width:45%"></colgroup>
         <thead><tr><th></th><th>Session 1 — first contact</th><th>Session 2 — today</th></tr></thead>
         <tbody>
           <tr><td><strong>Who you talk to</strong></td><td>The target itself</td><td>Everyone <em>except</em> the target</td></tr>
@@ -288,7 +288,7 @@
            through every tool, lets you watch a picture assemble — which is what recon actually feels like.</p>
       </div>
 
-      <h2>The client</h2>
+      <h2><span class="h-t">The client</span></h2>
       <div class="box lab-box">
         <span class="box-t">Target for every passive block today: <span class="mono">tryhackme.com</span></span>
         <p>A real company with a real internet footprint: certificates, subdomains, mail infrastructure,
@@ -299,13 +299,13 @@
            continues the same picture rather than starting a new one.</p>
       </div>
 
-      <h2>Where we swap targets, and why</h2>
+      <h2><span class="h-t">Where we swap targets, and why</span></h2>
       <p>Four things on today's list are <strong>active</strong> — they send traffic to the target. Doing those
          to a company that has not signed anything is a criminal offence in Egypt, the UK, the US and most
          other jurisdictions. So each of them gets a target that has <em>published its own permission</em>:</p>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:25%"><col style="width:15%"><col style="width:60%"></colgroup>
         <thead><tr><th>Technique</th><th>Target we use</th><th>Authorization basis</th></tr></thead>
         <tbody>
           <tr>
@@ -341,12 +341,12 @@
            you which target and why.</p>
       </div>
 
-      <h2>Where today sits in MITRE ATT&amp;CK</h2>
+      <h2><span class="h-t">Where today sits in MITRE ATT&amp;CK</span></h2>
       <p>Reconnaissance is tactic <strong>TA0043</strong> — the first column of the Enterprise matrix, and the
          only one that happens entirely outside your network. Every technique below is on today's menu.</p>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:14%"><col style="width:44%"><col style="width:42%"></colgroup>
         <thead><tr><th>ID</th><th>Technique</th><th>Today's tools</th></tr></thead>
         <tbody>
           <tr><td class="mono">T1593</td><td>Search Open Websites/Domains</td><td>Google dorks, GHDB, LinkedIn</td></tr>
@@ -497,7 +497,7 @@
          searching for <strong>the shape of a mistake</strong>. There are only three shapes:</p>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:34%"><col style="width:38%"><col style="width:28%"></colgroup>
         <thead><tr><th>Shape of mistake</th><th>What it looks like</th><th>The dork that finds it</th></tr></thead>
         <tbody>
           <tr>
@@ -543,7 +543,7 @@ site:tryhackme.com intitle:"index of"
 "tryhackme.com" -site:tryhackme.com filetype:pdf</code></pre>
 
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:22%"><col style="width:26%"><col style="width:52%"></colgroup>
         <thead><tr><th>Operator</th><th>Restricts to</th><th>Note</th></tr></thead>
         <tbody>
           <tr><td class="mono">site:</td><td>One domain or host</td><td>The single most useful operator. Combine with <span class="mono">-site:</span> to exclude</td></tr>
@@ -679,7 +679,7 @@ site:tryhackme.com intitle:"index of"
            <strong>Section 1 — Search-engine footprint</strong>. If it is not written down, it did not happen.</p>
       </div>
 
-      <h2>Step 1 — measure the published surface</h2>
+      <h2><span class="h-t">Step 1 — measure the published surface</span></h2>
       <ol class="steps">
         <li>
           <strong>Inventory everything the index holds, then strip out the obvious.</strong>
@@ -699,7 +699,7 @@ site:tryhackme.com -site:www.tryhackme.com</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — hunt documents, because documents leak</h2>
+      <h2><span class="h-t">Step 2 — hunt documents, because documents leak</span></h2>
       <ol class="steps">
         <li>
           <strong>Sweep the file types organisations lose control of.</strong>
@@ -719,7 +719,7 @@ site:tryhackme.com ext:txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — read the paths, not the titles</h2>
+      <h2><span class="h-t">Step 3 — read the paths, not the titles</span></h2>
       <ol class="steps">
         <li>
           <strong>Fingerprint the stack from URLs alone.</strong>
@@ -737,7 +737,7 @@ site:tryhackme.com ext:txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 4 — borrow three mistake-shapes from the GHDB</h2>
+      <h2><span class="h-t">Step 4 — borrow three mistake-shapes from the GHDB</span></h2>
       <ol class="steps">
         <li>
           <strong>Open the Google Hacking Database and mine it for patterns.</strong>
@@ -763,7 +763,7 @@ https://www.exploit-db.com/google-hacking-database</code></pre>
         </li>
       </ol>
 
-      <h2>Step 5 — the pivot</h2>
+      <h2><span class="h-t">Step 5 — the pivot</span></h2>
       <ol class="steps">
         <li>
           <strong>Find your target's data on someone else's server.</strong>
@@ -951,7 +951,7 @@ shodan host 104.26.10.229</code></pre>
 
       <h3>How to read the output</h3>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <thead><tr><th>Field on the host page</th><th>What it actually tells you</th></tr></thead>
         <tbody>
           <tr><td><strong>Last Seen</strong></td><td><strong>Read this first.</strong> Everything below it was true on that date. A "vulnerable" host last seen four months ago may have been patched, decommissioned, or reassigned to someone else entirely</td></tr>
@@ -1057,7 +1057,7 @@ shodan host 104.26.10.229</code></pre>
            Between them they turn one domain into an estate.</p>
       </div>
 
-      <h2>Netcraft Site Report</h2>
+      <h2><span class="h-t">Netcraft Site Report</span></h2>
       <h3>What it is</h3>
       <p>A free report at <span class="mono">sitereport.netcraft.com</span> covering a site's hosting, network,
          registrar, name servers, SPF and DMARC records, TLS chain, detected technologies — and, uniquely,
@@ -1079,7 +1079,7 @@ shodan host 104.26.10.229</code></pre>
           detection here is a free cross-check on what you will fingerprint by hand on page 15.</figcaption>
       </figure>
 
-      <h2>Certificate transparency — crt.sh</h2>
+      <h2><span class="h-t">Certificate transparency — crt.sh</span></h2>
       <h3>What it is</h3>
       <p>Certificate Transparency is a public, append-only log of essentially every TLS certificate issued by
          a publicly trusted CA. <span class="mono">crt.sh</span> is a free searchable front end to those logs.</p>
@@ -1273,7 +1273,7 @@ curl -s 'https://crt.sh/?q=%25.tryhackme.com&amp;output=json' \
            address bar pointed at them — stop. That is Session 3, and it is not authorised here.</p>
       </div>
 
-      <h2>Step 1 — resolve the name, without touching them</h2>
+      <h2><span class="h-t">Step 1 — resolve the name, without touching them</span></h2>
       <ol class="steps">
         <li>
           <strong>Ask a public resolver, not their name server.</strong>
@@ -1292,7 +1292,7 @@ curl -s 'https://crt.sh/?q=%25.tryhackme.com&amp;output=json' \
         </li>
       </ol>
 
-      <h2>Step 2 — Shodan: what is listening on that address</h2>
+      <h2><span class="h-t">Step 2 — Shodan: what is listening on that address</span></h2>
       <ol class="steps">
         <li>
           <strong>Search the hostname, then the IP, then pivot.</strong>
@@ -1319,7 +1319,7 @@ org:"&lt;organisation from the host page&gt;"</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — Netcraft: what was listening before</h2>
+      <h2><span class="h-t">Step 3 — Netcraft: what was listening before</span></h2>
       <ol class="steps">
         <li>
           <strong>Pull the site report and go straight to hosting history.</strong>
@@ -1341,7 +1341,7 @@ https://sitereport.netcraft.com/?url=https://tryhackme.com</code></pre>
         </li>
       </ol>
 
-      <h2>Step 4 — crt.sh: the names</h2>
+      <h2><span class="h-t">Step 4 — crt.sh: the names</span></h2>
       <ol class="steps">
         <li>
           <strong>Query the certificate logs and reduce them to a clean list.</strong>
@@ -1368,7 +1368,7 @@ wc -l crtsh_hosts.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 5 — merge into one table</h2>
+      <h2><span class="h-t">Step 5 — merge into one table</span></h2>
       <ol class="steps">
         <li>
           <strong>Build Section 2 of the report: one row per host, no duplicates.</strong>
@@ -1438,7 +1438,7 @@ wc -l crtsh_hosts.txt</code></pre>
          proxy. Beginners see "Withheld for Privacy" and close the terminal. Four fields survive, and all
          four are useful:</p>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
         <thead><tr><th>Field</th><th>What you do with it</th></tr></thead>
         <tbody>
           <tr><td><strong>Creation date</strong></td><td>Organisation age and maturity. Far more importantly: when you later find a <em>lookalike</em> domain registered three weeks ago, its creation date is the single strongest indicator that it is a phishing domain and not a legitimate brand asset</td></tr>
@@ -1739,7 +1739,7 @@ awk '{print tolower($1)"."tolower($2)"@target.com"}' names.txt | sort -u</code><
            contacts the target's infrastructure.</p>
       </div>
 
-      <h2>Step 1 — the domain record, old protocol and new</h2>
+      <h2><span class="h-t">Step 1 — the domain record, old protocol and new</span></h2>
       <ol class="steps">
         <li>
           <strong>Run both, and compare what you get.</strong>
@@ -1764,7 +1764,7 @@ curl -s https://rdap.verisign.com/com/v1/domain/tryhackme.com \
         </li>
       </ol>
 
-      <h2>Step 2 — the address record, which is a different database</h2>
+      <h2><span class="h-t">Step 2 — the address record, which is a different database</span></h2>
       <ol class="steps">
         <li>
           <strong>Look up the IP you resolved in Lab 2.</strong>
@@ -1783,7 +1783,7 @@ curl -s https://rdap.verisign.com/com/v1/domain/tryhackme.com \
         </li>
       </ol>
 
-      <h2>Step 3 — the email convention</h2>
+      <h2><span class="h-t">Step 3 — the email convention</span></h2>
       <ol class="steps">
         <li>
           <strong>Find the rule, not the addresses.</strong>
@@ -1803,7 +1803,7 @@ https://hunter.io/search/tryhackme.com</code></pre>
         </li>
       </ol>
 
-      <h2>Step 4 — the organisation, read-only</h2>
+      <h2><span class="h-t">Step 4 — the organisation, read-only</span></h2>
       <ol class="steps">
         <li>
           <strong>Three roles and one stack clue.</strong>
@@ -2160,7 +2160,7 @@ theHarvester -h | sed -n '/-b SOURCE/,/^$/p'</code></pre>
 
       <h3>Two ways to find subdomains — and only one is passive</h3>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:14%"><col style="width:38%"><col style="width:48%"></colgroup>
         <thead><tr><th></th><th>Passive aggregation</th><th>Brute-force</th></tr></thead>
         <tbody>
           <tr><td><strong>How</strong></td><td>Read what others recorded: CT logs, passive DNS, search indexes</td><td>Generate candidate names and ask DNS whether each resolves</td></tr>
@@ -2195,7 +2195,7 @@ amass enum -passive -d tryhackme.com</code></pre>
       <p>Once you know <em>which</em> hosts exist, you want to know <em>what</em> they run — before Session 3
          confirms it with a scan.</p>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:11%"><col style="width:41%"><col style="width:48%"></colgroup>
         <thead><tr><th>Tool</th><th>What it does</th><th>Status</th></tr></thead>
         <tbody>
           <tr><td><strong>Wappalyzer</strong></td><td>Browser extension: identifies CMS, frameworks, analytics, CDN, server software from the loaded page</td><td>The project <strong>went closed-source and paywalled its API in 2023</strong>; the extension is still installable and useful for one-off checks</td></tr>
@@ -2262,7 +2262,7 @@ amass enum -passive -d tryhackme.com</code></pre>
            <span class="mono">curl -s http://testphp.vulnweb.com/ | head -5</span> should return HTML.</p>
       </div>
 
-      <h2>Step 1 — theHarvester, with sources you chose</h2>
+      <h2><span class="h-t">Step 1 — theHarvester, with sources you chose</span></h2>
       <ol class="steps">
         <li>
           <strong>Run it deliberately and save the output.</strong>
@@ -2282,7 +2282,7 @@ amass enum -passive -d tryhackme.com</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — subfinder, as a second opinion</h2>
+      <h2><span class="h-t">Step 2 — subfinder, as a second opinion</span></h2>
       <ol class="steps">
         <li>
           <strong>Run a maintained aggregator and compare counts.</strong>
@@ -2301,7 +2301,7 @@ wc -l subfinder_hosts.txt crtsh_hosts.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — merge into one master list</h2>
+      <h2><span class="h-t">Step 3 — merge into one master list</span></h2>
       <ol class="steps">
         <li>
           <strong>Combine everything, deduplicate, count.</strong>
@@ -2319,7 +2319,7 @@ wc -l all_hosts.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 4 — resolve, still passively</h2>
+      <h2><span class="h-t">Step 4 — resolve, still passively</span></h2>
       <ol class="steps">
         <li>
           <strong>Ask a public resolver which of those names are actually alive.</strong>
@@ -2345,7 +2345,7 @@ grep -c DEAD resolved_hosts.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 5 — fingerprint the authorised target</h2>
+      <h2><span class="h-t">Step 5 — fingerprint the authorised target</span></h2>
       <ol class="steps">
         <li>
           <strong>Now cross the line, deliberately, on Acunetix's authorised test site.</strong>
@@ -2611,7 +2611,7 @@ whatweb -a 3 http://testphp.vulnweb.com/</code></pre>
           lookup and move on; the value is in MX, TXT and NS.</figcaption>
       </figure>
 
-      <h2>Zone transfer — the misconfiguration that gives you everything</h2>
+      <h2><span class="h-t">Zone transfer — the misconfiguration that gives you everything</span></h2>
       <h3>What it is and why it exists</h3>
       <p>A domain's zone is normally served by more than one name server for resilience. AXFR is the mechanism
          by which a <strong>secondary</strong> server copies the entire zone from the <strong>primary</strong>.
@@ -2822,7 +2822,7 @@ dnsrecon -d zonetransfer.me -t axfr</code></pre>
            You do not run <span class="mono">dig axfr</span> against the client. Not once, not "just to see".</p>
       </div>
 
-      <h2>Step 1 — the record sweep</h2>
+      <h2><span class="h-t">Step 1 — the record sweep</span></h2>
       <ol class="steps">
         <li>
           <strong>Pull every record type that matters, in one pass.</strong>
@@ -2840,7 +2840,7 @@ done | tee dns_sweep.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — read TXT as a supply-chain map</h2>
+      <h2><span class="h-t">Step 2 — read TXT as a supply-chain map</span></h2>
       <ol class="steps">
         <li>
           <strong>Pull the SPF and DMARC records apart.</strong>
@@ -2862,7 +2862,7 @@ dig +short TXT _dmarc.tryhackme.com @1.1.1.1</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — find the authoritative server, then ask it</h2>
+      <h2><span class="h-t">Step 3 — find the authoritative server, then ask it</span></h2>
       <ol class="steps">
         <li>
           <strong>Switch targets, and say the authorisation out loud before you press enter.</strong>
@@ -2882,7 +2882,7 @@ wc -l axfr_dump.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 4 — read the dump like an attacker, not like a log</h2>
+      <h2><span class="h-t">Step 4 — read the dump like an attacker, not like a log</span></h2>
       <ol class="steps">
         <li>
           <strong>Extract four categories from the zone, not just a host count.</strong>
@@ -2913,7 +2913,7 @@ grep -Ei 'TXT|HINFO|SRV|MX' axfr_dump.txt</code></pre>
         </li>
       </ol>
 
-      <h2>Step 5 — the same thing with a purpose-built tool</h2>
+      <h2><span class="h-t">Step 5 — the same thing with a purpose-built tool</span></h2>
       <ol class="steps">
         <li>
           <strong>Run dnsrecon and compare what it adds.</strong>
@@ -2962,7 +2962,7 @@ dig axfr @1.1.1.1 zonetransfer.me</code></pre>
            teaches.</p>
       </div>
 
-      <h2>Route tracing</h2>
+      <h2><span class="h-t">Route tracing</span></h2>
       <h3>What it is and why it exists</h3>
       <p>Traceroute reveals the sequence of routers between you and a target by exploiting the IP
          <strong>TTL</strong> field: send a packet with TTL 1 and the first router replies "expired"; TTL 2 and
@@ -3048,7 +3048,7 @@ dig axfr @1.1.1.1 zonetransfer.me</code></pre>
           Read the tail, ignore the head.</figcaption>
       </figure>
 
-      <h2>Web crawling</h2>
+      <h2><span class="h-t">Web crawling</span></h2>
       <h3>What it is and why it exists</h3>
       <p>A crawler requests a page, extracts every link, and follows them — recursively — building a map of a
          site's structure, files, parameters and external references. Doing this by hand on a site of any size
@@ -3135,7 +3135,7 @@ python3 photon.py -u http://testphp.vulnweb.com -l 2 -t 10 -o photon_out
            authorised test site). Do not crawl the client, and do not hammer scanme — one trace is enough.</p>
       </div>
 
-      <h2>Step 1 — trace the path to an authorised host</h2>
+      <h2><span class="h-t">Step 1 — trace the path to an authorised host</span></h2>
       <ol class="steps">
         <li>
           <strong>Run it two ways and compare.</strong>
@@ -3155,7 +3155,7 @@ tcptraceroute scanme.nmap.org 443</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — fetch robots.txt, and feel the line you crossed</h2>
+      <h2><span class="h-t">Step 2 — fetch robots.txt, and feel the line you crossed</span></h2>
       <ol class="steps">
         <li>
           <strong>Request the file directly from the target.</strong>
@@ -3174,7 +3174,7 @@ curl -s http://testphp.vulnweb.com/sitemap.xml</code></pre>
         </li>
       </ol>
 
-      <h2>Step 3 — crawl the target</h2>
+      <h2><span class="h-t">Step 3 — crawl the target</span></h2>
       <ol class="steps">
         <li>
           <strong>Map the site and mine the by-products.</strong>
@@ -3289,7 +3289,7 @@ cat photon_out/urls.txt | wc -l</code></pre>
       <div class="box warn">
         <span class="box-t">Tool-state summary — because your courseware is out of date on all of these</span>
         <div class="tbl-scroll">
-        <table>
+        <table><colgroup><col style="width:23%"><col style="width:21%"><col style="width:41%"><col style="width:15%"></colgroup>
           <thead><tr><th>Tool</th><th>Job</th><th>State (2026)</th><th>Use it?</th></tr></thead>
           <tbody>
             <tr><td class="mono">knockpy</td><td>Subdomain</td><td>v8, Oct 2025, async rewrite — healthy</td><td>Yes</td></tr>
@@ -3334,7 +3334,7 @@ cat photon_out/urls.txt | wc -l</code></pre>
          vulnerable, and explicitly provided for you to test tools against</strong> — so you always have a
          fallback and a variety of stacks to fingerprint:</p>
       <div class="tbl-scroll">
-      <table>
+      <table style="min-width:704px"><colgroup><col style="width:27%"><col style="width:35%"><col style="width:38%"></colgroup>
         <thead><tr><th>Target</th><th>What / stack</th><th>Good for</th></tr></thead>
         <tbody>
           <tr><td class="mono">testphp / testasp / testaspnet / testhtml5 / rest<br>.vulnweb.com</td><td>Acunetix — PHP, classic ASP, ASP.NET, HTML5, REST API</td><td>Directory &amp; content discovery, stack fingerprinting, params</td></tr>
@@ -3359,7 +3359,7 @@ cat photon_out/urls.txt | wc -l</code></pre>
          (install the big collection with <span class="mono">sudo apt install seclists</span>). The list you
          pick matters more than the tool you pick.</p>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:41%"><col style="width:16%"><col style="width:43%"></colgroup>
         <thead><tr><th>Wordlist</th><th>For</th><th>When</th></tr></thead>
         <tbody>
           <tr><td class="mono">seclists/Discovery/DNS/subdomains-top1million-5000.txt</td><td>Subdomains</td><td>Fast first pass — the 5k most common names</td></tr>
@@ -3383,7 +3383,7 @@ subfinder -d tryhackme.com -all -silent -o subs.txt
 #   -silent  print only results, no banner (clean for piping)
 #   -o FILE  write results to a file</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">-d / -dL</td><td>One domain / a file of domains</td></tr>
         <tr><td class="mono">-all</td><td>Query every source (slower, more complete)</td></tr>
         <tr><td class="mono">-silent</td><td>Results only — ideal for <span class="mono">| httpx</span> or <span class="mono">| dnsx</span></td></tr>
@@ -3401,7 +3401,7 @@ amass enum -active  -d vulnweb.com -brute                  # ACTIVE — vulnweb 
 #   -active    resolve + optionally brute (touches DNS — authorized targets only)
 #   -brute     turn on the brute-force resolver</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">-passive</td><td>OSINT sources only — the safe default</td></tr>
         <tr><td class="mono">-active</td><td>Resolves names / cert-grabs — authorized targets only</td></tr>
         <tr><td class="mono">-brute</td><td>Add wordlist brute-forcing</td></tr>
@@ -3418,7 +3418,7 @@ knockpy vulnweb.com -w mylist.txt --json     # your own wordlist, JSON output
 #   -w FILE       wordlist of candidate names
 #   --json        machine-readable output for your report</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">-w FILE</td><td>Candidate-name wordlist</td></tr>
         <tr><td class="mono">--json</td><td>JSON report (drop into your recon report)</td></tr>
         <tr><td class="mono">-t N</td><td>Timeout per query</td></tr>
@@ -3443,7 +3443,7 @@ fierce --domain vulnweb.com                          # focused subdomain brute +
 dnsrecon -d vulnweb.com -t brt -D mylist.txt         # -t brt = brute-force mode, -D = wordlist
 #   dnsrecon -t axfr  →  the zone-transfer test you used in Lab 5</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Tool</th><th>Best at</th><th>State</th></tr></thead><tbody>
+      <table><colgroup><col style="width:15%"><col style="width:50%"><col style="width:35%"></colgroup><thead><tr><th>Tool</th><th>Best at</th><th>State</th></tr></thead><tbody>
         <tr><td class="mono">dnsenum</td><td>All-in-one: records, AXFR try, brute, Google scrape</td><td>Ships in Kali; dated but works</td></tr>
         <tr><td class="mono">fierce</td><td>Subdomain brute + scanning the neighbouring IPs it finds</td><td>Rewritten in Py3 — fine</td></tr>
         <tr><td class="mono">dnsrecon</td><td>Scriptable: <span class="mono">-t std/axfr/brt/srv</span></td><td>Maintained — your go-to CLI</td></tr>
@@ -3466,7 +3466,7 @@ gobuster dir -u http://testphp.vulnweb.com -w /usr/share/wordlists/dirb/common.t
 #   -t N       threads (50 is a sane, polite-ish default)
 #   -o FILE    save output</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">-x php,txt,bak</td><td>Append extensions — turns <span class="mono">admin</span> into <span class="mono">admin.php</span> too</td></tr>
         <tr><td class="mono">-s / -b</td><td>Status codes to show / to blacklist</td></tr>
         <tr><td class="mono">-t N</td><td>Threads (speed vs noise)</td></tr>
@@ -3484,7 +3484,7 @@ gobuster dir -u http://testphp.vulnweb.com -w /usr/share/wordlists/dirb/common.t
 #   -e           extensions to append
 #   -o           output (JSON by default with -of)</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">-mc / -ms / -ml</td><td>Match by code / size / lines</td></tr>
         <tr><td class="mono">-fc / -fs / -fw</td><td><strong>Filter out</strong> by code / size / words — the key to killing false positives</td></tr>
         <tr><td class="mono">-e .php,.bak</td><td>Extensions to append</td></tr>
@@ -3506,7 +3506,7 @@ feroxbuster -u http://testphp.vulnweb.com -w /usr/share/wordlists/dirb/common.tx
 #   -d N     max recursion DEPTH — it auto-dives into found directories
 #   -o FILE  output</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">-d N</td><td>Recursion depth — its headline feature</td></tr>
         <tr><td class="mono">-x php,html</td><td>Extensions</td></tr>
         <tr><td class="mono">-C 404 / -s 200</td><td>Filter / show status codes</td></tr>
@@ -3523,7 +3523,7 @@ dirsearch -u http://testphp.vulnweb.com -e php,txt,bak -x 404,403 --format=plain
 #   -x CODES        exclude these status codes
 #   --format / -o   report format + file</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">-e php,asp</td><td>Extensions injected into <span class="mono">%EXT%</span> in its wordlist</td></tr>
         <tr><td class="mono">-x 403,404</td><td>Exclude noise codes</td></tr>
         <tr><td class="mono">-r</td><td>Recursive</td></tr>
@@ -3548,7 +3548,7 @@ wfuzz -w nums.txt --hc 404 "http://testphp.vulnweb.com/listproducts.php?cat=FUZZ
 #   FUZZ    placeholder — put it in the path, a parameter, a header, POST data…
 #   --hc    hide these response codes   --hh N  hide by char count</code></pre>
       <div class="tbl-scroll">
-      <table><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
+      <table><colgroup><col style="width:45%"><col style="width:55%"></colgroup><thead><tr><th>Flag</th><th>Does</th></tr></thead><tbody>
         <tr><td class="mono">--hc / --hl / --hw / --hh</td><td>Hide by code / lines / words / chars</td></tr>
         <tr><td class="mono">--sc / --sl …</td><td>Show-only equivalents</td></tr>
         <tr><td class="mono">-d "a=FUZZ"</td><td>Fuzz POST data</td></tr>
@@ -3562,7 +3562,7 @@ wfuzz -w nums.txt --hc 404 "http://testphp.vulnweb.com/listproducts.php?cat=FUZZ
       <!-- ===================== DECISION GUIDE ===================== -->
       <h4>Which tool, when — the 10-second decision</h4>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:42%"><col style="width:19%"><col style="width:39%"></colgroup>
         <thead><tr><th>You want to…</th><th>Reach for</th><th>Because</th></tr></thead>
         <tbody>
           <tr><td>Find subdomains without touching the target</td><td class="mono">subfinder</td><td>Fast, passive, legal on any domain</td></tr>
@@ -3630,7 +3630,7 @@ wfuzz -w nums.txt --hc 404 "http://testphp.vulnweb.com/listproducts.php?cat=FUZZ
            technique only ever runs against a domain you own.</p>
       </div>
 
-      <h2>Step 1 — subdomain brute-force with knockpy</h2>
+      <h2><span class="h-t">Step 1 — subdomain brute-force with knockpy</span></h2>
       <ol class="steps">
         <li>
           <strong>Point the maintained tool at the apex domain.</strong>
@@ -3652,7 +3652,7 @@ knockpy vulnweb.com -w ~/my_convention_list.txt --json</code></pre>
         </li>
       </ol>
 
-      <h2>Step 2 — the experiment: smart list vs big list</h2>
+      <h2><span class="h-t">Step 2 — the experiment: smart list vs big list</span></h2>
       <ol class="steps">
         <li>
           <strong>Run the convention-derived list you drafted, then a generic one.</strong>
@@ -3677,7 +3677,7 @@ ffuf -u http://testphp.vulnweb.com -H "Host: FUZZ.vulnweb.com" \
         </li>
       </ol>
 
-      <h2>Step 3 — directory brute-force, and read the codes</h2>
+      <h2><span class="h-t">Step 3 — directory brute-force, and read the codes</span></h2>
       <ol class="steps">
         <li>
           <strong>Enumerate paths on <span class="mono">testphp.vulnweb.com</span> with two tools.</strong>
@@ -3699,7 +3699,7 @@ dirb http://testphp.vulnweb.com        # the exam's tool, for comparison</code><
         </li>
       </ol>
 
-      <h2>Step 4 — watch your own noise (on a server you control)</h2>
+      <h2><span class="h-t">Step 4 — watch your own noise (on a server you control)</span></h2>
       <ol class="steps">
         <li>
           <strong>You cannot read Acunetix's logs — so generate the signal against your own throwaway server.</strong>
@@ -3866,9 +3866,9 @@ gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</c
            Twelve tool dumps stapled together is not a report — it is homework you did not finish.</p>
       </div>
 
-      <h2>The structure</h2>
+      <h2><span class="h-t">The structure</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:31%"><col style="width:15%"><col style="width:54%"></colgroup>
         <thead><tr><th>Section</th><th>Built in</th><th>The conclusion it must reach</th></tr></thead>
         <tbody>
           <tr><td><strong>0 · Executive summary</strong></td><td>now</td><td>Three sentences a non-technical client understands: how exposed are they, and what is the single worst thing you found</td></tr>
@@ -3884,7 +3884,7 @@ gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</c
       </table>
       </div>
 
-      <h2>Step 1 — build the ranked target list</h2>
+      <h2><span class="h-t">Step 1 — build the ranked target list</span></h2>
       <ol class="steps">
         <li>
           <strong>Turn every host you found into one prioritised table.</strong>
@@ -3904,7 +3904,7 @@ gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</c
         </li>
       </ol>
 
-      <h2>Step 2 — write the executive summary last</h2>
+      <h2><span class="h-t">Step 2 — write the executive summary last</span></h2>
       <ol class="steps">
         <li>
           <strong>Three sentences, no jargon.</strong>
@@ -3922,7 +3922,7 @@ gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</c
         </li>
       </ol>
 
-      <h2>Step 3 — the honesty pass</h2>
+      <h2><span class="h-t">Step 3 — the honesty pass</span></h2>
       <ol class="steps">
         <li>
           <strong>Separate fact from hypothesis, everywhere.</strong>
@@ -4135,7 +4135,7 @@ gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</c
 
       <div class="quiz-score" id="quizScore">Answered <b>0</b> / 10</div>
 
-      <h2>Short answer — discuss, don't click</h2>
+      <h2><span class="h-t">Short answer — discuss, don't click</span></h2>
 
       <div class="q">
         <p><span class="qn">S1</span> You find an open zone transfer during an authorised test. Name the ATT&amp;CK sub-technique, one thing the dump might contain that a subdomain scan never would, and one log source that would have caught you.</p>
@@ -4186,9 +4186,9 @@ gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</c
            domain nobody authorised, you are committing an offence — no matter how "passive" it felt in class.</p>
       </div>
 
-      <h2>Do these in order</h2>
+      <h2><span class="h-t">Do these in order</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:9%"><col style="width:20%"><col style="width:13%"><col style="width:9%"><col style="width:49%"></colgroup>
         <thead><tr><th>#</th><th>Room</th><th>Platform</th><th>Tier</th><th>Why this, now</th></tr></thead>
         <tbody>
           <tr><td>1</td><td>Passive Reconnaissance</td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>Today's passive half, self-paced: whois→RDAP, dig, DNSDumpster, crt.sh, Shodan. Start here.</td></tr>
@@ -4237,9 +4237,9 @@ gobuster dir -u http://127.0.0.1:8000 -w /usr/share/wordlists/dirb/common.txt</c
         <li><strong>You cannot detect most recon — so defend by publishing less and monitoring the same sources.</strong> Only ~3 of today's 10 techniques leave a signal you can alert on.</li>
       </ul>
 
-      <h2>Homework — due before Session 3</h2>
+      <h2><span class="h-t">Homework — due before Session 3</span></h2>
       <div class="tbl-scroll">
-      <table>
+      <table><colgroup><col style="width:11%"><col style="width:59%"><col style="width:30%"></colgroup>
         <thead><tr><th>#</th><th>Task</th><th>What you submit</th></tr></thead>
         <tbody>
           <tr><td>1</td><td>Finish and polish <span class="mono">recon_report.md</span> on <span class="mono">tryhackme.com</span> — all nine sections, ranked target list, executive summary, fact/hypothesis marked throughout</td><td>The completed report</td></tr>

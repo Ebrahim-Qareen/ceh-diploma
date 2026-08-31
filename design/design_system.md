@@ -212,11 +212,70 @@ One per topic page, at the **end** of the page, after the takeaway.
 
 ### The `min-width:0` trap (do not remove)
 
-`.page-layout>*{min-width:0}` in `ceh.css` is **load-bearing**. Without it, a grid
-item's implicit minimum is its content's min-content width, so one wide nested table
-forces the entire page wider than the viewport instead of scrolling inside its own
-`.tbl-scroll`. This was diagnosed as a real grid bug after being mistaken for a
-text-wrapping problem. Never delete that rule.
+`.page-layout>*{min-width:0}` and `.split>*,.grid>*,.tiles>*,.stats>*,.bio>*{min-width:0}`
+in `ceh.css` are **load-bearing**. Without them, a grid item's implicit minimum is its
+content's min-content width, so one wide nested table — or a single long `<pre>` command
+line — forces the entire page wider than the viewport instead of scrolling inside its own
+`.tbl-scroll`. First diagnosed on `.page-layout` (mistaken for a text-wrapping problem);
+the `.split` half was found on Session 3 on 2026-08-31 by the width audit below, where a
+`<pre>` pushed a `.split` track to 639px and the document 100–393px wide. Never delete
+either rule.
+
+---
+
+## 7b. Width discipline (added 2026-08-31 — the page must FILL the browser)
+
+**One container, and only one.** `.wrap` is it: `max-width:var(--maxw)` (1680px),
+`margin-inline:auto`, `padding-inline:var(--gutter)` = `clamp(16px,3vw,40px)`. Header,
+progress bar, hero, main and footer all use it, so every left edge lines up.
+*Nothing else in the stylesheet may set `max-width` on a layout element.* A later
+`main{max-width:none}` or `.content{max-width:1100px}` silently cancels the container and
+you get two alignments on one page — and it is invisible below the cap, which is why the
+audit runs at **1920**, not just 1400.
+
+**Never use the `padding` shorthand for section spacing.** `padding-block` only.
+`.section{padding:48px 0}` overrides `.wrap`'s horizontal padding and the text lands on
+the screen edge at 480px. This was a live bug on three elements —
+`main.wrap.section`, `section.wrap.section-sm`, `div.wrap.progress-inner` — all fixed
+2026-08-31.
+
+**Cap prose, not objects.** `.content p`, `.content>ul`, `.content>ol` and the lede cap at
+`var(--prose)` = 96ch. Tables, grids, figures, cards, boxes and practice blocks fill the
+whole container — they are explicitly reset to `max-width:none`. A 170-character line is
+not "using the width".
+
+**Grids use `auto-fit`, never `auto-fill`**, with `minmax(min(100%,X),1fr)`:
+cards 350px, tiles 236px, stat tiles 178px. `auto-fill` leaves dead empty tracks when a
+section has fewer items than the row can hold.
+
+**Tables are rules, not a grid of boxes.** `.tbl-scroll` is a rounded, bordered,
+shadowed panel with `overflow-x:auto`; the table is `border-collapse:separate`,
+`table-layout:fixed`, `min-width:660px`, no vertical borders, a 1px hairline under each
+row, a small uppercase **monospace** header on `--panel-2`, and a subtle row hover.
+Column widths are declared **per table** via `<colgroup><col style="width:N%">` —
+generated from that table's own content by `scripts/gen_table_colgroups.py`, which weights
+each column by `max(avg, header*0.85, maxCell*0.45)` so a single long outlier still earns
+width. Never use a blanket `td:last-child{width:1%}` — it reads fine on a three-column
+table and crushes the prose column of a two-column one. Where a table's widest prose
+column would still render under 190px at 660px, the generator writes that table its own
+`style="min-width:NNNpx"`.
+
+**Diagrams scale with the page.** Inline SVG keeps `viewBox` and carries no `width`/
+`height` attributes; `.dgm svg{width:100%;height:auto;min-width:780px}` inside the
+`overflow-x:auto` panel, so a diagram grows with the page and scrolls on a phone instead
+of shrinking its labels to 7px.
+
+**Section headings** are `display:flex` with an `::after` that is a 1px gradient rule
+running to the right edge — this one detail is most of what separates "designed" from
+"stretched". Inline children inside an `h2` must stay in normal flow, so the heading's
+text is wrapped in `<span class="h-t">`; the flex `gap` would otherwise open a hole
+between the text and any nested `<span>`/`<em>`.
+
+**One shared depth token.** `--depth` (inset top highlight + soft drop shadow) is used by
+every raised surface; `--depth-hi` is the hover state on cards and tiles, which also
+raise 3px and change border colour. Nothing else glows, pulses or animates.
+`.card` is `display:flex;flex-direction:column` with `.card-meta{margin-top:auto}` so
+badge rows pin to the card bottom instead of leaving ragged space.
 
 ---
 
@@ -231,10 +290,39 @@ Run the Playwright check across viewport widths — `/tmp/verify_s1.js` is the t
 const page = await browser.newPage({ viewport: { width: w, height: 900 } });
 ```
 
-Checks: document-level horizontal overflow at 1400/1100/900/700/480px · elements wider
-than the viewport that are *not* inside a scroll container · SVG text escaping its
-`viewBox` · console/page errors · every `data-node` has a `data-detail` · clicking each
-node opens exactly one panel · broken images · external link hosts.
+Checks: document-level horizontal overflow at **1920**/1400/1100/900/700/480px ·
+elements wider than the viewport that are *not* inside a scroll container · SVG text
+escaping its `viewBox` · console/page errors · every `data-node` has a `data-detail` ·
+clicking each node opens exactly one panel · broken images · external link hosts.
+
+### The four width assertions (added 2026-08-31) — `scripts/audit_layout.js`
+
+At **every** width, programmatically assert:
+
+1. every `.wrap` has the same `getBoundingClientRect().left` — catches a cancelled container;
+2. every `.wrap` has `paddingLeft >= 14px` — catches the padding-shorthand trap;
+3. no `td`/`th` holding more than 55 characters renders narrower than 190px — catches a squeezed prose column;
+4. the document does not scroll horizontally, and no element sits outside a scroll container.
+
+Run with `.page{display:block!important}` injected so one pass covers every paged section.
+**1920 is not optional.** With a 1680px cap, any rule that cancels the container is
+invisible at 1400 — that is exactly where the bug hides.
+
+**Then break each check on purpose and confirm it fails.** A check that passes the first
+time has proven nothing. `audit_layout.js` takes `BREAK=` for this; all six sabotages are
+known-failing as of 2026-08-31:
+
+| `BREAK=` | Sabotage | Must fail |
+|---|---|---|
+| `edges` | `main.wrap{max-width:1100px}` | 1920 + 1400 only |
+| `padding` | `.section{padding:48px 0}` | every width |
+| `nocolgroup` | strip `<colgroup>`, `table-layout:auto`, `td:last-child{width:1%}` | every width, 25–43 cells |
+| `overflow` | `.tbl-scroll{overflow-x:visible}` | 480/700/1100 |
+| `minwidth` | `.split>*{min-width:auto}` | S3 at 4 widths |
+| `tablemw` | `.tbl-scroll table{min-width:0}` | 480 on all sessions |
+
+A sabotage that does *not* fail is itself a finding: `td:last-child{width:1%}` alone
+passes, because the per-table `<colgroup>` overrides it — which is the point of having one.
 
 Hash navigation caveat: `page.goto(url + '#p8')` on an already-loaded document is a
 same-document navigation and will **not** re-run the page script. Use a fresh page or
