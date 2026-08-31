@@ -87,7 +87,7 @@ never in any `.md` file. Use placeholders + a local untracked credentials note.
 | 5 | `testing/` pass: credential scan, link check, review | No dedicated QA step before |
 | 6 | `ceh-github-publish` — push once QA passes | Screenshot-driven GitHub Desktop pushes |
 
-Current phase: **4 (Sessions 1–2 published; Session 3 built, awaiting review)** — see §7 status table.
+Current phase: **4 (Sessions 1–4 published; Session 5 not started)** — see §7 status table.
 
 ## 6. How a session gets built (repeat for each, phase 4)
 
@@ -113,8 +113,8 @@ Current phase: **4 (Sessions 1–2 published; Session 3 built, awaiting review)*
 | — | Lab design (baseline) | done |
 | 1 | Foundations, Lab Build & First Contact | built — awaiting review |
 | 2 | Footprinting & Reconnaissance | built — reviewed, published |
-| 3 | Scanning & Enumeration | built — awaiting review |
-| 4 | System Hacking I — Access | not started |
+| 3 | Scanning & Enumeration | built — published |
+| 4 | System Hacking I — Vuln Analysis, Auth & Password Attacks | built — published |
 | 5 | System Hacking II — Exploitation | not started |
 | 6 | System Hacking III — Privesc & Capstone | not started |
 | 7 | Malware Threats | not started |
