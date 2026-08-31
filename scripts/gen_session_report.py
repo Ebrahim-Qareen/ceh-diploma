@@ -89,6 +89,7 @@ def build(key, d):
     <nav class="topnav">
       <a href="index.html">Session {snum_short}</a>
       <a href="../index.html">All sessions</a>
+      <a href="../index.html#reports">All reports</a>
     </nav>
   </div>
 </header>

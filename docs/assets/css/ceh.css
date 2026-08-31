@@ -576,3 +576,11 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
   .rep-check input:checked+.rep-box{background:#0a8f3c!important;border-color:#0a8f3c!important}
   .rep-step.done{background:#f6fff8!important}
 }
+
+/* ---------- sidebar deliverable CTA (last section in the left bar) ---------- */
+.side-cta{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.side-cta h5{margin:0 0 8px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--red)}
+.side-cta a{display:block;text-align:center;font-size:13px;font-weight:700;color:var(--red-soft);
+  border:1px solid rgba(230,57,70,.4);background:rgba(230,57,70,.08);border-radius:var(--radius-sm);
+  padding:9px 12px;transition:border-color .16s,background .16s,color .16s}
+.side-cta a:hover{background:rgba(230,57,70,.16);border-color:var(--red);color:#fff;text-decoration:none}
