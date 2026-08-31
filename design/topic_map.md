@@ -10,12 +10,12 @@ topics trimmed (see DECISIONS.md).
 
 **Still open, not yet actioned in this map** (flagged for instructor
 decision):
-- No AD (Active Directory) lab exists yet, but Session 4 (NTLM/Kerberos,
-  LLMNR poisoning) and Session 6 (Windows privesc — Mimikatz, token abuse)
-  teach AD-style attacks against standalone Windows targets only. Recommend
-  adding one domain controller + domain-joined workstation to
-  `labs/lab_design.md` before Session 4 is built, or explicitly scoping those
-  topics to local (non-domain) Windows auth. See `scope_decisions.md` §Open.
+- ~~No AD (Active Directory) lab exists yet~~ **CLOSED 2026-08-28 (Session 3
+  build).** `WINSRV19-TGT01` was promoted to a domain controller for `ceh.lab`
+  and `WIN10-TGT01` joined to it, so LDAP enumeration is real in Session 3 and
+  the AD-style attacks in Session 4 (NTLM/Kerberos, LLMNR poisoning) and
+  Session 6 (Mimikatz, token abuse) now run against a real domain, not a
+  standalone box. See `labs/lab_design.md` §"Session 3 target preparation".
 - Official EC-Council module PDFs for Ch.11, 12, 17, 18, 19 are still not in
   `Resources/EC-Council Materials/` — those sessions' content (Session
   Hijacking, Evasion, Mobile, IoT/OT, Cloud) was built from verified public
@@ -31,8 +31,11 @@ decision):
   as Session 3's scan-list input. Active recon in S2 still uses authorised
   stand-ins (`zonetransfer.me`, `scanme.nmap.org`, the local `ceh-lab.local`
   zone) because you cannot lawfully send packets at `tryhackme.com`. A single
-  continuity target that can be *attacked* end to end (S3→S6) still needs an
-  instructor-owned domain or a dedicated lab company — unchanged open item.
+  continuity target that can be *attacked* end to end (S3→S6) is now the
+  local host-only lab, adopted 2026-08-28 (Session 3): the target profile
+  from S3 is S4's input, and the same VMs (incl. the new `ceh.lab` DC) run
+  through exploit (S5) and privesc (S6). A public internet-facing continuity
+  target for realism remains an optional extra, not required.
 
 - Currency corrections surfaced while building Session 2 (do not change
   sequencing, but the instructor deck / older courseware is wrong on them):

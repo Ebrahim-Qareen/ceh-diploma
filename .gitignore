@@ -17,4 +17,7 @@ _stage2/
 
 # session-scratch (undeletable via bridge)
 docs/session-02/_wtest.txt
-SESSION_02_BUILD_PROMPT.md
+SESSION_*_BUILD_PROMPT.md
+
+# Local VM images (multi-GB) — never commit
+labs/kali-linux-*

@@ -1,7 +1,8 @@
 # Practice Platforms — Verified Room Reference
 
 > Every entry below was **fetched live and confirmed** (exact name, access tier,
-> duration) on 2026-08-23. Do not link a room from memory — tiers change and slugs die.
+> duration) on 2026-08-23, with the Session 2 set added 2026-08-24 and the Session 3
+> set added — and the Session 1 Nmap tiers corrected — on 2026-08-28. Do not link a room from memory — tiers change and slugs die.
 > Re-verify anything older than ~3 months before putting it in front of students.
 
 ## Platform comparison
@@ -56,19 +57,62 @@ with no signup, no VM, no subscription.
 | Virtualization and Containers | `virtualizationandcontainers` | **Premium** | ~60 min |
 | Careers in Cyber | `careersincyber` | Free | ~30 min |
 
-### Scanning (Session 1 lab · Session 3)
-| Room | Slug | Tier | Time |
-|---|---|---|---|
-| **Blue** (first full compromise) | `blue` | **Free** | ~30 min, easy |
-| Nmap Live Host Discovery | `nmap01` | **Premium** | ~60 min |
-| Nmap Basic Port Scans | `nmap02` | **Premium** | ~60 min |
-| Nmap Advanced Port Scans | `nmap03` | **Premium** | ~60 min |
-| Nmap: The Basics | `nmap` | **Premium** | ~60 min |
-| RP: Nmap | `rpnmap` | **Premium** | — |
+### Scanning & Enumeration (Session 3) — re-verified 2026-08-28
 
-`Blue` is the motivation room: scan → find MS17-010 → exploit → SYSTEM. It runs the
-exact arc Sessions 1–5 build. Free, and worth assigning early precisely because it
-will feel like magic before students understand it.
+> ⚠️ **This section corrects the Session 1 record.** Session 1 listed the whole Nmap
+> family as Premium. That was wrong for three of them. See the verification method below.
+
+**Verification method (better than the logged-out page scrape):**
+`https://tryhackme.com/api/v2/rooms/details?roomCode=<slug>` returns the authoritative
+tier fields — `freeToUse: true` + `displaySubscriptionTier: null` = **free**;
+`freeToUse: false` + `displaySubscriptionTier: "premium"` = **premium**;
+`{"status":"fail","message":"This room is private."}` = **unusable**. The logged-out
+HTML page sometimes returns `{"status":"error","message":"Unauthorized"}` for free rooms
+(bot protection), so the page alone gives false premium readings.
+
+#### Free — the Session 3 path
+
+| Room | Slug | Tier | Time · difficulty | Why this room |
+|---|---|---|---|---|
+| **Nmap** | `furthernmap` | **Free** ✅ | ~50 min · easy | **The single best free companion to Session 3.** 15 tasks: switches, scan-type overview, TCP connect, SYN, UDP, NULL/FIN/Xmas, ICMP network scanning, NSE overview/usage/searching, firewall evasion, practical. Covers our whole scanning half |
+| **Nmap Basic Port Scans** | `nmap02` | **Free** ✅ | ~120 min · easy | Depth on TCP connect / SYN / UDP + TCP flags + fine-tuning scope and performance. Do after `furthernmap` |
+| **Network Services** | `networkservices` | **Free** ✅ | ~60 min · easy | The enumeration half: SMB (enum4linux, smbclient), Telnet, FTP + hydra. Maps directly to our Lab 4 and Lab 6 |
+| **Network Services 2** | `networkservices2` | **Free** ✅ | ~60 min · easy | NFS, SMTP and MySQL enumeration — the services our Lab 6 sweeps on Metasploitable2 |
+| **RustScan** | `rustscan` | **Free** ✅ | ~45 min · easy | The breadth-then-depth workflow we teach: rustscan finds ports fast, hands off to nmap |
+| **Vulnversity** | `vulnversity` | **Free** ✅ | ~45 min · easy | Nmap recon → service enumeration → foothold. The first room that uses scanning for something |
+| **Basic Pentesting** | `basicpentestingjt` | **Free** ✅ | ~45 min · easy (challenge) | SMB + service enumeration with no walkthrough hand-holding. Good homework |
+| **Blue** | `blue` | **Free** ✅ | ~30 min · easy | The motivation room: scan → find MS17-010 → exploit → SYSTEM. Runs the exact arc Sessions 1–5 build |
+
+#### Premium / unusable — do not link as required work
+
+| Room | Slug | Status | Note |
+|---|---|---|---|
+| Nmap: The Basics | `nmap` | **Premium** | `freeToUse:false`, tier `premium` |
+| Nmap Advanced Port Scans | `nmap03` | **Premium** | Fragmentation, decoys, spoofing — our S3 evasion preview covers the concepts free |
+| Nmap Post Port Scans | `nmap04` | **Premium** | — |
+| Nmap Live Host Discovery | `nmap01` | ⚠️ **Conflicting** | API reports `freeToUse:true` (medium, ~75 min) but the logged-out page returns `Unauthorized`. **Re-check on the day before assigning.** Not linked as required |
+| Enumeration | `enumeration` | **Private** | `{"status":"fail","message":"This room is private."}` |
+| RP: Nmap | `rpnmap` | **Private** | Same response |
+| Wireshark 101 | `wireshark101` | **Premium** | So the Wireshark work in Session 3 happens **in our own lab**, not in a THM room |
+| Wireshark: The Basics | `wiresharkthebasics` | **Premium** | ~60 min. Same conclusion |
+
+⚠️ **Dead slug (do not use):** `nmapthebasics` — returns the "room you tried to access
+doesn't exist" search page.
+
+**Also re-confirmed free (Session 1 networking prereqs, still valid):**
+`whatisnetworking` (info · 30 min) · `introtolan` (info · 15 min).
+
+**Non-THM targets used in Session 3 labs:**
+- **Tier A — the local host-only lab** (`KALI-ATK01` → `METASPLOITABLE2`, `WIN10-TGT01`,
+  `WINSRV19-TGT01`). The only place a full subnet sweep, every scan type, UDP scans and
+  real SMB/SNMP/LDAP/NFS enumeration are legal. Every hands-on block runs here.
+- `scanme.nmap.org` — Nmap's own host. Verified live 2026-08-28, still says
+  *"You are authorized to scan this machine with Nmap or other port scanners"* and
+  *"A few scans in a day is fine."* **Rate-limit it and say so on the page.**
+- `testphp.vulnweb.com` / vulnweb siblings, `demo.testfire.net` — Acunetix/HCL test
+  targets, used only for the LAN-vs-internet contrast. Both were unreachable to our
+  fetcher during this build (vulnweb robots timeout, testfire expired certificate) —
+  treat as flaky and always have the lab fallback, exactly as Session 2 teaches.
 
 ### Footprinting & Reconnaissance (Session 2) — verified live 2026-08-24
 
@@ -93,13 +137,56 @@ Premium or Max subscribers"*; reading a room while logged in proves nothing abou
 ⚠️ **Dead slugs (do not use):** `sublist3r` and `windowsuserfundamentals` both return
 "the room you tried to access doesn't exist."
 
-**Nmap rooms** (`nmap01`–`nmap03`, `nmap`) are **Premium** — see the Scanning section;
-they belong to Session 3, not Session 2.
+**Nmap rooms** belong to Session 3, not Session 2 — and the tiers were re-verified on
+2026-08-28: `furthernmap` and `nmap02` are **free**, not premium. See the Scanning &
+Enumeration (Session 3) section above.
 
 **Non-THM targets used in Session 2 labs (verified authorised):**
 - `zonetransfer.me` (DigiNinja) — published for zone-transfer training. NS: `nsztm1.digi.ninja`, `nsztm2.digi.ninja`.
 - `scanme.nmap.org` — "authorized to scan… a few scans in a day is fine."
 - `crt.sh`, `sitereport.netcraft.com`, `exploit-db.com/google-hacking-database` — free, public, no account for basic use (crt.sh is frequently 502 — have the `curl|jq` fallback and `subfinder` ready).
+
+### Vulnerability Analysis & Password Attacks (Session 4) — verified 2026-08-28
+
+> Verified via the API method (`https://tryhackme.com/api/v2/rooms/details?roomCode=<slug>`): `freeToUse:true`
+> + `displaySubscriptionTier:null` = free; `freeToUse:false` = premium/max; `"This room is private."` = unusable.
+
+#### Free — the Session 4 path
+
+| Room | Slug | Tier | Time · difficulty | Why this room |
+|---|---|---|---|---|
+| **Vulnerabilities 101** | `vulnerabilities101` | **Free** ✅ | ~20 min · easy | CVE, CVSS and vuln research — the vuln-analysis half. Do it first. |
+| **OpenVAS** | `openvas` | **Free** ✅ | ~45 min · easy | Automated scanning with Greenbone/GVM — the free stand-in for the Nessus demo (the `nessus` room is private). |
+| **Crack the Hash** | `crackthehash` | **Free** ✅ | ~45 min · easy | Identify + crack every common hash type (hashcat + John). Pure reps on the cracking pipeline. |
+| **Hydra** | `hydra` | **Free** ✅ | ~45 min · easy | Online brute-force against real services — the hydra block, hands-on. |
+| **Attacktive Directory** | `attacktivedirectory` | **Free** ✅ | ~75 min · medium | **The gem — and it's free.** kerbrute user-enum → GetNPUsers (AS-REP) → GetUserSPNs (Kerberoast) → secretsdump → evil-winrm: the exact Labs 5–6 chain against a fresh domain. |
+| **Network Services 2** | `networkservices2` | **Free** ✅ | ~60 min · easy | Service enumeration + hydra (carryover from S3) — good warm-up for the online-attack half. |
+
+#### Premium / private / dead — do not link as required work
+
+| Room | Slug | Status | Note |
+|---|---|---|---|
+| Hashing - Crypto 101 | `hashingcrypto101` | **Premium** | `freeToUse:false`, tier `premium` |
+| John the Ripper: The Basics | `johntheripperbasics` | **Premium** | `johntheripper0` is a **dead slug** (404) |
+| Password Attacks | `passwordattacks` | **Max** | tier `max` (hard, ~120 min) |
+| Attacking Kerberos | `attackingkerberos` | **Premium** | Kerberoast/AS-REP walkthrough — our local DC covers it free |
+| Nessus | `nessus` | **Private** | `{"status":"fail","message":"This room is private."}` |
+| Responder | `responder` | **Private** | Same response |
+| RP: Vulnerability Scanning | `rpvulnerabilityscanning` | **Dead** | 404 |
+| Holo | `holo` | ⚠️ **Unreliable / premium** | API returns inconsistent data (title "Throwback"); a heavy premium red-team network — out of scope, not linked |
+
+**Honest framing:** the strongest *dedicated* AD-credential rooms (Attacking Kerberos, Password Attacks,
+Breaching AD, Holo) are mostly premium. **Attacktive Directory being free is the exception** — and the local
+`ceh.lab` DC is exactly why we don't depend on paid rooms for this session.
+
+**Non-THM targets used in Session 4 labs:**
+- **Tier A — the local host-only lab** (`KALI-ATK01` → `METASPLOITABLE2`, `WIN7-TGT01`, `WIN10-TGT01`, the
+  `ceh.lab` DC `WINSRV19-TGT01`). The only lawful place to crack, spray, poison and roast. Every hands-on block runs here.
+- **Practice range (from S3):** Metasploitable 3 (weak "Star Wars" accounts → spray + SAM crack), Stapler 1
+  (enum4linux user list → spray list), Kioptrix 1 (mod_ssl/Samba versions → CVE→exploit reading).
+- **Research sources (free, no account for basic use):** `nvd.nist.gov`, `cve.org`, `exploit-db.com`,
+  `first.org/cvss/calculator`.
+
 
 ## Standing rule for students
 

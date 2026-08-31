@@ -83,9 +83,51 @@ virtualization is enabled (if VMware warns "VT-x disabled," fix it in BIOS).
 4. Allow ICMP as above so host discovery finds it.
 - **You know this worked when:** the VM has a `192.168.56.x` address and Kali can
   ping it.
-- **Note:** this is a standalone server for now — **no Active Directory domain is
-  configured**. Whether/when an AD domain gets added is an open lab decision
-  (see `lab_design.md` ▸ Open items); it is **not** required for Session 1.
+- **Session 3 prep:** this server is **promoted to a domain controller** for `ceh.lab`
+  and has **SNMP** installed before Session 3 — run `scripts/lab_s3_dc_setup.ps1` then
+  `scripts/lab_s3_snmp_setup.ps1` (both prompt for passwords; nothing is stored in the repo).
+  `WIN10-TGT01` is then **joined to `ceh.lab`** (point its DNS at this server first).
+  See `lab_design.md` ▸ "Session 3 target preparation". Not needed for Session 1.
+- **Session 4 prep:** after the S3 prep, run `scripts/lab_s4_dc_setup.ps1 -Stage Kerberoast` then
+  `-Stage SprayPolicy` on this DC (registers an SPN + weak password on `svc_backup` for Kerberoasting,
+  sets a shared weak password on a 3-account spray subset, and enables an account-lockout policy).
+  Snapshot as `baseline-s4` afterwards. All passwords are prompted — nothing is written to the repo.
+
+## VM 5 — WIN7-TGT01 (Windows 7 legacy target) — Session 1 homework
+> The legacy-Windows target. It is deliberately **unpatched** so the classic NetBIOS/SMB
+> enumeration and MS17-010 (EternalBlue) still work — the middle ground between
+> Metasploitable2 and hardened Windows 10. **Host-only only**, exactly like Metasploitable2:
+> an unpatched Win7 on a real network is compromised fast.
+
+1. Get a Windows 7 image (a legacy eval/ISO). 1 vCPU, 2 GB RAM, 40 GB. Network Adapter ▸ **Host-only (VMnet1)**.
+2. Complete setup with a local account (placeholder password, recorded outside the repo).
+3. **Do NOT install Windows Updates** and **leave SMBv1 enabled** (default on Win7) — the vulnerability is the point.
+4. For host discovery labs, note that Windows Firewall blocks ICMP by default — students reach it with `nmap -Pn` (that's the lesson), so you can leave the firewall alone.
+- **You know this worked when:** from Kali, `nmap -Pn -p 445 <WIN7_IP>` shows 445 open and
+  `nmap -p445 --script smb-protocols <WIN7_IP>` reports **SMBv1** enabled.
+- **Session 4 prep:** run `scripts/lab_s4_dc_setup.ps1 -Stage LocalAccounts` on this box to add 2–3
+  weak **local** accounts for the SAM/hashcat lab (Session 4). On Win10 also run `-Stage CheckLLMNR`
+  to confirm LLMNR/NBT-NS are still enabled (they are, by default) so Responder poisoning works.
+
+## Practice range (optional extra targets — Session 3) — import, don't install
+
+Three downloaded machines for extra scan/enum reps. **Host-only only**, same rule as Metasploitable2.
+
+**Kioptrix 1 and Stapler 1 (VulnHub `.ova`):**
+1. *VMware ▸ File ▸ Open ▸* the `.ova`, accept the import.
+2. Set the Network Adapter to **Host-only (VMnet1)**.
+3. Power on. Kioptrix gets its IP by DHCP; Stapler likewise. Find them from Kali with
+   `sudo nmap -sn 192.168.56.0/24`.
+- **You know this worked when:** Kioptrix shows 80/443/139 open and Stapler shows 139/445 open plus
+  `12380` on a full `-p-` scan.
+
+**Metasploitable3 (Windows Server 2008 R2):**
+1. Build from `github.com/rapid7/metasploitable3` (Packer + Vagrant: `vagrant up ms3-win`) **or** import a
+   prebuilt image. It is large (Windows Server 2008 R2).
+2. Network Adapter ▸ **Host-only (VMnet1)**. Snapshot after first boot.
+3. Windows Firewall drops ICMP and some ports — reach it with `nmap -Pn`.
+- **You know this worked when:** `nmap -Pn -sV <ip>` shows the web stack (Tomcat/Jenkins/GlassFish/
+  ElasticSearch) and `snmpwalk -v2c -c public <ip>` returns data.
 
 ## Snapshots (do this for EVERY VM after it's built)
 1. Power the VM to a clean, working state.
