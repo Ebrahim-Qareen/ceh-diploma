@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 03 — Team Scanning &amp; Enumeration Report | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 3 team deliverable — an interactive scanning and enumeration checklist your team fills in against an authorised target, saves in the browser, and exports to HTML or PDF.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 03 Report</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="index.html">Session 3</a>
+      <a href="../index.html">All sessions</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap section">
+  <div data-report="s3-scan" data-report-title="CEH Session 3 — Team Scanning & Enumeration Report">
+
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03</span><span class="tag lab">Team deliverable</span><span class="time">⏱ fill as you work</span></div>
+      <h1>Team Scanning &amp; Enumeration Report</h1>
+      <p class="lede">Take your Session 2 host list and make the target <strong>see you</strong>. Scanning is the loudest attacker stage — tick each step, paste what you found, click <em>example</em> for what good output looks like and why it matters next. Saves in <strong>this browser</strong>; export to HTML or PDF.</p>
+    </div>
+
+    <div class="rep-head">
+      <h2>Engagement header</h2>
+      <p>Fill this once. It prints at the top of your exported report.</p>
+      <div class="rep-fields">
+        <div class="rep-field"><label>Team name</label><input data-field="team" data-label="Team" placeholder="e.g. Team Nightowl" autocomplete="off"></div>
+        <div class="rep-field"><label>Date</label><input data-field="date" data-label="Date" placeholder="2026-09-01" autocomplete="off"></div>
+        <div class="rep-field wide"><label>Members</label><input data-field="members" data-label="Members" placeholder="Names of everyone on the team" autocomplete="off"></div>
+        <div class="rep-field"><label>Target (in-scope host/domain)</label><input data-field="target" data-label="Target" placeholder="target.com" autocomplete="off"></div>
+        <div class="rep-field"><label>Program / engagement</label><input data-field="program" data-label="Program" placeholder="HackerOne / Bugcrowd / lab engagement" autocomplete="off"></div>
+        <div class="rep-field wide"><label>Scope URL (the policy / authorisation you read)</label><input data-field="scope_url" data-label="Scope URL" placeholder="https://…/security  ·  or the lab authorisation note" autocomplete="off"></div>
+      </div>
+    </div>
+
+    <div class="rep-bar">
+      <div class="rep-prog"><b data-progress>0 / 11 steps</b><span class="pbar"><span data-progress-bar></span></span></div>
+      <div class="rep-actions">
+        <span class="rep-saved" data-saved>saved ✓</span>
+        <button class="rep-btn primary" data-export-html>⭳ Download HTML</button>
+        <button class="rep-btn" data-export-pdf>🖨 Save as PDF</button>
+        <button class="rep-btn ghost" data-clear>Clear</button>
+      </div>
+    </div>
+
+    <div class="rep-gate" data-gate="a1"><b>⚠ Stop.</b> You have ticked an <b>active</b> step but your scope &amp; authorization check (A1) is not signed off. Confirm you are authorised to test this target first — active testing outside an authorised scope is illegal and voids safe harbour.</div>
+
+    <div data-report-body>
+
+      <h3 class="rep-sec">A · Setup &amp; scope — do this first</h3>
+      <div class="rep-step" data-step="a1">
+        <label class="rep-check"><input type="checkbox" data-check="a1"><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Scope &amp; authorization check</span><code class="rep-cmd">confirm scanning is allowed — before any packet</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example — the line that authorises a scan</div><pre>In scope:      203.0.113.0/24, *.target.com
+Out of scope:  shared/hosted assets
+Testing:       port scanning ALLOWED, max 5 req/s, no DoS
+Window:        any time, identify with X-Bug-Hunter header</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>That <strong>active scanning is explicitly allowed</strong>, and the <strong>rate limit</strong></li>
+              <li>The in-scope <strong>IP ranges / hosts</strong> (scan nothing else)</li>
+              <li>Any forbidden test types (DoS, brute-force) and required test window</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> a port scan is the first thing that reaches the target and the first thing its IDS logs. Everything below is active — outside an authorised scope it is an attack, not a test.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="a1" placeholder="Scanning allowed? rate limit? | In-scope ranges: … | Forbidden: DoS/brute? | Window …"></textarea>
+        </div>
+      </div>
+      <h3 class="rep-sec">B · Host discovery &amp; port scanning — packets to the target</h3>
+      <div class="rep-step" data-step="b1">
+        <label class="rep-check"><input type="checkbox" data-check="b1" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Live-host discovery</span><code class="rep-cmd">nmap -sn 203.0.113.0/24 -oA sweep</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>Nmap scan report for 203.0.113.10  Host is up (0.011s)
+Nmap scan report for 203.0.113.20  Host is up (0.009s)
+Nmap done: 256 hosts, 4 up</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Which of your Session 2 hosts are actually <strong>up</strong></li>
+              <li>New live IPs in-scope you did not have from recon</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> you only scan live hosts — this trims the range so the loud full scan hits real targets, not dead space.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b1" placeholder="Live IPs (from the sweep + your S2 list)…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="b2">
+        <label class="rep-check"><input type="checkbox" data-check="b2" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Full TCP port scan (SYN)</span><code class="rep-cmd">nmap -sS -p- --min-rate 2000 -Pn 203.0.113.20 -oA allports</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>PORT     STATE SERVICE
+22/tcp   open  ssh
+80/tcp   open  http
+443/tcp  open  https
+3389/tcp open  ms-wbt-server
+8080/tcp open  http-proxy</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li><strong>Every open TCP port</strong> per host (all 65535, not just top 1000)</li>
+              <li>Note the odd/high ports — they are where the interesting services hide</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> this open-port list is the map for the rest of the session; each port becomes a service you enumerate in C, and a lead you rank in D.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b2" placeholder="Open ports per host…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="b3">
+        <label class="rep-check"><input type="checkbox" data-check="b3" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Service &amp; version detection</span><code class="rep-cmd">nmap -sV -sC -p22,80,443,3389,8080 203.0.113.20 -oA services</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>22/tcp   OpenSSH 7.4 (protocol 2.0)
+80/tcp   Apache httpd 2.4.29 ((Ubuntu))
+8080/tcp Apache Tomcat 8.5.31
+|_http-title: Staging Portal</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li><strong>Service + exact version</strong> on every open port</li>
+              <li>Default-script findings (titles, certs, anonymous access)</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> the version string is the whole game for Session 4 — <span class="mono">Tomcat 8.5.31</span> maps straight to a CVE. Vague "http" is useless; "Apache 2.4.29" is a lead.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b3" placeholder="Service + version per port + any -sC script hits…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="b4">
+        <label class="rep-check"><input type="checkbox" data-check="b4" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">OS detection</span><code class="rep-cmd">nmap -O 203.0.113.20</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>Running: Linux 4.X
+OS CPE: cpe:/o:linux:linux_kernel:4.15
+OS details: Linux 4.15 - 5.6</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Best-guess <strong>OS and version</strong> per host</li>
+              <li>Whether it is Windows vs Linux — it changes every enumeration tool in C</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> OS decides your toolset: SMB/LDAP for Windows, NFS/SSH for Linux — and Windows version hints at MS17-010-class exposure.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b4" placeholder="OS guess per host…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="b5">
+        <label class="rep-check"><input type="checkbox" data-check="b5" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">UDP top ports</span><code class="rep-cmd">nmap -sU --top-ports 20 203.0.113.20</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>PORT    STATE         SERVICE
+53/udp  open          domain
+161/udp open          snmp   ← enumerate this
+500/udp open|filtered isakmp</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Open <strong>UDP</strong> services — especially <strong>161 (SNMP)</strong>, 53, 123, 500</li>
+              <li>TCP-only scans miss these entirely</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> SNMP on 161 is a goldmine you enumerate in C3, and it is invisible to every TCP scan — this is the step teams forget.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="b5" placeholder="Open UDP ports (SNMP? DNS? IKE?)…"></textarea>
+        </div>
+      </div>
+      <h3 class="rep-sec">C · Enumeration — turn each service into detail</h3>
+      <div class="rep-step" data-step="c1">
+        <label class="rep-check"><input type="checkbox" data-check="c1" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Web (80/443/8080)</span><code class="rep-cmd">whatweb https://203.0.113.20 ; nmap --script http-enum -p80,443,8080 203.0.113.20</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>HTTP/1.1 200  Apache/2.4.29  PHP/7.2
+/admin/    (Status: 401)
+/backup/   (Status: 200)
+/robots.txt (Status: 200)</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Server, framework, CMS + versions; <strong>directories &amp; admin panels</strong></li>
+              <li>robots.txt, default pages, exposed backups</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> feeds Session 8 web testing and Session 4 login targets; the version confirms your CVE leads from B3.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c1" placeholder="Web tech / dirs / admin / backups per host…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c2">
+        <label class="rep-check"><input type="checkbox" data-check="c2" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">SMB (139/445)</span><code class="rep-cmd">enum4linux-ng -A 203.0.113.20 ; nmap --script "smb-os-discovery,smb-enum-shares,smb-enum-users" -p445 203.0.113.20</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>OS: Windows Server 2019
+Shares: ADMIN$, C$, IPC$, Backups (READ)
+Users: administrator, svc_backup, m.said
+[note] modern Windows: null session refused</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li><strong>Shares</strong> (readable ones especially), <strong>users</strong>, OS build, domain</li>
+              <li>Whether null/guest sessions work (legacy) or are refused (modern)</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> usernames feed Session 4 spraying/Kerberoast; a readable share can hold creds; the modern-vs-legacy result tells you which attacks are even possible.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c2" placeholder="Shares / users / OS / domain / null-session result…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c3">
+        <label class="rep-check"><input type="checkbox" data-check="c3" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">SNMP (161/udp)</span><code class="rep-cmd">onesixtyone 203.0.113.20 public ; snmpwalk -v2c -c public 203.0.113.20</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>public   → community string valid
+sysDescr: Linux target 4.15
+hrSWRunName: /usr/sbin/sshd, mysqld, apache2
+installed software, listening ports, user accounts…</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>A valid <strong>community string</strong> (try public/private/community)</li>
+              <li>Running processes, software, ports, user accounts, ARP tables</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> a weak SNMP community string leaks the whole host inventory without a login — one of the fastest wins on the exam and in the field.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c3" placeholder="Community string / sysDescr / processes / users leaked…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c4">
+        <label class="rep-check"><input type="checkbox" data-check="c4" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">LDAP / Active Directory (389/636)</span><code class="rep-cmd">nmap --script ldap-rootdse -p389 dc.ceh.lab ; ldapsearch -x -H ldap://dc.ceh.lab -b "dc=ceh,dc=lab"</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>namingContext: DC=ceh,DC=lab
+CN=Administrator,CN=Users,DC=ceh,DC=lab
+CN=svc_sql,...  servicePrincipalName: MSSQL/...
+sAMAccountName: m.said, a.hassan</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>The <strong>domain naming context</strong>, <strong>users</strong>, groups</li>
+              <li>Accounts with a <strong>servicePrincipalName</strong> (SPN) — Kerberoast targets</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> this is the Session 4 attack surface: the user list is your spray list, and any SPN account is a Kerberoasting target.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c4" placeholder="Domain / users / groups / SPN accounts…"></textarea>
+        </div>
+      </div>
+      <div class="rep-step" data-step="c5">
+        <label class="rep-check"><input type="checkbox" data-check="c5" data-active><span class="rep-box"></span></label>
+        <div class="rep-main">
+          <div class="rep-row"><span class="rep-name">Other services (FTP/NFS/SMTP/RPC)</span><code class="rep-cmd">showmount -e 203.0.113.30 ; smtp-user-enum -M VRFY -U users.txt -t 203.0.113.30 ; ftp 203.0.113.30</code><button class="rep-toggle" aria-expanded="false"></button></div>
+          <div class="rep-detail">
+            <div class="rep-out"><div class="rep-lbl">Example output</div><pre>NFS: /home *  (world-readable export!)
+SMTP: 252 a.hassan (user exists)
+FTP: anonymous login ALLOWED</pre></div>
+            <div class="rep-collect"><div class="rep-lbl">Collect</div><ul>
+              <li>Anonymous <strong>FTP</strong>, exported <strong>NFS</strong> shares, <strong>SMTP</strong> user enumeration</li>
+              <li>Any service that answers without a credential</li>
+            </ul></div>
+            <div class="rep-why"><b>Why it matters later:</b> a world-readable NFS export or anonymous FTP is often a direct foothold, and SMTP VRFY confirms which usernames are real before you spray them.</div>
+          </div>
+          <textarea class="rep-notes" data-notes="c5" placeholder="FTP anon? / NFS exports / SMTP valid users / RPC…"></textarea>
+        </div>
+      </div>
+      <h3 class="rep-sec">D · The deliverable — this is what you submit</h3>
+      <div class="rep-free">
+        <span class="rep-free-label">D1 · Target profile</span>
+        <p class="rep-free-hint">One block per live host — the picture Session 4 attacks. This replaces a pile of tool dumps.</p>
+        <textarea data-notes="d1" placeholder="host | IP | OS | open ports | service+version per port | key enum findings
+203.0.113.20 | Win2019 | 445,3389,8080 | SMB(2019), Tomcat 8.5.31 | shares: Backups(R); users: svc_backup,m.said"></textarea>
+      </div>
+      <div class="rep-free">
+        <span class="rep-free-label">D2 · Ranked exploitation leads</span>
+        <p class="rep-free-hint">Version → likely weakness → which host. This is the direct input to Session 4 vulnerability analysis.</p>
+        <textarea data-notes="d2" placeholder="1. Tomcat 8.5.31 on 203.0.113.20:8080 → known CVEs, check searchsploit
+2. svc_backup has SPN → Kerberoast candidate
+3. weak SNMP community on .30 → full inventory leak"></textarea>
+      </div>
+      <div class="rep-free">
+        <span class="rep-free-label">D3 · Detection note (the SOC flip)</span>
+        <p class="rep-free-hint">What did your scans look like from the defender side? One line per noisy step — this is the tier-1 SOC skill.</p>
+        <textarea data-notes="d3" placeholder="SYN scan → many SYNs, no ACK, from one source (firewall/IDS)
+SMB enum → 4625/anonymous logon events
+SNMP walk → burst of 161/udp from one host"></textarea>
+      </div>
+      <div class="rep-free">
+        <span class="rep-free-label">D4 · Scope statement</span>
+        <p class="rep-free-hint">Confirm every packet stayed in scope.</p>
+        <textarea data-notes="d4" placeholder="All scanning stayed within the in-scope ranges in A1, within the stated rate limit. No out-of-scope host was scanned; no DoS/brute-force was run."></textarea>
+      </div>
+    </div>
+
+    <div class="box tip" style="margin-top:22px">
+      <span class="box-t">How your team keeps this</span>
+      <p>This report saves automatically in <strong>the browser you are using now</strong> — reopen the page on the same machine and it is still here. To hand it in or share it between teammates, use <strong>Download HTML</strong> (a single file) or <strong>Save as PDF</strong>. It does not sync between devices on its own.</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>CEH Diploma · ITGate Academy · Session 3 team deliverable</span>
+    <span><a href="index.html">← Back to Session 3</a></span>
+  </div>
+</footer>
+
+<script src="../assets/js/report.js"></script>
+</body>
+</html>
