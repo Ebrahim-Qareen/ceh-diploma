@@ -1,0 +1,2857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 03 — Scanning &amp; Enumeration | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 3 — host discovery, every TCP and UDP scan type, timing and version detection, then SMB/SNMP/LDAP/NFS/SMTP enumeration — taught from both ends: the attacker's terminal and the defender's packet capture. Ends with a working port-scan detection rule.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s03">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 03</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 03 · Pages</h5>
+    <ol id="sessionNav"></ol>
+  </aside>
+
+  <article>
+
+  <!-- ==========  P1 · COVER  ========== -->
+  <section class="page" data-title="Welcome">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03</span><span class="tag offensive">Scanning &amp; Enumeration</span><span class="time">⏱ 4 hours</span></div>
+      <h1>Scanning &amp; Enumeration</h1>
+      <p class="lede">Last session the target never knew you were there. Today it finds out — and you learn
+         to be the one who catches it.</p>
+    </div>
+    <div class="content">
+      <div class="oneline">Session 2 built the picture without touching anything. Session 3 is where we
+        touch it. Scanning is the loudest thing an attacker does, and the most commonly detected stage of a
+        real intrusion — so every technique today comes with the log line it leaves behind.</div>
+
+      <h2>Today's agenda</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Where the recon report becomes a scan list · why scanning is loud</td><td>Theory</td><td>8</td></tr>
+          <tr><td>2</td><td><strong>Lab pre-flight</strong> — four VMs, one subnet, three targets answering</td><td>Hands-on</td><td>6</td></tr>
+          <tr><td>3</td><td><strong>The target zoo</strong> — one scan, four OSes (MSF2 · Win7 · Win10 · DC)</td><td>Theory</td><td>7</td></tr>
+          <tr><td>4</td><td>Host discovery — ARP on the wire vs ICMP across a router</td><td>Theory</td><td>9</td></tr>
+          <tr><td>5</td><td><strong>Lab 1</strong> — find the live hosts, and the one that plays dead</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td>6</td><td>TCP flags and every scan type · UDP and why it hurts</td><td>Theory</td><td>17</td></tr>
+          <tr><td>7</td><td><strong>Lab 2</strong> — one target, three scans, Wireshark open</td><td>Hands-on</td><td>20</td></tr>
+          <tr><td>8</td><td>Timing, breadth-then-depth, OS and version discovery</td><td>Theory</td><td>10</td></tr>
+          <tr><td>9</td><td><strong>Lab 3</strong> — the full scan and the version guess that lies</td><td>Hands-on</td><td>15</td></tr>
+          <tr><td>10</td><td>Scanning countermeasures — the SOC flip, scan type by scan type</td><td>Defender</td><td>7</td></tr>
+          <tr><td>—</td><td>Break</td><td>—</td><td>10</td></tr>
+          <tr><td>11</td><td>Why your scan got caught, and what attackers do about it</td><td>Theory</td><td>12</td></tr>
+          <tr><td>12</td><td>Enumeration — the funnel from open port to way in</td><td>Theory</td><td>7</td></tr>
+          <tr><td>13</td><td>SMB enumeration, and why the textbook output is empty in 2026</td><td>Theory</td><td>10</td></tr>
+          <tr><td>14</td><td><strong>Lab 4</strong> — SMB against 2012 and against today</td><td>Hands-on</td><td>16</td></tr>
+          <tr><td>15</td><td>SNMP and LDAP — the two services that hand over the org chart</td><td>Theory</td><td>8</td></tr>
+          <tr><td>16</td><td><strong>Lab 5</strong> — walk the MIB, query the directory</td><td>Hands-on</td><td>15</td></tr>
+          <tr><td>17</td><td>NFS · FTP · SMTP · RPC · NSE · the netcat banner</td><td>Theory</td><td>8</td></tr>
+          <tr><td>18</td><td><strong>Lab 6</strong> — the service sweep</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td>19</td><td>Enumeration countermeasures</td><td>Defender</td><td>5</td></tr>
+          <tr><td>20</td><td><strong>Lab 7</strong> — read your own noise, then write the rule that catches it</td><td>Hands-on</td><td>16</td></tr>
+          <tr><td>21</td><td><strong>Lab 8</strong> — assemble the target profile</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td>22</td><td>Into Session 4 · quiz · practice plan · homework</td><td>Wrap-up</td><td>21</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">What you hand in today</span>
+        <p>Two things. A <strong>target profile</strong> — every live host, every open TCP and UDP port,
+           service and version, OS guess with a confidence level, shares, users, and a ranked "most likely
+           way in". And <strong>one working detection rule</strong> that catches a port scan, written from
+           packets you generated yourself, in Sigma, SPL or KQL. The profile is Session 4's input. The rule
+           is the job.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Scope — read this before you touch a keyboard</span>
+        <p>Every hands-on block today runs against <strong>your own lab VMs</strong> on the host-only
+           network. That is the only place a full subnet sweep, every scan type and real service enumeration
+           are lawful. Two public hosts appear for one contrast exercise, both with published permission, and
+           both rate-limited. Sending a scan anywhere else is a criminal offence in most jurisdictions,
+           including Egypt. There is no "just to see".</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P2 · WHERE WE LEFT OFF  ========== -->
+  <section class="page" data-title="Where we left off">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P02</span><span class="tag theory">Bridge</span><span class="time">⏱ 8 min</span></div>
+      <h1>The Report Becomes a Scan List</h1>
+      <p class="lede">You ended last session with a ranked recon report. Today the first three columns of it
+         turn into targets, and the target starts logging you.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this follows Session 2</span>
+        <p>Session 2's deliverable was a ranked recon report on a real organisation, assembled entirely from
+           public data — the target never knew. That report named hosts, IP ranges, and technologies. Today
+           you take that list and confirm it: which of those hosts is actually alive, which ports are really
+           open, and what is really running on them. Recon told you where to look. Scanning tells you what is
+           there.</p>
+      </div>
+
+      <h2>Recon was invisible. This is not.</h2>
+      <p>Hold onto the difference, because it is the spine of the whole session. In Session 2 every technique
+         was <em>passive</em> — you read indexes, certificate logs and registration records that a third party
+         had already collected. The target's logs stayed empty. You could footprint a company for a week and
+         it would never know.</p>
+      <p>The moment you send a packet <em>at</em> the target, that ends. Scanning is <strong>active</strong>:
+         your IP address arrives at their door, thousands of times, in a pattern no normal client produces.
+         It is the loudest thing an attacker does, and — this is the part the textbooks skip — it is the
+         <strong>single most commonly detected stage of a real intrusion</strong>. A firewall log, an IDS
+         signature, a jump in connection attempts: this is where the defender first sees the attacker.</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 250" role="img" aria-label="Two halves of the kill chain: recon on the left produces no target-side log; scanning on the right produces firewall and IDS entries.">
+          <defs>
+            <marker id="ar-o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--orange)"/></marker>
+            <marker id="ar-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--cyan)"/></marker>
+            <marker id="ar-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--text-3)"/></marker>
+            <marker id="ar-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/></marker>
+          </defs>
+
+          <rect x="20" y="46" width="410" height="176" rx="10" fill="rgba(74,222,128,.06)" stroke="var(--green)" stroke-dasharray="4 4"/>
+          <text class="d-title" x="34" y="74" font-size="14" fill="var(--green)">SESSION 2 · RECON — passive</text>
+          <rect x="44" y="92" width="150" height="52" rx="7" fill="var(--panel)" stroke="var(--line-soft)"/>
+          <text x="119" y="122" font-size="12.5" fill="#fff" text-anchor="middle">You + Google, crt.sh</text>
+          <line x1="200" y1="118" x2="250" y2="118" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="256" y="92" width="150" height="52" rx="7" fill="var(--panel)" stroke="var(--line-soft)"/>
+          <text x="331" y="115" font-size="12.5" fill="#fff" text-anchor="middle">The target</text>
+          <text x="331" y="133" font-size="11" class="d-sub" text-anchor="middle">logs: nothing</text>
+          <text x="225" y="200" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="700">Target-side evidence: none</text>
+
+          <rect x="490" y="46" width="410" height="176" rx="10" fill="rgba(255,112,67,.06)" stroke="var(--orange)"/>
+          <text class="d-title" x="504" y="74" font-size="14" fill="var(--orange)">SESSION 3 · SCANNING — active</text>
+          <rect x="514" y="92" width="150" height="52" rx="7" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+          <text x="589" y="122" font-size="12.5" fill="var(--orange)" text-anchor="middle">You + nmap</text>
+          <line x1="670" y1="118" x2="720" y2="118" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <rect x="726" y="92" width="160" height="52" rx="7" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="806" y="115" font-size="12.5" fill="#fff" text-anchor="middle">The target</text>
+          <text x="806" y="133" font-size="11" fill="var(--red)" text-anchor="middle">logs: YOU</text>
+          <text x="695" y="200" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="700">Firewall log · IDS alert · your IP, thousands of times</text>
+        </svg>
+        <figcaption><b>The line you cross today.</b> Everything left of the break left no trace. Everything
+          right of it does. Half of learning to scan is learning what the scan leaves behind.</figcaption>
+      </figure>
+
+      <div class="box soc">
+        <span class="box-t">Why this session is built for both tracks at once</span>
+        <p>Your instructor is a SOC analyst. This is the session where the offensive and defensive tracks
+           meet, because scanning is the first attacker action a defender can reliably catch. So every scan
+           you learn to run, you also learn to detect — attacker terminal on one side, the defender's packet
+           capture and log line on the other. A modern EDR or IDS flags a default <span class="mono">nmap
+           -A</span> in seconds. Teaching you the flags without teaching you that would be teaching a myth.</p>
+      </div>
+
+      <h2>Where this sits in ATT&amp;CK</h2>
+      <p>Session 2 lived in <strong>TA0043 Reconnaissance</strong>. Today we move into the target itself.
+         Active scanning still has a foot in Reconnaissance, but enumeration is <strong>TA0007
+         Discovery</strong> — the tactic that describes an attacker already in contact with the systems,
+         mapping what is there.</p>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Today's action</th><th>ATT&amp;CK technique</th><th>ID</th></tr></thead>
+        <tbody>
+          <tr><td>Sending scans at IP ranges</td><td>Active Scanning</td><td class="mono">T1595</td></tr>
+          <tr><td>Sweeping a subnet for live hosts</td><td>Active Scanning: Scanning IP Blocks</td><td class="mono">T1595.001</td></tr>
+          <tr><td>Building the network picture</td><td>Gather Victim Network Information</td><td class="mono">T1590</td></tr>
+          <tr><td>Port/service discovery</td><td>Network Service Discovery</td><td class="mono">T1046</td></tr>
+          <tr><td>Finding other live hosts from a foothold</td><td>Remote System Discovery</td><td class="mono">T1018</td></tr>
+          <tr><td>Enumerating shares</td><td>Network Share Discovery</td><td class="mono">T1135</td></tr>
+          <tr><td>Enumerating users</td><td>Account Discovery</td><td class="mono">T1087</td></tr>
+          <tr><td>Enumerating groups</td><td>Permission Groups Discovery</td><td class="mono">T1069</td></tr>
+          <tr><td>Reading the password policy</td><td>Password Policy Discovery</td><td class="mono">T1201</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="muted">Every ID above was checked against the live ATT&amp;CK site while this page was built —
+         a habit worth copying, because technique IDs get renamed and deprecated.</p>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The one line to carry through today</span>
+        <p>Recon was reading about the target. Scanning is knocking on every door and writing down which ones
+           opened — while someone inside watches the knocks pile up in a log.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P3 · LAB PRE-FLIGHT  ========== -->
+  <section class="page" data-title="Lab pre-flight">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P03</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 5 min</span></div>
+      <h1>Pre-flight — Four VMs, One Subnet, Three Targets Answering</h1>
+      <p class="lede">A scanning class with a dead target is a dead class. Five minutes now saves the session.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why we start here and not with a scan</span>
+        <p>Everything today assumes your lab is up and the four machines can see each other on the host-only
+           network. Before we teach a single scan type, we prove that <span class="mono">nmap -sn</span> on
+           the lab subnet returns every target — Metasploitable2, Windows 7, Windows 10 and the Server 2019 DC. If it does not, we fix it now — not fifteen minutes into
+           Lab 2 when half the room is silently stuck.</p>
+      </div>
+
+      <h2>The check</h2>
+      <ol class="steps">
+        <li>
+          <strong>Power on all four VMs and confirm the network adapter.</strong> Every VM's adapter must be
+          <span class="mono">Host-only</span> (VMware: <em>VM → Settings → Network Adapter → Host-only</em>).
+          Not NAT, not Bridged. This is the number-one cause of a "dead" target.
+        </li>
+        <li>
+          <strong>Record your own address on Kali.</strong>
+          <pre><code>ip a | grep -A2 'ens\|eth'   # note your host-only IP, e.g. 192.168.56.101</code></pre>
+        </li>
+        <li>
+          <strong>Record each Windows target's address.</strong> On each, open <span class="mono">cmd</span>:
+          <pre><code>ipconfig | findstr /i "IPv4"</code></pre>
+        </li>
+        <li>
+          <strong>Sweep the subnet from Kali and confirm three targets answer.</strong>
+          <pre><code>sudo nmap -sn 192.168.56.0/24</code></pre>
+          <p>Adjust the range to whatever your host-only network actually is. On a class laptop it is often
+             <span class="mono">192.168.56.0/24</span> (VMware) — but read it off your own <span class="mono">ip
+             a</span>, do not assume.</p>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>The sweep lists <strong>Metasploitable2, Win7, Win10 and WinSrv2019 (DC)</strong> as up — four
+                  targets plus your own Kali box (both Windows-7 and -10 may hide behind ICMP — see below)</li>
+              <li>You have written down all four IPs; you will use them all session</li>
+              <li>If a Windows box is missing, that is expected until you read the box below — it is not
+                  necessarily dead</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box warn">
+        <span class="box-t">A Windows target missing from <span class="mono">-sn</span> is a lesson, not a fault</span>
+        <p>Windows Firewall blocks ICMP echo by default. A live Windows host can look dead to a ping sweep and
+           still be perfectly up. Hold that thought — it is the first real finding of Lab 1, and the
+           number-one beginner mistake in the whole topic. Do <strong>not</strong> "fix" it by turning the
+           firewall off; the point is to learn to scan past it.</p>
+      </div>
+
+      <h2>If a target really is missing — the 60-second triage</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td>VM not in the sweep at all, no IP shown in its console</td><td>Adapter is NAT/Bridged, or VM is suspended not started</td><td>Set adapter to Host-only; fully power on (not resume from a bad state)</td></tr>
+          <tr><td>Windows box up on its console but absent from <span class="mono">-sn</span></td><td>Windows Firewall dropping ICMP echo</td><td>Expected — reach it with <span class="mono">nmap -Pn</span> in Lab 1</td></tr>
+          <tr><td>IP is in a different subnet than Kali</td><td>Two host-only networks, or a stale DHCP lease</td><td>Put every adapter on the <em>same</em> host-only network; renew the lease (<span class="mono">ipconfig /renew</span>)</td></tr>
+          <tr><td>Metasploitable2 shows no IP at login</td><td>DHCP didn't assign</td><td>Log in (<span class="mono">msfadmin</span>), <span class="mono">sudo dhclient eth0</span>, re-check</td></tr>
+          <tr><td>Everything times out from Kali</td><td>Kali's own adapter is down or on the wrong network</td><td>Re-check <span class="mono">ip a</span>; bring the interface up; confirm you can ping the gateway</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">The fallback if your VM won't come back</span>
+        <p>If a target stays dead past five minutes, do not sit idle. Every lab today ships a saved output
+           file — the real command output, captured on a working lab — so you can do the reading and analysis
+           on evidence even when your own box is down. Grab it, keep moving, and fix the VM at the next break.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P04 · THE TARGET ZOO (multi-OS)  ========== -->
+  <section class="page" data-title="The target zoo">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P04</span><span class="tag theory">Targets · every OS</span><span class="time">⏱ 7 min</span></div>
+      <h1>One Scan, Every OS — Meet the Targets</h1>
+      <p class="lede">The same <span class="mono">nmap</span> command tells a different story on each box.
+         That difference is the whole point of the lab.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why four machines, not one</span>
+        <p>Scanning is OS-agnostic — the command doesn't change. But what comes back does, completely. So the
+           lab spans the range on purpose: an ancient Linux box, a legacy Windows, a hardened modern Windows,
+           and a domain controller. Learn to read the <em>difference</em> and you can fingerprint any host.</p>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 300" role="img" aria-label="Lab topology: KALI attacker on the host-only network connects to four targets — Metasploitable2 (Linux), Windows 7, Windows 10, and Windows Server 2019 domain controller.">
+          <rect x="360" y="20" width="200" height="52" rx="9" fill="rgba(255,112,67,.14)" stroke="var(--orange)"/>
+          <text x="460" y="42" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">KALI-ATK01 · attacker</text>
+          <text x="460" y="60" font-size="10.5" class="d-sub" text-anchor="middle">nmap · enum tools</text>
+          <text x="460" y="92" font-size="11" class="d-sub" text-anchor="middle">host-only network · 192.168.56.0/24</text>
+          <line x1="460" y1="72" x2="460" y2="108" stroke="var(--text-3)" stroke-width="2"/>
+          <line x1="130" y1="108" x2="790" y2="108" stroke="var(--text-3)" stroke-width="2"/>
+          <line x1="130" y1="108" x2="130" y2="146" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <line x1="360" y1="108" x2="360" y2="146" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <line x1="580" y1="108" x2="580" y2="146" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <line x1="790" y1="108" x2="790" y2="146" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+
+          <rect x="40" y="150" width="180" height="120" rx="9" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="130" y="174" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="700">METASPLOITABLE2</text>
+          <text x="130" y="192" font-size="10.5" class="d-sub" text-anchor="middle">Linux · 2012</text>
+          <text x="130" y="214" font-size="10.5" class="d-sub" text-anchor="middle">everything open</text>
+          <text x="130" y="232" font-size="10.5" class="d-sub" text-anchor="middle">the richest enum</text>
+          <text x="130" y="256" font-size="10" class="d-mono" text-anchor="middle" fill="var(--green)">21·80·139·445·3306</text>
+
+          <rect x="270" y="150" width="180" height="120" rx="9" fill="var(--panel)" stroke="var(--amber)"/>
+          <text x="360" y="174" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="700">WIN7-TGT01</text>
+          <text x="360" y="192" font-size="10.5" class="d-sub" text-anchor="middle">Windows · legacy</text>
+          <text x="360" y="214" font-size="10.5" class="d-sub" text-anchor="middle">SMBv1 ON</text>
+          <text x="360" y="232" font-size="10.5" class="d-sub" text-anchor="middle">MS17-010 vuln</text>
+          <text x="360" y="256" font-size="10" class="d-mono" text-anchor="middle" fill="var(--amber)">135·139·445·3389</text>
+
+          <rect x="490" y="150" width="180" height="120" rx="9" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="580" y="174" font-size="12.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">WIN10-TGT01</text>
+          <text x="580" y="192" font-size="10.5" class="d-sub" text-anchor="middle">Windows · modern</text>
+          <text x="580" y="214" font-size="10.5" class="d-sub" text-anchor="middle">hardened defaults</text>
+          <text x="580" y="232" font-size="10.5" class="d-sub" text-anchor="middle">enum comes up empty</text>
+          <text x="580" y="256" font-size="10" class="d-mono" text-anchor="middle" fill="var(--cyan)">135·139·445·3389</text>
+
+          <rect x="710" y="150" width="180" height="120" rx="9" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="800" y="174" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="700">WINSRV19 · DC</text>
+          <text x="800" y="192" font-size="10.5" class="d-sub" text-anchor="middle">Server 2019 · ceh.lab</text>
+          <text x="800" y="214" font-size="10.5" class="d-sub" text-anchor="middle">the domain</text>
+          <text x="800" y="232" font-size="10.5" class="d-sub" text-anchor="middle">LDAP · Kerberos</text>
+          <text x="800" y="256" font-size="10" class="d-mono" text-anchor="middle" fill="var(--red)">88·389·445·636·3268</text>
+        </svg>
+        <figcaption><b>The target zoo.</b> Ancient Linux → legacy Windows → modern Windows → domain
+          controller. One attacker, four very different answers.</figcaption>
+      </figure>
+
+      <h3>Same command, four results — click a machine</h3>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 920 130" role="img" aria-label="Four targets to compare the same nmap -sS scan against. Click each.">
+          <text class="d-title" x="20" y="22" font-size="14"><tspan class="d-mono">nmap -sS -Pn &lt;target&gt;</tspan> — same command, click each result</text>
+          <g class="node" data-node="tz-msf" tabindex="0"><rect x="24" y="40" width="210" height="72" rx="9" fill="rgba(74,222,128,.10)" stroke="var(--green)"/><text x="129" y="72" font-size="13" fill="var(--green)" text-anchor="middle" font-weight="700">Metasploitable2</text><text x="129" y="94" font-size="10.5" class="d-sub" text-anchor="middle">Linux · 2012</text></g>
+          <g class="node" data-node="tz-win7" tabindex="0"><rect x="246" y="40" width="200" height="72" rx="9" fill="rgba(251,191,36,.10)" stroke="var(--amber)"/><text x="346" y="72" font-size="13" fill="var(--amber)" text-anchor="middle" font-weight="700">Windows 7</text><text x="346" y="94" font-size="10.5" class="d-sub" text-anchor="middle">legacy</text></g>
+          <g class="node" data-node="tz-win10" tabindex="0"><rect x="458" y="40" width="200" height="72" rx="9" fill="rgba(34,211,238,.10)" stroke="var(--cyan)"/><text x="558" y="72" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">Windows 10</text><text x="558" y="94" font-size="10.5" class="d-sub" text-anchor="middle">hardened</text></g>
+          <g class="node" data-node="tz-dc" tabindex="0"><rect x="670" y="40" width="226" height="72" rx="9" fill="rgba(230,57,70,.10)" stroke="var(--red)"/><text x="783" y="72" font-size="13" fill="var(--red)" text-anchor="middle" font-weight="700">Server 2019 · DC</text><text x="783" y="94" font-size="10.5" class="d-sub" text-anchor="middle">domain controller</text></g>
+        </svg>
+        <div class="dgm-hint">The command never changes. Read how the answer — and your next move — changes per OS.</div>
+        <div class="dgm-detail" data-detail="tz-msf">
+          <h5><span class="dd-tag">METASPLOITABLE2 · LINUX</span>Everything is open</h5>
+          <pre><code>21/tcp   open  ftp      vsftpd 2.3.4
+22/tcp   open  ssh      OpenSSH 4.7p1
+23/tcp   open  telnet
+80/tcp   open  http     Apache 2.2.8
+139,445  open  netbios/samba
+3306     open  mysql    5.0.51a
+5432     open  postgresql</code></pre>
+          <p><b>Read it:</b> a dozen+ services, all old, all quotable versions → the richest enumeration target
+             and your exploit-search goldmine. This is what the textbook was written against.</p>
+        </div>
+        <div class="dgm-detail" data-detail="tz-win7">
+          <h5><span class="dd-tag">WINDOWS 7 · LEGACY</span>SMBv1 is on — the classic attacks work</h5>
+          <pre><code>135/tcp  open  msrpc
+139/tcp  open  netbios-ssn
+445/tcp  open  microsoft-ds   ← SMBv1 enabled
+3389/tcp open  ms-wbt-server  (RDP)
+
+nmap -p445 --script smb-protocols  →  SMBv1  ✔ (vulnerable)
+nmap -p445 --script smb-vuln-ms17-010  →  VULNERABLE (EternalBlue)</code></pre>
+          <p><b>Read it:</b> the legacy-Windows sweet spot — <span class="mono">enum4linux</span> still returns
+             users/shares, and MS17-010 is a one-shot to SYSTEM (the THM <em>Blue</em> arc). This is where the
+             2012 textbook still matches reality.</p>
+        </div>
+        <div class="dgm-detail" data-detail="tz-win10">
+          <h5><span class="dd-tag">WINDOWS 10 · MODERN</span>Open ports, empty enumeration</h5>
+          <pre><code>135/tcp  open  msrpc
+139/tcp  open  netbios-ssn
+445/tcp  open  microsoft-ds   ← SMBv1 OFF, null sessions denied
+3389/tcp open  ms-wbt-server
+
+enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
+          <p><b>Read it:</b> the ports look the same as Win7, but the doors are locked. "enum4linux returned
+             nothing" here is a <em>hardening finding</em>, not a failure — you'll need a credential. This is
+             the contrast Lab 4 is built on.</p>
+        </div>
+        <div class="dgm-detail" data-detail="tz-dc">
+          <h5><span class="dd-tag">SERVER 2019 · DOMAIN CONTROLLER</span>The port signature gives it away</h5>
+          <pre><code>53/tcp   open  domain      ← DNS
+88/tcp   open  kerberos-sec ← the tell: Kerberos = a DC
+135,139,445 open  rpc/smb
+389/tcp  open  ldap        ceh.lab
+636/tcp  open  ldapssl
+3268/tcp open  globalcatalog</code></pre>
+          <p><b>Read it:</b> <span class="mono">88</span> (Kerberos) + <span class="mono">389/636</span> (LDAP)
+             + <span class="mono">3268</span> (Global Catalog) is the fingerprint of a <em>domain
+             controller</em>. Spot that combo and you've found the crown jewels — LDAP hands you every user
+             and group (Lab 5).</p>
+        </div>
+      </figure>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 200" role="img" aria-label="Matrix of SMBv1 and null-session support across the four operating systems: Metasploitable2 Samba open, Windows 7 SMBv1 on, Windows 10 off, Server 2019 off.">
+          <text class="d-title" x="20" y="24" font-size="14">Why the same SMB command gives four different answers</text>
+          <line x1="230" y1="40" x2="230" y2="180" stroke="var(--line)"/>
+          <text x="130" y="58" font-size="11.5" class="d-sub" text-anchor="middle" font-weight="700">SMB feature</text>
+          <text x="330" y="58" font-size="11.5" fill="var(--green)" text-anchor="middle" font-weight="700">MSF2</text>
+          <text x="480" y="58" font-size="11.5" fill="var(--amber)" text-anchor="middle" font-weight="700">Win7</text>
+          <text x="630" y="58" font-size="11.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">Win10</text>
+          <text x="800" y="58" font-size="11.5" fill="var(--red)" text-anchor="middle" font-weight="700">Srv2019</text>
+          <line x1="30" y1="70" x2="890" y2="70" stroke="var(--line)"/>
+          <text x="40" y="98" font-size="11.5" fill="#fff">SMBv1 / null session</text>
+          <text x="330" y="98" font-size="13" fill="var(--green)" text-anchor="middle">✔ open</text>
+          <text x="480" y="98" font-size="13" fill="var(--amber)" text-anchor="middle">✔ on</text>
+          <text x="630" y="98" font-size="13" fill="var(--red)" text-anchor="middle">✘ off</text>
+          <text x="800" y="98" font-size="13" fill="var(--red)" text-anchor="middle">✘ off</text>
+          <line x1="30" y1="112" x2="890" y2="112" stroke="var(--line-soft)"/>
+          <text x="40" y="140" font-size="11.5" fill="#fff">enum4linux output</text>
+          <text x="330" y="140" font-size="12" fill="var(--green)" text-anchor="middle">full dump</text>
+          <text x="480" y="140" font-size="12" fill="var(--amber)" text-anchor="middle">users+shares</text>
+          <text x="630" y="140" font-size="12" fill="var(--text-3)" text-anchor="middle">empty</text>
+          <text x="800" y="140" font-size="12" fill="var(--text-3)" text-anchor="middle">empty</text>
+          <line x1="30" y1="154" x2="890" y2="154" stroke="var(--line-soft)"/>
+          <text x="40" y="180" font-size="11.5" fill="#fff">your move</text>
+          <text x="330" y="180" font-size="11" class="d-sub" text-anchor="middle">enumerate freely</text>
+          <text x="480" y="180" font-size="11" class="d-sub" text-anchor="middle">EternalBlue</text>
+          <text x="630" y="180" font-size="11" class="d-sub" text-anchor="middle">need creds</text>
+          <text x="800" y="180" font-size="11" class="d-sub" text-anchor="middle">LDAP on DC</text>
+        </svg>
+        <figcaption><b>The one-slide reason the textbook "fails" on modern Windows.</b> Nothing broke — SMBv1
+          and null sessions were turned off. Win7 is where the old output still appears.</figcaption>
+      </figure>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Carry this into every lab today</span>
+        <p>The command is constant; the OS decides the result. Metasploitable2 = read everything · Windows 7 =
+           legacy attacks still work · Windows 10 = hardened, need creds · Server 2019 = the domain. Fingerprint
+           the box from its ports before you pick a move.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P4 · HOST DISCOVERY  ========== -->
+  <section class="page" data-title="Host discovery">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P05</span><span class="tag theory">Method · attacker + defender</span><span class="time">⏱ 9 min</span></div>
+      <h1>Host Discovery — Who Is Actually There</h1>
+      <p class="lede">Before you scan ports you decide which hosts are worth scanning. How you ask that
+         question changes completely depending on whether a router sits between you and the target.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the first scanning skill</span>
+        <p>Your recon report might list a /24. Scanning all 65,535 ports on 256 addresses when only three are
+           alive is slow and deafeningly loud. Host discovery narrows 256 addresses to the handful that
+           answer, so every later scan is aimed. It is also the first place beginners get a wrong answer and
+           never notice — they call a live Windows box dead and walk away from the most valuable target in the
+           room.</p>
+      </div>
+
+      <div class="split">
+        <div>
+          <h3>What it is</h3>
+          <p>Sending a small probe to each address and watching for any reply that proves something is
+             listening at that IP — before committing to a full port scan.</p>
+          <h3>Why it exists</h3>
+          <p>Because a port scan against a dead IP is wasted time and wasted noise. Discovery is the cheap
+             question you ask first: <em>is anyone home?</em></p>
+        </div>
+        <div>
+          <h3>The method — this is the part that matters</h3>
+          <p>There are two fundamentally different ways to ask, and which one works depends entirely on
+             whether you are <strong>on the same network segment</strong> as the target or <strong>separated
+             by a router</strong>. Get this wrong and your results lie to you.</p>
+        </div>
+      </div>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 920 340" role="img" aria-label="Two host-discovery scenarios. On the local segment, ARP reaches every host and cannot be blocked. Across a router, only ICMP or TCP probes get through, and a firewall can drop them. Click each probe type.">
+          <text class="d-title" x="20" y="24" font-size="14">Same segment vs across a router — click each probe</text>
+
+          <!-- local segment -->
+          <rect x="20" y="44" width="410" height="128" rx="10" fill="rgba(34,211,238,.05)" stroke="var(--cyan)"/>
+          <text x="34" y="68" font-size="13" fill="var(--cyan)" font-weight="700">YOUR LAB — same host-only segment</text>
+          <g class="node" data-node="arp" tabindex="0">
+            <rect x="34" y="82" width="120" height="70" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+            <text x="94" y="108" font-size="12.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">ARP</text>
+            <text x="94" y="126" font-size="10.5" class="d-sub" text-anchor="middle">who-has broadcast</text>
+            <text x="94" y="141" font-size="10.5" class="d-sub" text-anchor="middle">layer 2</text>
+          </g>
+          <line class="flow-line" x1="158" y1="117" x2="250" y2="117" stroke="var(--cyan)" stroke-width="2" marker-end="url(#ar-c)"/>
+          <rect x="256" y="82" width="150" height="70" rx="8" fill="var(--panel)" stroke="var(--line-soft)"/>
+          <text x="331" y="112" font-size="12" fill="#fff" text-anchor="middle">Every host on</text>
+          <text x="331" y="130" font-size="12" fill="#fff" text-anchor="middle">the wire replies</text>
+
+          <!-- across a router -->
+          <rect x="20" y="188" width="880" height="134" rx="10" fill="rgba(255,112,67,.05)" stroke="var(--orange)"/>
+          <text x="34" y="212" font-size="13" fill="var(--orange)" font-weight="700">THE INTERNET — a router in the way</text>
+          <g class="node" data-node="icmp" tabindex="0">
+            <rect x="34" y="226" width="120" height="72" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="94" y="252" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">ICMP echo</text>
+            <text x="94" y="270" font-size="10.5" class="d-sub" text-anchor="middle">the classic ping</text>
+            <text x="94" y="285" font-size="10.5" class="d-sub" text-anchor="middle">-PE</text>
+          </g>
+          <g class="node" data-node="tcp" tabindex="0">
+            <rect x="164" y="226" width="120" height="72" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="224" y="252" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">TCP ping</text>
+            <text x="224" y="270" font-size="10.5" class="d-sub" text-anchor="middle">SYN/ACK to 80,443</text>
+            <text x="224" y="285" font-size="10.5" class="d-sub" text-anchor="middle">-PS -PA</text>
+          </g>
+          <line class="flow-line" x1="288" y1="262" x2="360" y2="262" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="366" y="232" width="120" height="60" rx="8" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text x="426" y="258" font-size="12" fill="var(--red)" text-anchor="middle" font-weight="700">Firewall</text>
+          <text x="426" y="276" font-size="10.5" class="d-sub" text-anchor="middle">may drop it all</text>
+          <line class="flow-line" x1="492" y1="262" x2="560" y2="262" stroke="var(--text-3)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar-g)"/>
+          <rect x="566" y="232" width="150" height="60" rx="8" fill="var(--panel)" stroke="var(--line-soft)"/>
+          <text x="641" y="258" font-size="12" fill="#fff" text-anchor="middle">Host — maybe up,</text>
+          <text x="641" y="276" font-size="12" fill="#fff" text-anchor="middle">maybe just silent</text>
+          <text x="800" y="258" font-size="12" fill="var(--orange)" text-anchor="middle" font-weight="700">This is why</text>
+          <text x="800" y="276" font-size="12" fill="var(--orange)" text-anchor="middle" font-weight="700">-Pn exists</text>
+        </svg>
+        <div class="dgm-hint">Click ARP, ICMP echo, or TCP ping for when each one is the right question.</div>
+
+        <div class="dgm-detail" data-detail="arp">
+          <h5><span class="dd-tag">ARP · LAYER 2</span>Unblockable, but local only</h5>
+          <p><b>How it works:</b> your machine broadcasts "who has 192.168.56.102?" and the host that owns
+             that IP must answer to be reachable at all — ARP is how the network functions, so a host
+             <em>cannot</em> refuse it without falling off the network. <b>Attacker value:</b> the most
+             reliable discovery there is, on your own segment. <b>The catch:</b> ARP does not cross a router,
+             so it only works on the local subnet — exactly your lab. Tools: <span class="mono">nmap -sn</span>
+             (uses ARP automatically on a local segment), <span class="mono">arp-scan</span>,
+             <span class="mono">netdiscover</span>.</p>
+        </div>
+        <div class="dgm-detail" data-detail="icmp">
+          <h5><span class="dd-tag">ICMP ECHO</span>The classic ping — often blocked</h5>
+          <p><b>How it works:</b> an ICMP echo request; a reply means the host is up. <b>Why it disappoints:</b>
+             Windows Firewall blocks it by default and most internet-facing firewalls drop it, so a live host
+             stays silent. A ping-sweep across the internet under-reports live hosts badly. Flag:
+             <span class="mono">-PE</span>.</p>
+        </div>
+        <div class="dgm-detail" data-detail="tcp">
+          <h5><span class="dd-tag">TCP PING</span>Ask a port instead of the OS</h5>
+          <p><b>How it works:</b> instead of ICMP, send a SYN or ACK to a port likely to be open
+             (<span class="mono">-PS443</span>, <span class="mono">-PA80</span>). Any TCP response — even a RST —
+             proves the host is alive. <b>Why it's better across a router:</b> a firewall that drops ICMP often
+             still lets 80/443 through, so the host answers. And when nothing works but you <em>know</em> the
+             host is there, <span class="mono">-Pn</span> skips discovery entirely and scans anyway.</p>
+        </div>
+      </figure>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view</span>
+        <p>On the lab you will use ARP — fast, silent-ish, total. Across the internet you will lean on TCP
+           pings and, constantly, <span class="mono">-Pn</span>. The instinct to build is: <em>ARP on the
+           segment, TCP probes through a router, and never trust a bare ICMP sweep to tell you a host is
+           dead.</em></p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>A host sweep is visible as a <strong>fan-out pattern</strong>: one source touching many
+           destinations in a short window. ARP sweeps flood the local switch with who-has broadcasts — a
+           NIDS on the segment (or <span class="mono">arpwatch</span>) sees dozens of ARP requests from one MAC
+           in seconds. ICMP/TCP sweeps across a router show up in firewall logs as one source IP hitting a
+           run of sequential destination addresses. The signature is not any single packet — it is
+           <strong>one-to-many in a short time</strong>. Hold that; it is what your detection rule keys on
+           later today.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Practice this topic</span>
+          <span class="pr-plat">TryHackMe</span>
+        </div>
+        <p class="pr-why">Host discovery is the opening of every scanning room. This one covers it end to end,
+           free, and is the best single companion to today's whole scanning half.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/furthernmap" target="_blank" rel="noopener">Nmap</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~50 min · easy</span>
+            </div>
+            <p class="pr-note">Fifteen tasks from switches through scan types to firewall evasion — the free
+               replacement for the paywalled Nmap-series rooms. <b>Do this one</b> before next session if you
+               do nothing else.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P5 · LAB 1 HOST DISCOVERY  ========== -->
+  <section class="page" data-title="Lab 1: host discovery">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P06</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 12 min</span></div>
+      <h1>Lab 1 — Find the Live Hosts, and the One That Plays Dead</h1>
+      <p class="lede">Three discovery methods against your own subnet, and the deliberate trap: the Windows
+         host that a ping sweep swears is offline.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>You will sweep the lab three ways, compare what each finds, and prove to yourself that ICMP
+           discovery misses a live Windows box that ARP and <span class="mono">-Pn</span> both catch. This is
+           the mistake that ends careers-in-miniature — reporting a live host as dead — and you are going to
+           make it on purpose, once, so you never make it for real.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Scope</span>
+        <p>Your host-only subnet only. Substitute your real range for <span class="mono">192.168.56.0/24</span>
+           throughout.</p>
+      </div>
+
+      <h2>Step 1 — the honest sweep (ARP, on your segment)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Let nmap use ARP automatically on the local segment.</strong>
+          <pre><code>sudo nmap -sn 192.168.56.0/24 | tee hosts_arp.txt</code></pre>
+          <p>Because you are on the same segment, <span class="mono">-sn</span> sends ARP, not ICMP — and ARP
+             cannot be refused. This is your ground truth.</p>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>All three targets appear <span class="mono">Host is up</span> — including <strong>both
+                  Windows boxes</strong></li>
+              <li>Each "up" line is followed by a <span class="mono">MAC Address</span> line — that is the tell
+                  that ARP answered</li>
+              <li>You recorded the IP→role mapping for all four targets</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — the lying sweep (ICMP only)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Force ICMP echo and forbid ARP, the way an internet scan behaves.</strong>
+          <pre><code>sudo nmap -sn -PE --send-ip --disable-arp-ping 192.168.56.0/24 | tee hosts_icmp.txt</code></pre>
+          <p>Now compare the two files:</p>
+          <pre><code>diff <(grep report hosts_arp.txt) <(grep report hosts_icmp.txt)</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>At least one <strong>Windows</strong> host present in <span class="mono">hosts_arp.txt</span>
+                  is <strong>missing</strong> from <span class="mono">hosts_icmp.txt</span></li>
+              <li>Metasploitable2 (Linux, replies to ICMP) appears in both</li>
+              <li>You can state, in one sentence, why the same host is "up" in one file and absent in the other</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view — the moment that matters</span>
+        <p>If this were a real engagement across the internet, Step 2 is the sweep you would have run, and you
+           would have crossed the most valuable host off your list. The habit that saves you:
+           <strong>never conclude "dead" from ICMP alone</strong>.</p>
+      </div>
+
+      <h2>Step 3 — scan it anyway (<span class="mono">-Pn</span>)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Take the Windows host ICMP called dead, and skip discovery entirely.</strong>
+          <pre><code>sudo nmap -Pn -p 135,139,445,3389 192.168.56.X   # the "dead" Windows IP</code></pre>
+          <p><span class="mono">-Pn</span> tells nmap "assume it's up, just scan." It is the correct answer
+             every time a firewall eats your discovery probes.</p>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>The "dead" host returns <strong>open ports</strong> — proof it was alive the whole time</li>
+              <li>You can now state the rule: <em>ICMP silence means "no answer," never "no host"</em></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Cross-check with a dedicated ARP tool.</strong>
+          <pre><code>sudo arp-scan --localnet          # or: sudo netdiscover -r 192.168.56.0/24</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>The MAC vendor strings hint at what each host is (VMware OUIs here; in the wild, vendor = a clue)</li>
+              <li>The host list matches your ARP ground truth from Step 1</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip — what your three sweeps just generated</span>
+        <p>On a monitored network, Step 1 and Step 3 lit up the segment with ARP who-has broadcasts from your
+           MAC — <span class="mono">arpwatch</span> or a NIDS would flag "excessive ARP from one host." Step 2
+           produced a run of ICMP echo requests to sequential IPs — a textbook <em>ping sweep</em> signature
+           in any firewall log. You will capture and read exactly this evidence in Lab 7.</p>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Time box &amp; stop point</span>
+        <p>Twelve minutes. Stop when you can show one host that is present via ARP and absent via ICMP. If your
+           lab is down, open <span class="mono">saved/hosts_arp.txt</span> and <span class="mono">saved/hosts_icmp.txt</span>
+           and do the diff on those.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P6 · TCP FLAGS & SCAN TYPES  ========== -->
+  <section class="page" data-title="TCP flags &amp; scan types">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P07</span><span class="tag theory">Method · the core of scanning</span><span class="time">⏱ 17 min</span></div>
+      <h1>The Scan Types — Same Question, Different Packet</h1>
+      <p class="lede">Every scan type is one idea: send a crafted TCP packet, and read the target's reflex.
+         Learn the reflexes and you never memorise a flag again.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the page that matters most today</span>
+        <p>There are half a dozen scan types and students try to memorise the flags. Don't. Every one of them
+           is the same move — send a packet the target's TCP stack must react to, then read the reaction. Once
+           you know what an open port and a closed port each <em>reflexively</em> do, every scan type is
+           obvious, including ones invented after you finish this course.</p>
+      </div>
+
+      <h2>The reflex you must know cold</h2>
+      <p>TCP has a fixed handshake: <strong>SYN → SYN/ACK → ACK</strong>. That is the law the target's stack
+         obeys. Scanning weaponises the first half of it.</p>
+
+      <figure class="dgm animate-run">
+        <svg viewBox="0 0 920 300" role="img" aria-label="Top: the full three-way TCP handshake SYN, SYN-ACK, ACK. Bottom: a SYN scan that sends SYN, receives SYN-ACK, then sends RST instead of ACK, never completing the connection.">
+          <text class="d-title" x="20" y="24" font-size="14">The handshake (top) and the half-open SYN scan that diverges from it (bottom)</text>
+
+          <!-- full handshake -->
+          <text x="120" y="58" font-size="12" fill="var(--cyan)" text-anchor="middle" font-weight="700">Client</text>
+          <text x="800" y="58" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">Server</text>
+          <line x1="120" y1="66" x2="120" y2="150" stroke="var(--line-soft)"/>
+          <line x1="800" y1="66" x2="800" y2="150" stroke="var(--line-soft)"/>
+          <path class="flow-line" d="M 128 82 L 792 82" fill="none" stroke="var(--cyan)" stroke-width="2" marker-end="url(#ar-c)"/>
+          <text x="460" y="76" font-size="12" fill="var(--cyan)" text-anchor="middle">1 · SYN</text>
+          <path class="flow-line" d="M 792 108 L 128 108" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <text x="460" y="102" font-size="12" fill="var(--text-2)" text-anchor="middle">2 · SYN / ACK</text>
+          <path class="flow-line" d="M 128 134 L 792 134" fill="none" stroke="var(--cyan)" stroke-width="2" marker-end="url(#ar-c)"/>
+          <text x="460" y="128" font-size="12" fill="var(--cyan)" text-anchor="middle">3 · ACK — connection ESTABLISHED (and logged)</text>
+
+          <line x1="40" y1="168" x2="880" y2="168" stroke="var(--line)" stroke-dasharray="3 5"/>
+
+          <!-- syn scan -->
+          <text x="120" y="196" font-size="12" fill="var(--orange)" text-anchor="middle" font-weight="700">Attacker</text>
+          <text x="800" y="196" font-size="12" fill="#fff" text-anchor="middle" font-weight="700">Target</text>
+          <line x1="120" y1="204" x2="120" y2="288" stroke="var(--line-soft)"/>
+          <line x1="800" y1="204" x2="800" y2="288" stroke="var(--line-soft)"/>
+          <path class="flow-line" d="M 128 220 L 792 220" fill="none" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <text x="460" y="214" font-size="12" fill="var(--orange)" text-anchor="middle">1 · SYN</text>
+          <path class="flow-line" d="M 792 246 L 128 246" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <text x="460" y="240" font-size="12" fill="var(--text-2)" text-anchor="middle">2 · SYN / ACK — "the port is open!"</text>
+          <path class="flow-line" d="M 128 272 L 792 272" fill="none" stroke="var(--red)" stroke-width="2" marker-end="url(#ar-r)"/>
+          <text x="460" y="266" font-size="12" fill="var(--red)" text-anchor="middle">3 · RST — attacker hangs up before ACK. Never established.</text>
+        </svg>
+        <button type="button" class="dgm-replay" data-replay>↻ Replay both</button>
+        <figcaption><b>The whole trick.</b> A SYN scan learns the port is open from packet 2, then sends RST
+          instead of the ACK — so the connection is never completed. That "never completed" is why it was
+          historically quieter than a full connect, and why it was called <em>half-open</em>.</figcaption>
+      </figure>
+
+      <h2>The reflexes, in one table</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Port state</th><th>Reflex to a SYN</th><th>Reflex to a FIN/NULL/Xmas</th><th>Reflex to an ACK</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Open</strong></td><td>SYN/ACK</td><td><em>silence</em></td><td>RST</td></tr>
+          <tr><td><strong>Closed</strong></td><td>RST</td><td>RST</td><td>RST</td></tr>
+          <tr><td><strong>Filtered</strong> (firewall)</td><td><em>silence</em> or ICMP unreachable</td><td><em>silence</em></td><td><em>silence</em></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>Read the whole scan-type chapter off that table. A SYN scan tells open from closed cleanly. A FIN/
+         NULL/Xmas scan can only tell you "not closed" (open <em>and</em> filtered both go silent) — but it
+         slips past devices that only watch for SYN. An ACK scan can't find open ports at all; it maps the
+         <em>firewall</em>, because a filtered port swallows the ACK while an unfiltered one answers RST.</p>
+
+      <div class="split">
+        <div>
+          <h3>Real syntax</h3>
+          <pre><code># half-open SYN (default with sudo)
+sudo nmap -sS -p- 192.168.56.102
+
+# full TCP connect (no sudo needed)
+nmap -sT -p 22,80,445 192.168.56.102
+
+# the stealth family — needs sudo (raw packets)
+sudo nmap -sF 192.168.56.102   # FIN
+sudo nmap -sN 192.168.56.102   # NULL (no flags)
+sudo nmap -sX 192.168.56.102   # Xmas (FIN+PSH+URG)
+
+# ACK — firewall mapping, not port finding
+sudo nmap -sA 192.168.56.102</code></pre>
+        </div>
+        <div>
+          <h3>Why SYN vs connect still matters</h3>
+          <p>A <strong>connect</strong> scan (<span class="mono">-sT</span>) completes the handshake, so the
+             target's application <em>accepts</em> the connection — which means the app logs it (an auth log,
+             an HTTP access line). A <strong>SYN</strong> scan hangs up first, so the application layer often
+             never sees it.</p>
+          <p><b>The honest 2026 correction:</b> "SYN is stealthy" is dated. Modern firewalls, IDS and
+             flow-based monitoring see the SYN flood regardless of whether you completed the handshake. SYN is
+             <em>faster and lighter</em>; it is no longer <em>invisible</em>. Teach yourself the newer reason,
+             not the myth.</p>
+        </div>
+      </div>
+
+      <h3>Read the real packets — what each scan actually put on the wire</h3>
+      <p>These are captured from a live scan against a lab target with <strong>22/80/445 open, 443 closed,
+         8080 filtered</strong>. Click a scan type to see the packets it sent and what came back.</p>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 920 150" role="img" aria-label="Four scan types to compare: SYN, Connect, Xmas, ACK. Click one to see its captured packets.">
+          <text class="d-title" x="20" y="24" font-size="14">Click a scan type — real capture below</text>
+          <g class="node" data-node="cap-syn" tabindex="0">
+            <rect x="30" y="44" width="195" height="72" rx="9" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/>
+            <text x="127" y="76" font-size="14" fill="var(--orange)" text-anchor="middle" font-weight="700">SYN  -sS</text>
+            <text x="127" y="98" font-size="10.5" class="d-sub" text-anchor="middle">half-open</text>
+          </g>
+          <g class="node" data-node="cap-con" tabindex="0">
+            <rect x="245" y="44" width="195" height="72" rx="9" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="342" y="76" font-size="14" fill="var(--orange)" text-anchor="middle" font-weight="700">Connect  -sT</text>
+            <text x="342" y="98" font-size="10.5" class="d-sub" text-anchor="middle">full handshake</text>
+          </g>
+          <g class="node" data-node="cap-xmas" tabindex="0">
+            <rect x="460" y="44" width="195" height="72" rx="9" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="557" y="76" font-size="14" fill="var(--orange)" text-anchor="middle" font-weight="700">Xmas  -sX</text>
+            <text x="557" y="98" font-size="10.5" class="d-sub" text-anchor="middle">FIN+PSH+URG</text>
+          </g>
+          <g class="node" data-node="cap-ack" tabindex="0">
+            <rect x="675" y="44" width="215" height="72" rx="9" fill="var(--panel)" stroke="var(--cyan)"/>
+            <text x="782" y="76" font-size="14" fill="var(--cyan)" text-anchor="middle" font-weight="700">ACK  -sA</text>
+            <text x="782" y="98" font-size="10.5" class="d-sub" text-anchor="middle">firewall map</text>
+          </g>
+        </svg>
+        <div class="dgm-hint">Each panel is a real Wireshark capture of that scan against the same target.</div>
+
+        <div class="dgm-detail" data-detail="cap-syn">
+          <h5><span class="dd-tag">SYN · -sS</span>Open port = SYN/ACK, then attacker RSTs</h5>
+          <pre><code>101 → 102  80  [SYN]              # probe
+102 → 101  80  [SYN, ACK]         # OPEN — port answers
+101 → 102  80  [RST]              # attacker hangs up  ← half-open
+101 → 102  443 [SYN]
+102 → 101  443 [RST, ACK]         # CLOSED — reset
+101 → 102  8080 [SYN]             # FILTERED — no reply at all
+101 → 102  8080 [SYN]             # ...so nmap retries, then gives up</code></pre>
+          <p><b>Read it:</b> open answers SYN/ACK, closed answers RST, filtered answers nothing (note the
+             retry). Result: <span class="mono">80 open · 443 closed · 8080 filtered</span>. 13 packets total.</p>
+        </div>
+        <div class="dgm-detail" data-detail="cap-con">
+          <h5><span class="dd-tag">CONNECT · -sT</span>Same result, but it finishes the handshake</h5>
+          <pre><code>101 → 102  22  [SYN]
+102 → 101  22  [SYN, ACK]
+101 → 102  22  [ACK]              # ← completes! connection ESTABLISHED
+102 → 101  22  Server: SSH-2.0-OpenSSH_8.2p1   # app now talks to us
+101 → 102  22  [RST, ACK]         # only then torn down</code></pre>
+          <p><b>Read it:</b> the extra ACK is the whole difference. The SSH service <em>accepted</em> the
+             connection and even sent its banner — so it logged us at the application layer. 23 packets vs the
+             SYN scan's 13: connect is heavier and louder up the stack.</p>
+        </div>
+        <div class="dgm-detail" data-detail="cap-xmas">
+          <h5><span class="dd-tag">XMAS · -sX</span>Open and filtered both go silent</h5>
+          <pre><code>101 → 102  445 [FIN, PSH, URG]    # the "lit-up tree" of flags
+101 → 102  443 [FIN, PSH, URG]
+102 → 101  443 [RST, ACK]         # CLOSED answers RST
+101 → 102  22  [FIN, PSH, URG]    # OPEN → silence
+101 → 102  80  [FIN, PSH, URG]    # OPEN → silence</code></pre>
+          <p><b>Read it:</b> only the closed port (443) answered. Open ports 22/80/445 said nothing — so Xmas
+             reports them <span class="mono">open|filtered</span>, unable to separate the two. Its one job:
+             slip past a device that only inspects SYN. <b>Caveat:</b> Windows and many appliances reply RST
+             to <em>everything</em>, so Xmas shows all ports closed against them — useless on Windows targets.</p>
+        </div>
+        <div class="dgm-detail" data-detail="cap-ack">
+          <h5><span class="dd-tag">ACK · -sA</span>It doesn't find ports — it finds the firewall</h5>
+          <pre><code>101 → 102  443 [ACK]
+102 → 101  443 [RST]              # unfiltered → RST  (stateless answer)
+101 → 102  445 [ACK]
+102 → 101  445 [RST]              # unfiltered → RST
+101 → 102  8080 [ACK]            # filtered → no RST at all</code></pre>
+          <p><b>Read it:</b> every port that answers RST is <em>unfiltered</em> (open or closed — you can't
+             tell which). A port that stays silent is behind a stateful firewall. ACK maps the filtering, not
+             the services — a different question entirely.</p>
+        </div>
+      </figure>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip — every one of these is loud</span>
+        <p>Look at the captures again as a defender. A SYN scan is a burst of SYNs to many ports from one
+           source with <em>no completed handshakes</em> — a classic IDS signature (Snort/Suricata
+           "portscan"). A connect scan additionally leaves <em>application</em> logs (an SSH connection, an
+           HTTP request) on every open port. Xmas/NULL/FIN packets are <em>abnormal by construction</em> —
+           no legitimate client sends a bare FIN or an all-flags packet, so a single one is high-signal and
+           trivially flagged. There is no scan type here that a monitored network cannot see. Stealth is
+           relative; invisibility is gone.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Carry this, not the flags</span>
+        <p>Open ports answer SYNs and ignore stealth flags. Closed ports RST everything. Filtered ports stay
+           silent. Every scan type is a different way to poke that reflex — and every one of them shows up in
+           a log.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P7 · UDP  ========== -->
+  <section class="page" data-title="UDP scanning">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P08</span><span class="tag theory">Method</span><span class="time">⏱ 5 min</span></div>
+      <h1>UDP — Slow, Painful, and Where the Good Stuff Lives</h1>
+      <p class="lede">Every scan type so far was TCP. But DNS, SNMP and DHCP are UDP — and skipping UDP means
+         missing the services you most want to enumerate.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why bother, when it's this slow</span>
+        <p>You just learned six TCP scan types. UDP is the awkward cousin everyone skips — and skipping it is
+           how you miss SNMP (161), DNS (53) and DHCP (67/68), three of the richest enumeration targets in the
+           whole course. Today's SNMP lab depends on you finding 161 open, and only a UDP scan finds it.</p>
+      </div>
+
+      <div class="split">
+        <div>
+          <h3>The method — why it's fundamentally harder</h3>
+          <p>UDP is connectionless: there is no handshake, no SYN/ACK reflex to read. So the logic inverts and
+             gets weaker:</p>
+          <ul>
+            <li><strong>Open</strong> → the service <em>might</em> reply, or might say nothing. Silence is
+               ambiguous.</li>
+            <li><strong>Closed</strong> → the OS sends back <span class="mono">ICMP port unreachable</span>.</li>
+            <li><strong>Open|filtered</strong> → silence, because open and filtered look identical.</li>
+          </ul>
+          <p>And here's the killer: to be polite, operating systems <strong>rate-limit</strong> those ICMP
+             unreachable replies. So nmap must wait between probes, and a full UDP scan of 65,535 ports can
+             take <em>hours</em>.</p>
+        </div>
+        <div>
+          <h3>Real syntax — scope it hard</h3>
+          <pre><code># DON'T scan all UDP ports in class — target the ones that matter
+sudo nmap -sU -p 53,67,123,161,137 192.168.56.102
+
+# add version probes so open|filtered resolves to open
+sudo nmap -sU -sV -p 161 192.168.56.102
+
+# the classic mistake, for reference only — do NOT run in class:
+# sudo nmap -sU -p- 192.168.56.102   # can run for hours</code></pre>
+          <p class="muted">Captured against the lab: a 4-port UDP scan finished in ~1.2 s. The same scan
+             across all 65,535 ports is the failure case in Lab 3 — you will see why by watching it crawl.</p>
+        </div>
+      </div>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view</span>
+        <p>Never <span class="mono">-sU -p-</span> blind. Scan the <em>named</em> UDP services you actually
+           enumerate — 53, 161, 123, 137, 500 — and let TCP carry the breadth. UDP is a scalpel, not a net.</p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>A UDP sweep produces a burst of <em>outbound ICMP port-unreachable</em> messages from the target —
+           a distinctive pattern, because normal traffic doesn't generate a flurry of type-3/code-3 ICMP to
+           one source. Firewalls and NIDS flag "many ICMP unreachable to a single external host" as a UDP
+           scan signature.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P8 · LAB 2 SCAN TYPES + WIRESHARK  ========== -->
+  <section class="page" data-title="Lab 2: scans + Wireshark">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P09</span><span class="tag lab">Hands-on · everyone · Wireshark</span><span class="time">⏱ 20 min</span></div>
+      <h1>Lab 2 — One Target, Three Scans, Wireshark Open</h1>
+      <p class="lede">This is the lab that makes scan types real. You will scan the same host three ways and
+         watch, packet by packet, exactly what each one puts on the wire.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do — and why it's the signature lab</span>
+        <p>Reading about SYN vs connect vs Xmas is one thing; seeing your own packets prove it is another.
+           You will run all three scans against Metasploitable2 with Wireshark capturing, then line the three
+           captures up side by side. The image you produce — the same target scanned three ways, with the flag
+           fields highlighted — teaches the whole chapter in one screen. You will also <em>save these
+           captures</em>, because Lab 7 turns them into a detection rule.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Scope</span>
+        <p>Metasploitable2 on your host-only network. Its many open ports make the clearest capture.</p>
+      </div>
+
+      <h2>Step 1 — start the capture</h2>
+      <ol class="steps">
+        <li>
+          <strong>Open Wireshark on Kali, capture on the host-only interface, and set a filter.</strong>
+          <pre><code># in the Wireshark filter bar:
+ip.addr == 192.168.56.102 and tcp</code></pre>
+          <p>Or capture headless so you keep the file for Lab 7:</p>
+          <pre><code>sudo tcpdump -i eth0 -w lab2_syn.pcap host 192.168.56.102 &</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul><li>Packets start scrolling only when you run a scan — a quiet capture means the right filter</li></ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — the three scans, one at a time</h2>
+      <ol class="steps">
+        <li>
+          <strong>SYN, then connect, then Xmas — save each capture under its own name.</strong>
+          <pre><code>sudo nmap -sS -p 22,80,443,445 192.168.56.102     # save as lab2_syn.pcap
+sudo nmap -sT -p 22,80,443,445 192.168.56.102     # save as lab2_connect.pcap
+sudo nmap -sX -p 22,80,443,445 192.168.56.102     # save as lab2_xmas.pcap</code></pre>
+          <div class="verify">
+            <h4>✓ Verification — you should be able to point at each of these in your own capture</h4>
+            <ul>
+              <li><strong>SYN:</strong> for each open port — <span class="mono">SYN → SYN,ACK → RST</span>
+                  (your machine sends the RST, not the target)</li>
+              <li><strong>Connect:</strong> for each open port — <span class="mono">SYN → SYN,ACK → ACK</span>
+                  then a teardown; the extra ACK is visible</li>
+              <li><strong>Xmas:</strong> outbound packets flagged <span class="mono">FIN, PSH, URG</span>;
+                  open ports produce <em>no</em> reply, closed ports send <span class="mono">RST, ACK</span></li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — line them up (the money shot)</h2>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 920 250" role="img" aria-label="Three columns comparing the first packets of a SYN, connect and Xmas scan to port 80. Click each column.">
+          <text class="d-title" x="20" y="24" font-size="14">The same open port (80), three scans — click each column</text>
+          <g class="node" data-node="l2syn" tabindex="0">
+            <rect x="24" y="42" width="280" height="188" rx="9" fill="rgba(255,112,67,.10)" stroke="var(--orange)"/>
+            <text x="164" y="68" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">SYN  -sS</text>
+            <text x="164" y="96" font-size="11" class="d-mono" text-anchor="middle">→ 80 [SYN]</text>
+            <text x="164" y="116" font-size="11" class="d-mono" text-anchor="middle">← 80 [SYN, ACK]</text>
+            <text x="164" y="136" font-size="11" class="d-mono" text-anchor="middle" fill="var(--red)">→ 80 [RST]</text>
+            <text x="164" y="176" font-size="10.5" class="d-sub" text-anchor="middle">3 packets</text>
+            <text x="164" y="194" font-size="10.5" class="d-sub" text-anchor="middle">never established</text>
+          </g>
+          <g class="node" data-node="l2con" tabindex="0">
+            <rect x="320" y="42" width="280" height="188" rx="9" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="460" y="68" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">Connect  -sT</text>
+            <text x="460" y="96" font-size="11" class="d-mono" text-anchor="middle">→ 80 [SYN]</text>
+            <text x="460" y="116" font-size="11" class="d-mono" text-anchor="middle">← 80 [SYN, ACK]</text>
+            <text x="460" y="136" font-size="11" class="d-mono" text-anchor="middle" fill="var(--cyan)">→ 80 [ACK]</text>
+            <text x="460" y="156" font-size="11" class="d-mono" text-anchor="middle" fill="var(--cyan)">← 200 OK / banner</text>
+            <text x="460" y="192" font-size="10.5" class="d-sub" text-anchor="middle">ESTABLISHED — app logs it</text>
+          </g>
+          <g class="node" data-node="l2xmas" tabindex="0">
+            <rect x="616" y="42" width="280" height="188" rx="9" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="756" y="68" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">Xmas  -sX</text>
+            <text x="756" y="96" font-size="11" class="d-mono" text-anchor="middle">→ 80 [FIN,PSH,URG]</text>
+            <text x="756" y="120" font-size="11" class="d-sub" text-anchor="middle" fill="var(--text-3)">(silence)</text>
+            <text x="756" y="150" font-size="11" class="d-mono" text-anchor="middle">open|filtered</text>
+            <text x="756" y="192" font-size="10.5" class="d-sub" text-anchor="middle">1 packet, no reply</text>
+          </g>
+        </svg>
+        <div class="dgm-hint">This is the comparison to reproduce from your own captures and paste into your lab report.</div>
+        <div class="dgm-detail" data-detail="l2syn">
+          <h5><span class="dd-tag">SYN COLUMN</span>Three packets, connection never completed</h5>
+          <p>Your machine sent SYN, got SYN/ACK (proof: open), then sent RST to tear it down before the
+             handshake finished. The target's <em>application</em> (Apache) never saw a completed connection,
+             so there is no HTTP access-log line — only the kernel/firewall saw it.</p>
+        </div>
+        <div class="dgm-detail" data-detail="l2con">
+          <h5><span class="dd-tag">CONNECT COLUMN</span>The ACK that costs you</h5>
+          <p>The third packet — <span class="mono">ACK</span> — completes the handshake. Apache accepts the
+             connection and may log it and even return a banner. More packets, more layers touched, more
+             evidence. Use connect only when you lack root for raw sockets.</p>
+        </div>
+        <div class="dgm-detail" data-detail="l2xmas">
+          <h5><span class="dd-tag">XMAS COLUMN</span>One weird packet, one ambiguous answer</h5>
+          <p>A single packet with FIN+PSH+URG set — a combination no real client sends. The open port stayed
+             silent, so nmap can only say <span class="mono">open|filtered</span>. High-signal for a defender
+             (abnormal flags), low-information for you (can't confirm open). A poor trade against a modern
+             target.</p>
+        </div>
+      </figure>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip — now flip to the defence for two minutes</span>
+        <p>In your same Wireshark window, add the filter <span class="mono">tcp.flags.syn==1 and
+           tcp.flags.ack==0</span> and watch the SYN scan light up: dozens of bare SYNs from one source to many
+           ports, in under a second, with no matching completed handshakes. <strong>That</strong> is the
+           port-scan signature. Note the count and the time window — you will encode exactly this into a Sigma
+           rule in Lab 7. Keep <span class="mono">lab2_syn.pcap</span>.</p>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Deliberate failure to try if you have time</span>
+        <p>Run <span class="mono">sudo nmap -sX 192.168.56.X</span> against a <em>Windows</em> target. It will
+           report every port closed — because Windows RSTs all malformed packets regardless of state. That is
+           not a bug; it is why Xmas scans are useless against Windows, and worth seeing once.</p>
+      </div>
+
+      <figure class="shot">
+        <img src="assets/img/syn-vs-connect-capture.jpg" alt="Wireshark showing a SYN scan capture: bursts of SYN packets to multiple ports from one source, open ports answering SYN-ACK then RST.">
+        <figcaption>Wireshark capture of the SYN scan from this lab — open ports answer SYN/ACK and are
+          immediately reset. Reproduce this from your own capture.</figcaption>
+      </figure>
+    </div>
+  </section>
+  <!-- ==========  P9 · NMAP TIMING / VERSION / OS  ========== -->
+  <section class="page" data-title="Timing, version &amp; OS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P10</span><span class="tag theory">Method · attacker + defender</span><span class="time">⏱ 10 min</span></div>
+      <h1>Timing, Breadth-then-Depth, and What's Actually Running</h1>
+      <p class="lede">Knowing a port is open is half an answer. Which software, which version, which OS — that
+         is what turns a port number into an exploit search.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this follows the scan types</span>
+        <p>You can now find open ports. But "445 is open" doesn't tell you whether it's a patched Server 2022
+           or an unpatched 2008 box one CVE away from SYSTEM. Version and OS detection close that gap — and
+           timing decides whether your scan finishes before the class ends or trips every alarm on the way.</p>
+      </div>
+
+      <h2>Timing — the <span class="mono">-T</span> dial</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Template</th><th>Name</th><th>Use when</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">-T0 / -T1</td><td>paranoid / sneaky</td><td>Evading IDS — one packet every few seconds to minutes. Very slow, deliberately under the detection threshold</td></tr>
+          <tr><td class="mono">-T2</td><td>polite</td><td>Fragile targets you don't want to overload</td></tr>
+          <tr><td class="mono">-T3</td><td>normal</td><td>The default</td></tr>
+          <tr><td class="mono">-T4</td><td>aggressive</td><td>A fast, healthy LAN — the usual choice on your lab</td></tr>
+          <tr><td class="mono">-T5</td><td>insane</td><td>Fastest, packet-loss risk — can miss ports and crash weak services</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>The method:</strong> timing is a trade between speed and both accuracy and stealth. On the lab
+         you'll use <span class="mono">-T4</span>. Against a real target you'd drop to <span class="mono">-T2</span>
+         or lower — not for politeness, but because <span class="mono">-T4/-T5</span> is a screaming siren in
+         any IDS.</p>
+
+      <h2>The current workflow: breadth, then depth</h2>
+      <p>The dated approach is one giant <span class="mono">nmap -A -p-</span> against everything. The modern
+         real-world workflow splits the job in two, because a single tool doing both is slow at the first part:</p>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 170" role="img" aria-label="Breadth-then-depth workflow: masscan or rustscan finds open ports fast across all 65535, then nmap runs deep version and script scans on only those ports.">
+          <rect x="24" y="46" width="250" height="86" rx="9" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="149" y="76" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">1 · BREADTH</text>
+          <text x="149" y="98" font-size="11" class="d-sub" text-anchor="middle">masscan / rustscan</text>
+          <text x="149" y="115" font-size="11" class="d-sub" text-anchor="middle">all 65,535 ports, seconds</text>
+          <line x1="278" y1="89" x2="360" y2="89" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <text x="319" y="80" font-size="10.5" class="d-sub" text-anchor="middle">open</text>
+          <text x="319" y="104" font-size="10.5" class="d-sub" text-anchor="middle">ports</text>
+          <rect x="366" y="46" width="250" height="86" rx="9" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="491" y="76" font-size="13" fill="var(--orange)" text-anchor="middle" font-weight="700">2 · DEPTH</text>
+          <text x="491" y="98" font-size="11" class="d-sub" text-anchor="middle">nmap -sV -sC -O</text>
+          <text x="491" y="115" font-size="11" class="d-sub" text-anchor="middle">only those ports</text>
+          <line x1="620" y1="89" x2="702" y2="89" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="708" y="46" width="188" height="86" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text x="802" y="82" font-size="12" fill="#fff" text-anchor="middle">service + version</text>
+          <text x="802" y="102" font-size="12" fill="#fff" text-anchor="middle">+ OS + scripts</text>
+        </svg>
+        <figcaption><b>Why split it.</b> masscan can sweep all 65,535 ports in seconds but tells you almost
+          nothing about them; nmap is rich but slow across a full range. Run masscan/rustscan for breadth,
+          then point nmap's deep probes at only the open ports.</figcaption>
+      </figure>
+
+      <div class="split">
+        <div>
+          <h3>Real syntax</h3>
+          <pre><code># breadth (rustscan → auto-hands off to nmap)
+rustscan -a 192.168.56.102 -- -sV
+
+# breadth (masscan, nmap-compatible flags)
+sudo masscan 192.168.56.102 -p1-65535 --rate 1000
+
+# depth (the one to memorise)
+sudo nmap -sS -sV -O -T4 -p <open,ports> 192.168.56.102
+
+# version + default scripts in one go
+sudo nmap -sC -sV -p <ports> 192.168.56.102</code></pre>
+        </div>
+        <div>
+          <h3>How version &amp; OS detection work</h3>
+          <p><span class="mono">-sV</span> connects to each open port and matches the reply against a
+             database of service fingerprints — it reads banners, but also probes services that don't
+             volunteer one. <span class="mono">-O</span> guesses the OS from TCP/IP stack quirks (TTL, window
+             size, options ordering).</p>
+          <p><b>Read the output critically:</b> both <em>guess</em>. In our lab capture, <span class="mono">-sV</span>
+             labelled a real service <span class="mono">tcpwrapped</span> (wrong), and <span class="mono">-O</span>
+             returned <em>"No exact OS matches"</em>. Version detection is evidence, not gospel — you'll hit
+             exactly these two failures in Lab 3.</p>
+        </div>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Currency check — verify the tool is still alive before you teach the command</span>
+        <p>The tools move. <span class="mono">masscan</span> and <span class="mono">rustscan</span> are current
+           and maintained (rustscan still claims all 65k ports in ~3 s and hands off to nmap). But always run
+           <span class="mono">&lt;tool&gt; --version</span> and check the project's last release before you rely
+           on it in front of a client — Session 2 caught three "standard" recon tools that had been dead for
+           years. Verify, don't assume.</p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>Version detection is <em>noisier</em> than a plain port scan, not quieter — <span class="mono">-sV</span>
+           opens full connections and sends probe strings to each service, so it leaves application-layer logs
+           on every open port (odd HTTP requests, malformed protocol handshakes). A masscan at high rate is a
+           flood the firewall sees instantly. Our captures: a plain SYN scan of 5 ports was 13 packets; the
+           same target with <span class="mono">-sV</span> was 103; a full <span class="mono">-A</span> was 708.
+           Depth costs noise.</p>
+      </div>
+
+      <figure class="shot">
+        <img src="assets/img/packet-noise-comparison.jpg" alt="Bar chart of packets generated by each scan type against the same lab target: SYN 13, Xmas 10, connect 23, UDP 19, version 103, aggressive 708.">
+        <figcaption>Real capture counts from this lab's targets — the noise cost of depth, measured. A plain
+          SYN scan is 13 packets; a full <span class="mono">-A</span> is 708, and every one is logged.</figcaption>
+      </figure>
+    </div>
+  </section>
+  <!-- ==========  P10 · LAB 3 FULL SCAN  ========== -->
+  <section class="page" data-title="Lab 3: full scan">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P11</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 15 min</span></div>
+      <h1>Lab 3 — The Full Scan, and the Version Guess That Lies</h1>
+      <p class="lede">Breadth-then-depth on a real target, plus the two failures every scanner must learn to
+         distrust: a wrong version guess and a UDP scan that never ends.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>You'll build the real workflow — fast breadth, then deep depth — against Metasploitable2, then
+           deliberately trip two failure cases so you learn to read scan output as evidence, not truth. The
+           open-port/version list you produce here is a column in tonight's target profile.</p>
+      </div>
+
+      <div class="box warn"><span class="box-t">Scope</span><p>Metasploitable2, your host-only network.</p></div>
+
+      <h2>Step 1 — breadth</h2>
+      <ol class="steps">
+        <li>
+          <strong>Find every open TCP port fast.</strong>
+          <pre><code>rustscan -a 192.168.56.102 --range 1-65535 -- -Pn   # or:
+sudo nmap -sS -p- -T4 192.168.56.102 -oG breadth.txt</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You get a list of open ports — Metasploitable2 has <strong>many</strong> (21, 22, 23, 25,
+                  53, 80, 139, 445, 3306, 5432 and more)</li>
+              <li>Breadth finished in seconds/tens of seconds, not minutes</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — depth on only those ports</h2>
+      <ol class="steps">
+        <li>
+          <strong>Point nmap's deep probes at the open set.</strong>
+          <pre><code>sudo nmap -sS -sV -O -T4 -p 21,22,23,25,53,80,139,445,3306 192.168.56.102 -oN depth.txt</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Each open port now has a <strong>service + version</strong> (e.g.
+                  <span class="mono">vsftpd 2.3.4</span>, <span class="mono">Apache 2.2.8</span>)</li>
+              <li>An OS guess appears (Linux 2.6.x) — note the <em>confidence</em> nmap states</li>
+              <li>Those version strings are your exploit-search input for Session 4 — write them down exactly</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — trip the failures on purpose</h2>
+      <ol class="steps">
+        <li>
+          <strong>Failure A — the version guess that lies.</strong> Somewhere in your output a port will be
+          labelled <span class="mono">tcpwrapped</span> or carry a version nmap flags with a
+          <span class="mono">?</span>. In our own capture, <span class="mono">-sV</span> called an open service
+          <span class="mono">tcpwrapped</span> — flatly wrong.
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You found at least one port whose service nmap is unsure about, and you did <strong>not</strong>
+                  take it at face value — you'd confirm it by hand (Lab 6's netcat banner grab)</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Failure B — the UDP scan that never ends.</strong> Start a full UDP scan, watch it crawl,
+          then kill it and scan only what matters.
+          <pre><code>sudo nmap -sU 192.168.56.102          # watch the ETA — then Ctrl-C
+sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You saw the full-range UDP ETA balloon into tens of minutes / hours, and understood why
+                  (ICMP rate-limiting)</li>
+              <li>The scoped UDP scan finished in seconds and found the UDP services worth enumerating</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Failure C — filtered vs closed.</strong> Point one scan at a port you know is firewalled on
+          a Windows target and one at a genuinely closed port, and read the difference:
+          <span class="mono">filtered</span> (silence) vs <span class="mono">closed</span> (RST).
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul><li>You can state which state means "a firewall ate it" and which means "the host said no"</li></ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The skill this lab actually teaches</span>
+        <p>Debugging a scan <em>is</em> the skill. A version string with a question mark, a UDP scan that
+           won't finish, a filtered port that looks closed — reading these correctly is what separates someone
+           who runs nmap from someone who understands it.</p>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Time box &amp; fallback</span>
+        <p>Fifteen minutes; stop when you have <span class="mono">depth.txt</span> with services and versions.
+           VM down? Analyse <span class="mono">saved/depth.txt</span> instead — the reading matters more than
+           the running.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h">
+          <span class="pr-t">Practice this topic</span>
+          <span class="pr-plat">TryHackMe</span>
+        </div>
+        <p class="pr-why">Two free rooms drill the exact breadth-then-depth workflow. Do RustScan first for
+           the speed idea, then the deep Nmap room for the port scans.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/rustscan" target="_blank" rel="noopener">RustScan</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span>
+            </div>
+            <p class="pr-note">Fast port discovery that pipes straight into nmap — the breadth half, hands-on.
+               <b>Do this one</b> to feel why nobody runs <span class="mono">nmap -p-</span> alone any more.</p>
+          </li>
+          <li>
+            <div class="pr-row">
+              <a href="https://tryhackme.com/room/nmap02" target="_blank" rel="noopener">Nmap Basic Port Scans</a>
+              <span class="res-tag free">Free</span><span class="pr-meta">~120 min · easy</span>
+            </div>
+            <p class="pr-note">TCP connect, SYN and UDP in depth, plus fine-tuning scope and performance.
+               <b>Do this one</b> if today's scan-type page went fast for you.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P11 · SCANNING COUNTERMEASURES / SOC FLIP  ========== -->
+  <section class="page" data-title="Scanning countermeasures">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P12</span><span class="tag defensive">Defender · the SOC flip</span><span class="time">⏱ 7 min</span></div>
+      <h1>Scanning Countermeasures — What the Target Logs</h1>
+      <p class="lede">You've run every scan type. Now sit on the other side of the wire and see exactly what
+         each one wrote into a log.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why the defence comes right after the attack</span>
+        <p>This is the SOC-analyst session. You've spent an hour being the attacker; this page is the pivot to
+           the desk you'll actually sit at. Every scan you ran left a trace — and knowing which trace, in
+           which log, with which Event ID, is precisely what a tier-1 analyst is paid to recognise.</p>
+      </div>
+
+      <h2>The consolidated SOC flip — scan type by scan type</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Attacker action</th><th>What the target sees</th><th>Where it's logged</th><th>The tell</th></tr></thead>
+        <tbody>
+          <tr><td>ARP host sweep</td><td>Flood of who-has broadcasts from one MAC</td><td>NIDS on the segment · <span class="mono">arpwatch</span></td><td>Dozens of ARP requests, one source, seconds</td></tr>
+          <tr><td>ICMP ping sweep</td><td>Echo requests to sequential IPs</td><td>Firewall log</td><td>One source → many destinations, ICMP type 8</td></tr>
+          <tr><td>SYN scan</td><td>Many SYNs, no completed handshakes</td><td>Firewall · IDS (Snort/Suricata portscan) · Win Firewall <span class="mono">5156</span></td><td>SYN without matching ACK, many ports/sec</td></tr>
+          <tr><td>Connect scan</td><td>Full connections opened + closed</td><td>All the above <em>plus</em> application logs</td><td>Auth/HTTP log entries on every open port</td></tr>
+          <tr><td>NULL / FIN / Xmas</td><td>Packets with illegal flag combos</td><td>IDS</td><td>A bare FIN or FIN+PSH+URG — no real client does this</td></tr>
+          <tr><td>UDP scan</td><td>Burst of outbound ICMP port-unreachable</td><td>Firewall · NIDS</td><td>Many ICMP type 3 code 3 to one host</td></tr>
+          <tr><td>Version / <span class="mono">-A</span> scan</td><td>Probe strings sent to each service</td><td>Application logs on every open port</td><td>Malformed/odd protocol handshakes, high packet count</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The one pattern under all of them</span>
+        <p>Every row is the same shape: <strong>one source, many destinations (or many ports), in a short
+           window</strong>. That is the universal port-scan signature, and it's what your detection rule keys
+           on in Lab 7 — not any single magic packet, but the fan-out rate. Individual packets can be forged;
+           the <em>pattern</em> of touching everything is what gives a scan away.</p>
+      </div>
+
+      <h2>Defensive countermeasures (what the blue team does about it)</h2>
+      <ul>
+        <li><strong>Rate-limit and alert</strong> on connection attempts per source (firewall, IDS threshold).</li>
+        <li><strong>Drop, don't reject</strong> — a firewall that silently drops gives the attacker
+           <span class="mono">filtered</span> everywhere and no information, and slows them down.</li>
+        <li><strong>Close unused ports, disable unused services</strong> — the smaller the attack surface, the
+           less a scan reveals.</li>
+        <li><strong>Scan yourself first</strong> — run nmap against your own estate so you find what the
+           attacker will find, before they do.</li>
+        <li><strong>Deploy IDS/IPS signatures</strong> for portscan and abnormal-flag traffic (Snort/Suricata
+           ship these).</li>
+      </ul>
+
+      <div class="box soc">
+        <span class="box-t">Career framing</span>
+        <p>"An external IP scanned our perimeter" is one of the most common tickets a tier-1 SOC analyst
+           triages. Being able to look at a firewall log and say <em>"that's a SYN scan, one source, 4,000
+           ports in 8 seconds, here's the source IP"</em> — and then write the rule that auto-flags the next
+           one — is the job. That's Lab 7.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P12 · BREAK  ========== -->
+  <section class="page" data-title="Break">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P13</span><span class="tag activity">Break</span><span class="time">⏱ 10 min</span></div>
+      <h1>Break</h1>
+      <p class="lede">Halfway. Scanning done — enumeration and the detection rule are after the break.</p>
+    </div>
+    <div class="content">
+      <div class="timer-card" data-timer="10">
+        <h3>Back in 10 minutes</h3>
+        <div class="timer-ring"></div>
+      </div>
+      <div class="box intro">
+        <span class="box-t">Where we are</span>
+        <p>You can now discover hosts, run every scan type, read the packets, and describe what each one logs.
+           After the break: why scans get caught and what attackers do about it, then enumeration — turning
+           open ports into usernames, shares and a way in — and finally writing the detection rule that closes
+           the loop.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P13 · EVASION PREVIEW  ========== -->
+  <section class="page" data-title="Evasion preview">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P14</span><span class="tag offensive">Preview · attacker + defender</span><span class="time">⏱ 12 min</span></div>
+      <h1>Why Your Scan Got Caught — and What Attackers Do About It</h1>
+      <p class="lede">A short preview, not the full chapter. Just enough to see the arms race between the
+         scanner and the sensor — the deep dive is Session 10.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why a taste of evasion belongs here</span>
+        <p>You just learned that every scan is loud. The natural next question — "so how do attackers scan
+           without getting caught?" — deserves an honest answer now, while the packets are fresh. This is a
+           <strong>10–15 minute preview</strong>: the four or five tricks and, more importantly, why they
+           mostly don't work against a modern sensor. Full IDS/firewall/honeypot evasion is a whole session
+           later.</p>
+      </div>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 920 250" role="img" aria-label="Five evasion techniques: fragmentation, decoys, timing, source-port spoofing, and -Pn. Click each.">
+          <text class="d-title" x="20" y="24" font-size="14">Five things a scanner does to look less obvious — click each</text>
+          <g class="node" data-node="ev-frag" tabindex="0"><rect x="24" y="44" width="168" height="66" rx="8" fill="var(--panel)" stroke="var(--orange)"/><text x="108" y="74" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">Fragmentation</text><text x="108" y="94" font-size="10.5" class="d-mono" text-anchor="middle">-f / --mtu</text></g>
+          <g class="node" data-node="ev-decoy" tabindex="0"><rect x="200" y="44" width="168" height="66" rx="8" fill="var(--panel)" stroke="var(--orange)"/><text x="284" y="74" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">Decoys</text><text x="284" y="94" font-size="10.5" class="d-mono" text-anchor="middle">-D RND:10</text></g>
+          <g class="node" data-node="ev-time" tabindex="0"><rect x="376" y="44" width="168" height="66" rx="8" fill="var(--panel)" stroke="var(--orange)"/><text x="460" y="74" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">Slow timing</text><text x="460" y="94" font-size="10.5" class="d-mono" text-anchor="middle">-T0 / -T1</text></g>
+          <g class="node" data-node="ev-src" tabindex="0"><rect x="552" y="44" width="168" height="66" rx="8" fill="var(--panel)" stroke="var(--orange)"/><text x="636" y="74" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">Source port</text><text x="636" y="94" font-size="10.5" class="d-mono" text-anchor="middle">--source-port 53</text></g>
+          <g class="node" data-node="ev-pn" tabindex="0"><rect x="728" y="44" width="168" height="66" rx="8" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/><text x="812" y="74" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">-Pn</text><text x="812" y="94" font-size="10.5" class="d-sub" text-anchor="middle">skip discovery</text></g>
+          <line x1="150" y1="150" x2="770" y2="150" stroke="var(--line)" stroke-dasharray="3 5"/>
+          <text x="460" y="180" font-size="13" fill="var(--red)" text-anchor="middle" font-weight="700">The honest truth</text>
+          <text x="460" y="204" font-size="12" fill="var(--text-2)" text-anchor="middle">A modern EDR/IDS catches a default nmap -A in seconds.</text>
+          <text x="460" y="224" font-size="12" fill="var(--text-2)" text-anchor="middle">These slow it down and muddy attribution — they don't grant invisibility.</text>
+        </svg>
+        <div class="dgm-hint">Click each technique for how it works and why it's a delaying tactic, not a cloak.</div>
+        <div class="dgm-detail" data-detail="ev-frag">
+          <h5><span class="dd-tag">FRAGMENTATION</span>Split the packet below the inspector's window</h5>
+          <p><b>How:</b> <span class="mono">-f</span> breaks the TCP header across tiny IP fragments so a
+             simple signature engine can't match on the whole header at once. <b>Why it fades:</b> any modern
+             IDS <em>reassembles</em> fragments before inspecting — this beats 2005, not 2026. We captured it:
+             the SYN still arrives, just in two fragments first.</p>
+        </div>
+        <div class="dgm-detail" data-detail="ev-decoy">
+          <h5><span class="dd-tag">DECOYS</span>Hide your real IP in a crowd of fakes</h5>
+          <p><b>How:</b> <span class="mono">-D</span> mixes your real probes with spoofed source IPs, so the
+             target's log shows ten scanners and can't tell which is you. <b>Why it fades:</b> only the real
+             source can complete a handshake or receive replies, and flow analysis often picks it out. It
+             muddies attribution, it doesn't hide the scan. Our capture showed the decoy IPs interleaved with
+             the real one — all visible.</p>
+        </div>
+        <div class="dgm-detail" data-detail="ev-time">
+          <h5><span class="dd-tag">SLOW TIMING</span>Stay under the rate threshold</h5>
+          <p><b>How:</b> <span class="mono">-T0/-T1</span> spread probes over minutes so you never trip a
+             "many connections per second" rule. <b>Cost:</b> a full scan can take days. <b>Why it partly
+             works:</b> threshold-based rules genuinely can be crept under — which is exactly why good
+             detections use longer windows and behavioural baselines, not just a per-second count.</p>
+        </div>
+        <div class="dgm-detail" data-detail="ev-src">
+          <h5><span class="dd-tag">SOURCE PORT</span>Wear a trusted port number</h5>
+          <p><b>How:</b> <span class="mono">--source-port 53</span> (or 80) makes probes look like DNS/web
+             replies, slipping past a lazy ACL that trusts those ports. <b>Why it fades:</b> stateful
+             firewalls track real connections, not just port numbers, so a SYN "from port 53" with no
+             matching request is still anomalous. Our capture: the scan worked, but every packet plainly came
+             from source port 53 with no prior DNS query — obvious to a stateful device.</p>
+        </div>
+        <div class="dgm-detail" data-detail="ev-pn">
+          <h5><span class="dd-tag">-Pn</span>Not evasion — necessity</h5>
+          <p><b>How:</b> skips host discovery and scans as if the host is up. <b>Why it's here:</b> it's the
+             single flag you'll use most against Windows and firewalled hosts, because their dropped ICMP
+             makes discovery lie. It doesn't hide you — it stops <em>you</em> being fooled. Learn it as
+             mandatory, not sneaky.</p>
+        </div>
+      </figure>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The honest lesson — say it out loud</span>
+        <p>A modern EDR or IDS catches a default <span class="mono">nmap -A</span> in seconds. Evasion buys
+           time and confuses attribution; it does not make a scan invisible. Teaching the flags without
+           teaching that is teaching a myth. The full evasion toolkit — and how a defender defeats each piece
+           of it — is <strong>Session 10</strong>.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Scope note</span>
+        <p>Try these flags in the lab only, against your own targets. <span class="mono">-D</span> spoofs
+           source addresses; doing that on a network you don't own is packet forgery, not a homework exercise.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P14 · ENUMERATION CONCEPTS  ========== -->
+  <section class="page" data-title="Enumeration concepts">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P15</span><span class="tag theory">Method</span><span class="time">⏱ 7 min</span></div>
+      <h1>Enumeration — From Open Port to Way In</h1>
+      <p class="lede">Scanning found the doors. Enumeration walks up to each one and asks it questions until it
+         hands over names, shares, versions and configuration.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this follows scanning, not exploitation</span>
+        <p>Your scan says "445 open, SMB." That is not enough to attack anything. Enumeration is the step
+           between knowing a service exists and knowing how to abuse it: you make an <em>active connection</em>
+           to that service and ask it directed questions — what shares do you have, which users, what version,
+           what policy. It is the third phase of the methodology: recon → scan → <strong>enumerate</strong> →
+           gain access.</p>
+      </div>
+
+      <div class="split">
+        <div>
+          <h3>Scanning vs enumeration — the exact difference</h3>
+          <p><strong>Scanning</strong> is one-way: you send packets and read reflexes; you never log in. It
+             tells you <em>what is alive and open</em>.</p>
+          <p><strong>Enumeration</strong> is a conversation: you actually connect to the service and query it,
+             sometimes anonymously, sometimes with credentials. It tells you <em>what is inside</em> — users,
+             shares, group memberships, software versions, the password policy.</p>
+          <p>That connection is why enumeration is even louder and more logged than scanning: you're not
+             knocking any more, you're talking.</p>
+        </div>
+        <div>
+          <h3>The enumeration funnel</h3>
+          <p>Every service follows the same narrowing:</p>
+        </div>
+      </div>
+
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 920 250" role="img" aria-label="The enumeration funnel: open port narrows to service, then version, then users/shares/config, then the way in. Click each stage.">
+          <text class="d-title" x="20" y="24" font-size="14">Open port → service → version → users/shares/config → way in · click each</text>
+          <g class="node" data-node="fn1" tabindex="0"><rect x="24" y="90" width="150" height="70" rx="8" fill="var(--panel)" stroke="var(--cyan)"/><text x="99" y="120" font-size="12.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">Open port</text><text x="99" y="140" font-size="10.5" class="d-sub" text-anchor="middle">445/tcp</text></g>
+          <line x1="178" y1="125" x2="214" y2="125" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="fn2" tabindex="0"><rect x="220" y="94" width="150" height="62" rx="8" fill="var(--panel)" stroke="var(--cyan)"/><text x="295" y="122" font-size="12.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">Service</text><text x="295" y="141" font-size="10.5" class="d-sub" text-anchor="middle">SMB</text></g>
+          <line x1="374" y1="125" x2="410" y2="125" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="fn3" tabindex="0"><rect x="416" y="98" width="150" height="54" rx="8" fill="var(--panel)" stroke="var(--orange)"/><text x="491" y="122" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="700">Version</text><text x="491" y="141" font-size="10.5" class="d-sub" text-anchor="middle">Samba 3.x</text></g>
+          <line x1="570" y1="125" x2="606" y2="125" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="fn4" tabindex="0"><rect x="612" y="94" width="150" height="62" rx="8" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/><text x="687" y="118" font-size="12" fill="var(--orange)" text-anchor="middle" font-weight="700">Users · shares</text><text x="687" y="137" font-size="10.5" class="d-sub" text-anchor="middle">config · policy</text></g>
+          <line x1="766" y1="125" x2="802" y2="125" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <g class="node" data-node="fn5" tabindex="0"><rect x="808" y="94" width="88" height="62" rx="8" fill="var(--panel-2)" stroke="var(--red)"/><text x="852" y="122" font-size="12" fill="var(--red)" text-anchor="middle" font-weight="700">Way in</text><text x="852" y="141" font-size="10" class="d-sub" text-anchor="middle">S4/S5</text></g>
+        </svg>
+        <div class="dgm-hint">Click each stage — the same funnel applies to SMB, SNMP, LDAP, NFS and the rest.</div>
+        <div class="dgm-detail" data-detail="fn1"><h5><span class="dd-tag">OPEN PORT</span>Scanning's output</h5><p>A port number and a guessed service — the end of scanning, the start of enumeration. It's a lead, not a finding.</p></div>
+        <div class="dgm-detail" data-detail="fn2"><h5><span class="dd-tag">SERVICE</span>Confirm what's really there</h5><p>You connect and confirm the protocol. 445 is almost always SMB, but confirm — banners and <span class="mono">-sV</span> can be wrong, as Lab 3 showed.</p></div>
+        <div class="dgm-detail" data-detail="fn3"><h5><span class="dd-tag">VERSION</span>The exploit pivot</h5><p>The exact version decides whether a known exploit exists. "SMB" is nothing; "Samba 3.0.20" is a searchsploit hit. This is why version detection mattered so much.</p></div>
+        <div class="dgm-detail" data-detail="fn4"><h5><span class="dd-tag">USERS · SHARES · CONFIG</span>The payload of enumeration</h5><p>Now the directed queries: list shares, list users, read the password policy, dump the SNMP config. This is the material you actually attack with — the whole point of today's second half.</p></div>
+        <div class="dgm-detail" data-detail="fn5"><h5><span class="dd-tag">WAY IN</span>Session 4 and 5</h5><p>A username + a weak password policy = a password-spray target (Session 4). A vulnerable version = an exploit target (Session 5). Enumeration doesn't break in — it hands the next session everything it needs to.</p></div>
+      </figure>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip — enumeration is where "recon" becomes "intrusion attempt"</span>
+        <p>Scanning might be shrugged off as internet background noise. Enumeration is different: anonymous SMB
+           session setups, SNMP GET floods, LDAP binds, failed logins — these are <em>authenticated or
+           semi-authenticated</em> interactions that map cleanly to ATT&amp;CK Discovery (T1087, T1135, T1069,
+           T1201) and raise the severity of a ticket. A defender who sees enumeration knows the attacker is no
+           longer window-shopping.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P15 · SMB ENUMERATION  ========== -->
+  <section class="page" data-title="SMB enumeration">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P16</span><span class="tag theory">Tool group · attacker + defender</span><span class="time">⏱ 10 min</span></div>
+      <h1>SMB — The Richest Service, and Why It's Gone Quiet</h1>
+      <p class="lede">SMB enumeration is the classic CEH set-piece. It's also the one where the textbook output
+         no longer appears on a modern target — and knowing why is the real lesson.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why SMB first, and why it needs a warning</span>
+        <p>SMB (ports 139/445) historically leaked more than any other service — users, shares, groups, the
+           password policy, the whole domain. Every CEH course teaches <span class="mono">enum4linux</span>
+           against it. But run that command against a default Windows 10 or Server 2019 today and you get
+           almost nothing back, and a student who has only seen the 2012 output will wrongly report "no SMB
+           findings." Today you'll see both, side by side, and learn to tell <em>hardened</em> from <em>not
+           reachable</em>.</p>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Currency correction — verify the tool is still alive</span>
+        <p>Two names in the textbook are dead or renamed. Learn the successors:</p>
+        <ul>
+          <li><span class="mono">enum4linux</span> → <strong><span class="mono">enum4linux-ng</span></strong>
+             — a maintained rewrite that outputs JSON/YAML and does LDAP + password policy natively (it wraps
+             <span class="mono">nmblookup, net, rpcclient, smbclient</span>).</li>
+          <li><span class="mono">crackmapexec</span> → <strong><span class="mono">NetExec (nxc)</span></strong>
+             — CrackMapExec is unmaintained since 2023; the active contributors forked it to NetExec. Command
+             is <span class="mono">nxc</span>. Use it, not <span class="mono">cme</span>.</li>
+        </ul>
+      </div>
+
+      <h2>The seven-part frame — SMB enumeration</h2>
+      <div class="tbl-scroll">
+      <table>
+        <tbody>
+          <tr><td><strong>What it is</strong></td><td>Querying the SMB/CIFS service for shares, users, groups, OS and domain info</td></tr>
+          <tr><td><strong>Why it exists</strong></td><td>By hand you'd script dozens of <span class="mono">rpcclient</span> and <span class="mono">smbclient</span> queries; the tools batch them</td></tr>
+          <tr><td><strong>The method</strong></td><td>Try an <em>anonymous</em> (null) session first; if it's allowed, enumerate freely. If not, try creds you found. The finding is often "null session refused" — that itself tells you the target is modern/hardened</td></tr>
+          <tr><td><strong>Real syntax</strong></td><td>see below</td></tr>
+          <tr><td><strong>Read the output</strong></td><td>Shares that aren't default (<span class="mono">ADMIN$/C$/IPC$</span> are default) are the interesting ones; a readable non-default share is a finding; the password policy tells you how hard password attacks will be</td></tr>
+          <tr><td><strong>What it feeds</strong></td><td>Usernames → Session 4 password spraying; shares → data theft; version → Session 5 exploits (e.g. EternalBlue on unpatched SMBv1)</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td>Anonymous SMB session setup + share enumeration is logged (Windows Security <span class="mono">5140</span> share access, <span class="mono">5145</span> detailed file share); a burst of null-session attempts is a Discovery signature</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="split">
+        <div>
+          <h3>Real syntax</h3>
+          <pre><code># the modern all-in-one
+enum4linux-ng -A 192.168.56.102
+
+# list shares (anonymous)
+smbclient -L //192.168.56.102/ -N
+smbmap -H 192.168.56.102 -u '' -p ''
+
+# NetBIOS name table
+nbtscan 192.168.56.0/24
+
+# NetExec — versions, shares, users, policy
+nxc smb 192.168.56.102
+nxc smb 192.168.56.102 -u '' -p '' --shares
+nxc smb 192.168.56.102 -u user -p pass --users --pass-pol
+
+# nmap NSE
+nmap --script smb-enum-shares,smb-enum-users,smb-os-discovery -p445 192.168.56.102</code></pre>
+        </div>
+        <div>
+          <h3>Why the modern box is empty — the actual reason</h3>
+          <p>Microsoft's own position: <em>"SMBv1 isn't installed by default in any edition of Windows 11 or
+             Windows Server 2019 and later versions."</em> SMBv1 and anonymous null sessions — the mechanism
+             that made classic <span class="mono">enum4linux</span> dumps possible — are <strong>off by
+             default</strong> on every current Windows.</p>
+          <p>So against Metasploitable2 (Samba, 2012) you get the full dump. Against a default Windows 10 /
+             2019 you get "null session denied" and an empty user list — <em>not</em> because you did it wrong,
+             but because the host is hardened. What still works: <strong>authenticated</strong> enumeration
+             with a found credential (<span class="mono">nxc ... -u -p</span>), and — once we have a domain —
+             LDAP against the DC.</p>
+        </div>
+      </div>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view</span>
+        <p>Don't declare "no SMB findings" when a null session is refused. Refused means <em>hardened</em>, and
+           your play changes to: find one credential elsewhere, then come back authenticated. The empty result
+           is information, not a dead end.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P16 · LAB 4 SMB  ========== -->
+  <section class="page" data-title="Lab 4: SMB">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P17</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 16 min</span></div>
+      <h1>Lab 4 — SMB Against 2012, and Against Today</h1>
+      <p class="lede">The same command, two targets, two completely different results — and the whole point is
+         understanding the difference.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Run <span class="mono">enum4linux-ng</span> against three boxes and watch the same command tell
+           three stories: <strong>Metasploitable2</strong> (Linux, wide open), <strong>Windows 7</strong>
+           (legacy — SMBv1 on, the classic output still appears), and <strong>Windows 10</strong> (modern,
+           locked down). The contrast is the finding that matters on a real engagement.</p>
+      </div>
+
+      <div class="box warn"><span class="box-t">Scope</span><p>Metasploitable2 and your Windows targets, host-only network. Both are yours.</p></div>
+
+      <h2>Step 1 — the rich target (Metasploitable2)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Full anonymous enumeration.</strong>
+          <pre><code>enum4linux-ng -A 192.168.56.102 | tee smb_msf.txt
+smbclient -L //192.168.56.102/ -N</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You get <strong>users</strong> (msfadmin, user, service…), <strong>shares</strong> (tmp,
+                  opt, a printer), OS = Unix/Samba, and a <strong>workgroup</strong></li>
+              <li>You can connect to a readable share anonymously:
+                  <span class="mono">smbclient //192.168.56.102/tmp -N</span></li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 1b — the legacy target (Windows 7) — where the textbook still works</h2>
+      <ol class="steps">
+        <li>
+          <strong>Same command, against Windows 7.</strong>
+          <pre><code>enum4linux-ng -A 192.168.56.X | tee smb_win7.txt
+nmap -p445 --script smb-protocols,smb-vuln-ms17-010 192.168.56.X</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li><span class="mono">enum4linux-ng</span> returns <strong>users, shares and the OS</strong> —
+                  the classic dump, because SMBv1/null sessions are on</li>
+              <li><span class="mono">smb-protocols</span> shows <strong>SMBv1 enabled</strong>;
+                  <span class="mono">smb-vuln-ms17-010</span> reports <strong>VULNERABLE</strong> (EternalBlue → Session 5)</li>
+              <li>You can state why this works here but not on Win10: the legacy defaults were never turned off</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — the hardened target (modern Windows)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Exactly the same command, against Win10 / WinSrv.</strong>
+          <pre><code>enum4linux-ng -A 192.168.56.X | tee smb_win.txt
+nxc smb 192.168.56.X</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>The user/share enumeration comes back <strong>empty or "access denied / null session
+                  refused"</strong></li>
+              <li><span class="mono">nxc</span> still shows you the <strong>SMB version, hostname, domain and
+                  signing status</strong> — proof the host is up and talking, just not leaking</li>
+              <li>You wrote down <em>why</em>: SMBv1 + null sessions off by default since Win10 FCU / Server 2019</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 3 — what still works: authenticated</h2>
+      <ol class="steps">
+        <li>
+          <strong>Re-run with a lab credential (given to you for this lab).</strong>
+          <pre><code>nxc smb 192.168.56.X -u '&lt;LAB_USER&gt;' -p '&lt;LAB_PASS&gt;' --shares --users --pass-pol</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>With a credential you now get shares, users and the <strong>password policy</strong> — the
+                  same intelligence, via authentication instead of a null session</li>
+              <li>You can state the lesson: modern SMB enumeration is a <em>post-credential</em> activity, not
+                  an anonymous one</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>Flip to the Windows target's own logs. Your anonymous attempts and the authenticated run both wrote
+           Security events: <span class="mono">4624</span>/<span class="mono">4625</span> (logon success/fail),
+           <span class="mono">5140</span>/<span class="mono">5145</span> (share access). A defender sees a
+           single source touching IPC$, ADMIN$ and enumerating shares in seconds — a Network Share Discovery
+           signature (T1135). You'll pull these logs in Lab 7.</p>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">The finding to write down</span>
+        <p>"enum4linux returned nothing" is <em>never</em> the finding. The finding is "the target refuses
+           null sessions → it's a modern, hardened host → SMB enumeration requires credentials here." That
+           sentence is worth more than any 2012 dump.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h"><span class="pr-t">Practice this topic</span><span class="pr-plat">TryHackMe</span></div>
+        <p class="pr-why">The free enumeration path for SMB, FTP and Telnet — hands-on rooms that mirror Lab 4
+           and Lab 6 exactly.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row"><a href="https://tryhackme.com/room/networkservices" target="_blank" rel="noopener">Network Services</a><span class="res-tag free">Free</span><span class="pr-meta">~60 min · easy</span></div>
+            <p class="pr-note">SMB (enum4linux, smbclient), Telnet and FTP enumeration, then using what you
+               found. <b>Do this one</b> right after today — it's the closest free match to Lab 4.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P17 · SNMP & LDAP  ========== -->
+  <section class="page" data-title="SNMP &amp; LDAP">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P18</span><span class="tag theory">Tool group · attacker + defender</span><span class="time">⏱ 8 min</span></div>
+      <h1>SNMP and LDAP — The Two Services That Hand Over the Org Chart</h1>
+      <p class="lede">One reads a device's entire internal state over UDP; the other <em>is</em> the directory.
+         Both, misconfigured, give an attacker the map.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why these two together</span>
+        <p>SMB gave you shares and users. SNMP and LDAP go further: SNMP can dump a device's running processes,
+           interfaces, installed software and user accounts; LDAP <em>is</em> the directory — every user,
+           group and computer in the domain. In our lab both are deliberately enabled so you can practise
+           against them, and the page is honest about the fact that a stock box doesn't ship this way.</p>
+      </div>
+
+      <h2>SNMP — the config-leak protocol (UDP 161)</h2>
+      <div class="split">
+        <div>
+          <h3>The method</h3>
+          <p>SNMP exposes a device's state as a tree of values (the MIB). Read access is gated by a
+             <strong>community string</strong> — effectively a password that is very often left as the default
+             <span class="mono">public</span>. Guess or find the community string and you can <em>walk</em> the
+             entire tree: interfaces, routes, running processes, installed software, and on Windows even user
+             accounts.</p>
+          <p><b>Read the output:</b> a successful <span class="mono">snmpwalk</span> returns hundreds of OIDs —
+             the ones that matter are <span class="mono">1.3.6.1.2.1.25.4.2</span> (running processes),
+             <span class="mono">.25.6.3</span> (installed software), and the interface/route tables. On
+             Windows with the right MIB, user accounts appear too.</p>
+        </div>
+        <div>
+          <h3>Real syntax</h3>
+          <pre><code># find the community string (brute-force)
+onesixtyone -c community_list.txt 192.168.56.X
+
+# walk the whole tree once you have it
+snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X
+
+# targeted: running processes / software
+snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.25.4.2.1.2
+
+# nmap NSE
+nmap -sU -p161 --script snmp-info,snmp-processes 192.168.56.X</code></pre>
+        </div>
+      </div>
+      <figure class="dgm">
+        <svg viewBox="0 0 920 170" role="img" aria-label="An SNMP MIB tree: from the root iso.org.dod.internet down to system, interfaces, and host resources with processes and software.">
+          <rect x="24" y="20" width="120" height="34" rx="6" fill="var(--panel)" stroke="var(--cyan)"/><text x="84" y="42" font-size="11" fill="var(--cyan)" text-anchor="middle">1.3.6.1 (internet)</text>
+          <line x1="84" y1="54" x2="84" y2="78" stroke="var(--text-3)"/><line x1="84" y1="78" x2="480" y2="78" stroke="var(--text-3)"/>
+          <line x1="84" y1="78" x2="84" y2="96" stroke="var(--text-3)" marker-end="url(#ar-g)"/>
+          <line x1="290" y1="78" x2="290" y2="96" stroke="var(--text-3)" marker-end="url(#ar-g)"/>
+          <line x1="480" y1="78" x2="480" y2="96" stroke="var(--text-3)" marker-end="url(#ar-g)"/>
+          <rect x="30" y="98" width="110" height="34" rx="6" fill="var(--panel)" stroke="var(--line-soft)"/><text x="85" y="120" font-size="10.5" fill="#fff" text-anchor="middle">system</text>
+          <rect x="236" y="98" width="110" height="34" rx="6" fill="var(--panel)" stroke="var(--line-soft)"/><text x="291" y="120" font-size="10.5" fill="#fff" text-anchor="middle">interfaces</text>
+          <rect x="410" y="98" width="150" height="34" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/><text x="485" y="120" font-size="10.5" fill="var(--orange)" text-anchor="middle">hrSWRun (processes)</text>
+          <text x="700" y="112" font-size="12" class="d-sub">Walk it all with one guessed community string.</text>
+        </svg>
+        <figcaption><b>The MIB tree.</b> Each branch is an OID; a read community string unlocks the lot.</figcaption>
+      </figure>
+
+      <h2>LDAP — enumerate the directory itself (TCP 389/636)</h2>
+      <div class="split">
+        <div>
+          <h3>The method</h3>
+          <p>LDAP is the protocol behind Active Directory. Against a domain controller, an anonymous or
+             authenticated <strong>bind</strong> lets you query the directory tree for every user, group,
+             computer and organisational unit. This only exists if there's a directory to query — which is why
+             our <span class="mono">WINSRV19-TGT01</span> is a domain controller for <span class="mono">ceh.lab</span>.
+             A standalone Windows box runs no LDAP at all.</p>
+          <p><b>Read the output:</b> the naming context (<span class="mono">DC=ceh,DC=lab</span>) is the root;
+             <span class="mono">objectClass=user</span> entries are accounts, <span class="mono">group</span>
+             entries are groups. <span class="mono">memberOf</span> shows who's in what — the group map you'll
+             abuse in Session 6.</p>
+        </div>
+        <div>
+          <h3>Real syntax</h3>
+          <pre><code># find the base naming context
+ldapsearch -x -H ldap://192.168.56.X -s base namingContexts
+
+# dump users and groups (anonymous, if allowed)
+ldapsearch -x -H ldap://192.168.56.X -b "DC=ceh,DC=lab" "(objectClass=user)"
+
+# windapsearch — friendlier
+windapsearch -d ceh.lab --dc-ip 192.168.56.X -U   # users
+windapsearch -d ceh.lab --dc-ip 192.168.56.X -G   # groups
+
+# nxc over LDAP
+nxc ldap 192.168.56.X -u '&lt;USER&gt;' -p '&lt;PASS&gt;' --users</code></pre>
+        </div>
+      </div>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view</span>
+        <p>SNMP and LDAP are the "org chart" services — they hand you names and structure without you touching
+           SMB at all. On a real engagement, a default community string or an anonymous LDAP bind is a
+           free win: the whole user list, ready for Session 4's password attacks.</p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>SNMP GET floods to UDP 161 from an unknown manager, and a burst of LDAP binds/searches from one
+           source, are both Discovery signatures (T1087 Account Discovery, T1069 Permission Groups Discovery).
+           On the DC, directory queries are logged; SNMP access can be logged by the agent. The countermeasure
+           on both: don't leave defaults (community string ≠ <span class="mono">public</span>; restrict
+           anonymous LDAP binds), and restrict which hosts may query.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Honesty note for students</span>
+        <p>SNMP is <em>not</em> installed by default on Windows Server, and we enabled it with a weak community
+           string specifically so this lab teaches something. Don't generalise from the lab to "every server
+           leaks SNMP" — a hardened server doesn't run it at all, or locks the community string down. The lab
+           is a firing range, not a photograph of the real world.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P18 · LAB 5 SNMP + LDAP  ========== -->
+  <section class="page" data-title="Lab 5: SNMP &amp; LDAP">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P19</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 15 min</span></div>
+      <h1>Lab 5 — Walk the MIB, Query the Directory</h1>
+      <p class="lede">Find a community string and read a machine's internals; bind to the domain controller and
+         pull the user list.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Two enumerations that produce the org chart. First SNMP against the WinSrv target: guess the
+           community string, then walk the tree for processes and accounts. Then LDAP against the same box — now
+           a domain controller — to dump users and groups. Both feed straight into tonight's target profile
+           and Session 4's password attacks.</p>
+      </div>
+
+      <div class="box warn"><span class="box-t">Scope</span><p><span class="mono">WINSRV19-TGT01</span> on your host-only network — your DC.</p></div>
+
+      <h2>Part A — SNMP</h2>
+      <ol class="steps">
+        <li>
+          <strong>Confirm 161/udp is open, then find the community string.</strong>
+          <pre><code>sudo nmap -sU -p161 192.168.56.X
+onesixtyone -c /usr/share/seclists/Discovery/SNMP/snmp.txt 192.168.56.X</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>161/udp shows <span class="mono">open</span> (not open|filtered) once the version probe confirms it</li>
+              <li><span class="mono">onesixtyone</span> prints the community string the lab was configured with</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Walk the tree and pull the useful branches.</strong>
+          <pre><code>snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.1     # system
+snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.25.4.2.1.2  # processes</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>System branch returns the hostname, uptime and the <span class="mono">sysContact</span>/
+                  <span class="mono">sysLocation</span> strings</li>
+              <li>The process branch lists running processes — write down anything that names installed software</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Part B — LDAP</h2>
+      <ol class="steps">
+        <li>
+          <strong>Find the naming context, then enumerate.</strong>
+          <pre><code>ldapsearch -x -H ldap://192.168.56.X -s base namingContexts
+windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>The base context comes back as <span class="mono">DC=ceh,DC=lab</span></li>
+              <li><span class="mono">ldap_users.txt</span> contains the seeded lab accounts (a.fahmy, m.said,
+                  n.gamal, svc_backup…) with their titles and departments</li>
+              <li>You can name at least one <strong>group</strong> and who belongs to it</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Cross-reference.</strong> Do the SNMP findings and the LDAP user list agree on the hostname
+          and domain? Note any account that appears in one source but not the other.
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul><li>A single, deduplicated user list assembled from both services — the input to Session 4</li></ul>
+          </div>
+        </li>
+      </ol>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>On the DC, your LDAP binds and searches are logged; the SNMP walk is a flood of GETs to UDP 161
+           from an unrecognised manager. Both are textbook Discovery (T1087 Account Discovery, T1069
+           Permission Groups Discovery). In Lab 7 you'll decide whether your detection rule should also fire on
+           this, or only on the port scan — a real scoping decision every detection engineer makes.</p>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Time box &amp; fallback</span>
+        <p>Fifteen minutes across both parts. If the DC or SNMP isn't reachable, analyse
+           <span class="mono">saved/ldap_users.txt</span> and <span class="mono">saved/snmpwalk.txt</span>.
+           If your instructor declined the DC build, Part B runs against a THM room instead —
+           <span class="mono">networkservices2</span> — and you'll do LDAP concept-only here.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P19 · OTHER SERVICES + NSE + MANUAL  ========== -->
+  <section class="page" data-title="NFS · FTP · SMTP · RPC">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P20</span><span class="tag theory">Tool group · attacker + defender</span><span class="time">⏱ 8 min</span></div>
+      <h1>The Rest of the Services — and the Manual Skill Under Them All</h1>
+      <p class="lede">NFS, FTP, SMTP and RPC each leak in their own way — and behind every automated tool sits
+         one manual skill: connect with netcat and read the banner yourself.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why group these four</span>
+        <p>SMB, SNMP and LDAP earned their own labs because they leak the most. The remaining classic services
+           each have one enumeration move worth knowing — and all four are live on Metasploitable2, so Lab 6
+           sweeps them in one pass. Then the skill that outlasts every tool: grabbing a banner by hand.</p>
+      </div>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Service</th><th>Port</th><th>What it leaks</th><th>Tool / command</th></tr></thead>
+        <tbody>
+          <tr><td><strong>NFS</strong></td><td>2049 / 111</td><td>Exported directories you can mount without auth</td><td><span class="mono">showmount -e &lt;ip&gt;</span> → <span class="mono">mount -t nfs</span></td></tr>
+          <tr><td><strong>FTP</strong></td><td>21</td><td>Anonymous login, writable dirs, version (→ CVE)</td><td><span class="mono">ftp &lt;ip&gt;</span> (user <span class="mono">anonymous</span>); <span class="mono">nmap --script ftp-anon</span></td></tr>
+          <tr><td><strong>SMTP</strong></td><td>25</td><td>Valid usernames via <span class="mono">VRFY</span>/<span class="mono">EXPN</span>/<span class="mono">RCPT</span></td><td><span class="mono">smtp-user-enum -M VRFY -U users.txt -t &lt;ip&gt;</span></td></tr>
+          <tr><td><strong>RPC / NetBIOS</strong></td><td>135 / 137-139</td><td>Endpoints, usernames, domain, MAC via null session</td><td><span class="mono">rpcclient -U "" -N &lt;ip&gt;</span> → <span class="mono">enumdomusers</span>; <span class="mono">nbtscan</span></td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="split">
+        <div>
+          <h3>NSE — nmap as an enumeration engine</h3>
+          <p>The Nmap Scripting Engine turns nmap into an enumeration tool, not just a scanner. Scripts live in
+             <span class="mono">/usr/share/nmap/scripts/</span> and group into categories —
+             <span class="mono">safe</span>, <span class="mono">default</span>, <span class="mono">discovery</span>,
+             <span class="mono">vuln</span>, <span class="mono">brute</span>, <span class="mono">auth</span>,
+             <span class="mono">intrusive</span>, <span class="mono">exploit</span>.</p>
+          <pre><code># default scripts (a good first pass)
+nmap -sC -p- 192.168.56.102
+
+# find a script, then read what it does
+ls /usr/share/nmap/scripts/ | grep smb
+nmap --script-help smb-enum-shares
+
+# category scans
+nmap --script "discovery" 192.168.56.102
+nmap --script smb-enum-users,snmp-info,ftp-anon 192.168.56.102</code></pre>
+        </div>
+        <div>
+          <h3>Directory enumeration — a first taste (web depth is Session 8)</h3>
+          <p>When a web server is open, content discovery finds unlinked paths. Today it's a <em>service
+             enumeration</em> footnote; the full web-attack treatment is Session 8.</p>
+          <pre><code>gobuster dir -u http://192.168.56.102 -w /usr/share/wordlists/dirb/common.txt
+ffuf -u http://192.168.56.102/FUZZ -w /usr/share/wordlists/dirb/common.txt</code></pre>
+          <p class="muted">Just the idea for now: same brute-force logic as Session 2's subdomain work, aimed
+             at paths instead of hostnames.</p>
+        </div>
+      </div>
+
+      <h2>The manual skill: read the banner yourself</h2>
+      <p>Behind every automated enumerator is one move — open a raw connection and read what the service
+         announces. When a tool gives an ambiguous answer (remember Lab 3's <span class="mono">tcpwrapped</span>),
+         this is how you get the truth:</p>
+      <pre><code># netcat: connect and read the banner
+nc -nv 192.168.56.102 22        # SSH announces its version
+nc -nv 192.168.56.102 25        # SMTP greeting + you can type VRFY
+# HTTP by hand
+printf 'HEAD / HTTP/1.0\r\n\r\n' | nc 192.168.56.102 80   # Server: header</code></pre>
+
+      <div class="box attacker-view">
+        <span class="box-t">Attacker view</span>
+        <p>Automated tools are for speed; the netcat banner is for <em>truth</em>. When <span class="mono">-sV</span>
+           hedges, connect by hand and read the version yourself. That one habit resolves most "the scanner
+           lied to me" moments.</p>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>NSE <span class="mono">brute</span>/<span class="mono">vuln</span> scripts, <span class="mono">VRFY</span>
+           floods, anonymous FTP logins and <span class="mono">rpcclient</span> null sessions all leave
+           service-specific logs — failed SMTP recipients, FTP login lines, RPC bind attempts. A netcat banner
+           grab is a single clean connection: quiet, but still a completed connection the service can log. None
+           of it is invisible; enumeration is a conversation, and conversations are recorded.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P20 · LAB 6 SERVICE SWEEP  ========== -->
+  <section class="page" data-title="Lab 6: service sweep">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P21</span><span class="tag lab">Hands-on · everyone</span><span class="time">⏱ 12 min</span></div>
+      <h1>Lab 6 — The Service Sweep</h1>
+      <p class="lede">Four services, four enumeration moves, one target that leaks all of them — plus the
+         manual banner grab that confirms what the tools guessed.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Metasploitable2 runs NFS, FTP, SMTP and RPC wide open. You'll enumerate each, then grab a banner by
+           hand to confirm a version. Everything you find is a row in tonight's target profile.</p>
+      </div>
+
+      <div class="box warn"><span class="box-t">Scope</span><p>Metasploitable2, host-only network.</p></div>
+
+      <ol class="steps">
+        <li>
+          <strong>NFS — list and understand the exports.</strong>
+          <pre><code>showmount -e 192.168.56.102</code></pre>
+          <div class="verify"><h4>✓ Verification</h4><ul>
+            <li>An exported path appears (Metasploitable2 exports <span class="mono">/</span> to everyone — note why that's catastrophic)</li>
+          </ul></div>
+        </li>
+        <li>
+          <strong>FTP — try anonymous, read the version.</strong>
+          <pre><code>nmap --script ftp-anon -p21 192.168.56.102
+ftp 192.168.56.102     # log in as: anonymous</code></pre>
+          <div class="verify"><h4>✓ Verification</h4><ul>
+            <li>Anonymous login succeeds; you noted the FTP daemon + version (<span class="mono">vsftpd 2.3.4</span> — a name to remember for Session 5)</li>
+          </ul></div>
+        </li>
+        <li>
+          <strong>SMTP — enumerate valid users.</strong>
+          <pre><code>smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t 192.168.56.102</code></pre>
+          <div class="verify"><h4>✓ Verification</h4><ul>
+            <li>At least one username is confirmed valid by the mail server (e.g. <span class="mono">root</span>, <span class="mono">user</span>)</li>
+          </ul></div>
+        </li>
+        <li>
+          <strong>RPC / NetBIOS — null session.</strong>
+          <pre><code>rpcclient -U "" -N 192.168.56.102
+# at the prompt:  enumdomusers   srvinfo   querydominfo
+nbtscan 192.168.56.0/24</code></pre>
+          <div class="verify"><h4>✓ Verification</h4><ul>
+            <li><span class="mono">enumdomusers</span> returns a user list; <span class="mono">nbtscan</span> shows NetBIOS names</li>
+          </ul></div>
+        </li>
+        <li>
+          <strong>Confirm one finding by hand.</strong> Pick a service the scanner was unsure about and grab
+          its banner with netcat.
+          <pre><code>nc -nv 192.168.56.102 22
+nc -nv 192.168.56.102 25</code></pre>
+          <div class="verify"><h4>✓ Verification</h4><ul>
+            <li>You read a real version banner directly, and it matches (or corrects) what <span class="mono">-sV</span> reported</li>
+          </ul></div>
+        </li>
+      </ol>
+
+      <div class="box defender-view">
+        <span class="box-t">The SOC flip</span>
+        <p>This one lab generated anonymous FTP logins, SMTP <span class="mono">VRFY</span> probes, RPC null
+           sessions and NFS mount queries — four different service logs, one source, seconds apart. That
+           clustering (one host enumerating many services fast) is itself the signature: a defender doesn't
+           need to catch each protocol, just the fan-out across all of them.</p>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Time box, fallback &amp; the absorb option</span>
+        <p>Twelve minutes. VM down? Analyse <span class="mono">saved/service_sweep.txt</span>. If the class is
+           running long, this is the lab your instructor may move to homework — the services here are the least
+           novel (you met Metasploitable2 in Session 1), and the sweep self-runs cleanly from the guided-lab
+           script.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h"><span class="pr-t">Practice this topic</span><span class="pr-plat">TryHackMe</span></div>
+        <p class="pr-why">The free room that mirrors this exact sweep — NFS, SMTP and more, with a target
+           provided.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row"><a href="https://tryhackme.com/room/networkservices2" target="_blank" rel="noopener">Network Services 2</a><span class="res-tag free">Free</span><span class="pr-meta">~60 min · easy</span></div>
+            <p class="pr-note">NFS, SMTP and MySQL enumeration end to end. <b>Do this one</b> after Network
+               Services — together they cover every service in Lab 6.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P21 · ENUMERATION COUNTERMEASURES  ========== -->
+  <section class="page" data-title="Enumeration countermeasures">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P22</span><span class="tag defensive">Defender</span><span class="time">⏱ 5 min</span></div>
+      <h1>Enumeration Countermeasures</h1>
+      <p class="lede">Everything you enumerated today existed because someone left a default on. Here's the
+         blue-team side of each.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this closes the enumeration half</span>
+        <p>You've spent an hour pulling users, shares and config out of services. Every one of those wins came
+           from a default or a legacy setting. The countermeasures aren't abstract — they're the exact
+           settings that would have made your labs return nothing.</p>
+      </div>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Service</th><th>What let you in</th><th>The fix</th></tr></thead>
+        <tbody>
+          <tr><td>SMB</td><td>SMBv1 / null sessions</td><td>Disable SMBv1 (default now); require signing; deny anonymous enumeration (<span class="mono">RestrictAnonymous</span>)</td></tr>
+          <tr><td>SNMP</td><td>Default/weak community string, v2c</td><td>Use SNMPv3 (auth+encryption); change the community string; restrict permitted managers; or don't run it</td></tr>
+          <tr><td>LDAP</td><td>Anonymous bind allowed</td><td>Disable anonymous binds; require authenticated, ideally LDAPS</td></tr>
+          <tr><td>NFS</td><td>Export to everyone (<span class="mono">*</span>)</td><td>Export only to specific hosts; use <span class="mono">root_squash</span>; require Kerberos</td></tr>
+          <tr><td>FTP</td><td>Anonymous login</td><td>Disable anonymous; use SFTP/FTPS; patch the daemon</td></tr>
+          <tr><td>SMTP</td><td><span class="mono">VRFY</span>/<span class="mono">EXPN</span> enabled</td><td>Disable VRFY/EXPN; don't leak valid-vs-invalid recipients</td></tr>
+          <tr><td>RPC</td><td>Null session</td><td>Restrict anonymous RPC; firewall 135-139 at the perimeter</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box defender-view">
+        <span class="box-t">The one defensive doctrine under all of it</span>
+        <p>Three moves cover most of the table: <strong>disable legacy protocols</strong> (SMBv1, SNMPv2c,
+           anonymous binds), <strong>change every default</strong> (community strings, admin account names),
+           and <strong>restrict who can even reach the service</strong> (host-based firewall, network
+           segmentation). And behind those: <strong>monitor for enumeration patterns</strong> — rapid,
+           sequential, one-to-many queries — which is exactly what you'll build a rule for next.</p>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">Career framing</span>
+        <p>Half of GRC and hardening work is this table: a scanner (you, in an assessment) finds the leak, and
+           the remediation ticket is one of these rows. Being able to write both the finding <em>and</em> the
+           fix is what makes an assessment report worth paying for.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P22 · LAB 7 — THE DETECTION RULE (SIGNATURE EXERCISE)  ========== -->
+  <section class="page" data-title="Lab 7: write the rule">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P23</span><span class="tag lab">Hands-on · everyone · the signature exercise</span><span class="time">⏱ 16 min</span></div>
+      <h1>Lab 7 — Read Your Own Noise, Then Write the Rule That Catches It</h1>
+      <p class="lede">You spent today being the attacker. Now become the SOC analyst who catches you — using
+         the packets and logs your own scans generated.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why this is the exercise that defines the session</span>
+        <p>Nothing else in the diploma closes the loop this cleanly. You generated the evidence in Lab 2. Now
+           you'll read it as a defender, identify the scan type from the evidence <em>alone</em>, and write one
+           <strong>working detection rule</strong> that would fire on it. This is, almost exactly, what a SOC
+           analyst is paid to do — and you'll have done the attack and the detection for the same packets.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">You need the evidence from Lab 2</span>
+        <p>Have <span class="mono">lab2_syn.pcap</span> and your Windows target's Security/Firewall log open. If
+           you didn't keep them, use <span class="mono">saved/lab2_syn.pcap</span> — but you generated the real
+           thing an hour ago; use yours.</p>
+      </div>
+
+      <h2>Step 1 — identify the scan from evidence alone</h2>
+      <ol class="steps">
+        <li>
+          <strong>Open the capture and answer, without looking at your nmap command:</strong> what scan type
+          was this?
+          <pre><code># in Wireshark: filter to the scanner's SYNs with no completed handshake
+tcp.flags.syn==1 and tcp.flags.ack==0
+# how many destination ports in how many seconds?
+# from the shell:
+tshark -r lab2_syn.pcap -Y 'tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0' -T fields -e tcp.dstport | sort -un | wc -l</code></pre>
+          <div class="verify">
+            <h4>✓ Verification — you can state, from evidence only:</h4>
+            <ul>
+              <li>The <strong>scan type</strong> (many SYNs, RSTs from the scanner, no completed handshakes → SYN scan)</li>
+              <li>The <strong>source IP</strong>, the <strong>number of distinct destination ports</strong>, and the <strong>time window</strong></li>
+              <li>Which Windows event IDs correspond (5156/5157 firewall, 4624/4625 logon) if you're keying off logs instead</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2>Step 2 — write the rule (your choice of language)</h2>
+      <p>The pattern to encode is the one under every scan today: <strong>one source touching many distinct
+         ports (or hosts) inside a short window</strong>. Here is a <strong>worked Sigma rule</strong>. Then
+         complete <em>one</em> of the SPL or KQL skeletons — your choice.</p>
+
+      <h3>Worked example — Sigma (vendor-neutral)</h3>
+      <pre><code>title: Horizontal TCP Port Scan (single source, many ports)
+id: 8f1e2a30-ce7a-4f2c-9c11-s3labexercise01
+status: experimental
+description: One source connecting to many distinct destination ports in a short
+  window - a TCP port scan. Modelled on packets generated in the CEH S3 lab.
+logsource:
+  product: windows
+  service: security          # Windows Filtering Platform connection events
+detection:
+  selection:
+    EventID: 5156            # WFP permitted a connection
+  timeframe: 30s
+  condition: selection | count(DestPort) by SourceAddress &gt; 100
+fields:
+  - SourceAddress
+  - DestPort
+  - DestAddress
+level: medium
+tags:
+  - attack.discovery
+  - attack.t1046            # Network Service Discovery
+  - attack.reconnaissance
+  - attack.t1595            # Active Scanning</code></pre>
+      <p class="muted">The load-bearing lines are <span class="mono">timeframe</span> and the
+         <span class="mono">count(DestPort) by SourceAddress &gt; 100</span> condition — that's the "many ports,
+         one source, short window" signature expressed as a threshold. Tune the number to your environment;
+         too low and normal traffic (a busy web server, a vuln scanner you own) trips it.</p>
+
+      <h3>Skeleton A — Splunk SPL (complete the blanks)</h3>
+      <pre><code>index=firewall (action=allowed OR action=teardown)
+| bin _time span=30s
+| stats dc(dest_port) AS distinct_ports values(dest_port) AS ports by src_ip, _time
+| where distinct_ports &gt; ______            &lt;-- your threshold
+| sort - distinct_ports</code></pre>
+
+      <h3>Skeleton B — Microsoft Sentinel KQL (complete the blanks)</h3>
+      <pre><code>// Windows Firewall connection events, or your NSG/flow table
+SecurityEvent
+| where EventID == 5156
+| summarize distinct_ports = dcount(DestPort), sample=make_set(DestPort, 20)
+    by SourceAddress, bin(TimeGenerated, ____m)   // your window
+| where distinct_ports &gt; ______                   // your threshold
+| order by distinct_ports desc</code></pre>
+
+      <div class="verify">
+        <h4>✓ Verification — the deliverable</h4>
+        <ul>
+          <li>One <strong>complete, working</strong> rule in Sigma, SPL <em>or</em> KQL that would fire on your Lab 2 SYN scan</li>
+          <li>A stated <strong>threshold and time window</strong>, with one sentence on why you chose them and what would cause a false positive</li>
+          <li>The <strong>ATT&amp;CK mapping</strong> (T1046 / T1595) on the rule</li>
+          <li>One sentence on how an attacker using <span class="mono">-T0</span> timing (Lab 13's preview) could slip under your threshold — and what you'd change to catch them</li>
+        </ul>
+      </div>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Why this is the most valuable 16 minutes today</span>
+        <p>You attacked, you captured, you detected, and you wrote the rule — for the same packets. That full
+           loop, on one whiteboard, is exactly the tier-1-into-tier-2 skill these students get hired for. Keep
+           this rule; it goes in your target profile appendix and it's a portfolio piece.</p>
+      </div>
+
+      <div class="practice">
+        <div class="practice-h"><span class="pr-t">Practice this topic</span><span class="pr-plat">TryHackMe</span></div>
+        <p class="pr-why">The payoff room — scan, find a known vuln, and see the whole attacker arc you can now
+           detect. Free.</p>
+        <ul class="pr-list">
+          <li>
+            <div class="pr-row"><a href="https://tryhackme.com/room/blue" target="_blank" rel="noopener">Blue</a><span class="res-tag free">Free</span><span class="pr-meta">~30 min · easy</span></div>
+            <p class="pr-note">Scan → find MS17-010 (EternalBlue, unpatched SMBv1) → exploit → SYSTEM. <b>Blue's
+               target is a Windows 7 box — exactly our WIN7-TGT01.</b> Do this one to see why the SMB version
+               you enumerated today matters, and picture the log trail it leaves.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P23 · LAB 8 TARGET PROFILE  ========== -->
+  <section class="page" data-title="Lab 8: target profile">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P24</span><span class="tag lab">Hands-on · everyone · deliverable</span><span class="time">⏱ 12 min</span></div>
+      <h1>Lab 8 — Assemble the Target Profile</h1>
+      <p class="lede">Everything you found today, per host, in one ranked document — literally Session 4's input.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">What you are about to do</span>
+        <p>Session 2 ended with a ranked recon report. Session 3 ends with a <strong>target profile</strong>:
+           the confirmed, scanned, enumerated picture of each host. Same discipline — conclusions over dumps,
+           confidence stated — but now built from packets you sent, not public data. This is the single most
+           important artefact you carry into Session 4.</p>
+      </div>
+
+      <h2>The template — one block per host</h2>
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Field</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Host / IP</td><td><span class="mono">192.168.56.102</span> · METASPLOITABLE2</td></tr>
+          <tr><td>Live? How confirmed</td><td>Up — ARP reply (not ICMP)</td></tr>
+          <tr><td>Open TCP ports</td><td>21, 22, 23, 25, 53, 80, 139, 445, 3306…</td></tr>
+          <tr><td>Open UDP ports</td><td>53, 111, 161</td></tr>
+          <tr><td>Service + version (per port)</td><td>21 → vsftpd 2.3.4 · 445 → Samba 3.0.20 · 80 → Apache 2.2.8</td></tr>
+          <tr><td>OS guess + confidence</td><td>Linux 2.6.x — high (stack fingerprint + banners agree)</td></tr>
+          <tr><td>Shares</td><td>tmp (read), opt, print$</td></tr>
+          <tr><td>Users</td><td>msfadmin, user, service (SMB + SMTP VRFY)</td></tr>
+          <tr><td>SNMP / LDAP findings</td><td>n/a here (see WinSrv block)</td></tr>
+          <tr><td>Notable / anomalies</td><td><span class="mono">-sV</span> called 445 tcpwrapped — corrected by hand to Samba 3.0.20</td></tr>
+          <tr><td><strong>Ranked "most likely way in"</strong></td><td>1) vsftpd 2.3.4 (known backdoor) 2) Samba 3.0.20 (usermap) 3) anonymous NFS export of /</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <strong>Fill one block per live host</strong> — Metasploitable2, Windows 7, Windows 10, WinSrv/DC — from
+          your Lab 1–6 output files.
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Every live host has a block; dead/absent hosts are noted with <em>how</em> you confirmed the state</li>
+              <li>Every version string is exact (it's an exploit-search key next session)</li>
+              <li>Confidence is stated wherever you guessed (OS, an unsure version)</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Write the ranked "most likely way in"</strong> for each host — your top three, with a
+          one-line reason each.
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>Each entry names a <em>specific</em> service+version and why it's promising, not "SMB looks old"</li>
+              <li>The ranking reflects both ease and impact — a root-level service beats a low-priv one</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Attach your detection rule</strong> from Lab 7 as an appendix — the profile is attacker
+          <em>and</em> defender.
+        </li>
+      </ol>
+
+      <div class="box key-takeaway">
+        <span class="box-t">How this is graded (pass / needs-review)</span>
+        <p><strong>Pass:</strong> a ranked, sourced, honest picture — exact versions, stated confidence,
+           anomalies flagged, a defensible "way in" ranking, and a working detection rule. <strong>Needs-review:</strong>
+           a pile of raw nmap output. Same standard as Session 2's recon report: conclusions, not dumps.</p>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">Continuity — where this goes</span>
+        <p>This profile is not busywork. <strong>Session 4</strong> takes your ranked way-in list and your user
+           list and turns them into vulnerability analysis and password attacks. <strong>Session 5</strong>
+           exploits the versions you recorded. The same local lab is your carry-through target from here (S3)
+           through privilege escalation (S6) — one target, profiled once, attacked all the way down. Session
+           2's recon report fed this; this feeds Session 4. Keep the chain intact.</p>
+      </div>
+    </div>
+  </section>
+  <!-- ==========  P24 · INTO SESSION 4  ========== -->
+  <section class="page" data-title="Into Session 4">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P25</span><span class="tag theory">Bridge</span><span class="time">⏱ 5 min</span></div>
+      <h1>Into Session 4 — The Profile Becomes an Attack Plan</h1>
+      <p class="lede">You have a ranked way-in list and a user list. Next session turns both into access.</p>
+    </div>
+    <div class="content">
+      <div class="box intro">
+        <span class="box-t">Where today lands</span>
+        <p>Session 3 was the pivot from looking to touching. You confirmed what's alive, mapped every open
+           port, enumerated the services, and — crucially — learned to see all of it from the defender's
+           chair. The target profile you just built is the bridge.</p>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 120" role="img" aria-label="The kill-chain continuity: Session 2 recon report feeds Session 3 scan and enumerate, which produces the target profile that feeds Session 4 vulnerability analysis and password attacks.">
+          <rect x="16" y="40" width="180" height="52" rx="8" fill="var(--panel)" stroke="var(--green)"/><text x="106" y="62" font-size="11.5" fill="var(--green)" text-anchor="middle" font-weight="700">S2 · Recon report</text><text x="106" y="80" font-size="10" class="d-sub" text-anchor="middle">who &amp; where</text>
+          <line x1="200" y1="66" x2="236" y2="66" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="240" y="40" width="180" height="52" rx="8" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/><text x="330" y="62" font-size="11.5" fill="var(--orange)" text-anchor="middle" font-weight="700">S3 · Target profile</text><text x="330" y="80" font-size="10" class="d-sub" text-anchor="middle">what &amp; how open</text>
+          <line x1="424" y1="66" x2="460" y2="66" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          <rect x="464" y="40" width="200" height="52" rx="8" fill="var(--panel)" stroke="var(--red)"/><text x="564" y="62" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">S4 · Vuln + passwords</text><text x="564" y="80" font-size="10" class="d-sub" text-anchor="middle">the way in</text>
+          <line x1="668" y1="66" x2="704" y2="66" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          <rect x="708" y="40" width="196" height="52" rx="8" fill="var(--panel)" stroke="var(--line-soft)"/><text x="806" y="62" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">S5 · Exploit</text><text x="806" y="80" font-size="10" class="d-sub" text-anchor="middle">access</text>
+        </svg>
+        <figcaption><b>One target, all the way down.</b> Nothing you did today is thrown away — it's the input
+          to everything that follows.</figcaption>
+      </figure>
+
+      <div class="box soc">
+        <span class="box-t">Next session</span>
+        <p><strong>Session 4 — Vulnerability Analysis, Authentication &amp; Password Attacks.</strong> Bring
+           your target profile. We'll take those exact version strings into CVE/CVSS and searchsploit, take
+           your user list into password spraying and hash cracking, and — because <span class="mono">WINSRV19</span>
+           is now a domain controller — do real NTLM/Kerberos and LLMNR poisoning against the domain, not a
+           standalone box. The AD lab you built today is what unlocks it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P25 · QUIZ  ========== -->
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P26</span><span class="tag activity">Quiz</span><span class="time">⏱ 8 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Ten questions. If any answer isn't obvious, that's the topic to revisit tonight.</p>
+    </div>
+    <div class="content">
+
+      <div class="q mcq" data-correct="c" data-why="ARP operates at layer 2 on the local segment and a host must answer it to be on the network at all — so it can't be blocked and doesn't cross a router. That's why it's the reliable choice on your host-only lab.">
+        <p class="qn">1 · On your host-only lab, which host-discovery method is the most reliable and cannot be blocked at the host?</p>
+        <ul class="opts">
+          <li data-opt="a">ICMP echo (ping)</li>
+          <li data-opt="b">TCP SYN ping to 443</li>
+          <li data-opt="c">ARP</li>
+          <li data-opt="d">UDP ping</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="A SYN scan sends SYN, gets SYN/ACK from an open port, then sends RST instead of the final ACK — the handshake never completes, which is why it's called half-open.">
+        <p class="qn">2 · What makes a SYN scan "half-open"?</p>
+        <ul class="opts">
+          <li data-opt="a">It only scans half the ports</li>
+          <li data-opt="b">It sends RST instead of the final ACK, never completing the handshake</li>
+          <li data-opt="c">It uses half the normal timing</li>
+          <li data-opt="d">It only works on half-duplex links</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="d" data-why="Open and filtered ports both stay silent to a FIN/NULL/Xmas probe, so the scan can't tell them apart and reports open|filtered. Only a closed port replies (RST).">
+        <p class="qn">3 · Why does an Xmas scan report open ports as <span class="mono">open|filtered</span>?</p>
+        <ul class="opts">
+          <li data-opt="a">Because Xmas scans are inaccurate by design</li>
+          <li data-opt="b">Because the firewall rewrites the response</li>
+          <li data-opt="c">Because open ports send RST</li>
+          <li data-opt="d">Because open and filtered ports both stay silent, so they're indistinguishable</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="a" data-why="Windows Firewall drops ICMP echo by default, so a ping sweep reports a live Windows host as down. -Pn skips discovery and scans anyway. It's the #1 beginner mistake.">
+        <p class="qn">4 · A live Windows host is missing from your <span class="mono">nmap -sn</span> sweep. Most likely cause?</p>
+        <ul class="opts">
+          <li data-opt="a">Windows Firewall blocks ICMP echo by default</li>
+          <li data-opt="b">The host is genuinely offline</li>
+          <li data-opt="c">nmap can't scan Windows</li>
+          <li data-opt="d">ARP is disabled on Windows</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="A connect scan completes the handshake, so the target application accepts and can log the connection. A SYN scan tears down before the app layer sees it. Neither is invisible to a modern IDS, but connect leaves the extra application-log trail.">
+        <p class="qn">5 · Why is a full connect scan noisier than a SYN scan?</p>
+        <ul class="opts">
+          <li data-opt="a">It sends more packets per port always</li>
+          <li data-opt="b">It uses UDP as well</li>
+          <li data-opt="c">It completes the handshake, so the application layer logs the connection</li>
+          <li data-opt="d">It scans more ports</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="enum4linux is superseded by enum4linux-ng; CrackMapExec (cme) is unmaintained since 2023 and its successor is NetExec (nxc). Teaching the dead names is the currency mistake this session warns against.">
+        <p class="qn">6 · Which pair names the current, maintained tools?</p>
+        <ul class="opts">
+          <li data-opt="a">enum4linux and crackmapexec</li>
+          <li data-opt="b">enum4linux-ng and NetExec (nxc)</li>
+          <li data-opt="c">enum4linux-ng and crackmapexec</li>
+          <li data-opt="d">smbmap and cme</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="d" data-why="On a default modern Windows, SMBv1 and null sessions are off, so anonymous enum4linux returns almost nothing. That's a hardening finding, not a failed command — and authenticated enumeration still works.">
+        <p class="qn">7 · <span class="mono">enum4linux-ng</span> returns nothing against a default Windows Server 2019. The correct conclusion is:</p>
+        <ul class="opts">
+          <li data-opt="a">The command was typed wrong</li>
+          <li data-opt="b">The host is offline</li>
+          <li data-opt="c">SMB isn't running</li>
+          <li data-opt="d">The host is hardened (null sessions off) — enumerate with credentials instead</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="a" data-why="SNMP read access is gated by a community string, frequently left as the default 'public'. Guess or brute-force it (onesixtyone) and snmpwalk dumps the device's internals.">
+        <p class="qn">8 · What gates SNMP read access, and what's the common weakness?</p>
+        <ul class="opts">
+          <li data-opt="a">A community string, often left as the default 'public'</li>
+          <li data-opt="b">A Kerberos ticket, often expired</li>
+          <li data-opt="c">An SSH key, often shared</li>
+          <li data-opt="d">Nothing — SNMP is always open</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="c" data-why="LDAP is the directory protocol; a standalone Windows box runs no directory, so there's nothing to query. That's exactly why WINSRV19 was promoted to a domain controller for this session.">
+        <p class="qn">9 · Why can't you do LDAP enumeration against a standalone (non-domain) Windows box?</p>
+        <ul class="opts">
+          <li data-opt="a">LDAP is a Linux-only protocol</li>
+          <li data-opt="b">The firewall always blocks 389</li>
+          <li data-opt="c">There's no directory service running to query</li>
+          <li data-opt="d">LDAP needs SNMP first</li>
+        </ul>
+      </div>
+
+      <div class="q mcq" data-correct="b" data-why="The universal port-scan signature is one source touching many distinct ports (or hosts) in a short window. Your detection rule keys on that fan-out rate, not on any single packet, because packets can be forged but the pattern of touching everything can't be hidden.">
+        <p class="qn">10 · Your port-scan detection rule should key on which pattern?</p>
+        <ul class="opts">
+          <li data-opt="a">A single SYN packet to port 445</li>
+          <li data-opt="b">One source hitting many distinct ports/hosts in a short time window</li>
+          <li data-opt="c">Any use of nmap's User-Agent</li>
+          <li data-opt="d">Encrypted traffic on port 443</li>
+        </ul>
+      </div>
+
+      <div class="quiz-score" id="quizScore"></div>
+    </div>
+  </section>
+  <!-- ==========  P27 · THE PRACTICE RANGE  ========== -->
+  <section class="page" data-title="The practice range">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P27</span><span class="tag lab">Practice · three more targets</span><span class="time">⏱ self-study</span></div>
+      <h1>The Practice Range — Three More Machines to Sharpen On</h1>
+      <p class="lede">Beyond the four core targets, three classic vulnerable boxes to drill scanning and
+         enumeration on your own. Each teaches one thing best.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Why add these</span>
+        <p>The four core targets teach the session; these three give you reps. All run <strong>host-only</strong>
+           under the same safety rule as Metasploitable2, and each has a signature scan result worth
+           recognising. Import them, scan them, and add their profiles to your practice notes.</p>
+      </div>
+
+      <figure class="dgm">
+        <svg viewBox="0 0 920 120" role="img" aria-label="Three practice machines and the one skill each drills best: Metasploitable3 for Windows enumeration, Kioptrix for version-to-exploit thinking, Stapler for SMB user enumeration.">
+          <rect x="24" y="30" width="270" height="66" rx="9" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="159" y="56" font-size="12.5" fill="var(--cyan)" text-anchor="middle" font-weight="700">METASPLOITABLE3 · Windows</text>
+          <text x="159" y="78" font-size="10.5" class="d-sub" text-anchor="middle">drills: modern Windows + web-service enum</text>
+          <rect x="324" y="30" width="270" height="66" rx="9" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="459" y="56" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="700">KIOPTRIX 1 · Linux</text>
+          <text x="459" y="78" font-size="10.5" class="d-sub" text-anchor="middle">drills: version → known-exploit thinking</text>
+          <rect x="624" y="30" width="270" height="66" rx="9" fill="var(--panel)" stroke="var(--amber)"/>
+          <text x="759" y="56" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="700">STAPLER 1 · Linux</text>
+          <text x="759" y="78" font-size="10.5" class="d-sub" text-anchor="middle">drills: SMB user enumeration</text>
+        </svg>
+        <figcaption><b>One machine, one headline skill.</b> Pick the box that drills the thing you're weakest at.</figcaption>
+      </figure>
+
+      <h3>What each scan finds — click a machine</h3>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 920 130" role="img" aria-label="Three practice machines to inspect. Click each for its port signature and key enumeration output.">
+          <text class="d-title" x="20" y="22" font-size="14">Real scan + enum output — click each</text>
+          <g class="node" data-node="pr-msf3" tabindex="0"><rect x="24" y="40" width="285" height="72" rx="9" fill="rgba(34,211,238,.10)" stroke="var(--cyan)"/><text x="166" y="72" font-size="13" fill="var(--cyan)" text-anchor="middle" font-weight="700">Metasploitable 3</text><text x="166" y="94" font-size="10.5" class="d-sub" text-anchor="middle">Windows Server 2008 R2</text></g>
+          <g class="node" data-node="pr-kio" tabindex="0"><rect x="321" y="40" width="270" height="72" rx="9" fill="rgba(74,222,128,.10)" stroke="var(--green)"/><text x="456" y="72" font-size="13" fill="var(--green)" text-anchor="middle" font-weight="700">Kioptrix 1</text><text x="456" y="94" font-size="10.5" class="d-sub" text-anchor="middle">Linux · the classic first box</text></g>
+          <g class="node" data-node="pr-stap" tabindex="0"><rect x="603" y="40" width="293" height="72" rx="9" fill="rgba(251,191,36,.10)" stroke="var(--amber)"/><text x="749" y="72" font-size="13" fill="var(--amber)" text-anchor="middle" font-weight="700">Stapler 1</text><text x="749" y="94" font-size="10.5" class="d-sub" text-anchor="middle">Linux · SMB enum playground</text></g>
+        </svg>
+        <div class="dgm-hint">Each panel is the real scan + the one enumeration win that machine is famous for.</div>
+
+        <div class="dgm-detail" data-detail="pr-msf3">
+          <h5><span class="dd-tag">METASPLOITABLE 3 · WINDOWS</span>A modern Windows box drowning in web apps</h5>
+          <pre><code># many services — scan with -Pn (Windows Firewall drops ICMP + some ports)
+21/tcp    open  ftp
+22/tcp    open  ssh
+80/tcp    open  http          WAMP / Apache
+445/tcp   open  microsoft-ds  SMB
+3306/tcp  open  mysql
+3389/tcp  open  ms-wbt-server RDP
+4848/tcp  open  glassfish
+8020/tcp  open  manageengine
+8080/tcp  open  http          Tomcat / Jenkins
+8484/tcp  open  jenkins
+9200/tcp  open  elasticsearch
+161/udp   open  snmp          community: public
+
+# SMB / SNMP user enum → weak "Star Wars" accounts
+nxc smb &lt;ip&gt; -u '' -p '' --users  →  leia_organa, luke_skywalker,
+   han_solo, artoo_detoo, ben_kenobi, chewbacca, boba_fett, vagrant …</code></pre>
+          <p><b>Drills:</b> modern Windows enumeration at scale — SNMP (public string), a dozen web consoles to
+             fingerprint, and a rich SMB user list with weak passwords. The Windows companion to Metasploitable2.</p>
+        </div>
+        <div class="dgm-detail" data-detail="pr-kio">
+          <h5><span class="dd-tag">KIOPTRIX 1 · LINUX</span>Old versions = known exploits</h5>
+          <pre><code>22/tcp    open  ssh      OpenSSH 2.9p2
+80/tcp    open  http     Apache 1.3.20
+443/tcp   open  ssl/http Apache 1.3.20 (mod_ssl 2.8.4)   ← OpenFuck
+111/tcp   open  rpcbind
+139/tcp   open  netbios-ssn  Samba 2.2.1a                ← trans2open
+32768/tcp open  status</code></pre>
+          <p><b>Drills:</b> reading a version string as an exploit lead. Two ancient services, two direct roots —
+             <span class="mono">mod_ssl 2.8.4</span> (OpenFuck) and <span class="mono">Samba 2.2.1a</span>
+             (trans2open). The whole point: <em>the version is the vulnerability</em> — exactly Session 4's job.</p>
+        </div>
+        <div class="dgm-detail" data-detail="pr-stap">
+          <h5><span class="dd-tag">STAPLER 1 · LINUX</span>The SMB-enumeration playground</h5>
+          <pre><code>21/tcp    open  ftp     (banner leaks a username)
+22/tcp    open  ssh     (banner: "don't forget the cron job")
+53/tcp    open  domain  dnsmasq
+80/tcp    open  http
+139,445   open  samba
+3306/tcp  open  mysql
+12380/tcp open  http    Apache (only a full -p- finds it!)
+
+# the famous win:
+enum4linux -a &lt;ip&gt;  →  peter, RNunemaker, elly, kathy, tim,
+   sam, drew, jess, zoe, NATHAN, barry, garry, harry, scott …</code></pre>
+          <p><b>Drills:</b> SMB user enumeration (a huge list falls out), banner intelligence on FTP/SSH, and the
+             lesson that a service can hide above port 1024 — <span class="mono">12380</span> only shows on a
+             full <span class="mono">-p-</span> scan. Reinforces Lab 3 and Lab 4.</p>
+        </div>
+      </figure>
+
+      <div class="box tip">
+        <span class="box-t">How to use the range</span>
+        <p>Import each (VulnHub <span class="mono">.ova</span> for Kioptrix &amp; Stapler; Metasploitable3 from
+           its Rapid7 GitHub build), set the adapter to <strong>host-only</strong>, snapshot, then run the full
+           workflow: <span class="mono">-sn → -sS -p- → -sV → enum</span>. Add each to your target-profile
+           practice notes. Setup steps are in <span class="mono">labs/setup_guide.md</span>.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">Same safety rule</span>
+        <p>All three are intentionally vulnerable — <strong>host-only or isolated NAT only, never Bridged or
+           internet-facing.</strong> An exposed box is compromised in minutes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P26 · PRACTICE PLAN  ========== -->
+  <section class="page" data-title="Your practice plan">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P28</span><span class="tag activity">Self-study</span><span class="time">⏱ 4 min</span></div>
+      <h1>Your Practice Plan</h1>
+      <p class="lede">A fully free path this session — do them in this order.</p>
+    </div>
+    <div class="content">
+
+      <div class="box intro">
+        <span class="box-t">Good news for this session</span>
+        <p>The best Nmap rooms used to be paywalled. As of this build, the flagship <strong>Nmap</strong> room
+           and the two <strong>Network Services</strong> rooms are <strong>free</strong> — so you can practise
+           everything from today without a subscription. Order matters: scanning first, then enumeration, then
+           the payoff.</p>
+      </div>
+
+      <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>#</th><th>Room</th><th>Platform</th><th>Tier</th><th>Teaches</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><a href="https://tryhackme.com/room/furthernmap" target="_blank" rel="noopener">Nmap</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>Every scan type, NSE, evasion flags — the whole scanning half</td></tr>
+          <tr><td>2</td><td><a href="https://tryhackme.com/room/rustscan" target="_blank" rel="noopener">RustScan</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>Fast breadth, hand-off to nmap</td></tr>
+          <tr><td>3</td><td><a href="https://tryhackme.com/room/nmap02" target="_blank" rel="noopener">Nmap Basic Port Scans</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>TCP connect/SYN/UDP in depth + performance tuning</td></tr>
+          <tr><td>4</td><td><a href="https://tryhackme.com/room/networkservices" target="_blank" rel="noopener">Network Services</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>SMB, Telnet, FTP enumeration</td></tr>
+          <tr><td>5</td><td><a href="https://tryhackme.com/room/networkservices2" target="_blank" rel="noopener">Network Services 2</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>NFS, SMTP, MySQL enumeration</td></tr>
+          <tr><td>6</td><td><a href="https://tryhackme.com/room/vulnversity" target="_blank" rel="noopener">Vulnversity</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>Scan → enumerate → foothold, integrated</td></tr>
+          <tr><td>7</td><td><a href="https://tryhackme.com/room/basicpentestingjt" target="_blank" rel="noopener">Basic Pentesting</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>SMB/service enum with no walkthrough — test yourself</td></tr>
+          <tr><td>8</td><td><a href="https://tryhackme.com/room/blue" target="_blank" rel="noopener">Blue</a></td><td>TryHackMe</td><td><span class="res-tag free">Free</span></td><td>The payoff — scan → EternalBlue → SYSTEM</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box lab-box">
+        <span class="box-t">Plus your local practice range (previous page)</span>
+        <p>Offline and unlimited: <strong>Metasploitable 3</strong> (Windows web-service + SMB enum),
+           <strong>Kioptrix 1</strong> (version → exploit), <strong>Stapler 1</strong> (SMB user enum). Run the
+           full workflow on each and add its profile to your notes — no subscription, no rate limit.</p>
+      </div>
+
+      <div class="box warn">
+        <span class="box-t">The authorisation rule — again, because it's the one that matters</span>
+        <p>Every platform above hands you a target <strong>and</strong> written permission to attack it. That
+           permission does not travel. Running today's scans against <span class="mono">scanme.nmap.org</span>
+           is fine in strict moderation (its owner allows "a few scans a day"); running them against anything
+           else you don't own is a criminal offence. Your lab and these rooms are the whole legal playground.</p>
+      </div>
+
+      <div class="box tip">
+        <span class="box-t">Note on the Nmap series</span>
+        <p>You may see references to <span class="mono">nmap01</span>, <span class="mono">nmap03</span>,
+           <span class="mono">nmap04</span> and "Nmap: The Basics" — several of those are <strong>Premium</strong>.
+           The free <strong>Nmap</strong> room (#1 above) and <strong>Nmap Basic Port Scans</strong> cover the
+           same ground without a subscription. Don't pay for what's free.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  P27 · TAKEAWAYS & HOMEWORK  ========== -->
+  <section class="page" data-title="Takeaways &amp; homework">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S03 · P29</span><span class="tag theory">Wrap-up</span><span class="time">⏱ 4 min</span></div>
+      <h1>Takeaways &amp; Homework</h1>
+      <p class="lede">What to keep, and what to hand in.</p>
+    </div>
+    <div class="content">
+
+      <h2>The seven things to keep</h2>
+      <ul class="takeaways">
+        <li><strong>Scanning is loud.</strong> It's the most commonly detected stage of an intrusion — every technique leaves a log.</li>
+        <li><strong>Learn the reflexes, not the flags.</strong> Open answers SYNs and ignores stealth flags; closed RSTs everything; filtered stays silent. Every scan type falls out of that.</li>
+        <li><strong>ICMP silence ≠ dead host.</strong> ARP on the segment, TCP probes through a router, <span class="mono">-Pn</span> when discovery lies.</li>
+        <li><strong>Breadth then depth.</strong> masscan/rustscan to find ports fast, nmap to interrogate them deeply.</li>
+        <li><strong>Enumeration is a conversation.</strong> "enum4linux returned nothing" is a hardening finding, not a failure — enumerate with credentials.</li>
+        <li><strong>Verify the tool is alive before you teach the command.</strong> enum4linux-ng, NetExec (nxc) — not the dead names.</li>
+        <li><strong>You can catch yourself.</strong> One source, many ports, short window — that's the rule you wrote, and it's the job.</li>
+      </ul>
+
+      <div class="box key-takeaway">
+        <span class="box-t">Homework — due before Session 4</span>
+        <p><strong>1 · Finish the target profile</strong> (Lab 8) for all four live hosts — exact versions,
+           confidence, ranked way-in, detection rule attached. This is Session 4's input; come without it and
+           you'll be building it while everyone else is attacking.</p>
+        <p><strong>2 · One-page lab report:</strong> the SYN-vs-connect-vs-Xmas comparison from your own Lab 2
+           captures (the three-column screenshot), plus two sentences on what each scan left in a log.</p>
+        <p><strong>3 · Practice:</strong> complete the free <strong>Nmap</strong> room and <strong>Network
+           Services</strong>. Bring one thing each taught you that this session didn't.</p>
+        <p><strong>4 · Practice range (local):</strong> scan and enumerate at least <strong>two</strong> of
+           <strong>Metasploitable 3</strong>, <strong>Kioptrix 1</strong>, <strong>Stapler 1</strong>, and add a
+           short profile for each — capture Stapler's <span class="mono">enum4linux</span> user list and
+           Kioptrix's version→exploit read.</p>
+        <p><strong>5 · Stretch (optional):</strong> improve your Lab 7 detection rule so it also catches a slow
+           <span class="mono">-T1</span> scan — and write one sentence on the false-positive cost of doing so.</p>
+      </div>
+
+      <div class="box soc">
+        <span class="box-t">One last thing</span>
+        <p>You attacked a network and detected the attack in the same afternoon, on the same packets. Hold onto
+           that. The market pays for people who can sit on both sides of the wire — and you just proved you
+           can. See you in Session 4.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========  NAV  ========== -->
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">—</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">—</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">←</span> <span class="kbd">→</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>ITGate Academy · CEH Diploma · Session 03</span>
+    <span class="mono">Primary reference: EC-Council CEH 312-50 · Modules 3 &amp; 4</span>
+  </div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
