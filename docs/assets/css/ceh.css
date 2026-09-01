@@ -584,3 +584,18 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
   border:1px solid rgba(230,57,70,.4);background:rgba(230,57,70,.08);border-radius:var(--radius-sm);
   padding:9px 12px;transition:border-color .16s,background .16s,color .16s}
 .side-cta a:hover{background:rgba(230,57,70,.16);border-color:var(--red);color:#fff;text-decoration:none}
+
+/* ---------- cumulative report: prior-session groups ---------- */
+details.rep-group{border:1px solid var(--line);border-radius:var(--radius);background:var(--bg-alt);box-shadow:var(--depth);overflow:hidden;margin:0 0 10px}
+details.rep-group>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:14px 18px;font-weight:700;font-size:14.5px;color:var(--text-2)}
+details.rep-group>summary::-webkit-details-marker{display:none}
+details.rep-group>summary::before{content:"▸";color:var(--red);font-size:13px}
+details.rep-group[open]>summary::before{content:"▾"}
+details.rep-group[open]>summary{border-bottom:1px solid var(--line)}
+details.rep-group .rep-group-title{color:var(--text)}
+.rep-group-tag{font-family:var(--mono);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-4);border:1px solid var(--line-soft);border-radius:20px;padding:2px 9px;margin-left:auto;white-space:nowrap}
+.rep-group-tag.now{color:var(--red);border-color:rgba(230,57,70,.45);margin-left:0}
+.rep-group-body{padding:2px 18px 14px}
+.rep-group.current{margin:8px 0 10px}
+.rep-group-title--cur{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:17px;font-weight:800;color:#fff;margin:26px 0 6px}
+@media print{ details.rep-group,details.rep-group[open]{border-color:#ccc!important} details.rep-group>summary{color:#111!important} .rep-group-title--cur{color:#111!important} }

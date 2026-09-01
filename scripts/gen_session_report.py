@@ -26,13 +26,15 @@ TEAM_FIELDS = '''      <div class="rep-fields">
       </div>'''
 
 
-def step_html(s):
+def step_html(s, prefix, current):
+    sid = prefix + '-' + s['id']
     active = ' data-active' if s.get('active') else ''
+    curattr = ' data-current' if current else ''
     exlbl = s.get('exlabel', 'Example output')
     lis = ''.join('\n              <li>%s</li>' % x for x in s['collect'])
     return '''
-      <div class="rep-step" data-step="{id}">
-        <label class="rep-check"><input type="checkbox" data-check="{id}"{active}><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="{sid}">
+        <label class="rep-check"><input type="checkbox" data-check="{sid}"{active}{cur}><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">{name}</span><code class="rep-cmd">{cmd}</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -41,29 +43,52 @@ def step_html(s):
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> {why}</div>
           </div>
-          <textarea class="rep-notes" data-notes="{id}" placeholder="{ph}"></textarea>
+          <textarea class="rep-notes" data-notes="{sid}" placeholder="{ph}"></textarea>
         </div>
-      </div>'''.format(id=s['id'], active=active, name=s['name'], cmd=s['cmd'],
+      </div>'''.format(sid=sid, active=active, cur=curattr, name=s['name'], cmd=s['cmd'],
                        exlbl=exlbl, example=s['example'], lis=lis, why=s['why'], ph=s['ph'])
 
 
-def free_html(f):
+def free_html(f, prefix):
+    fid = prefix + '-' + f['id']
     return '''
       <div class="rep-free">
         <span class="rep-free-label">{label}</span>
         <p class="rep-free-hint">{hint}</p>
-        <textarea data-notes="{id}" placeholder="{ph}"></textarea>
-      </div>'''.format(label=f['label'], hint=f['hint'], id=f['id'], ph=f['ph'])
+        <textarea data-notes="{fid}" placeholder="{ph}"></textarea>
+      </div>'''.format(label=f['label'], hint=f['hint'], fid=fid, ph=f['ph'])
 
 
-def build(key, d):
-    n_steps = sum(1 for sec in d['sections'] for it in sec['items'] if it.get('t', 'step') == 'step')
-    body = []
-    for sec in d['sections']:
-        body.append('\n      <h3 class="rep-sec">%s</h3>' % sec['name'])
-        for it in sec['items']:
-            body.append(free_html(it) if it.get('t') == 'free' else step_html(it))
-    body = ''.join(body)
+def build(key, d, all_sessions):
+    # A session's report is cumulative: it shows every session with num <= this one,
+    # earlier ones collapsed, the current one open. Ids are namespaced per session
+    # (s2-a1, s3-b1, …) so the shared store carries a team's answers across pages.
+    cur = int(d['num']); cur_prefix = 's' + str(cur)
+    included = sorted([(k, v) for k, v in all_sessions.items() if int(v['num']) <= cur],
+                      key=lambda kv: int(kv[1]['num']))
+    n_steps = 0
+    groups = []
+    for k2, d2 in included:
+        p2 = 's' + str(int(d2['num'])); is_cur = (k2 == key)
+        gtitle = 'Session %s &middot; %s' % (d2['num'], d2['short'])
+        inner = []
+        for sec in d2['sections']:
+            inner.append('\n        <h3 class="rep-sec">%s</h3>' % sec['name'])
+            for it in sec['items']:
+                if it.get('t') == 'free':
+                    inner.append(free_html(it, p2))
+                else:
+                    inner.append(step_html(it, p2, is_cur)); n_steps += 1
+        inner = ''.join(inner)
+        if is_cur:
+            groups.append('\n      <section class="rep-group current" data-group-title="%s">'
+                          '\n        <div class="rep-group-title--cur">%s <span class="rep-group-tag now">this session</span></div>%s'
+                          '\n      </section>' % (gtitle, gtitle, inner))
+        else:
+            groups.append('\n      <details class="rep-group" data-group-title="%s">'
+                          '\n        <summary><span class="rep-group-title">%s</span><span class="rep-group-tag">carried forward</span></summary>'
+                          '\n        <div class="rep-group-body">%s\n        </div>\n      </details>' % (gtitle, gtitle, inner))
+    body = ''.join(groups)
 
     return '''<!doctype html>
 <html lang="en">
@@ -89,16 +114,15 @@ def build(key, d):
     <nav class="topnav">
       <a href="index.html">Session {snum_short}</a>
       <a href="../index.html">All sessions</a>
-      <a href="../index.html#reports">All reports</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap section">
-  <div data-report="{key}" data-report-title="{report_title}">
+  <div data-report="{key}" data-report-title="{report_title}" data-current="{cur_prefix}">
 
     <div class="page-head">
-      <div class="kicker"><span class="snum">S{num}</span><span class="tag lab">Team deliverable</span><span class="time">⏱ fill as you work</span></div>
+      <div class="kicker"><span class="snum">S{num}</span><span class="tag lab">Cumulative team deliverable</span><span class="time">⏱ fill as you work</span></div>
       <h1>{title}</h1>
       <p class="lede">{lede}</p>
     </div>
@@ -119,7 +143,7 @@ def build(key, d):
       </div>
     </div>
 
-    <div class="rep-gate" data-gate="{gate}"><b>⚠ Stop.</b> You have ticked an <b>active</b> step but your scope &amp; authorization check ({gate_up}) is not signed off. Confirm you are authorised to test this target first — active testing outside an authorised scope is illegal and voids safe harbour.</div>
+    <div class="rep-gate" data-gate="{gate}"><b>⚠ Stop.</b> You have ticked an <b>active</b> step in this session, but its <b>scope &amp; authorization check</b> is not signed off. Confirm you are authorised to test this target first — active testing outside an authorised scope is illegal and voids safe harbour.</div>
 
     <div data-report-body>
 {body}
@@ -145,7 +169,7 @@ def build(key, d):
 </html>
 '''.format(num=d['num'], snum_short=str(int(d['num'])), title=d['title'], desc=d['desc'],
            key=key, report_title=d['report_title'], lede=d['lede'], team=TEAM_FIELDS,
-           n=n_steps, gate=d['gate'], gate_up=d['gate'].upper(), body=body)
+           n=n_steps, gate=cur_prefix + '-a1', cur_prefix=cur_prefix, body=body)
 
 
 # ==========================================================================
@@ -156,7 +180,7 @@ SESSIONS = {}
 # ---- placeholder; real data appended below by data module ----
 
 SESSIONS['s2-recon'] = {
-  'num': '02', 'gate': 'a1',
+  'num': '02', 'gate': 'a1', 'short': 'Reconnaissance',
   'title': 'Team Recon Report',
   'report_title': 'CEH Session 2 — Team Recon Report',
   'desc': 'CEH Diploma Session 2 team deliverable — an interactive recon checklist your team fills in against an authorised target, saves in the browser, and exports to HTML or PDF.',
@@ -242,7 +266,7 @@ SESSIONS['s2-recon'] = {
 }
 
 SESSIONS['s3-scan'] = {
-  'num': '03', 'gate': 'a1',
+  'num': '03', 'gate': 'a1', 'short': 'Scanning &amp; Enumeration',
   'title': 'Team Scanning &amp; Enumeration Report',
   'report_title': 'CEH Session 3 — Team Scanning & Enumeration Report',
   'desc': 'CEH Diploma Session 3 team deliverable — an interactive scanning and enumeration checklist your team fills in against an authorised target, saves in the browser, and exports to HTML or PDF.',
@@ -323,7 +347,7 @@ SESSIONS['s3-scan'] = {
 }
 
 SESSIONS['s4-access'] = {
-  'num': '04', 'gate': 'a1',
+  'num': '04', 'gate': 'a1', 'short': 'Vulnerability &amp; Access',
   'title': 'Team Vulnerability &amp; Access Report',
   'report_title': 'CEH Session 4 — Team Vulnerability & Access Report',
   'desc': 'CEH Diploma Session 4 team deliverable — an interactive vulnerability-analysis and credential-attack checklist for the authorised lab domain, saved in the browser, exported to HTML or PDF.',
@@ -398,7 +422,7 @@ def main():
         if only and key != only:
             continue
         out = os.path.join(DOCS, 'session-%s' % d['num'], 'report.html')
-        html = build(key, d)
+        html = build(key, d, SESSIONS)
         io.open(out, 'w', encoding='utf-8', newline='').write(html)
         n = sum(1 for sec in d['sections'] for it in sec['items'] if it.get('t', 'step') == 'step')
         print('wrote %-40s  (%d steps)  %d bytes' % (out, n, len(html)))

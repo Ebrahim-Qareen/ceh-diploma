@@ -22,16 +22,15 @@
     <nav class="topnav">
       <a href="index.html">Session 2</a>
       <a href="../index.html">All sessions</a>
-      <a href="../index.html#reports">All reports</a>
     </nav>
   </div>
 </header>
 
 <main class="wrap section">
-  <div data-report="s2-recon" data-report-title="CEH Session 2 — Team Recon Report">
+  <div data-report="s2-recon" data-report-title="CEH Session 2 — Team Recon Report" data-current="s2">
 
     <div class="page-head">
-      <div class="kicker"><span class="snum">S02</span><span class="tag lab">Team deliverable</span><span class="time">⏱ fill as you work</span></div>
+      <div class="kicker"><span class="snum">S02</span><span class="tag lab">Cumulative team deliverable</span><span class="time">⏱ fill as you work</span></div>
       <h1>Team Recon Report</h1>
       <p class="lede">Work in your team against <strong>one authorised target</strong>. Tick each step as you do it, paste what you found, and click <em>example</em> to see what good output looks like and why it matters later. Everything saves in <strong>this browser</strong> — export to HTML or PDF to submit.</p>
     </div>
@@ -59,13 +58,15 @@
       </div>
     </div>
 
-    <div class="rep-gate" data-gate="a1"><b>⚠ Stop.</b> You have ticked an <b>active</b> step but your scope &amp; authorization check (A1) is not signed off. Confirm you are authorised to test this target first — active testing outside an authorised scope is illegal and voids safe harbour.</div>
+    <div class="rep-gate" data-gate="s2-a1"><b>⚠ Stop.</b> You have ticked an <b>active</b> step in this session, but its <b>scope &amp; authorization check</b> is not signed off. Confirm you are authorised to test this target first — active testing outside an authorised scope is illegal and voids safe harbour.</div>
 
     <div data-report-body>
 
-      <h3 class="rep-sec">A · Setup &amp; scope — do this first</h3>
-      <div class="rep-step" data-step="a1">
-        <label class="rep-check"><input type="checkbox" data-check="a1"><span class="rep-box"></span></label>
+      <section class="rep-group current" data-group-title="Session 02 &middot; Reconnaissance">
+        <div class="rep-group-title--cur">Session 02 &middot; Reconnaissance <span class="rep-group-tag now">this session</span></div>
+        <h3 class="rep-sec">A · Setup &amp; scope — do this first</h3>
+      <div class="rep-step" data-step="s2-a1">
+        <label class="rep-check"><input type="checkbox" data-check="s2-a1" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Scope &amp; authorization check</span><code class="rep-cmd">read the program policy — before any tool</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -81,12 +82,12 @@ Safe harbour:  yes, if you stay in scope</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> every step below must stay inside this scope. Touch an out-of-scope host and it is not a finding — it is unauthorised access. This line is what makes the whole engagement legal.</div>
           </div>
-          <textarea class="rep-notes" data-notes="a1" placeholder="In-scope: … | Out-of-scope: … | Scanning allowed? rate limit? | Safe harbour? …"></textarea>
+          <textarea class="rep-notes" data-notes="s2-a1" placeholder="In-scope: … | Out-of-scope: … | Scanning allowed? rate limit? | Safe harbour? …"></textarea>
         </div>
       </div>
-      <h3 class="rep-sec">B · Passive recon — no packets to the target</h3>
-      <div class="rep-step" data-step="b1">
-        <label class="rep-check"><input type="checkbox" data-check="b1"><span class="rep-box"></span></label>
+        <h3 class="rep-sec">B · Passive recon — no packets to the target</h3>
+      <div class="rep-step" data-step="s2-b1">
+        <label class="rep-check"><input type="checkbox" data-check="s2-b1" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">WHOIS / RDAP — who owns it</span><code class="rep-cmd">whois target.com</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -101,11 +102,11 @@ Name Server:      NS1.TARGET.COM</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> the org name widens your subdomain hunt, and the name servers are exactly what you try a zone transfer against.</div>
           </div>
-          <textarea class="rep-notes" data-notes="b1" placeholder="Registrar / org / creation date / name servers…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-b1" placeholder="Registrar / org / creation date / name servers…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="b2">
-        <label class="rep-check"><input type="checkbox" data-check="b2"><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-b2">
+        <label class="rep-check"><input type="checkbox" data-check="s2-b2" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">DNS records</span><code class="rep-cmd">dig target.com A MX NS TXT +noall +answer</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -119,11 +120,11 @@ target.com.  300 IN TXT  "v=spf1 include:_spf.google.com ~all"</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> the IPs become Session 3&rsquo;s scan list; a missing/weak SPF or no DMARC is a phishing lead for Session 9.</div>
           </div>
-          <textarea class="rep-notes" data-notes="b2" placeholder="A/AAAA IPs / MX / NS / SPF-DMARC posture…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-b2" placeholder="A/AAAA IPs / MX / NS / SPF-DMARC posture…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="b3">
-        <label class="rep-check"><input type="checkbox" data-check="b3"><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-b3">
+        <label class="rep-check"><input type="checkbox" data-check="s2-b3" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Certificate transparency — subdomains</span><code class="rep-cmd">curl -s 'https://crt.sh/?q=%25.target.com&amp;output=json' | jq -r '.[].name_value' | sort -u</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -138,11 +139,11 @@ www.target.com</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> subdomains ARE the attack surface. The old <span class="mono">uat</span> box is usually softer than the hardened homepage — you resolve and rank these in C1 and D1.</div>
           </div>
-          <textarea class="rep-notes" data-notes="b3" placeholder="Paste the subdomain list (or the interesting ones)…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-b3" placeholder="Paste the subdomain list (or the interesting ones)…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="b4">
-        <label class="rep-check"><input type="checkbox" data-check="b4"><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-b4">
+        <label class="rep-check"><input type="checkbox" data-check="s2-b4" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Passive subdomain enumeration</span><code class="rep-cmd">subfinder -d target.com -silent</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -156,11 +157,11 @@ legacy.target.com</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> different passive sources see different names — the union is your real host list, and it is the input to every active step.</div>
           </div>
-          <textarea class="rep-notes" data-notes="b4" placeholder="New hosts beyond crt.sh / total unique count…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-b4" placeholder="New hosts beyond crt.sh / total unique count…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="b5">
-        <label class="rep-check"><input type="checkbox" data-check="b5"><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-b5">
+        <label class="rep-check"><input type="checkbox" data-check="s2-b5" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Search-engine dorking</span><code class="rep-cmd">site:target.com (ext:pdf | intitle:"index of" | inurl:admin)</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -174,11 +175,11 @@ site:target.com "SQL syntax"        → leaky error pages</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> you found sensitive endpoints without a single packet at the app — these become web-testing targets in Session 8 and login targets in Session 4.</div>
           </div>
-          <textarea class="rep-notes" data-notes="b5" placeholder="Interesting URLs the dorks surfaced…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-b5" placeholder="Interesting URLs the dorks surfaced…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="b6">
-        <label class="rep-check"><input type="checkbox" data-check="b6"><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-b6">
+        <label class="rep-check"><input type="checkbox" data-check="s2-b6" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Exposed hosts &amp; tech — Shodan / Netcraft</span><code class="rep-cmd">shodan host &lt;ip&gt;   ·   netcraft site report</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -192,11 +193,11 @@ site:target.com "SQL syntax"        → leaky error pages</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> this is a no-touch preview of Session 3&rsquo;s scan, and every version string is a Session 4 CVE lookup (that Tomcat 8.5.31 is a lead).</div>
           </div>
-          <textarea class="rep-notes" data-notes="b6" placeholder="Ports / versions / tech / hosting seen passively…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-b6" placeholder="Ports / versions / tech / hosting seen passively…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="b7">
-        <label class="rep-check"><input type="checkbox" data-check="b7"><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-b7">
+        <label class="rep-check"><input type="checkbox" data-check="s2-b7" data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Emails &amp; people OSINT</span><code class="rep-cmd">theHarvester -d target.com -b bing,crtsh,duckduckgo</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -210,12 +211,12 @@ m.said@target.com
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> the username convention is your Session 4 password-spray list, and the people are your Session 9 social-engineering targets. Mark generated emails "predicted", not "valid".</div>
           </div>
-          <textarea class="rep-notes" data-notes="b7" placeholder="Emails / naming convention / usernames…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-b7" placeholder="Emails / naming convention / usernames…"></textarea>
         </div>
       </div>
-      <h3 class="rep-sec">C · Active recon — packets to the target (scope must be signed off)</h3>
-      <div class="rep-step" data-step="c1">
-        <label class="rep-check"><input type="checkbox" data-check="c1" data-active><span class="rep-box"></span></label>
+        <h3 class="rep-sec">C · Active recon — packets to the target (scope must be signed off)</h3>
+      <div class="rep-step" data-step="s2-c1">
+        <label class="rep-check"><input type="checkbox" data-check="s2-c1" data-active data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Resolve to live hosts</span><code class="rep-cmd">subfinder -d target.com -silent | dnsx -silent -a -resp | httpx -silent -sc -title -td</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -228,11 +229,11 @@ https://vpn.target.com [200] [SSL VPN] [Fortinet]</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> this turns a long passive list into the short list of <strong>real, reachable</strong> targets Session 3 actually scans.</div>
           </div>
-          <textarea class="rep-notes" data-notes="c1" placeholder="Live hosts + status + title + tech…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-c1" placeholder="Live hosts + status + title + tech…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="c2">
-        <label class="rep-check"><input type="checkbox" data-check="c2" data-active><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-c2">
+        <label class="rep-check"><input type="checkbox" data-check="s2-c2" data-active data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Tech fingerprint</span><code class="rep-cmd">whatweb -a3 https://uat.target.com</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -244,11 +245,11 @@ https://vpn.target.com [200] [SSL VPN] [Fortinet]</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> PHP 5.6 / WordPress 5.2 are direct CVE leads for Session 4; the CMS decides your Session 8 web attack path; "WAF: none" shapes Session 10 evasion.</div>
           </div>
-          <textarea class="rep-notes" data-notes="c2" placeholder="Server / CMS / frameworks / versions / WAF per host…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-c2" placeholder="Server / CMS / frameworks / versions / WAF per host…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="c3">
-        <label class="rep-check"><input type="checkbox" data-check="c3" data-active><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-c3">
+        <label class="rep-check"><input type="checkbox" data-check="s2-c3" data-active data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Zone transfer attempt</span><code class="rep-cmd">dig AXFR target.com @ns1.target.com</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -263,11 +264,11 @@ intranet.target.com. IN A 10.0.5.20  ← internal, leaked</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> a successful AXFR dumps the whole host list at once — one of the highest-value recon findings there is. Try every name server from B1.</div>
           </div>
-          <textarea class="rep-notes" data-notes="c3" placeholder="Per name server: refused / allowed. If allowed, what leaked…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-c3" placeholder="Per name server: refused / allowed. If allowed, what leaked…"></textarea>
         </div>
       </div>
-      <div class="rep-step" data-step="c4">
-        <label class="rep-check"><input type="checkbox" data-check="c4" data-active><span class="rep-box"></span></label>
+      <div class="rep-step" data-step="s2-c4">
+        <label class="rep-check"><input type="checkbox" data-check="s2-c4" data-active data-current><span class="rep-box"></span></label>
         <div class="rep-main">
           <div class="rep-row"><span class="rep-name">Content / directory discovery</span><code class="rep-cmd">ffuf -u https://uat.target.com/FUZZ -w common.txt -mc 200,301,403 -ac</code><button class="rep-toggle" aria-expanded="false"></button></div>
           <div class="rep-detail">
@@ -281,26 +282,27 @@ api/v1       [Status: 200]</pre></div>
             </ul></div>
             <div class="rep-why"><b>Why it matters later:</b> these endpoints are Session 8&rsquo;s web-testing surface and Session 4&rsquo;s login targets — a <span class="mono">backup.zip</span> or exposed <span class="mono">.git</span> can be the whole engagement.</div>
           </div>
-          <textarea class="rep-notes" data-notes="c4" placeholder="Paths found + status codes + anything juicy…"></textarea>
+          <textarea class="rep-notes" data-notes="s2-c4" placeholder="Paths found + status codes + anything juicy…"></textarea>
         </div>
       </div>
-      <h3 class="rep-sec">D · The deliverable — this is what you submit</h3>
+        <h3 class="rep-sec">D · The deliverable — this is what you submit</h3>
       <div class="rep-free">
         <span class="rep-free-label">D1 · Ranked target list</span>
         <p class="rep-free-hint">Every live host, ordered by attacker interest — not by discovery order. This is the literal input to Session 3 scanning.</p>
-        <textarea data-notes="d1" placeholder="# | host | IP | what it appears to be | why interesting | confidence | source
+        <textarea data-notes="s2-d1" placeholder="# | host | IP | what it appears to be | why interesting | confidence | source
 1. uat.target.com | 203.0.113.20 | old staging login | PHP 5.6, no WAF, backup.zip exposed | high | httpx+ffuf"></textarea>
       </div>
       <div class="rep-free">
         <span class="rep-free-label">D2 · Executive summary</span>
         <p class="rep-free-hint">3–5 sentences a non-technical manager reads. Overall exposure, the single worst finding, what to do this week. No jargon.</p>
-        <textarea data-notes="d2" placeholder="In three to five sentences…"></textarea>
+        <textarea data-notes="s2-d2" placeholder="In three to five sentences…"></textarea>
       </div>
       <div class="rep-free">
         <span class="rep-free-label">D3 · Scope statement</span>
         <p class="rep-free-hint">Confirm your work stayed inside the authorised scope.</p>
-        <textarea data-notes="d3" placeholder="All activity stayed within the in-scope domains listed in A1. No out-of-scope host was touched."></textarea>
+        <textarea data-notes="s2-d3" placeholder="All activity stayed within the in-scope domains listed in A1. No out-of-scope host was touched."></textarea>
       </div>
+      </section>
     </div>
 
     <div class="box tip" style="margin-top:22px">
