@@ -599,3 +599,126 @@ details.rep-group .rep-group-title{color:var(--text)}
 .rep-group.current{margin:8px 0 10px}
 .rep-group-title--cur{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:17px;font-weight:800;color:#fff;margin:26px 0 6px}
 @media print{ details.rep-group,details.rep-group[open]{border-color:#ccc!important} details.rep-group>summary{color:#111!important} .rep-group-title--cur{color:#111!important} }
+
+/* ==========================================================================
+   ADDED 2026-09-07 — Session 3 teaching components
+   1. .pktflow   step-through packet-flow player (what happens on the wire)
+   2. .leads-to  "what this scan gets you" — the memory box
+   3. .wsbox     "in Wireshark / what the SOC sees" + capture download
+   4. .proto-*   protocol-first page furniture
+   All are shared components: any later session may reuse them unchanged.
+   ========================================================================== */
+
+/* ---------- 1. packet-flow player ---------- */
+.dgm.pktflow svg .pf-step{opacity:.085;transition:opacity .25s ease-out}
+.dgm.pktflow svg .pf-step.on{opacity:1}
+.dgm.pktflow svg .pf-step.now{animation:pfIn .42s cubic-bezier(.22,.9,.3,1) both}
+@keyframes pfIn{from{opacity:0;transform:translateX(var(--pf-dx,-26px))}to{opacity:1;transform:translateX(0)}}
+.dgm.pktflow svg .pf-step{transform-box:view-box}
+.pf-ctl{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.pf-ctl button{font-family:var(--mono);font-size:12px;color:var(--cyan);background:transparent;
+  border:1px solid var(--cyan);border-radius:20px;padding:5px 15px;cursor:pointer;transition:background .15s}
+.pf-ctl button:hover:not(:disabled){background:rgba(34,211,238,.12)}
+.pf-ctl button:disabled{opacity:.35;cursor:default}
+.pf-ctl button[data-pf="play"]{color:var(--red);border-color:var(--red);font-weight:700}
+.pf-ctl button[data-pf="play"]:hover{background:rgba(230,57,70,.12)}
+.pf-count{font-family:var(--mono);font-size:11.5px;color:var(--text-4);letter-spacing:.4px;min-width:52px;text-align:center}
+.pf-cap{display:none;margin-top:12px;border:1px solid var(--line-soft);border-left:3px solid var(--cyan);
+  border-radius:var(--radius-sm);background:var(--panel-2);padding:12px 16px;font-size:13.5px;color:var(--text-2)}
+.pf-cap.open{display:block;animation:dgmIn .18s ease-out}
+.pf-cap .pf-n{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.5px;margin-right:8px}
+.pf-cap b{color:#fff}
+
+/* ---------- 2. "what this scan gets you" memory box ---------- */
+.leads-to{border:1px solid var(--line-soft);border-left:3px solid var(--amber);border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,rgba(251,191,36,.075),rgba(251,191,36,.02));padding:15px 18px 13px;margin:22px 0}
+.leads-to .lt-t{display:block;color:var(--amber);font-size:11.5px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;margin-bottom:11px}
+.leads-to .lt-t::before{content:"➜ "}
+.lt-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.lt-grid>*{min-width:0}
+.lt-cell{background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 13px}
+.lt-cell .lt-k{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--text-4);margin-bottom:4px}
+.lt-cell p{margin:0;font-size:13.5px;color:var(--text-2);line-height:1.55}
+.lt-cell p b{color:#fff}
+.lt-mem{margin:12px 0 0;font-size:14px;color:var(--text);border-top:1px dashed var(--line-soft);padding-top:10px;max-width:none}
+.lt-mem b{color:var(--amber)}
+
+/* ---------- 3. Wireshark / SOC view box ---------- */
+.wsbox{border:1px solid var(--line-soft);border-left:3px solid var(--cyan);border-radius:var(--radius-sm);
+  background:var(--bg-alt);padding:14px 16px;margin:22px 0}
+.ws-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ws-h .ws-t{color:var(--cyan);font-size:11.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+.ws-h .ws-t::before{content:"🦈 "}
+.ws-dl{display:inline-block;max-width:100%;font-family:var(--mono);font-size:11px;color:var(--text-3);
+  border:1px solid var(--line-soft);border-radius:20px;padding:3px 12px;line-height:1.7;word-break:break-word}
+.ws-h .ws-dl{margin-left:auto;white-space:nowrap}
+@media (max-width:620px){.ws-h .ws-dl{margin-left:0;white-space:normal;word-break:break-all}}
+.ws-dl:hover{color:var(--cyan);border-color:var(--cyan);text-decoration:none;background:rgba(34,211,238,.08)}
+.ws-filter{font-family:var(--mono);font-size:12.5px;background:#0a0d13;border:1px solid var(--line);
+  border-radius:6px;padding:8px 12px;margin-bottom:10px;overflow-x:auto;white-space:nowrap}
+.ws-filter::before{content:"filter";display:inline-block;color:var(--text-4);font-size:10px;letter-spacing:.8px;
+  text-transform:uppercase;margin-right:10px;border-right:1px solid var(--line-soft);padding-right:10px}
+.ws-filter code{color:var(--green);background:none;padding:0;font-size:12.5px}
+.ws-pkt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px;margin:0 0 10px;
+  display:block;overflow-x:auto;white-space:nowrap}
+.ws-pkt tr{border-bottom:1px solid var(--line)}
+.ws-pkt tr:last-child{border-bottom:none}
+.ws-pkt th{color:var(--text-4);font-size:10px;letter-spacing:.7px;text-transform:uppercase;text-align:left;
+  padding:5px 10px 5px 0;font-weight:600}
+.ws-pkt td{padding:4px 10px 4px 0;color:var(--text-2);vertical-align:top}
+.ws-pkt td:first-child{color:var(--text-4);width:34px}
+.ws-pkt tr.p-out td{color:#ffb59f}       /* attacker → target */
+.ws-pkt tr.p-in  td{color:#8ee7f5}       /* target → attacker */
+.ws-pkt tr.p-none td{color:var(--text-4);font-style:italic}
+.ws-soc{margin:0;padding-top:9px;border-top:1px dashed var(--line-soft);font-size:13.5px;color:var(--text-2);max-width:none}
+.ws-soc b{color:var(--green)}
+.ws-soc .ws-sig{font-family:var(--mono);color:var(--green);font-size:12.5px}
+
+/* capture bar — download every pcap for the session */
+.pcap-bar{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));margin:20px 0}
+.pcap-bar>*{min-width:0}
+.pcap-card{display:block;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-alt);
+  padding:11px 14px;text-decoration:none}
+.pcap-card:hover{border-color:var(--cyan);background:var(--panel-2);text-decoration:none}
+.pcap-card .pc-n{display:block;font-family:var(--mono);font-size:12.5px;color:var(--cyan);margin-bottom:2px;
+  overflow:hidden;text-overflow:ellipsis}
+.pcap-card .pc-d{display:block;font-size:12px;color:var(--text-3);line-height:1.5}
+
+/* ---------- 4. protocol-first page furniture ---------- */
+.proto-hd{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line-soft);
+  border-left:3px solid var(--red);border-radius:var(--radius-sm);
+  background:linear-gradient(120deg,rgba(230,57,70,.1),transparent 60%);padding:14px 18px;margin:0 0 20px}
+.proto-hd .ph-abbr{font-family:var(--mono);font-size:26px;font-weight:700;color:#fff;letter-spacing:1px;line-height:1}
+.proto-hd .ph-txt{min-width:0}
+.proto-hd .ph-full{display:block;color:var(--text);font-size:15px;font-weight:600}
+.proto-hd .ph-one{display:block;color:var(--text-3);font-size:13px;margin-top:2px}
+.proto-hd .ph-ports{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+.ph-port{font-family:var(--mono);font-size:11.5px;color:var(--cyan);border:1px solid rgba(34,211,238,.45);
+  background:rgba(34,211,238,.08);border-radius:20px;padding:3px 11px;white-space:nowrap}
+.ph-port.udp{color:var(--purple);border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.08)}
+
+.proto-facts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,168px),1fr));margin:18px 0}
+.proto-facts>*{min-width:0}
+.pf-fact{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-alt);padding:10px 13px}
+.pf-fact .pff-k{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--text-4);margin-bottom:3px}
+.pf-fact .pff-v{display:block;font-size:13.5px;color:var(--text);line-height:1.5}
+.pf-fact.good .pff-v{color:var(--green)}
+.pf-fact.bad .pff-v{color:var(--orange)}
+
+/* "if you see this port, you can…" — attacker value ladder */
+.gain{border:1px solid var(--line-soft);border-left:3px solid var(--orange);border-radius:var(--radius-sm);
+  background:rgba(255,112,67,.05);padding:15px 18px;margin:22px 0}
+.gain .g-t{display:block;color:var(--orange);font-size:11.5px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;margin-bottom:11px}
+.gain .g-t::before{content:"⚔ "}
+.gain ol{list-style:none;counter-reset:gn;padding:0;margin:0}
+.gain ol>li{counter-increment:gn;position:relative;padding:0 0 11px 34px;margin:0;font-size:13.5px;color:var(--text-2)}
+.gain ol>li:last-child{padding-bottom:0}
+.gain ol>li::before{content:counter(gn);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;
+  background:rgba(255,112,67,.15);border:1px solid rgba(255,112,67,.5);color:var(--orange);
+  font-family:var(--mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.gain ol>li b{color:#fff}
+.gain ol>li .g-att{font-family:var(--mono);font-size:11px;color:var(--text-4);letter-spacing:.3px}

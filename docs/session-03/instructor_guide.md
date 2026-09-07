@@ -18,6 +18,9 @@ Everything you need to run the session. Pair this with `session_plan.md` (timing
 - [ ] Verify tool currency live: `nxc --version`, `enum4linux-ng`, `rustscan --version`, `masscan --version`. Install any that are missing (lines in the guided lab).
 - [ ] `saved/` fallback output files are on each student image (hosts_arp.txt, depth.txt, lab2_syn.pcap, smb_msf.txt, ldap_users.txt, service_sweep.txt) for anyone whose VM dies.
 - [ ] One lab credential per student for Lab 4 Step 3 (authenticated SMB) — hand out, never write in any repo file.
+- [ ] **Wireshark opens the 19 shipped captures** in `docs/session-03/assets/pcap/`. Open `03-tcp-syn-scan.pcapng` once before class — if it opens, they all will.
+- [ ] **Decide the Lab 9 slot** (see session_plan "How the new material is delivered"): start of Session 4, a separate workshop hour, or here if you have 5 hours. Do not improvise this on the day.
+- [ ] **Set the pre-reading** at least 2 days out: pages 23 (SNMP), 26 (RPC), 27 (NFS), 28 (FTP), 29 (SMTP). The class time for those five is Q&A, not lecture.
 
 ## The currency corrections — know these cold
 Say each out loud as "verify the tool is still alive before you teach the command," not as trivia.
@@ -30,6 +33,32 @@ Say each out loud as "verify the tool is still alive before you teach the comman
 
 ## The one thing to get right all session: the noise/detection spine
 This is the session where offense meets defense. Every time a student runs a scan, ask "what did the target just log?" before moving on. The universal signature under every scan and enumeration is **one source → many ports/hosts → short window**. Drive toward Lab 7, where they encode exactly that into a rule.
+
+## What changed on 2026-09-07 — read this before re-teaching from an old run
+
+The page went from 29 to **40 pages**. Three structural changes; the page numbers in the flow below
+have moved, so use the page *titles*, not the old numbers.
+
+1. **Protocol before scan.** SMB, LDAP, SNMP, RPC, NFS, FTP and SMTP each have their own page
+   *before* the tool page: what the protocol is, a real-world analogy, a stepped packet flow of one
+   normal transaction, a facts grid, and an "if you find this port open, here is what it buys the
+   attacker" ladder. **Always teach the protocol page first.** The enumeration page assumes it.
+2. **Every scan carries three fixed blocks:** a stepped packet-flow diagram, a *What this scan gets
+   you* box, and an *In Wireshark* box. Same shape every time — students start predicting it by the
+   third scan, which is the point.
+3. **Wireshark is a first-class part of the session,** not a lab prop. New page 3 teaches the five
+   things they need, and 19 real captures ship with the course.
+
+### Driving the stepped diagrams (the `▶ Play` figures)
+There are 21 of them. They open on step 1 with the later steps ghosted, so the shape is visible from
+the start. Use **Next** and narrate — do not press Play and talk over it. One step, one sentence, then
+the next. The caption under each step is written to be *your* line: read it, don't paraphrase it.
+Press **Back** when a student asks "wait, why?" — going backwards is the whole reason it is stepped.
+
+### Driving the Wireshark boxes
+Thirty to forty-five seconds each, no more. Point at the filter. Point at the one highlighted line.
+Say the SOC sentence. Move on. They are reference blocks the student re-reads at home with the
+capture open — reading them aloud in full will cost you 20 minutes across the session and teach less.
 
 ## Teaching flow
 
@@ -45,7 +74,21 @@ The ARP-vs-router distinction is the method here. ARP can't be blocked but is lo
 ### Lab 1 (12 min, hands-on)
 The set-piece: ARP sweep (ground truth) vs ICMP sweep (misses a Windows host) vs `-Pn` (proves it was alive). The teaching moment is the diff between hosts_arp.txt and hosts_icmp.txt. Make them say the rule aloud: *ICMP silence means "no answer," never "no host."*
 
-### P6 — Scan types (12 min)
+### Wireshark first (8 min) — NEW, page 3
+Do not skip this to "save time" — it is what makes every later capture box land. Show the five things
+on a live Wireshark window, not on the slide. Do the display-filter table as a live demo: type
+`tcp.flags.syn==1 && tcp.flags.ack==0` into a running capture and watch the list collapse. Then point
+at the capture library and set "open three tonight" as homework. Say the honesty line out loud: *a pcap
+is evidence, and evidence contains other people's data.*
+
+### The scan-type reflex (9 min) — the mental model, no tools yet
+Two stepped diagrams: the handshake, then the same probe against open/closed/filtered. Resist teaching
+any flags on this page. If a student can say "open answers SYN/ACK, closed answers RST, filtered says
+nothing" without looking, the next two pages take half the time they used to.
+
+### SYN & Connect (11 min) / Stealth family & ACK (9 min)
+
+### (superseded) P6 — Scan types (12 min)
 The heart of the session. Teach the reflex table (open answers SYN, ignores stealth flags; closed RSTs everything; filtered is silent) so every scan type is derivable. Play the animated handshake→SYN-scan diverge. Then the interactive real-capture panels — these are actual packets, walk one column. Kill the "SYN is stealthy" myth: it's *faster/lighter*, not invisible.
 
 ### P7 — UDP (5 min)
@@ -68,7 +111,26 @@ This is a 10–15 min preview, not the chapter. Four tricks + the honest EDR tru
 ### P14 — Enumeration concepts (7 min)
 Scanning = one-way reflex reading; enumeration = a conversation you log into. The funnel (port→service→version→users/shares→way in) applies to every service. This is where "recon" becomes "intrusion attempt" for a defender.
 
-### P15 + Lab 4 (10 + 16 min) — the SMB contrast
+### Protocol: SMB (10 min) — NEW, teach this before the SMB tool page
+The nine-step flow is the spine of the whole SMB half. Walk it with **Next**, and stop hard on two
+steps: the **NTLMSSP_CHALLENGE** (say "remember this packet — it is all of Session 4") and the
+**IPC$ tree connect** (say "this is the door every SMB tool goes through"). Then the gain ladder.
+By the time you reach the tool page, `smbclient -L` should feel like an obvious consequence.
+
+### Protocol: LDAP (12 min) and Protocol: SNMP (12 min) — NEW
+LDAP: the whole lesson is **packet 2**. An anonymous bind that returns `success` is the finding;
+everything after it is the protocol working as designed. Make them say that distinction out loud —
+it is the difference between "a vulnerability" and "a misconfiguration," and interviewers ask.
+SNMP: if you are short of time, this is the page to set as pre-reading (see the checklist). If you do
+teach it, teach `sysDescr` and `hrSWRunName` and skip the rest of the OID table.
+
+### Protocol: RPC · NFS · FTP · SMTP (16 min as written) — NEW, pre-reading candidates
+Four short pages. RPC before NFS, always — NFS's helper ports make no sense without portmapper. If
+you teach only one live, teach **SMTP**: the 252-vs-550 oracle is the same shape as the FTP 331-vs-530
+oracle, the Kerberos user-enum in Session 4, and every login form in Session 8. Name that pattern once,
+here, and it pays for the rest of the diploma.
+
+### (superseded) P15 + Lab 4 (10 + 16 min) — the SMB contrast
 The key enumeration lesson. enum4linux-ng rich on Metasploitable2, near-silent on modern Windows, then authenticated with a credential. Drill the line: "enum4linux returned nothing" is never the finding — "the host refuses null sessions → hardened → enumerate with creds" is.
 
 ### P17 + Lab 5 (8 + 15 min) — SNMP + LDAP
@@ -85,6 +147,23 @@ The session's reason to exist. They read their own `lab2_syn.pcap`, identify the
 
 ### Lab 8 (12 min) — the target profile
 Assemble everything per host, ranked. Same pass/needs-review standard as S2's recon report: conclusions, not dumps. This is literally S4's input — make them finish it as homework if class runs out.
+
+### Lab 9 — the team engagement (45 min) — NEW, and probably not today
+Read the delivery note in `session_plan.md` first: this runs at the **start of Session 4** unless you
+have a 5-hour slot. It is a full engagement — scope gate, one authorised internet host
+(`scanme.nmap.org`), the four-OS lab zoo, the practice range, then a capture swap with another team.
+
+Three things to police:
+- **The scope gate is not optional.** Nobody scans until the report's A1 block is filled in and every
+  member can say why each target is legal. This is the habit the session exists to build.
+- **One scan per team against `scanme.nmap.org`,** top 100 ports, `-T3`. Nmap's own page asks for
+  restraint; twenty teams hammering a volunteer host is how a free resource disappears. Enforce it.
+- **The capture swap is the point,** not the scanning. Protect the last 12 minutes for it. If you run
+  out of time, cut Phase 3 (the practice range), never Phase 4.
+
+The HackerOne question *will* come up — the page answers it, and the answer is on the page precisely
+so you do not have to improvise it: bug-bounty programmes almost universally forbid network scanning,
+which is why Session 2 used a bounty domain for passive recon and this session does not.
 
 ### P24–P27 — Bridge, quiz, practice, wrap (21 min)
 Bridge to S4 (profile → vuln + passwords, now against a real domain). Run the 10-question quiz. Point at the fully-free practice path. Assign homework.

@@ -27,13 +27,26 @@ you'll build it while everyone else attacks.
    (read the old versions as exploit leads), **Stapler 1** (`enum4linux` dumps a big user list; a service
    hides on `12380`, so run `-p-`). Add a short target-profile block for each. Host-only only.
 
-5. **Stretch (optional).** Improve your Lab 7 detection rule so it also fires on a slow `-T1` scan,
+5. **Read three shipped captures.** From `docs/session-03/assets/pcap/` (or the zip), open **three**
+   of the 19 captures — one scan type, one protocol, and `09-os-detection.pcapng`. For each, write:
+   the display filter you used, the one packet that gave you the answer, and one sentence on what a
+   SOC would have alerted on. The OS-detection one only needs a packet count and a sentence.
+
+6. **Protocol recall — no notes, no page.** For any **four** of the seven protocols (SMB, LDAP, SNMP,
+   RPC, NFS, FTP, SMTP) write three lines each: (a) what the protocol does when nobody is attacking
+   it, (b) which step in that normal flow the attack abuses, (c) what finding the port open actually
+   buys the attacker. Anything you cannot write from memory, re-read that protocol page and try again
+   the next day.
+
+7. **Stretch (optional).** Improve your Lab 7 detection rule so it also fires on a slow `-T1` scan,
    and write one sentence on the false-positive cost of doing so.
 
 ## Deliverables
 - `target_profile.md` (all three hosts, ranked, with the detection rule appendix).
 - `scan_types_report.pdf` or `.md` (the three-column comparison + log note).
 - A short note listing what the two free rooms added.
+- `capture_reading.md` — the three-capture reading exercise (task 5).
+- `protocols.md` — the four protocol recall blocks (task 6).
 
 ## Grading rubric (pass / needs-review)
 **Pass:**
@@ -41,11 +54,14 @@ you'll build it while everyone else attacks.
 - A defensible ranked "way in" naming specific service+version, not "SMB looks old."
 - A complete, working detection rule with a threshold and time window.
 - The three-scan comparison built from *your own* captures, with the log note.
+- Capture reading that names a specific packet, not "I saw some SYNs."
+- Protocol blocks that answer *what it buys the attacker*, not just what the protocol is.
 
 **Needs-review:**
 - Raw nmap output pasted in with no ranking or analysis.
 - "No SMB findings" written where the real finding is "hardened — enumerate with creds."
 - A detection rule with no threshold/window, or copied without understanding the pattern.
+- Protocol blocks that describe the tool ("enum4linux dumps users") instead of the protocol ("SMB's IPC$ pipe answers management questions, and RID cycling walks the SIDs").
 
 ## Looking ahead to Session 4
 Session 4 — Vulnerability Analysis, Authentication & Password Attacks — takes your target profile

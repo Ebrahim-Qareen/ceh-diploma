@@ -122,6 +122,58 @@ Fill `exercises/session-03/target_profile_template.md`, one block per live host,
 output files, plus the ranked "most likely way in" and the Lab 7 rule as an appendix.
 ✓ Ranked, sourced, exact versions, stated confidence — not raw nmap dumps.
 
+## Lab 9 — The team engagement (45 min) → the team report
+Runs in teams of 3-4, usually at the **start of Session 4** rather than at the end of this one — check
+with your instructor. Full brief on the session page ("Lab 9: team engagement"). Four phases:
+
+```bash
+# ---- PHASE 0 — the gate. NOTHING runs before this is filled in.
+#   Open report.html, complete the scope block (A1): date, every target, why each is legal.
+#   Roles: Operator / Capture / Analyst / Scribe — rotate at every phase.
+
+# ---- PHASE 1 — the one authorised internet host. ONE scan per team. No -p-, no -T5, no -A.
+sudo tcpdump -i eth0 -w team-phase1.pcap host scanme.nmap.org &
+nmap -sS --top-ports 100 -T3 scanme.nmap.org
+#   Then answer FROM THE CAPTURE: packet count? reply TTL? which ports answered how?
+
+# ---- PHASE 2 — the lab zoo, same method on all four targets
+sudo nmap -sn 10.10.10.0/24                                  # discover (note MAC vendors)
+sudo nmap -sS -p- -T4 <host> -oA scan-<host>                 # breadth
+sudo nmap -sV -sC -p <open ports only> <host>                # depth — never -sV -p-
+sudo nmap -sU -p 53,69,123,137,161,500 <host>                # the ports TCP cannot see
+#   Then enumerate every service that answered, one command per protocol.
+
+# ---- PHASE 3 — the practice range: Metasploitable 3, Kioptrix 1, Stapler 1 (split across the team)
+
+# ---- PHASE 4 — the SOC swap. Trade one pcap with another team and answer, from packets alone:
+#   1. source address, on-segment or not?   2. which scan type — and which packet proves it?
+#   3. how many ports, over what window?    4. which answered, and what do they now know?
+#   5. did they go on to ENUMERATE, or stop at scanning?
+#   Fastest route: Statistics → Conversations, then Statistics → Protocol Hierarchy.
+```
+✓ Scope block signed before any packet · four target profiles · one pcap per phase · a two-sentence
+triage note on the other team's capture · report exported.
+
+## Reading the shipped captures (any time, no VM needed)
+Nineteen real captures ship with this session in `docs/session-03/assets/pcap/` (or download
+`session-03-captures.zip`). Attacker `10.10.10.1`, target `10.10.10.10`. If your VM breaks, you can
+still do every reading exercise in this session from these files.
+
+```bash
+# side-by-side: what changes between a SYN scan and a connect scan
+wireshark 03-tcp-syn-scan.pcapng &
+wireshark 04-tcp-connect-scan.pcapng &
+#   In each:  tcp.flags.ack==1 && tcp.flags.syn==0 && tcp.len==0
+#   Only the connect scan has ACKs from the attacker. That one filter IS the difference.
+
+# the noise argument, in one file
+capinfos -c 09-os-detection.pcapng      # 2231 packets — for ONE host
+
+# read a protocol conversation as a human typed it
+#   open 14-ftp-anonymous.pcapng → right-click any packet → Follow → TCP Stream
+#   then 15-smtp-user-enum.pcapng — watch 252 (exists) vs 550 (does not)
+```
+
 ## Success check (show your instructor)
 - Host present via ARP but absent via ICMP, and you scanned it with `-Pn`.
 - Your own three-scan Wireshark comparison, `lab2_syn.pcap` saved.
@@ -138,3 +190,5 @@ output files, plus the ranked "most likely way in" and the Lab 7 rule as an appe
 - Trusting a `tcpwrapped`/`version?` guess — confirm with netcat.
 - Forgetting to save `lab2_syn.pcap` — Lab 7 needs it.
 - A detection rule with no threshold or time window — that's not a rule, it's a wish.
+- Scanning anything in Lab 9 before the scope block is filled in — that is the one mistake with legal consequences.
+- Re-scanning `scanme.nmap.org` "just to check". One scan per team. Its owners asked politely; honour it.

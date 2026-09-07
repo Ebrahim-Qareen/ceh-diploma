@@ -21,6 +21,7 @@
     wireShots();
     wireInteractiveDiagrams();
     wireReplay();
+    wirePacketFlows();
 
     var start = parseInt((location.hash || '').replace('#p', ''), 10);
     go(isNaN(start) ? 0 : start - 1, true);
@@ -252,6 +253,68 @@
         img.parentNode.replaceChild(ph, img);
         if (cap) cap.style.opacity = '.6';
       });
+    });
+  }
+
+
+  /* ---------- packet-flow player (step through what happens on the wire) ----------
+     Markup contract (see design/design_system.md §5c):
+       <figure class="dgm pktflow">
+         <svg …>  <g class="pf-step" data-step="1">…</g>  … </svg>
+         <div class="pf-ctl">
+           <button data-pf="prev">…</button>
+           <button data-pf="play">…</button>
+           <button data-pf="next">…</button>
+           <span class="pf-count"></span>
+         </div>
+         <div class="pf-cap" data-cap="1">…</div>  (one per step)
+       </figure>
+     Steps are cumulative: at step N, steps 1..N are visible and N animates in.  */
+  function wirePacketFlows() {
+    document.querySelectorAll('.dgm.pktflow').forEach(function (dgm) {
+      var steps = Array.prototype.slice.call(dgm.querySelectorAll('.pf-step'));
+      if (!steps.length) return;
+      var caps  = Array.prototype.slice.call(dgm.querySelectorAll('.pf-cap'));
+      var total = steps.length;
+      var cur = 1, timer = null;   // land on step 1 so the figure is never blank
+
+      var ctl   = dgm.querySelector('.pf-ctl');
+      var bPrev = ctl && ctl.querySelector('[data-pf="prev"]');
+      var bNext = ctl && ctl.querySelector('[data-pf="next"]');
+      var bPlay = ctl && ctl.querySelector('[data-pf="play"]');
+      var count = ctl && ctl.querySelector('.pf-count');
+
+      function render(animateLast) {
+        steps.forEach(function (g, i) {
+          var on = (i < cur);
+          g.classList.toggle('on', on);
+          g.classList.remove('now');
+          if (on && animateLast && i === cur - 1) {
+            void g.offsetWidth;
+            g.classList.add('now');
+          }
+        });
+        caps.forEach(function (c) {
+          c.classList.toggle('open', String(c.getAttribute('data-cap')) === String(cur));
+        });
+        if (count) count.textContent = cur + ' / ' + total;
+        if (bPrev) bPrev.disabled = (cur === 0);
+        if (bNext) bNext.disabled = (cur === total);
+      }
+      function stop() { if (timer) { clearInterval(timer); timer = null; } if (bPlay) bPlay.textContent = '▶ Play'; }
+      function play() {
+        if (timer) { stop(); return; }
+        if (cur >= total) { cur = 0; render(false); }
+        if (bPlay) bPlay.textContent = '❚❚ Pause';
+        timer = setInterval(function () {
+          if (cur >= total) { stop(); return; }
+          cur++; render(true);
+        }, 1400);
+      }
+      bPrev && bPrev.addEventListener('click', function () { stop(); if (cur > 0) { cur--; render(false); } });
+      bNext && bNext.addEventListener('click', function () { stop(); if (cur < total) { cur++; render(true); } });
+      bPlay && bPlay.addEventListener('click', play);
+      render(false);
     });
   }
 

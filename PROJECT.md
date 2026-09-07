@@ -113,7 +113,7 @@ Current phase: **4 (Sessions 1–4 published; Session 5 not started)** — see �
 | — | Lab design (baseline) | done |
 | 1 | Foundations, Lab Build & First Contact | built — awaiting review |
 | 2 | Footprinting & Reconnaissance | built — reviewed, published |
-| 3 | Scanning & Enumeration | built — published |
+| 3 | Scanning & Enumeration | **rebuilt 2026-09-07 (protocol-first, 40 pages, 19 pcaps) — awaiting review, not yet re-published** |
 | 4 | System Hacking I — Vuln Analysis, Auth & Password Attacks | built — published |
 | 5 | System Hacking II — Exploitation | not started |
 | 6 | System Hacking III — Privesc & Capstone | not started |

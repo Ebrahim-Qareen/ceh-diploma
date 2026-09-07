@@ -47,6 +47,66 @@ returned "no exact OS match" in our own captures. Confirm by hand with netcat wh
 
 `-T` timing: `-T4` on a fast LAN (your lab), `-T0/-T1` to creep under an IDS (very slow). `-T5` can miss ports and crash weak targets.
 
+## 4b. Wireshark — read every scan twice
+
+nmap tells you **what it decided**. Wireshark shows you **why**. Every scan in this session ships as a
+real capture in `assets/pcap/` — download one, open it, and read the packets that produced the verdict.
+
+**The five filters that do 90% of the work**
+
+| You want to see | Filter |
+|---|---|
+| Everything to/from one host | `ip.addr == 10.10.10.10` |
+| The probes you sent | `tcp.flags.syn == 1 && tcp.flags.ack == 0` |
+| Ports that answered **open** | `tcp.flags.syn == 1 && tcp.flags.ack == 1` |
+| Ports that answered **closed** | `tcp.flags.reset == 1` |
+| UDP closed-port evidence | `icmp.type == 3 && icmp.code == 3` |
+
+Then two menu items: **Follow → TCP Stream** turns 20 packets into the conversation a human would have
+typed (this is how you read FTP, SMTP and HTTP), and **Statistics → Conversations** shows one row per
+host pair with packet counts — which is how a SOC spots "one source, 254 destinations" in two seconds.
+
+**The noise ladder — real packet counts from the lab, same target every time**
+
+| Scan | Packets | vs a SYN scan |
+|---|---|---|
+| ICMP ping sweep `-sn -PE` | 4 | 0.2× |
+| SYN scan, 7 ports `-sS` | 22 | baseline |
+| Connect scan, 7 ports `-sT` | 26 | 1.2× |
+| UDP scan, 4 ports `-sU` | 26 | 1.2× |
+| Version detection, 5 ports `-sV` | 152 | 6.9× |
+| Default scripts `-sC` | 933 | 42× |
+| SYN scan, 1000 ports `-T4` | 2015 | 92× |
+| OS detection `-O` | **2231** | **101×** |
+
+There is no stealthy scan. There is only cheaper and more expensive.
+
+## 4c. Protocol first — the habit to keep
+
+For every service you enumerate, answer these three before you run a tool. If you can't, you are
+typing commands, not testing.
+
+1. **What does this protocol do when nobody is attacking it?** (SMB moves files; LDAP answers
+   directory queries; SNMP reports device health.)
+2. **Which step in that normal flow am I abusing?** (SMB: the IPC$ tree connect. LDAP: the bind.
+   SNMP: the community string. SMTP: the recipient check.)
+3. **What does finding it open actually buy me?** (Not "it's SMB" — *shares, users, password policy,
+   and a path to execution.*)
+
+| Protocol | The step you abuse | The one-line reason it works |
+|---|---|---|
+| **SMB** 445 | Tree connect to `IPC$` | IPC$ is a *management* pipe, not storage — it answers questions |
+| **LDAP** 389 | The `bindRequest` | An anonymous bind that returns `success` means the directory reads out to anyone |
+| **SNMP** 161/udp | The community string | v1/v2c "authentication" is one clear-text word, and it defaults to `public` |
+| **RPC** 111 | The portmap `DUMP` | It is a public directory of services on random high ports |
+| **NFS** 2049 | The `MOUNT EXPORT` call | NFS authenticates the *machine*, then believes whatever UID it claims |
+| **FTP** 21 | The `USER` response code | 331 vs 530 tells you which usernames are real |
+| **SMTP** 25 | `VRFY` / `RCPT TO` | 252 vs 550 tells you which mailboxes are real |
+
+Notice the last three rows are the same idea wearing different clothes: **two different answers to a
+yes/no question is an enumeration oracle.** You will meet that shape again in every session that
+follows.
+
 ## 5. Enumeration — the funnel
 ```
 open port → service → version → users / shares / config / policy → way in (S4/S5)
@@ -90,6 +150,25 @@ window**. Individual packets can be forged; the *pattern* of touching everything
 - Enumeration → service logs (4624/4625 logon, 5140/5145 share access, LDAP binds, SMTP VRFY).
 The honest truth: a modern EDR/IDS catches a default `nmap -A` in seconds. Evasion buys time and
 muddies attribution; it does not grant invisibility.
+
+## 8b. The legal line — read this twice
+Passive recon on public data (Session 2) is legal almost anywhere. **Port scanning is not.** In Egypt,
+Law 175/2018 criminalises unauthorised access to and interference with information systems; the UK
+Computer Misuse Act, the US CFAA and UAE Federal Decree-Law 34/2021 do the same. "I was learning" is
+not a defence.
+
+You may scan exactly three things:
+1. **Machines you built** — your own lab VMs.
+2. **Machines the academy owns** — the lab zoo and the practice range.
+3. **A host whose owner published permission** — `scanme.nmap.org` is the canonical one. Its own page
+   says: *"You are authorized to scan this machine with Nmap or other port scanners."* It also asks
+   you not to hammer it: *"A few scans in a day is fine."* Honouring that request is part of the
+   permission.
+
+**Bug bounties are not a fourth category.** Almost every HackerOne / Bugcrowd / Intigriti programme
+explicitly forbids automated scanning and network-level testing, even on in-scope assets — and
+breaking that removes your safe-harbour protection. Use bounty domains for passive recon, as you did
+in Session 2, and read the policy to see the rule for yourself.
 
 ## 9. The deliverable
 A **ranked target profile** — per host: live/dead + how confirmed, open TCP/UDP ports, service +

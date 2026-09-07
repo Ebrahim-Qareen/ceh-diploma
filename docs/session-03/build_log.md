@@ -1,6 +1,6 @@
 ---
 session: 3
-status: built — awaiting review
+status: rebuilt 2026-09-07 — awaiting review
 ---
 
 # Session 3 — Build Log
@@ -9,16 +9,22 @@ What was built, what changed, and what is still open. Rationale is in `DECISIONS
 working detail. Same shape as the Session 1 and 2 build logs.
 
 ## Current state
-- **29 pages**, ~190 KB single HTML file at `docs/session-03/index.html`
-- **16 hand-authored inline SVG diagrams** — **7 click-to-reveal** (four-OS target zoo + the practice-range machines), **1 animated with replay**
-- **2 real captured-data screenshots** (generated from live scans, ~96 KB total) + **3–4 defender-side slots deferred as placeholders**
+- **40 pages**, ~440 KB single HTML file at `docs/session-03/index.html`
+- **21 stepped packet-flow diagrams** (`.dgm.pktflow` — Back / Play / Next, one caption per step) — the new "what happens in the background" mechanic
+- **~17 other hand-authored inline SVG diagrams**, of which **7 are click-to-reveal** (four-OS target zoo, practice-range machines, MIB tree, enumeration funnel, …); **23 interactive nodes, 0 orphans**
+- **7 protocol-first pages** — SMB, LDAP, SNMP, RPC, NFS, FTP, SMTP — each with a proto header, a stepped flow of one *normal* transaction, a facts grid and an attacker-gain ladder
+- **22 "In Wireshark" boxes** — display filter + real packet lines + what the SOC sees + a download link to the capture
+- **13 "What this scan gets you" boxes** — learn / reach for it when / it feeds / remember it as
+- **19 real packet captures** (~668 KB, `assets/pcap/` + a 135 KB zip) covering every scan type and every protocol taught, all generated from a live lab
+- **2 real captured-data screenshots** + 3–4 defender-side slots still deferred as placeholders
 - **5 practice blocks** linking verified free rooms; a consolidated fully-free practice-plan page
 - **The signature exercise (Lab 7):** students write one working port-scan detection rule (Sigma worked + SPL/KQL skeletons) from evidence they captured in Lab 2
-- **8 hands-on blocks + a lab pre-flight ≈ 124 min ≈ 50%** of live time; plan is ~256 min (+16 over 240) with documented absorb options
+- **Lab 9 — the team engagement:** scope gate → `scanme.nmap.org` → the four-OS lab zoo → the practice range → a capture swap with another team
+- Page carries **~385 min** of material; delivered at **240** via a fixed pre-reading/absorb plan in `session_plan.md`
 - Break timer, 10-question self-scoring quiz + 2 short-answer, sidebar nav, progress bar, keyboard nav
 - Full 7-doc package + a target-profile template
 - Two PowerShell lab-prep scripts (DC promotion + SNMP), credential-scanned clean
-- Not yet published to GitHub (awaiting review)
+- Rebuild of 2026-09-07 **not yet published to GitHub** (awaiting review)
 
 ## What makes this session different
 Sessions 1–2 were recon: invisible to the target. **Session 3 is where the attacker becomes visible**,
@@ -159,3 +165,74 @@ Shared (not forked): `docs/assets/css/ceh.css`, `docs/assets/js/session.js`, `do
 - Instructor review of the page and package.
 - Run `lab_s3_dc_setup.ps1` + `lab_s3_snmp_setup.ps1` on the real lab and confirm the labs return data.
 - `git push` via GitHub Desktop (Cowork has no push credentials) — commit is staged locally per logical change.
+
+## Build history — 2026-09-07 rebuild (protocol-first + dynamic diagrams + Wireshark everywhere)
+
+**What the instructor asked for**
+1. A diagram for every scan showing what happens in the background, and make it *dynamic*.
+2. A short box per scan saying what the scan leads to / what advantage it gives, memorable enough to
+   recall when deciding which scan to run.
+3. Wireshark used all session — a short "what you will see as a SOC analyst" section in every scan
+   section.
+4. Teach the protocol first (SMB, LDAP, …) visually, then the scan against it, then what an attacker
+   gains from finding it.
+5. A team practice lab at the end, like the Session 2 recon engagement, with machines and a legal
+   domain to scan.
+6. Rebuild sections if needed.
+
+**Gate answers (instructor, before build):** all 7 protocols get full pages · Wireshark boxes **plus**
+real downloadable pcaps · final lab = legal external target + lab zoo · keep 4 h and compress.
+
+**How the captures were made (all 19 are real)**
+A network namespace lab was built in the container: veth pair, attacker `10.10.10.1`, target
+`10.10.10.10` running **real services** — Samba (SMB1+SMB2, three shares), slapd (seeded
+`dc=ceh,dc=lab` directory, anonymous bind on), net-snmp (`public`/`private`, real sysDescr/sysContact/
+sysLocation), vsftpd (anonymous), rpcbind + rpc.mountd (two exports, one to `*`), and Python listeners
+for SSH/telnet/POP3/IMAP/MySQL banners, HTTP and an SMTP server implementing the VRFY 252-vs-550
+oracle. TCP 3389 and 8080 were dropped by iptables (filtered) and 9999 left closed. Every scan and
+enumeration was then run for real and captured with `dumpcap`. Nothing is illustrated from memory;
+the packet counts quoted on the page are the actual counts.
+
+**Real numbers that went onto the page** (same target every time): ICMP sweep 4 · SYN 7 ports 22 ·
+connect 7 ports 26 · UDP 4 ports 26 · FIN/NULL/Xmas 18 · ACK 8 · version detection 5 ports 152 ·
+`-sC` 933 · SYN 1000 ports 2015 · **OS detection 2231**. The noise ladder table and the "101×" claim
+are computed from these.
+
+**Accuracy corrections made during the rebuild**
+- The old scan-types page carried *illustrative* capture panels with invented packet counts (13 / 23).
+  Replaced with the real captures and real counts.
+- `-sV` against the lab reported `vsftpd 2.0.8 or later` (actually 3.0.5), `OpenLDAP 2.2.X - 2.3.X`
+  (actually 2.6) and a MySQL that is only a banner. That real, reproducible lie is now the evidence
+  for the "version detection is a hypothesis" box, replacing an asserted claim.
+- `scanme.nmap.org` authorisation text and its rate-limit request were fetched live and quoted
+  verbatim, including "A few scans in a day is fine."
+
+**Structural changes**
+- 29 → 40 pages. New: Wireshark first (P03); the scan-type reflex (P08); SYN & Connect (P09); stealth
+  family & ACK (P10); 7 protocol pages (P19, P22, P23, P26–P29); Lab 9 team engagement (P35).
+- The old single "TCP flags & scan types" page was **split into three and deleted** (no `_v2` file kept
+  — PROJECT §3 rules 1 and 2).
+- Shared arrow-marker `<defs>` moved out of the "Where we left off" diagram into a hidden top-of-article
+  SVG (matching Session 4), and extended with `ar-grn`, `ar-am`, `ar-pu`.
+
+**Shared design-system additions** (in `docs/assets/css/ceh.css` + `js/session.js`, reusable by S5–S10)
+`.dgm.pktflow` + `wirePacketFlows()` · `.leads-to` · `.wsbox` / `.ws-pkt` / `.pcap-bar` ·
+`.proto-hd` / `.proto-facts` / `.gain`. Documented in `design/design_system.md` §5c and §3b.
+
+**Verification**
+- `scripts/audit_layout.js` at 1920/1400/1100/900/700/480 on the **whole site**: **30/30 passed**.
+  Two real bugs found and fixed: `.ws-dl` forced `nowrap` and pushed the document 104 px wide at 480
+  (now wraps outside `.ws-h`); one pre-existing SVG label on the MIB-tree diagram overflowed its
+  viewBox at x=700 (now `text-anchor="end"`).
+- Functional pass: 40 pages · snum P02–P40 contiguous · 23 interactive nodes, **0 orphans** ·
+  **21/21** pktflow figures correctly wired (steps == captions == 3 controls) · **0** SVG text escaping
+  its viewBox · **0** duplicate ids · **0** console errors · **0** failed requests ·
+  Next/Play/Back stepping verified programmatically.
+- `scripts/gen_table_colgroups.py` re-run: 44 tables, 44 colgroups.
+
+**Open items from this rebuild**
+- Lab 9 has no scheduled slot yet — instructor to choose (start of S4, a workshop hour, or a 5-hour S3).
+- The three deferred defender-side screenshots (Win Event Viewer 5156/5157, Zeek `conn.log`, Suricata)
+  are still placeholders; the 19 pcaps now carry that teaching in the meantime.
+- The team report (`report.html`) still has 11 S3 steps — it does not yet include Lab 9's four phases.
+  Regenerating it needs `scripts/gen_session_report.py` and is a separate, safe change.

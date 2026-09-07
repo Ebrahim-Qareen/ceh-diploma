@@ -193,3 +193,20 @@ Breaching AD, Holo) are mostly premium. **Attacktive Directory being free is the
 Every one of these platforms hands the learner a target **and** written authorization
 to attack it. That authorization does not travel. This warning appears on every page
 carrying a practice block, and in full on the practice-plan page.
+
+---
+
+## Legal scan targets on the public internet (verified 2026-09-07)
+
+Not a practice *platform* — but the same verify-before-you-link rule applies, and Session 3's Lab 9
+depends on it.
+
+| Target | Status | Verified text |
+|---|---|---|
+| `scanme.nmap.org` | **AUTHORISED** — the only external target used in the diploma | Its own page: *"You are authorized to scan this machine with Nmap or other port scanners."* plus *"Try not to hammer on the server too hard. A few scans in a day is fine, but don't scan 100 times a day or use this site to test your ssh brute-force password cracking tool."* Fetched live 2026-09-07. |
+| `testphp.vulnweb.com` (Acunetix) | Web-app testing only — **not** a port-scan target; intermittent downtime | Unreachable at verification time on 2026-09-07 (same flakiness recorded during the S2 build). Keep as a Session 2/8 web target with a fallback, do not build a scanning lab on it. |
+| HackerOne / Bugcrowd / Intigriti programmes | **NOT authorised for scanning** | Programme policies almost universally prohibit automated scanning and network-level testing even on in-scope assets, and doing it voids safe harbour. Bounty domains stay a **passive-recon** exercise (Session 2). Session 3 says this explicitly on the Lab 9 page so instructors don't have to improvise the answer. |
+
+**The class rule, as taught:** you may scan (1) machines you built, (2) machines the academy owns,
+(3) a host whose owner published permission. Nothing else. Lab 9 enforces it with a scope gate that
+must be signed before any packet leaves.

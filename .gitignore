@@ -21,3 +21,13 @@ SESSION_*_BUILD_PROMPT.md
 
 # Local VM images (multi-GB) — never commit
 labs/kali-linux-*
+
+# Local VM images (multi-GB) — never commit
+labs/Windows 7/
+labs/Windows*/
+labs/Metasploitable*/
+labs/Kioptrix*/
+labs/Stapler*/
+
+# Cowork scratch output folder — not course material
+Claude outputs/

@@ -159,6 +159,94 @@ the `<figure>`:
 Plays once on load, then on demand. Runs 3 cycles and stops (not infinite — a
 looping animation behind a lecturer is distracting).
 
+
+### 5c. Stepped packet-flow diagrams (`.dgm.pktflow`) — added 2026-09-07
+
+The "what happens in the background" mechanic. A sequence diagram the student **steps through** with
+Back / Play / Next; revealed steps are full-colour, not-yet-reached steps sit at 8.5% opacity so the
+figure never looks empty.
+
+```html
+<figure class="dgm pktflow">
+  <svg viewBox="0 0 940 H">
+    …actor boxes + lifelines (static)…
+    <g class="pf-step" data-step="1" style="--pf-dx:-26px">…arrow + label…</g>
+    <g class="pf-step" data-step="2" style="--pf-dx:26px">…</g>
+  </svg>
+  <div class="pf-ctl">
+    <button type="button" data-pf="prev">‹ Back</button>
+    <button type="button" data-pf="play">▶ Play</button>
+    <button type="button" data-pf="next">Next ›</button>
+    <span class="pf-count"></span>
+  </div>
+  <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>…</div>
+  <figcaption><b>Lead-in.</b> …</figcaption>
+</figure>
+```
+
+**Contract — the verify script checks all of it:**
+- one `.pf-cap[data-cap="N"]` per `.pf-step[data-step="N"]`, numbered from 1, no gaps
+- exactly three `[data-pf]` buttons plus a `.pf-count` span
+- `--pf-dx` is the slide-in direction: `-26px` for attacker→target, `26px` for the reply
+- steps are **cumulative** — at step N, 1..N are lit and N animates in
+- the page loads on **step 1**, not 0 (`var cur = 1` in `wirePacketFlows()`)
+
+**Do not** put more than ~9 steps in one figure — the SVG grows 46 px per step and the caption stack
+gets unreadable. Split it into two figures instead.
+
+Built by `gen.pktflow()` in the session-3 build harness; hand-authoring one is fine as long as the
+contract above holds. Used 21× in Session 3.
+
+---
+
+## 3b. The three fixed teaching blocks (added 2026-09-07)
+
+Session 3 attaches the same three blocks to every scan and every protocol, in the same order, so the
+student learns the shape and starts predicting what comes next. **Keep the order and keep the
+wording labels identical** — the repetition is the pedagogy.
+
+**1. `.leads-to` — what this scan gets you** (amber). Four slots, never more:
+`You learn` / `Reach for it when` / `It feeds` / `Remember it as:` — the last is a single quoted
+mnemonic, e.g. *"Knock, listen, walk away."*
+
+```html
+<div class="leads-to">
+  <span class="lt-t">What this scan gets you</span>
+  <div class="lt-grid">
+    <div class="lt-cell"><span class="lt-k">You learn</span><p>…</p></div>
+    <div class="lt-cell"><span class="lt-k">Reach for it when</span><p>…</p></div>
+    <div class="lt-cell"><span class="lt-k">It feeds</span><p>…</p></div>
+  </div>
+  <p class="lt-mem"><b>Remember it as:</b> "…"</p>
+</div>
+```
+
+**2. `.wsbox` — in Wireshark, what the SOC sees** (cyan). Filter, real packet rows, one SOC sentence,
+and a download link to the capture that produced them.
+
+```html
+<div class="wsbox">
+  <div class="ws-h"><span class="ws-t">In Wireshark — what the SOC sees</span>
+    <a class="ws-dl" href="assets/pcap/03-tcp-syn-scan.pcapng" download>⇩ 03-tcp-syn-scan.pcapng · 22 pkts</a></div>
+  <div class="ws-filter"><code>tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0</code></div>
+  <table class="ws-pkt">
+    <thead><tr><th>#</th><th>Source</th><th>Destination</th><th>Proto</th><th>Info</th></tr></thead>
+    <tbody><tr class="p-out">…</tr><tr class="p-in">…</tr><tr class="p-none">…</tr></tbody>
+  </table>
+  <p class="ws-soc"><b>SOC reads it as:</b> … <span class="ws-sig">the signature phrase</span> …</p>
+</div>
+```
+Row classes: `p-out` attacker→target (warm) · `p-in` target→attacker (cool) · `p-none` "no reply"
+(grey italic). **Packet rows must be copied from a real capture** — if you have not captured it, do
+not write the box.
+
+**3. Protocol pages** use `.proto-hd` (abbr + full name + one-liner + port pills; add `.udp` to a pill
+for UDP), `.proto-facts` (a grid of `.pf-fact`, with `.good`/`.bad` to colour the value), and `.gain`
+(the numbered "if you find this port open, here is what it buys the attacker" ladder, each item ending
+in a `<span class="g-att">` ATT&CK id).
+
+`.pcap-bar` / `.pcap-card` is the capture-library grid on the Wireshark page.
+
 ---
 
 ## 6. Practice blocks (external platform labs)
