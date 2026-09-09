@@ -722,3 +722,22 @@ details.rep-group .rep-group-title{color:var(--text)}
   font-family:var(--mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .gain ol>li b{color:#fff}
 .gain ol>li .g-att{font-family:var(--mono);font-size:11px;color:var(--text-4);letter-spacing:.3px}
+
+/* ---------- inline highlighter (added 2026-09-09) ----------
+   Marker-pen emphasis for the ONE thing on a page a student must leave with.
+   Rides on an existing <strong>/<b> so nothing re-flows. Three tints, and the
+   tint carries meaning — do not use them decoratively:
+     .hl      amber  · the fact to remember / the rule
+     .hl-d    green  · the defender / SOC fact
+     .hl-w    red    · the danger, the legal line, the thing that bites
+   Budget: 2-3 per page. More than that and none of them are highlights.      */
+.hl{background:rgba(251,191,36,.14);box-shadow:inset 0 -2px 0 rgba(251,191,36,.85);
+  color:#fff;font-weight:700;padding:1px 5px;border-radius:3px;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hl-d{background:rgba(74,222,128,.13);box-shadow:inset 0 -2px 0 rgba(74,222,128,.85)}
+.hl-w{background:rgba(230,57,70,.15);box-shadow:inset 0 -2px 0 rgba(230,57,70,.9)}
+/* a highlight inside an already-tinted box keeps only its underline, so two
+   washes never stack into mud */
+.box .hl,.leads-to .hl,.gain .hl,.verify .hl,.practice .hl{background:transparent;padding:1px 2px}
+@media print{.hl{background:rgba(251,191,36,.5)!important;box-shadow:none!important;color:#000!important}
+  .hl-d{background:rgba(74,222,128,.45)!important}.hl-w{background:rgba(230,57,70,.4)!important}}

@@ -108,9 +108,9 @@
 
       <div class="box key-takeaway">
         <span class="box-t">What you hand in today</span>
-        <p>Three things. A <strong>target profile</strong> — every live host, every open TCP and UDP port,
+        <p>Three things. A <strong class="hl">target profile</strong> — every live host, every open TCP and UDP port,
            service and version, OS guess with a confidence level, shares, users, and a ranked "most likely
-           way in". And <strong>one working detection rule</strong> that catches a port scan, written from
+           way in". And <strong class="hl hl-d">one working detection rule</strong> that catches a port scan, written from
            packets you generated yourself, in Sigma, SPL or KQL. And the <strong>team engagement report</strong>
            from Lab 9, carried forward from Session 2. The profile is Session 4's input. The rule is the
            job.</p>
@@ -154,7 +154,7 @@
       <p>The moment you send a packet <em>at</em> the target, that ends. Scanning is <strong>active</strong>:
          your IP address arrives at their door, thousands of times, in a pattern no normal client produces.
          It is the loudest thing an attacker does, and — this is the part the textbooks skip — it is the
-         <strong>single most commonly detected stage of a real intrusion</strong>. A firewall log, an IDS
+         <strong class="hl">single most commonly detected stage of a real intrusion</strong>. A firewall log, an IDS
          signature, a jump in connection attempts: this is where the defender first sees the attacker.</p>
 
       <figure class="dgm">
@@ -180,7 +180,7 @@
           <text x="806" y="133" font-size="11" fill="var(--red)" text-anchor="middle">logs: YOU</text>
           <text x="695" y="200" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="700">Firewall log · IDS alert · your IP, thousands of times</text>
         </svg>
-        <figcaption><b>The line you cross today.</b> Everything left of the break left no trace. Everything
+        <figcaption><b class="hl hl-w">The line you cross today.</b> Everything left of the break left no trace. Everything
           right of it does. Half of learning to scan is learning what the scan leaves behind.</figcaption>
       </figure>
 
@@ -280,7 +280,7 @@
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Every packet nmap sends is a frame on the wire. Your terminal will summarise 1000 of them into one line; Wireshark keeps all 1000.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The reply is the part that matters. <b>Open, closed and filtered are not three commands &mdash; they are three different replies to the same packet.</b> You will only ever see that here.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>This is the whole reason Wireshark is open all session: nmap tells you <i>what it decided</i>, Wireshark tells you <i>why</i>. When the two disagree, the capture is right.</div>
-        <figcaption><b>One rule for today.</b> Capture first, scan second, read third. Every lab in this session follows that order.</figcaption>
+        <figcaption><b class="hl">One rule for today.</b> Capture first, scan second, read third. Every lab in this session follows that order.</figcaption>
       </figure>
 
       <h2><span class="h-t">Five things you need in Wireshark today &mdash; nothing more</span></h2>
@@ -300,7 +300,7 @@
       <div class="box tip">
         <span class="box-t">The colouring rule that does half the work</span>
         <p>Wireshark colours <span class="mono">RST</span> packets red-on-black by default. On a scan capture
-           that means: <strong>a screen full of black rows = a screen full of closed ports.</strong> You can
+           that means: <strong class="hl hl-d">a screen full of black rows = a screen full of closed ports.</strong> You can
            read the result of a scan from across the room before you filter anything.</p>
       </div>
 
@@ -445,7 +445,7 @@
           <pre><code>ipconfig | findstr /i "IPv4"</code></pre>
         </li>
         <li>
-          <strong>Sweep the subnet from Kali and confirm three targets answer.</strong>
+          <strong class="hl">Sweep the subnet from Kali and confirm three targets answer.</strong>
           <pre><code>sudo nmap -sn 192.168.56.0/24</code></pre>
           <p>Adjust the range to whatever your host-only network actually is. On a class laptop it is often
              <span class="mono">192.168.56.0/24</span> (VMware) — but read it off your own <span class="mono">ip
@@ -551,7 +551,7 @@
           <text x="800" y="232" font-size="10.5" class="d-sub" text-anchor="middle">LDAP · Kerberos</text>
           <text x="800" y="256" font-size="10" class="d-mono" text-anchor="middle" fill="var(--red)">88·389·445·636·3268</text>
         </svg>
-        <figcaption><b>The target zoo.</b> Ancient Linux → legacy Windows → modern Windows → domain
+        <figcaption><b class="hl">The target zoo.</b> Ancient Linux → legacy Windows → modern Windows → domain
           controller. One attacker, four very different answers.</figcaption>
       </figure>
 
@@ -689,7 +689,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
         <div>
           <h3>The method — this is the part that matters</h3>
           <p>There are two fundamentally different ways to ask, and which one works depends entirely on
-             whether you are <strong>on the same network segment</strong> as the target or <strong>separated
+             whether you are <strong class="hl">on the same network segment</strong> as the target or <strong>separated
              by a router</strong>. Get this wrong and your results lie to you.</p>
         </div>
       </div>
@@ -782,7 +782,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
            NIDS on the segment (or <span class="mono">arpwatch</span>) sees dozens of ARP requests from one MAC
            in seconds. ICMP/TCP sweeps across a router show up in firewall logs as one source IP hitting a
            run of sequential destination addresses. The signature is not any single packet — it is
-           <strong>one-to-many in a short time</strong>. Hold that; it is what your detection rule keys on
+           <strong class="hl hl-d">one-to-many in a short time</strong>. Hold that; it is what your detection rule keys on
            later today.</p>
       </div>
 
@@ -988,7 +988,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
       <h2><span class="h-t">Step 2 — the lying sweep (ICMP only)</span></h2>
       <ol class="steps">
         <li>
-          <strong>Force ICMP echo and forbid ARP, the way an internet scan behaves.</strong>
+          <strong class="hl">Force ICMP echo and forbid ARP, the way an internet scan behaves.</strong>
           <pre><code>sudo nmap -sn -PE --send-ip --disable-arp-ping 192.168.56.0/24 | tee hosts_icmp.txt</code></pre>
           <p>Now compare the two files:</p>
           <pre><code>diff <(grep report hosts_arp.txt) <(grep report hosts_icmp.txt)</code></pre>
@@ -1111,7 +1111,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The server's TCP stack answers <b>reflexively</b> &mdash; before the application is even involved. An open port <i>must</i> answer SYN/ACK; that is the RFC, not a choice. This reflex is what makes scanning possible at all.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The client confirms and the connection is up. Now the application (SSH, SMB, HTTP) sees a client and starts logging.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>This is the entire idea of scanning: <b>the answer to “is this port open?” arrives in packet 2.</b> Everything after that is optional &mdash; and every scan type is just a different way of provoking packet 2.</div>
-        <figcaption><b>Learn this and you never memorise a scan flag again.</b> Every scan type below is one variation on “send something the stack must react to, then read the reaction.”</figcaption>
+        <figcaption><b class="hl">Learn this and you never memorise a scan flag again.</b> Every scan type below is one variation on “send something the stack must react to, then read the reaction.”</figcaption>
       </figure>
 
       <figure class="dgm pktflow">
@@ -1159,7 +1159,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The same probe, to a port with no listener.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span><b>CLOSED.</b> RST/ACK &mdash; “the host is alive, but nothing is on that port.” Useful: a closed port still <i>proves the host exists</i>.</div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span><b>FILTERED.</b> Silence. A firewall dropped the packet without answering. This is the most informative reply of the three &mdash; silence tells you there is a security control between you and the target.</div>
-        <figcaption><b>Open / Closed / Filtered are not three commands.</b> They are three different replies to the same packet. Every port state you will report today comes from this one picture.</figcaption>
+        <figcaption><b class="hl">Open / Closed / Filtered are not three commands.</b> They are three different replies to the same packet. Every port state you will report today comes from this one picture.</figcaption>
       </figure>
 
       <h2><span class="h-t">The reflexes, in one table</span></h2>
@@ -1265,8 +1265,8 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The port is open. <b>You already have your answer</b> and you are only two packets in.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Instead of the ACK that would complete the connection, nmap sends RST. The connection is torn down before the application layer ever saw a client. That is what &ldquo;half-open&rdquo; means.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Next port. Nothing is listening on 9999.</div>
-        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>RST/ACK &mdash; closed. Two packets, done. Notice both open and closed cost exactly two packets: SYN scanning is fast <b>because it never finishes anything</b>.</div>
-        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>3389 is dropped by a firewall. No reply at all, so nmap sends a second SYN, waits, and then reports <span class='mono'>filtered</span>. <b>Filtered ports are the slow ones</b> &mdash; a scan that hangs is usually a scan hitting a firewall.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>RST/ACK &mdash; closed. Two packets, done. Notice both open and closed cost exactly two packets: SYN scanning is fast <b class="hl">because it never finishes anything</b>.</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>3389 is dropped by a firewall. No reply at all, so nmap sends a second SYN, waits, and then reports <span class='mono'>filtered</span>. <b class="hl">Filtered ports are the slow ones</b> &mdash; a scan that hangs is usually a scan hitting a firewall.</div>
         <figcaption><b>22 packets for 7 ports.</b> Open costs 3 (SYN, SYN/ACK, RST), closed costs 2, filtered costs 2 SYNs and a timeout. That is the cheapest full-fidelity scan there is &mdash; and why <span class="mono">-sS</span> is the default when you have root.</figcaption>
       </figure>
 
@@ -1295,7 +1295,7 @@ enum4linux-ng -A  →  (almost nothing — access denied)</code></pre>
           </tbody>
         </table>
         <p class="ws-soc"><b>SOC reads it as:</b> many SYNs from one source to many ports, <span class="ws-sig">no ACK ever follows a SYN/ACK</span>, and RSTs from the attacker. That &ldquo;SYN answered but never completed&rdquo; pattern is the textbook IDS port-scan signature (Suricata <span class="mono">sfPortscan</span>, Zeek <span class="mono">Scan::Port_Scan</span>).</p>
-        <p class="ws-soc" style="border-top:none;padding-top:4px"><b>The fingerprint to notice:</b> <span class="mono">Win=1024</span> and an MSS-only option list. No real operating system opens a connection that way &mdash; that is nmap&rsquo;s raw-packet builder, and it is detectable on its own.</p>
+        <p class="ws-soc" style="border-top:none;padding-top:4px"><b class="hl hl-d">The fingerprint to notice:</b> <span class="mono">Win=1024</span> and an MSS-only option list. No real operating system opens a connection that way &mdash; that is nmap&rsquo;s raw-packet builder, and it is detectable on its own.</p>
       </div>
 
       <h2><span class="h-t">2 &middot; Connect scan &mdash; <span class="mono">-sT</span></span></h2>
@@ -1474,9 +1474,9 @@ sudo nmap -sS -p 22,80,445,9999 10.10.10.10</code></pre>
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>A bare FIN says &ldquo;I am closing our connection&rdquo; &mdash; except there is no connection. The stack has to decide what to do with nonsense.</div>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>RFC&nbsp;793 says: if the port is <b>open</b>, drop it silently. So silence means open &mdash; <i>or</i> a firewall ate it. You cannot tell which, so nmap honestly reports <span class='mono'>open|filtered</span>.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Same probe, closed port.</div>
-        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>RFC&nbsp;793 says a <b>closed</b> port must answer RST. So this family finds closed ports with certainty and everything else is ambiguous. <b>That is the trade you are making.</b></div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>RFC&nbsp;793 says a <b>closed</b> port must answer RST. So this family finds closed ports with certainty and everything else is ambiguous. <b class="hl">That is the trade you are making.</b></div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>NULL is the same trick with zero flags set. Completely illegal as real traffic &mdash; which is the point: some old packet filters only match on the SYN bit and let this through.</div>
-        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Xmas sets FIN, PSH and URG together. Identical logic, different silhouette. <b>All three are one idea with three costumes.</b></div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Xmas sets FIN, PSH and URG together. Identical logic, different silhouette. <b class="hl">All three are one idea with three costumes.</b></div>
         <figcaption><b>Their only real job:</b> get past a stateless filter that only inspects SYN packets. Against anything stateful &mdash; which is everything modern &mdash; they are louder than a SYN scan, not quieter.</figcaption>
       </figure>
 
@@ -1504,7 +1504,7 @@ sudo nmap -sS -p 22,80,445,9999 10.10.10.10</code></pre>
             <tr class="p-none"><td>&mdash;</td><td></td><td></td><td></td><td>port 22 never replies to any of the three &rarr; open|filtered</td></tr>
           </tbody>
         </table>
-        <p class="ws-soc"><b>SOC reads it as:</b> these are <b>abnormal by construction</b>. No legitimate client sends a bare FIN to a port it never connected to, and nothing on earth sends a packet with zero flags set. <span class="ws-sig">A single NULL or Xmas packet is high-signal on its own</span> &mdash; you do not need a threshold rule, you need one match. Ironically, the &ldquo;stealth&rdquo; scans are the easiest of all to alert on.</p>
+        <p class="ws-soc"><b>SOC reads it as:</b> these are <b class="hl hl-d">abnormal by construction</b>. No legitimate client sends a bare FIN to a port it never connected to, and nothing on earth sends a packet with zero flags set. <span class="ws-sig">A single NULL or Xmas packet is high-signal on its own</span> &mdash; you do not need a threshold rule, you need one match. Ironically, the &ldquo;stealth&rdquo; scans are the easiest of all to alert on.</p>
         <p class="ws-soc" style="border-top:none;padding-top:4px"><b>Try it in the capture:</b> the filter above returns the FIN and Xmas probes; add <span class="mono">|| tcp.flags==0x000</span> to catch the NULL probes too.</p>
       </div>
 
@@ -1719,7 +1719,7 @@ sudo nmap -sU -sV -p 161 192.168.56.102
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>UDP has no handshake, so there is no reflex to exploit. nmap&rsquo;s trick is to send a <b>protocol-specific payload</b> for well-known ports &mdash; a real SNMP get, a real DNS query &mdash; and hope the service answers.</div>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>It did. An answer in the service&rsquo;s own protocol is the strongest possible &ldquo;open&rdquo;, and it usually leaks version data for free.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Next port. Nothing is bound to UDP 53 here.</div>
-        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The <b>host&rsquo;s IP stack</b>, not the service, answers with ICMP port-unreachable. This is the only definite closed signal UDP has &mdash; and RFC&nbsp;1812 says hosts should rate-limit these to about one per second. <b>That rate limit is why UDP scanning is slow.</b></div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The <b>host&rsquo;s IP stack</b>, not the service, answers with ICMP port-unreachable. This is the only definite closed signal UDP has &mdash; and RFC&nbsp;1812 says hosts should rate-limit these to about one per second. <b class="hl">That rate limit is why UDP scanning is slow.</b></div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>A port where a service exists but ignores unknown payloads, or a firewall drops the packet.</div>
         <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Silence. Was the datagram lost? Was it filtered? Is the service just quiet? nmap cannot tell, so it retries, waits out the timeout, and reports the honest <span class='mono'>open|filtered</span>.</div>
         <figcaption><b>The arithmetic that explains everything.</b> One ICMP unreachable per second &times; 65,535 ports = over 18 hours for a full UDP scan. Never <span class="mono">-sU -p-</span>. Pick your ports.</figcaption>
@@ -1728,7 +1728,7 @@ sudo nmap -sU -sV -p 161 192.168.56.102
       <div class="leads-to">
         <span class="lt-t">What this scan gets you</span>
         <div class="lt-grid">
-          <div class="lt-cell"><span class="lt-k">You learn</span><p>The services TCP scanning is <b>structurally blind to</b>: SNMP (161), DNS (53), NetBIOS (137), IKE/VPN (500), TFTP (69), NTP (123).</p></div>
+          <div class="lt-cell"><span class="lt-k">You learn</span><p>The services TCP scanning is <b class="hl">structurally blind to</b>: SNMP (161), DNS (53), NetBIOS (137), IKE/VPN (500), TFTP (69), NTP (123).</p></div>
           <div class="lt-cell"><span class="lt-k">Reach for it when</span><p>After your TCP scan, always &mdash; but with a hand-picked port list, never <span class="mono">-p-</span>.</p></div>
           <div class="lt-cell"><span class="lt-k">It feeds</span><p>SNMP and NetBIOS enumeration later this session &mdash; two of the richest data sources on the network.</p></div>
         </div>
@@ -1809,7 +1809,7 @@ ip.addr == 192.168.56.102 and tcp</code></pre>
       <h2><span class="h-t">Step 2 — the three scans, one at a time</span></h2>
       <ol class="steps">
         <li>
-          <strong>SYN, then connect, then Xmas — save each capture under its own name.</strong>
+          <strong class="hl">SYN, then connect, then Xmas — save each capture under its own name.</strong>
           <pre><code>sudo nmap -sS -p 22,80,443,445 192.168.56.102     # save as lab2_syn.pcap
 sudo nmap -sT -p 22,80,443,445 192.168.56.102     # save as lab2_connect.pcap
 sudo nmap -sX -p 22,80,443,445 192.168.56.102     # save as lab2_xmas.pcap</code></pre>
@@ -2044,10 +2044,10 @@ sudo nmap -sC -sV -p <ports> 192.168.56.102</code></pre>
           <span class="pf-count"></span>
         </div>
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>This is the first scan today that opens a real connection to every open port. There is no half-open version detection &mdash; you cannot have a conversation without connecting.</div>
-        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Most services introduce themselves unprompted. FTP, SSH, SMTP and POP3 all send a banner the moment you connect. <b>That one line is most of what version detection is.</b></div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Most services introduce themselves unprompted. FTP, SSH, SMTP and POP3 all send a banner the moment you connect. <b class="hl">That one line is most of what version detection is.</b></div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>For services that stay silent, nmap works through its probe database &mdash; send something, see what breaks, send something else.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The reply is matched against nmap&rsquo;s signature file. Match found &rarr; a product and version. No match &rarr; nmap prints the raw response and asks you to submit it.</div>
-        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>&ldquo;<span class='mono'>vsftpd 3.0.5</span>&rdquo; is not trivia &mdash; it is the exact string you paste into searchsploit and the NVD in Session&nbsp;4. <b>Everything before this page was about finding doors; this page is about naming them.</b></div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>&ldquo;<span class='mono'>vsftpd 3.0.5</span>&rdquo; is not trivia &mdash; it is the exact string you paste into searchsploit and the NVD in Session&nbsp;4. <b class="hl">Everything before this page was about finding doors; this page is about naming them.</b></div>
         <figcaption><b>The cost:</b> 152 packets for 5 ports, versus 22 for a plain SYN scan on 7. Version detection is roughly an order of magnitude louder &mdash; and completes a connection to every service it touches.</figcaption>
       </figure>
 
@@ -2265,7 +2265,7 @@ sudo nmap -sS -p- -T4 192.168.56.102 -oG breadth.txt</code></pre>
       <h2><span class="h-t">Step 3 — trip the failures on purpose</span></h2>
       <ol class="steps">
         <li>
-          <strong>Failure A — the version guess that lies.</strong> Somewhere in your output a port will be
+          <strong class="hl hl-w">Failure A — the version guess that lies.</strong> Somewhere in your output a port will be
           labelled <span class="mono">tcpwrapped</span> or carry a version nmap flags with a
           <span class="mono">?</span>. In our own capture, <span class="mono">-sV</span> called an open service
           <span class="mono">tcpwrapped</span> — flatly wrong.
@@ -2379,7 +2379,7 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
 
       <div class="box defender-view">
         <span class="box-t">The one pattern under all of them</span>
-        <p>Every row is the same shape: <strong>one source, many destinations (or many ports), in a short
+        <p>Every row is the same shape: <strong class="hl hl-d">one source, many destinations (or many ports), in a short
            window</strong>. That is the universal port-scan signature, and it's what your detection rule keys
            on in Lab 7 — not any single magic packet, but the fan-out rate. Individual packets can be forged;
            the <em>pattern</em> of touching everything is what gives a scan away.</p>
@@ -2388,7 +2388,7 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
       <h2><span class="h-t">Defensive countermeasures (what the blue team does about it)</span></h2>
       <ul>
         <li><strong>Rate-limit and alert</strong> on connection attempts per source (firewall, IDS threshold).</li>
-        <li><strong>Drop, don't reject</strong> — a firewall that silently drops gives the attacker
+        <li><strong class="hl hl-d">Drop, don't reject</strong> — a firewall that silently drops gives the attacker
            <span class="mono">filtered</span> everywhere and no information, and slows them down.</li>
         <li><strong>Close unused ports, disable unused services</strong> — the smaller the attack surface, the
            less a scan reveals.</li>
@@ -2549,11 +2549,11 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
           <span class="pf-count"></span>
         </div>
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>IP fragmentation is legal and old. <span class='mono'>-f</span> abuses it: the TCP header is chopped so a signature engine matching on &ldquo;SYN to port 445&rdquo; never sees a whole header in one packet.</div>
-        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Six fragments here, 8 bytes of payload each. A device that does not reassemble before inspecting is blind to this. <b>Every modern IDS reassembles</b> &mdash; this defeats 2003, not 2026.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Six fragments here, 8 bytes of payload each. A device that does not reassemble before inspecting is blind to this. <b class="hl hl-d">Every modern IDS reassembles</b> &mdash; this defeats 2003, not 2026.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Decoys are different: nmap sends the <b>same real probe</b> repeatedly with forged source addresses. The target genuinely receives a scan from each of them.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>More decoys. The defender&rsquo;s alert now names four sources and cannot rank them.</div>
-        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Your real address must be in the list &mdash; otherwise you never see the replies. <b>That is the permanent weakness of decoy scanning:</b> only the source that receives answers is the real one, and a defender with flow data can work that out.</div>
-        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Evasion buys <b>time and confusion</b>, not invisibility. It raises the analyst&rsquo;s workload; it does not remove the alert. Say that in an interview and you will sound like someone who has actually looked at the packets.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Your real address must be in the list &mdash; otherwise you never see the replies. <b class="hl">That is the permanent weakness of decoy scanning:</b> only the source that receives answers is the real one, and a defender with flow data can work that out.</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Evasion buys <b class="hl">time and confusion</b>, not invisibility. It raises the analyst&rsquo;s workload; it does not remove the alert. Say that in an interview and you will sound like someone who has actually looked at the packets.</div>
         <figcaption><b>Read this as a defender.</b> Fragmented SYNs and four sources sending byte-identical probes in the same millisecond are <em>more</em> anomalous than a plain scan, not less.</figcaption>
       </figure>
 
@@ -2623,7 +2623,7 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
           <h3>Scanning vs enumeration — the exact difference</h3>
           <p><strong>Scanning</strong> is one-way: you send packets and read reflexes; you never log in. It
              tells you <em>what is alive and open</em>.</p>
-          <p><strong>Enumeration</strong> is a conversation: you actually connect to the service and query it,
+          <p><strong class="hl">Enumeration</strong> is a conversation: you actually connect to the service and query it,
              sometimes anonymously, sometimes with credentials. It tells you <em>what is inside</em> — users,
              shares, group memberships, software versions, the password policy.</p>
           <p>That connection is why enumeration is even louder and more logged than scanning: you're not
@@ -2719,41 +2719,41 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
           <line x1="790" y1="80" x2="790" y2="522" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
           <g class="pf-step" data-step="1" style="--pf-dx:-26px">
             <path d="M 160 116 L 780 116" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="107" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600">TCP handshake to 445, then <b>Negotiate Protocol Request</b></text>
+            <text x="470" y="107" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600">TCP handshake to 445, then <tspan font-weight="700">Negotiate Protocol Request</tspan></text>
             <text x="470" y="134" font-size="11" class="d-sub" text-anchor="middle">“which SMB dialects do you speak?” &mdash; client offers its list</text>
           </g>
           <g class="pf-step" data-step="2" style="--pf-dx:26px">
             <path d="M 780 162 L 160 162" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="153" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>Negotiate Protocol Response</b> &mdash; “SMB 3.1.1, signing required”</text>
+            <text x="470" y="153" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Negotiate Protocol Response</tspan> &mdash; “SMB 3.1.1, signing required”</text>
             <text x="470" y="180" font-size="11" class="d-sub" text-anchor="middle">the server picks the highest common dialect and states its security policy</text>
           </g>
           <g class="pf-step" data-step="3" style="--pf-dx:-26px">
             <path d="M 160 208 L 780 208" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>Session Setup</b> &mdash; NTLMSSP_NEGOTIATE</text>
+            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Session Setup</tspan> &mdash; NTLMSSP_NEGOTIATE</text>
             <text x="470" y="226" font-size="11" class="d-sub" text-anchor="middle">“I want to log in, here is what my authentication can do”</text>
           </g>
           <g class="pf-step" data-step="4" style="--pf-dx:26px">
             <path d="M 780 254 L 160 254" fill="none" stroke="var(--amber)" stroke-width="2.2" marker-end="url(#ar-am)"/>
-            <text x="470" y="245" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600"><b>Session Setup Response</b> &mdash; NTLMSSP_CHALLENGE + 8-byte nonce</text>
+            <text x="470" y="245" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Session Setup Response</tspan> &mdash; NTLMSSP_CHALLENGE + 8-byte nonce</text>
             <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">the server sends a random challenge &mdash; THIS is what Responder steals in Session 4</text>
           </g>
           <g class="pf-step" data-step="5" style="--pf-dx:-26px">
             <path d="M 160 300 L 780 300" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="291" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>Session Setup</b> &mdash; NTLMSSP_AUTH  (user + response to the challenge)</text>
+            <text x="470" y="291" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Session Setup</tspan> &mdash; NTLMSSP_AUTH  (user + response to the challenge)</text>
             <text x="470" y="318" font-size="11" class="d-sub" text-anchor="middle">the password itself never crosses the wire</text>
           </g>
           <g class="pf-step" data-step="6" style="--pf-dx:26px">
             <path d="M 780 346 L 160 346" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>Session Setup Response</b> &mdash; STATUS_SUCCESS  &rarr; you now have a SESSION</text>
+            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Session Setup Response</tspan> &mdash; STATUS_SUCCESS  &rarr; you now have a SESSION</text>
           </g>
           <g class="pf-step" data-step="7" style="--pf-dx:-26px">
             <path d="M 160 392 L 780 392" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="383" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>Tree Connect</b>  \\FILE01\IPC$</text>
+            <text x="470" y="383" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Tree Connect</tspan>  \\FILE01\IPC$</text>
             <text x="470" y="410" font-size="11" class="d-sub" text-anchor="middle">“connect me to this share” &mdash; IPC$ is the admin pipe, not a folder</text>
           </g>
           <g class="pf-step" data-step="8" style="--pf-dx:-26px">
             <path d="M 160 438 L 780 438" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
-            <text x="470" y="429" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><b>Create</b> \srvsvc  &rarr;  DCERPC Bind  &rarr;  <b>NetShareEnumAll</b></text>
+            <text x="470" y="429" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Create</tspan> \srvsvc  &rarr;  DCERPC Bind  &rarr;  <tspan font-weight="700">NetShareEnumAll</tspan></text>
             <text x="470" y="456" font-size="11" class="d-sub" text-anchor="middle">this exact call is what “smbclient -L” is underneath</text>
           </g>
           <g class="pf-step" data-step="9" style="--pf-dx:26px">
@@ -2770,13 +2770,13 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>SMB is a stateful, layered protocol. Before anything else the two sides must agree on a <b>dialect</b>. SMB1 (2001), SMB2 (Vista), SMB3 (Windows 8/2012), SMB 3.1.1 (Windows 10+). The dialect decides which attacks are even possible.</div>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The server&rsquo;s answer carries the whole security posture: dialect, whether <b>signing</b> is required (kills SMB relay), and whether encryption is on. One packet, and you know how hard this box will be.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Now authentication. Windows uses NTLMSSP inside SMB &mdash; a challenge/response scheme, not a password send.</div>
-        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The server generates a random 8-byte challenge. <b>Remember this packet.</b> Everything Session&nbsp;4 does with Responder and NTLM relay lives right here.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The server generates a random 8-byte challenge. <b class="hl hl-w">Remember this packet.</b> Everything Session&nbsp;4 does with Responder and NTLM relay lives right here.</div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The client hashes the challenge with the user&rsquo;s NT hash and returns the result. Because the hash <i>is</i> the credential, stealing it is as good as stealing the password &mdash; that is pass-the-hash.</div>
         <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Session established. From here on, every request rides inside this session.</div>
         <div class="pf-cap" data-cap="7"><span class="pf-n">STEP 7</span>A <b>tree connect</b> attaches you to one share. <span class='mono'>IPC$</span> is special: it is not storage, it is the named-pipe endpoint used for remote management &mdash; and it is the door every SMB enumeration tool goes through.</div>
-        <div class="pf-cap" data-cap="8"><span class="pf-n">STEP 8</span>Over IPC$ the client opens the <span class='mono'>srvsvc</span> pipe and makes a remote procedure call. <b>NetShareEnumAll is the actual function</b> behind <span class='mono'>smbclient -L</span>, <span class='mono'>enum4linux</span> and <span class='mono'>net view</span>. Different tools, one RPC.</div>
+        <div class="pf-cap" data-cap="8"><span class="pf-n">STEP 8</span>Over IPC$ the client opens the <span class='mono'>srvsvc</span> pipe and makes a remote procedure call. <b class="hl">NetShareEnumAll is the actual function</b> behind <span class='mono'>smbclient -L</span>, <span class='mono'>enum4linux</span> and <span class='mono'>net view</span>. Different tools, one RPC.</div>
         <div class="pf-cap" data-cap="9"><span class="pf-n">STEP 9</span>And the server answers with the share list. If it answered that <i>without</i> a valid session, you have a null session &mdash; the classic finding.</div>
-        <figcaption><b>Nine steps, and four of them are attack surface.</b> Dialect (SMBv1?), signing (relay?), the challenge (theft?) and IPC$ (enumeration?). When you scan port 445 later, you are asking about these four things.</figcaption>
+        <figcaption><b class="hl">Nine steps, and four of them are attack surface.</b> Dialect (SMBv1?), signing (relay?), the challenge (theft?) and IPC$ (enumeration?). When you scan port 445 later, you are asking about these four things.</figcaption>
       </figure>
 
       <div class="proto-facts">
@@ -2879,10 +2879,10 @@ sudo nmap -sU -p 53,111,161,137 192.168.56.102   # the right way</code></pre>
         <span class="box-t">Currency correction — verify the tool is still alive</span>
         <p>Two names in the textbook are dead or renamed. Learn the successors:</p>
         <ul>
-          <li><span class="mono">enum4linux</span> → <strong><span class="mono">enum4linux-ng</span></strong>
+          <li><span class="mono">enum4linux</span> → <strong class="hl"><span class="mono">enum4linux-ng</span></strong>
              — a maintained rewrite that outputs JSON/YAML and does LDAP + password policy natively (it wraps
              <span class="mono">nmblookup, net, rpcclient, smbclient</span>).</li>
-          <li><span class="mono">crackmapexec</span> → <strong><span class="mono">NetExec (nxc)</span></strong>
+          <li><span class="mono">crackmapexec</span> → <strong class="hl"><span class="mono">NetExec (nxc)</span></strong>
              — CrackMapExec is unmaintained since 2023; the active contributors forked it to NetExec. Command
              is <span class="mono">nxc</span>. Use it, not <span class="mono">cme</span>.</li>
         </ul>
@@ -2996,7 +2996,7 @@ nmap --script smb-enum-shares,smb-enum-users,smb-os-discovery -p445 192.168.56.1
       <h2><span class="h-t">Step 1 — the rich target (Metasploitable2)</span></h2>
       <ol class="steps">
         <li>
-          <strong>Full anonymous enumeration.</strong>
+          <strong class="hl">Full anonymous enumeration.</strong>
           <pre><code>enum4linux-ng -A 192.168.56.102 | tee smb_msf.txt
 smbclient -L //192.168.56.102/ -N</code></pre>
           <div class="verify">
@@ -3022,7 +3022,7 @@ nmap -p445 --script smb-protocols,smb-vuln-ms17-010 192.168.56.X</code></pre>
             <ul>
               <li><span class="mono">enum4linux-ng</span> returns <strong>users, shares and the OS</strong> —
                   the classic dump, because SMBv1/null sessions are on</li>
-              <li><span class="mono">smb-protocols</span> shows <strong>SMBv1 enabled</strong>;
+              <li><span class="mono">smb-protocols</span> shows <strong class="hl hl-w">SMBv1 enabled</strong>;
                   <span class="mono">smb-vuln-ms17-010</span> reports <strong>VULNERABLE</strong> (EternalBlue → Session 5)</li>
               <li>You can state why this works here but not on Win10: the legacy defaults were never turned off</li>
             </ul>
@@ -3125,7 +3125,7 @@ nxc smb 192.168.56.X</code></pre>
          <span class="mono">uid=a.hassan,ou=People,dc=ceh,dc=lab</span> &mdash; and a set of attributes.
          You query by giving a <em>base</em> (where to start), a <em>scope</em> (how deep to go) and a
          <em>filter</em> (what to match). That is the whole protocol.
-         <strong>In a Windows domain, Active Directory <em>is</em> an LDAP server</strong>, and port 389 on a
+         <strong class="hl">In a Windows domain, Active Directory <em>is</em> an LDAP server</strong>, and port 389 on a
          domain controller answers the same queries as any other directory.</p>
 
       <div class="box tip">
@@ -3162,41 +3162,41 @@ nxc smb 192.168.56.X</code></pre>
           <line x1="790" y1="80" x2="790" y2="476" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
           <g class="pf-step" data-step="1" style="--pf-dx:-26px">
             <path d="M 160 116 L 780 116" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="107" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600">TCP handshake to 389, then <b>bindRequest</b></text>
+            <text x="470" y="107" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600">TCP handshake to 389, then <tspan font-weight="700">bindRequest</tspan></text>
             <text x="470" y="134" font-size="11" class="d-sub" text-anchor="middle">“who am I?” — with a DN + password, or EMPTY for anonymous</text>
           </g>
           <g class="pf-step" data-step="2" style="--pf-dx:26px">
             <path d="M 780 162 L 160 162" fill="none" stroke="var(--amber)" stroke-width="2.2" marker-end="url(#ar-am)"/>
-            <text x="470" y="153" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600"><b>bindResponse: success</b></text>
+            <text x="470" y="153" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600"><tspan font-weight="700">bindResponse: success</tspan></text>
             <text x="470" y="180" font-size="11" class="d-sub" text-anchor="middle">if the DN was empty and this still says success → ANONYMOUS BIND IS ON</text>
           </g>
           <g class="pf-step" data-step="3" style="--pf-dx:-26px">
             <path d="M 160 208 L 780 208" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>searchRequest</b>  base="" scope=base  attrs=namingContexts</text>
+            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">searchRequest</tspan>  base="" scope=base  attrs=namingContexts</text>
             <text x="470" y="226" font-size="11" class="d-sub" text-anchor="middle">the RootDSE query — “what directory do you serve?”</text>
           </g>
           <g class="pf-step" data-step="4" style="--pf-dx:26px">
             <path d="M 780 254 L 160 254" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="245" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>searchResEntry</b>  namingContexts: dc=ceh,dc=lab</text>
+            <text x="470" y="245" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">searchResEntry</tspan>  namingContexts: dc=ceh,dc=lab</text>
             <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">the server hands over its own base DN, unauthenticated</text>
           </g>
           <g class="pf-step" data-step="5" style="--pf-dx:-26px">
             <path d="M 160 300 L 780 300" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
-            <text x="470" y="291" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><b>searchRequest</b>  base="dc=ceh,dc=lab" scope=wholeSubtree filter=(objectClass=*)</text>
+            <text x="470" y="291" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><tspan font-weight="700">searchRequest</tspan>  base="dc=ceh,dc=lab" scope=wholeSubtree filter=(objectClass=*)</text>
             <text x="470" y="318" font-size="11" class="d-sub" text-anchor="middle">“give me everything”</text>
           </g>
           <g class="pf-step" data-step="6" style="--pf-dx:26px">
             <path d="M 780 346 L 160 346" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>searchResEntry</b> × N — one packet per object</text>
+            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">searchResEntry</tspan> × N — one packet per object</text>
             <text x="470" y="364" font-size="11" class="d-sub" text-anchor="middle">users, groups, OUs, service accounts, phone numbers, job titles</text>
           </g>
           <g class="pf-step" data-step="7" style="--pf-dx:26px">
             <path d="M 780 392 L 160 392" fill="none" stroke="var(--text-3)" stroke-width="2.2" marker-end="url(#ar-g)"/>
-            <text x="470" y="383" font-size="12.5" fill="var(--text-3)" text-anchor="middle" font-weight="600"><b>searchResDone: success</b></text>
+            <text x="470" y="383" font-size="12.5" fill="var(--text-3)" text-anchor="middle" font-weight="600"><tspan font-weight="700">searchResDone: success</tspan></text>
           </g>
           <g class="pf-step" data-step="8" style="--pf-dx:-26px">
             <path d="M 160 438 L 780 438" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="429" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>unbindRequest</b></text>
+            <text x="470" y="429" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">unbindRequest</tspan></text>
             <text x="470" y="456" font-size="11" class="d-sub" text-anchor="middle">polite goodbye — most tools do not bother</text>
           </g>
         </svg>
@@ -3211,10 +3211,10 @@ nxc smb 192.168.56.X</code></pre>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The RootDSE is a special, always-present entry that describes the server itself. You query it with an empty base DN. <b>You do not need to know the domain name to ask this</b> &mdash; the server tells you.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>And there it is: <span class='mono'>dc=ceh,dc=lab</span>. One unauthenticated query and you now know the domain naming context, the supported controls, and often the DC&rsquo;s own hostname.</div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Now the real query. Base = the DN you just learned, scope = the whole subtree, filter = match everything.</div>
-        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>One <span class='mono'>searchResEntry</span> per object. In Active Directory that is every user, every group, every computer, plus <span class='mono'>description</span> fields, <span class='mono'>title</span>, <span class='mono'>telephoneNumber</span>, <span class='mono'>servicePrincipalName</span> and <span class='mono'>memberOf</span>. <b>This is an org chart with attack paths attached.</b></div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>One <span class='mono'>searchResEntry</span> per object. In Active Directory that is every user, every group, every computer, plus <span class='mono'>description</span> fields, <span class='mono'>title</span>, <span class='mono'>telephoneNumber</span>, <span class='mono'>servicePrincipalName</span> and <span class='mono'>memberOf</span>. <b class="hl">This is an org chart with attack paths attached.</b></div>
         <div class="pf-cap" data-cap="7"><span class="pf-n">STEP 7</span>The search completes.</div>
         <div class="pf-cap" data-cap="8"><span class="pf-n">STEP 8</span>Done. Total cost: one TCP connection and, on a misconfigured directory, no credentials whatsoever.</div>
-        <figcaption><b>The entire attack is packet 2.</b> Everything valuable that follows is legitimate protocol behaviour &mdash; LDAP is <em>designed</em> to answer these questions. The vulnerability is who is allowed to ask.</figcaption>
+        <figcaption><b class="hl hl-w">The entire attack is packet 2.</b> Everything valuable that follows is legitimate protocol behaviour &mdash; LDAP is <em>designed</em> to answer these questions. The vulnerability is who is allowed to ask.</figcaption>
       </figure>
 
       <div class="proto-facts">
@@ -3327,7 +3327,7 @@ nxc smb 192.168.56.X</code></pre>
           <tr><td><span class="mono">1.3.6.1.2.1.1.4.0</span></td><td>sysContact</td><td>An internal email address, verified</td></tr>
           <tr><td><span class="mono">1.3.6.1.2.1.1.5.0</span></td><td>sysName</td><td>Hostname</td></tr>
           <tr><td><span class="mono">1.3.6.1.2.1.1.6.0</span></td><td>sysLocation</td><td>Physical location &mdash; often a real rack and room</td></tr>
-          <tr><td><span class="mono">1.3.6.1.2.1.25.4.2.1.2</span></td><td>hrSWRunName</td><td><b>Every running process</b></td></tr>
+          <tr><td><span class="mono">1.3.6.1.2.1.25.4.2.1.2</span></td><td>hrSWRunName</td><td><b class="hl">Every running process</b></td></tr>
           <tr><td><span class="mono">1.3.6.1.2.1.25.6.3.1.2</span></td><td>hrSWInstalledName</td><td>Every installed package</td></tr>
           <tr><td><span class="mono">1.3.6.1.2.1.4.22.1.2</span></td><td>ipNetToMediaPhysAddress</td><td>The device&rsquo;s <b>ARP table</b> &mdash; other live hosts</td></tr>
           <tr><td><span class="mono">1.3.6.1.4.1.77.1.2.25</span></td><td>(Windows) userTable</td><td>Local user accounts on old Windows SNMP agents</td></tr>
@@ -3346,32 +3346,32 @@ nxc smb 192.168.56.X</code></pre>
           <line x1="790" y1="80" x2="790" y2="476" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
           <g class="pf-step" data-step="1" style="--pf-dx:-26px">
             <path d="M 160 116 L 780 116" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="107" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>get-next-request</b>  OID 1.3.6.1.2.1.1  community=<b>public</b></text>
+            <text x="470" y="107" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">get-next-request</tspan>  OID 1.3.6.1.2.1.1  community=<tspan font-weight="700">public</tspan></text>
             <text x="470" y="134" font-size="11" class="d-sub" text-anchor="middle">UDP 161 — the “password” travels in clear text in every packet</text>
           </g>
           <g class="pf-step" data-step="2" style="--pf-dx:26px">
             <path d="M 780 162 L 160 162" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="153" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>get-response</b>  1.3.6.1.2.1.1.1.0 = “Linux vm 6.18.44 x86_64”</text>
+            <text x="470" y="153" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">get-response</tspan>  1.3.6.1.2.1.1.1.0 = “Linux vm 6.18.44 x86_64”</text>
             <text x="470" y="180" font-size="11" class="d-sub" text-anchor="middle">sysDescr — the exact OS and kernel version, free</text>
           </g>
           <g class="pf-step" data-step="3" style="--pf-dx:-26px">
             <path d="M 160 208 L 780 208" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>get-next-request</b>  1.3.6.1.2.1.1.1.0</text>
+            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">get-next-request</tspan>  1.3.6.1.2.1.1.1.0</text>
             <text x="470" y="226" font-size="11" class="d-sub" text-anchor="middle">“give me the NEXT object after that one” — this is how a walk works</text>
           </g>
           <g class="pf-step" data-step="4" style="--pf-dx:26px">
             <path d="M 780 254 L 160 254" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="245" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>get-response</b>  sysContact = it-support@ceh.lab</text>
+            <text x="470" y="245" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">get-response</tspan>  sysContact = it-support@ceh.lab</text>
             <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">a real internal email address for phishing</text>
           </g>
           <g class="pf-step" data-step="5" style="--pf-dx:26px">
             <path d="M 780 300 L 160 300" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="291" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>get-response</b>  sysLocation = “Cairo DC1 - Rack 12”</text>
+            <text x="470" y="291" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">get-response</tspan>  sysLocation = “Cairo DC1 - Rack 12”</text>
             <text x="470" y="318" font-size="11" class="d-sub" text-anchor="middle">physical location of the box</text>
           </g>
           <g class="pf-step" data-step="6" style="--pf-dx:26px">
             <path d="M 780 346 L 160 346" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>get-response</b>  sysName = FILE01</text>
+            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">get-response</tspan>  sysName = FILE01</text>
             <text x="470" y="364" font-size="11" class="d-sub" text-anchor="middle">the hostname, without DNS or SMB</text>
           </g>
           <g class="pf-step" data-step="7" style="--pf-dx:-26px">
@@ -3392,14 +3392,14 @@ nxc smb 192.168.56.X</code></pre>
           <span class="pf-count"></span>
         </div>
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>SNMP&rsquo;s v1 and v2c &ldquo;authentication&rdquo; is a single shared string called a <b>community string</b>. It is sent in clear text in every single packet. The two defaults that ship on countless devices are <span class='mono'>public</span> (read) and <span class='mono'>private</span> (read-write).</div>
-        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The first object in the standard system group is <span class='mono'>sysDescr</span>. On a router it names the exact IOS build; on a printer, the firmware; here, the kernel. <b>That is a version string for a CVE lookup, with no TCP connection at all.</b></div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The first object in the standard system group is <span class='mono'>sysDescr</span>. On a router it names the exact IOS build; on a printer, the firmware; here, the kernel. <b class="hl">That is a version string for a CVE lookup, with no TCP connection at all.</b></div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>A &ldquo;walk&rdquo; is not a special operation &mdash; it is get-next called over and over, each time asking for the object after the last one. That is why a walk is one packet per value and shows up as hundreds of small UDP datagrams.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span><span class='mono'>sysContact</span> is meant for the admin&rsquo;s email. It is a verified internal address, handed to an unauthenticated stranger.</div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span><span class='mono'>sysLocation</span> is meant for the data-centre rack. It maps the physical estate.</div>
         <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span><span class='mono'>sysName</span> is the hostname. You now have the machine&rsquo;s identity without touching SMB, DNS or a single TCP port.</div>
         <div class="pf-cap" data-cap="7"><span class="pf-n">STEP 7</span>And this is where it stops being an inventory tool and becomes reconnaissance. The <b>host resources MIB</b> exposes running software, installed software, mounted storage, network interfaces and the ARP table.</div>
         <div class="pf-cap" data-cap="8"><span class="pf-n">STEP 8</span>Every process by name. You can see whether an EDR agent is running, which database is installed, whether a backup client is present &mdash; <b>before you have any access to the machine at all</b>.</div>
-        <figcaption><b>232 packets, no credentials, no TCP connection.</b> SNMP is the single most under-rated finding in this session &mdash; students walk past UDP 161 because they only scanned TCP.</figcaption>
+        <figcaption><b class="hl hl-w">232 packets, no credentials, no TCP connection.</b> SNMP is the single most under-rated finding in this session &mdash; students walk past UDP 161 because they only scanned TCP.</figcaption>
       </figure>
 
       <div class="proto-facts">
@@ -3520,7 +3520,7 @@ nmap -sU -p161 --script snmp-info,snmp-processes 192.168.56.X</code></pre>
           <rect x="410" y="98" width="150" height="34" rx="6" fill="rgba(255,112,67,.12)" stroke="var(--orange)"/><text x="485" y="120" font-size="10.5" fill="var(--orange)" text-anchor="middle">hrSWRun (processes)</text>
           <text x="900" y="112" font-size="12" class="d-sub" text-anchor="end">Walk it all with one guessed community string.</text>
         </svg>
-        <figcaption><b>The MIB tree.</b> Each branch is an OID; a read community string unlocks the lot.</figcaption>
+        <figcaption><b class="hl">The MIB tree.</b> Each branch is an OID; a read community string unlocks the lot.</figcaption>
       </figure>
 
       <div class="leads-to">
@@ -3683,7 +3683,7 @@ snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.25.4.2.1.2  # p
       <h2><span class="h-t">Part B — LDAP</span></h2>
       <ol class="steps">
         <li>
-          <strong>Find the naming context, then enumerate.</strong>
+          <strong class="hl">Find the naming context, then enumerate.</strong>
           <pre><code>ldapsearch -x -H ldap://192.168.56.X -s base namingContexts
 windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre>
           <div class="verify">
@@ -3778,22 +3778,22 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
           </g>
           <g class="pf-step" data-step="3" style="--pf-dx:-26px">
             <path d="M 160 208 L 780 208" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>Portmap V2 DUMP Call</b>  &rarr;  TCP/UDP 111</text>
+            <text x="470" y="199" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Portmap V2 DUMP Call</tspan>  &rarr;  TCP/UDP 111</text>
             <text x="470" y="226" font-size="11" class="d-sub" text-anchor="middle">“list every RPC program you know about”</text>
           </g>
           <g class="pf-step" data-step="4" style="--pf-dx:26px">
             <path d="M 780 254 L 160 254" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="245" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>DUMP Reply</b> &mdash; program, version, protocol, PORT</text>
+            <text x="470" y="245" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">DUMP Reply</tspan> &mdash; program, version, protocol, PORT</text>
             <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">100000 portmapper 111 · 100005 mountd 45520 · 100003 nfs 2049</text>
           </g>
           <g class="pf-step" data-step="5" style="--pf-dx:-26px">
             <path d="M 160 300 L 780 300" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="291" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>Portmap V4 GETADDR Call</b>  program=100005</text>
+            <text x="470" y="291" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">Portmap V4 GETADDR Call</tspan>  program=100005</text>
             <text x="470" y="318" font-size="11" class="d-sub" text-anchor="middle">“which port is mountd on right now?”</text>
           </g>
           <g class="pf-step" data-step="6" style="--pf-dx:26px">
             <path d="M 780 346 L 160 346" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>GETADDR Reply</b> &rarr; port 45520</text>
+            <text x="470" y="337" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">GETADDR Reply</tspan> &rarr; port 45520</text>
             <text x="470" y="364" font-size="11" class="d-sub" text-anchor="middle">you now know a port no port-scan range would have covered</text>
           </g>
         </svg>
@@ -3806,10 +3806,10 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>This is the design problem RPC has. A service like <span class='mono'>mountd</span> or <span class='mono'>statd</span> does not own a well-known port &mdash; it grabs a free high port each time it starts. Tomorrow it will be a different one.</div>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>So Sun invented a directory: one service on a fixed, well-known port whose only job is to answer &ldquo;where is program N today?&rdquo;. That is <b>portmapper</b>, also called <b>rpcbind</b>, on port 111.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>A DUMP call asks for the entire registration table. It is unauthenticated by design.</div>
-        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>And you get the map. Program number, version, whether it is on TCP or UDP, and the live port. <b>You just enumerated services you would never have found</b> &mdash; a scan of ports 1-1000 misses mountd on 45520 completely.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>And you get the map. Program number, version, whether it is on TCP or UDP, and the live port. <b class="hl">You just enumerated services you would never have found</b> &mdash; a scan of ports 1-1000 misses mountd on 45520 completely.</div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>GETADDR is the targeted version: ask about one program number.</div>
         <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>One reply, one port. Now you can talk to mountd directly &mdash; which is exactly what <span class='mono'>showmount</span> does next.</div>
-        <figcaption><b>Port 111 is a free map of high ports.</b> This is why <span class="mono">rpcinfo -p</span> is one of the highest-value single commands in the whole session: one packet exchange, and you have services no port range would have revealed.</figcaption>
+        <figcaption><b class="hl">Port 111 is a free map of high ports.</b> This is why <span class="mono">rpcinfo -p</span> is one of the highest-value single commands in the whole session: one packet exchange, and you have services no port range would have revealed.</figcaption>
       </figure>
 
       <div class="proto-facts">
@@ -3910,22 +3910,22 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
           </g>
           <g class="pf-step" data-step="2" style="--pf-dx:-26px">
             <path d="M 160 162 L 780 162" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="153" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>MOUNT EXPORT</b> &rarr; mountd</text>
+            <text x="470" y="153" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">MOUNT EXPORT</tspan> &rarr; mountd</text>
             <text x="470" y="180" font-size="11" class="d-sub" text-anchor="middle">“what do you export, and to whom?” — no credentials required</text>
           </g>
           <g class="pf-step" data-step="3" style="--pf-dx:26px">
             <path d="M 780 208 L 160 208" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
-            <text x="470" y="199" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600">/srv/backups → 10.10.10.0/24  ·  /srv/finance_share → <b>*</b></text>
+            <text x="470" y="199" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600">/srv/backups → 10.10.10.0/24  ·  /srv/finance_share → <tspan font-weight="700">*</tspan></text>
             <text x="470" y="226" font-size="11" class="d-sub" text-anchor="middle">the “*” means ANY host may mount it</text>
           </g>
           <g class="pf-step" data-step="4" style="--pf-dx:-26px">
             <path d="M 160 254 L 780 254" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="245" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>MOUNT MNT</b> /srv/finance_share</text>
+            <text x="470" y="245" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">MOUNT MNT</tspan> /srv/finance_share</text>
             <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">“mount it for me” — mountd checks only the CLIENT IP</text>
           </g>
           <g class="pf-step" data-step="5" style="--pf-dx:26px">
             <path d="M 780 300 L 160 300" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="291" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600">a <b>file handle</b></text>
+            <text x="470" y="291" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600">a <tspan font-weight="700">file handle</tspan></text>
             <text x="470" y="318" font-size="11" class="d-sub" text-anchor="middle">the token used for every later read/write</text>
           </g>
           <g class="pf-step" data-step="6" style="--pf-dx:-26px">
@@ -3947,12 +3947,12 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
         </div>
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Because mountd is on a random port, everything starts at portmapper.</div>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The EXPORT call is the enumeration. It asks the server to describe its own export table.</div>
-        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>And there is the finding. <span class='mono'>/srv/finance_share *</span> &mdash; the asterisk is the export list saying <b>any IP address at all</b> may mount this. You did not need a password to learn that.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>And there is the finding. <span class='mono'>/srv/finance_share *</span> &mdash; the asterisk is the export list saying <b class="hl hl-w">any IP address at all</b> may mount this. You did not need a password to learn that.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>A mount request. Here is the critical thing: classic NFS (v2/v3) authenticates the <b>machine</b>, by IP address, not the user. If your IP is in the allow list, you are in.</div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>You get a file handle. From now on the file system is attached to your machine.</div>
         <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>And now the real weakness: <b>AUTH_SYS</b>. The client tells the server which UID it is acting as. There is no verification. If you are root on your own Kali box, you send uid=0.</div>
-        <div class="pf-cap" data-cap="7"><span class="pf-n">STEP 7</span>If the export was written with <span class='mono'>no_root_squash</span>, the server treats your uid 0 as its own root. You can read every file, write an SSH key into a user&rsquo;s <span class='mono'>.ssh</span>, or drop a SUID binary and run it locally. <b>That is a full privilege-escalation path, from a mount.</b></div>
-        <figcaption><b>NFS trusts the client machine, not the user.</b> Everything you attack about NFS follows from that one sentence.</figcaption>
+        <div class="pf-cap" data-cap="7"><span class="pf-n">STEP 7</span>If the export was written with <span class='mono'>no_root_squash</span>, the server treats your uid 0 as its own root. You can read every file, write an SSH key into a user&rsquo;s <span class='mono'>.ssh</span>, or drop a SUID binary and run it locally. <b class="hl hl-w">That is a full privilege-escalation path, from a mount.</b></div>
+        <figcaption><b class="hl">NFS trusts the client machine, not the user.</b> Everything you attack about NFS follows from that one sentence.</figcaption>
       </figure>
 
       <div class="proto-facts">
@@ -4037,7 +4037,7 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
       <h2><span class="h-t">What it is, in one paragraph</span></h2>
       <p>A client opens a <strong>control connection</strong> to port 21 and types short ASCII commands. The
          server replies with a three-digit code and a message. When an actual file has to move, a
-         <strong>separate data connection</strong> is opened for it &mdash; that split is FTP&rsquo;s defining
+         <strong class="hl">separate data connection</strong> is opened for it &mdash; that split is FTP&rsquo;s defining
          quirk and the source of most of its problems. Nothing in the protocol is encrypted; FTPS adds TLS,
          and SFTP is not FTP at all (it is a subsystem of SSH on port 22).</p>
 
@@ -4060,37 +4060,37 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
           <line x1="790" y1="80" x2="790" y2="476" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
           <g class="pf-step" data-step="1" style="--pf-dx:26px">
             <path d="M 780 116 L 160 116" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="107" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>220 FILE01 FTP service (vsftpd 3.0.5)</b></text>
+            <text x="470" y="107" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">220 FILE01 FTP service (vsftpd 3.0.5)</tspan></text>
             <text x="470" y="134" font-size="11" class="d-sub" text-anchor="middle">the banner arrives BEFORE you type anything — free version info</text>
           </g>
           <g class="pf-step" data-step="2" style="--pf-dx:-26px">
             <path d="M 160 162 L 780 162" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="153" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>USER anonymous</b></text>
+            <text x="470" y="153" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">USER anonymous</tspan></text>
             <text x="470" y="180" font-size="11" class="d-sub" text-anchor="middle">the username, readable by anyone on the path</text>
           </g>
           <g class="pf-step" data-step="3" style="--pf-dx:26px">
             <path d="M 780 208 L 160 208" fill="none" stroke="var(--amber)" stroke-width="2.2" marker-end="url(#ar-am)"/>
-            <text x="470" y="199" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600"><b>331 Please specify the password.</b></text>
+            <text x="470" y="199" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600"><tspan font-weight="700">331 Please specify the password.</tspan></text>
             <text x="470" y="226" font-size="11" class="d-sub" text-anchor="middle">331 = “that user exists, keep going” — a user-enumeration oracle</text>
           </g>
           <g class="pf-step" data-step="4" style="--pf-dx:-26px">
             <path d="M 160 254 L 780 254" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
-            <text x="470" y="245" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><b>PASS a@b.c</b></text>
+            <text x="470" y="245" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><tspan font-weight="700">PASS a@b.c</tspan></text>
             <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">a real password would be sitting right here, in clear text</text>
           </g>
           <g class="pf-step" data-step="5" style="--pf-dx:26px">
             <path d="M 780 300 L 160 300" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
-            <text x="470" y="291" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><b>230 Login successful.</b></text>
+            <text x="470" y="291" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><tspan font-weight="700">230 Login successful.</tspan></text>
             <text x="470" y="318" font-size="11" class="d-sub" text-anchor="middle">anonymous access is ON — the classic finding</text>
           </g>
           <g class="pf-step" data-step="6" style="--pf-dx:-26px">
             <path d="M 160 346 L 780 346" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="337" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>SYST</b>  /  <b>PWD</b></text>
+            <text x="470" y="337" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">SYST</tspan>  /  <tspan font-weight="700">PWD</tspan></text>
             <text x="470" y="364" font-size="11" class="d-sub" text-anchor="middle">“what OS are you?” / “where am I?”</text>
           </g>
           <g class="pf-step" data-step="7" style="--pf-dx:26px">
             <path d="M 780 392 L 160 392" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="383" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>215 UNIX Type: L8</b>   ·   <b>257 &quot;/&quot; is the current directory</b></text>
+            <text x="470" y="383" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">215 UNIX Type: L8</tspan>   ·   <tspan font-weight="700">257 &quot;/&quot; is the current directory</tspan></text>
           </g>
           <g class="pf-step" data-step="8" style="--pf-dx:-26px">
             <rect x="160" y="422" width="620" height="30" rx="8" fill="var(--panel)" stroke="var(--line-soft)"/>
@@ -4106,7 +4106,7 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>FTP servers greet you. The 220 line is sent the instant the TCP handshake finishes, which is why banner-grabbing FTP takes one <span class='mono'>nc</span> and no protocol knowledge at all.</div>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Commands are plain ASCII text, one per line. You can drive FTP entirely by hand.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Watch the response codes. Many servers answer <b>331</b> for a user that exists and <b>530</b> for one that does not. That difference is a username oracle &mdash; the same idea you will meet again in SMTP below and in Session&nbsp;4&rsquo;s Kerberos enumeration.</div>
-        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>And here is the reason FTP is on every &ldquo;deprecate this&rdquo; list. The password is <b>not hashed, not encrypted, not encoded</b>. Anyone sniffing the segment reads it. In Session&nbsp;9 you will pull exactly this out of a capture.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>And here is the reason FTP is on every &ldquo;deprecate this&rdquo; list. The password is <b class="hl hl-w">not hashed, not encrypted, not encoded</b>. Anyone sniffing the segment reads it. In Session&nbsp;9 you will pull exactly this out of a capture.</div>
         <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>230 means you are in as anonymous. Now ask: what is in here, and can you write?</div>
         <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>FTP has a small, human command set: SYST, PWD, LIST, RETR, STOR, CWD. Learn six words and you never need a client.</div>
         <div class="pf-cap" data-cap="7"><span class="pf-n">STEP 7</span>SYST hands you the OS family. PWD tells you the root of the served tree.</div>
@@ -4212,41 +4212,41 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
           <line x1="790" y1="80" x2="790" y2="476" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
           <g class="pf-step" data-step="1" style="--pf-dx:26px">
             <path d="M 780 116 L 160 116" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="107" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>220 mail01.ceh.lab ESMTP Postfix (Ubuntu)</b></text>
+            <text x="470" y="107" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">220 mail01.ceh.lab ESMTP Postfix (Ubuntu)</tspan></text>
             <text x="470" y="134" font-size="11" class="d-sub" text-anchor="middle">banner: the MTA software AND the internal hostname</text>
           </g>
           <g class="pf-step" data-step="2" style="--pf-dx:-26px">
             <path d="M 160 162 L 780 162" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="153" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>EHLO attacker.local</b></text>
+            <text x="470" y="153" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">EHLO attacker.local</tspan></text>
             <text x="470" y="180" font-size="11" class="d-sub" text-anchor="middle">“hello, what can you do?”</text>
           </g>
           <g class="pf-step" data-step="3" style="--pf-dx:26px">
             <path d="M 780 208 L 160 208" fill="none" stroke="var(--amber)" stroke-width="2.2" marker-end="url(#ar-am)"/>
-            <text x="470" y="199" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600">250-PIPELINING · SIZE · <b>VRFY</b> · ETRN · STARTTLS · 8BITMIME</text>
+            <text x="470" y="199" font-size="12.5" fill="var(--amber)" text-anchor="middle" font-weight="600">250-PIPELINING · SIZE · <tspan font-weight="700">VRFY</tspan> · ETRN · STARTTLS · 8BITMIME</text>
             <text x="470" y="226" font-size="11" class="d-sub" text-anchor="middle">the capability list — and VRFY is listed, so it is enabled</text>
           </g>
           <g class="pf-step" data-step="4" style="--pf-dx:-26px">
             <path d="M 160 254 L 780 254" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="245" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>VRFY a.hassan</b></text>
+            <text x="470" y="245" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">VRFY a.hassan</tspan></text>
             <text x="470" y="272" font-size="11" class="d-sub" text-anchor="middle">“does this mailbox exist?”</text>
           </g>
           <g class="pf-step" data-step="5" style="--pf-dx:26px">
             <path d="M 780 300 L 160 300" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
-            <text x="470" y="291" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><b>252 2.0.0 a.hassan@ceh.lab</b></text>
+            <text x="470" y="291" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><tspan font-weight="700">252 2.0.0 a.hassan@ceh.lab</tspan></text>
             <text x="470" y="318" font-size="11" class="d-sub" text-anchor="middle">YES — the user exists</text>
           </g>
           <g class="pf-step" data-step="6" style="--pf-dx:-26px">
             <path d="M 160 346 L 780 346" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
-            <text x="470" y="337" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><b>VRFY nosuchuser</b></text>
+            <text x="470" y="337" font-size="12.5" fill="var(--orange)" text-anchor="middle" font-weight="600"><tspan font-weight="700">VRFY nosuchuser</tspan></text>
           </g>
           <g class="pf-step" data-step="7" style="--pf-dx:26px">
             <path d="M 780 392 L 160 392" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
-            <text x="470" y="383" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><b>550 5.1.1 Recipient address rejected: User unknown</b></text>
+            <text x="470" y="383" font-size="12.5" fill="var(--green)" text-anchor="middle" font-weight="600"><tspan font-weight="700">550 5.1.1 Recipient address rejected: User unknown</tspan></text>
             <text x="470" y="410" font-size="11" class="d-sub" text-anchor="middle">NO — and now you have an oracle</text>
           </g>
           <g class="pf-step" data-step="8" style="--pf-dx:-26px">
             <path d="M 160 438 L 780 438" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
-            <text x="470" y="429" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><b>VRFY svc_backup</b>  &rarr;  <b>252</b></text>
+            <text x="470" y="429" font-size="12.5" fill="var(--red)" text-anchor="middle" font-weight="600"><tspan font-weight="700">VRFY svc_backup</tspan>  &rarr;  <tspan font-weight="700">252</tspan></text>
             <text x="470" y="456" font-size="11" class="d-sub" text-anchor="middle">a service account, confirmed, with no authentication at all</text>
           </g>
         </svg>
@@ -4258,13 +4258,13 @@ windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</code></pre
         </div>
         <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Like FTP, SMTP greets you. The 220 banner usually names the MTA (Postfix, Exim, Sendmail, Exchange) and very often the server&rsquo;s real internal hostname.</div>
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>EHLO is the modern hello. The server answers with everything it supports.</div>
-        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Read the capability list carefully. <b>VRFY listed = VRFY enabled.</b> Also note whether STARTTLS is offered, and whether <span class='mono'>AUTH</span> appears before TLS (which would mean credentials can travel in the clear).</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Read the capability list carefully. <b class="hl">VRFY listed = VRFY enabled.</b> Also note whether STARTTLS is offered, and whether <span class='mono'>AUTH</span> appears before TLS (which would mean credentials can travel in the clear).</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>VRFY exists to let an administrator check an address. It has no authentication requirement in the base protocol.</div>
-        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>252 means the mailbox is real. <b>You just confirmed an employee identity with one line of text.</b></div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>252 means the mailbox is real. <b class="hl">You just confirmed an employee identity with one line of text.</b></div>
         <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Now the control: a name that certainly does not exist.</div>
         <div class="pf-cap" data-cap="7"><span class="pf-n">STEP 7</span>550 with &ldquo;User unknown&rdquo;. The difference between 252 and 550 <i>is</i> the vulnerability &mdash; not a bug in the code, but a difference in behaviour that leaks information. This pattern &mdash; two different answers to a yes/no question &mdash; is what security people mean by an <b>oracle</b>.</div>
         <div class="pf-cap" data-cap="8"><span class="pf-n">STEP 8</span>Feed it a wordlist and you have the company&rsquo;s user list. Service accounts, executives, everyone. That list goes straight into the password spray in Session&nbsp;4 and the phishing scenario in Session&nbsp;9.</div>
-        <figcaption><b>Blocked VRFY? Use RCPT TO.</b> Start a fake message with <span class="mono">MAIL FROM:</span> then <span class="mono">RCPT TO:&lt;user@domain&gt;</span> &mdash; a 250 means the mailbox exists, a 550 means it does not. Same oracle, different door.</figcaption>
+        <figcaption><b class="hl">Blocked VRFY? Use RCPT TO.</b> Start a fake message with <span class="mono">MAIL FROM:</span> then <span class="mono">RCPT TO:&lt;user@domain&gt;</span> &mdash; a 250 means the mailbox exists, a 550 means it does not. Same oracle, different door.</figcaption>
       </figure>
 
       <div class="proto-facts">
@@ -4417,7 +4417,7 @@ printf 'HEAD / HTTP/1.0\r\n\r\n' | nc 192.168.56.102 80   # Server: header</code
           </tbody>
         </table>
         <p class="ws-soc"><b>SOC reads it as:</b> in every case the same shape &mdash; <span class="ws-sig">a host that asks the &ldquo;what do you have?&rdquo; question and then leaves without using the answer</span>. Real clients mount, transfer or send. Scanners enumerate and disconnect. Write your detections around that difference and they will survive the tool changing.</p>
-        <p class="ws-soc" style="border-top:none;padding-top:4px"><b>Three captures, one lesson:</b> open <span class="mono">16-rpc-nfs-showmount</span>, <span class="mono">14-ftp-anonymous</span> and <span class="mono">15-smtp-user-enum</span> side by side. Different protocols, identical attacker behaviour.</p>
+        <p class="ws-soc" style="border-top:none;padding-top:4px"><b class="hl">Three captures, one lesson:</b> open <span class="mono">16-rpc-nfs-showmount</span>, <span class="mono">14-ftp-anonymous</span> and <span class="mono">15-smtp-user-enum</span> side by side. Different protocols, identical attacker behaviour.</p>
       </div>
 
       <div class="box attacker-view">
@@ -4488,7 +4488,7 @@ nbtscan 192.168.56.0/24</code></pre>
           </ul></div>
         </li>
         <li>
-          <strong>Confirm one finding by hand.</strong> Pick a service the scanner was unsure about and grab
+          <strong class="hl">Confirm one finding by hand.</strong> Pick a service the scanner was unsure about and grab
           its banner with netcat.
           <pre><code>nc -nv 192.168.56.102 22
 nc -nv 192.168.56.102 25</code></pre>
@@ -4563,8 +4563,8 @@ nc -nv 192.168.56.102 25</code></pre>
       <div class="box defender-view">
         <span class="box-t">The one defensive doctrine under all of it</span>
         <p>Three moves cover most of the table: <strong>disable legacy protocols</strong> (SMBv1, SNMPv2c,
-           anonymous binds), <strong>change every default</strong> (community strings, admin account names),
-           and <strong>restrict who can even reach the service</strong> (host-based firewall, network
+           anonymous binds), <strong class="hl hl-d">change every default</strong> (community strings, admin account names),
+           and <strong class="hl hl-d">restrict who can even reach the service</strong> (host-based firewall, network
            segmentation). And behind those: <strong>monitor for enumeration patterns</strong> — rapid,
            sequential, one-to-many queries — which is exactly what you'll build a rule for next.</p>
       </div>
@@ -4624,7 +4624,7 @@ tshark -r lab2_syn.pcap -Y 'tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0' -T fie
       </ol>
 
       <h2><span class="h-t">Step 2 — write the rule (your choice of language)</span></h2>
-      <p>The pattern to encode is the one under every scan today: <strong>one source touching many distinct
+      <p>The pattern to encode is the one under every scan today: <strong class="hl hl-d">one source touching many distinct
          ports (or hosts) inside a short window</strong>. Here is a <strong>worked Sigma rule</strong>. Then
          complete <em>one</em> of the SPL or KQL skeletons — your choice.</p>
 
@@ -4676,7 +4676,7 @@ SecurityEvent
       <div class="verify">
         <h4>✓ Verification — the deliverable</h4>
         <ul>
-          <li>One <strong>complete, working</strong> rule in Sigma, SPL <em>or</em> KQL that would fire on your Lab 2 SYN scan</li>
+          <li>One <strong class="hl">complete, working</strong> rule in Sigma, SPL <em>or</em> KQL that would fire on your Lab 2 SYN scan</li>
           <li>A stated <strong>threshold and time window</strong>, with one sentence on why you chose them and what would cause a false positive</li>
           <li>The <strong>ATT&amp;CK mapping</strong> (T1046 / T1595) on the rule</li>
           <li>One sentence on how an attacker using <span class="mono">-T0</span> timing (Lab 13's preview) could slip under your threshold — and what you'd change to catch them</li>
@@ -4716,7 +4716,7 @@ SecurityEvent
 
       <div class="box intro">
         <span class="box-t">What you are about to do</span>
-        <p>Session 2 ended with a ranked recon report. Session 3 ends with a <strong>target profile</strong>:
+        <p>Session 2 ended with a ranked recon report. Session 3 ends with a <strong class="hl">target profile</strong>:
            the confirmed, scanned, enumerated picture of each host. Same discipline — conclusions over dumps,
            confidence stated — but now built from packets you sent, not public data. This is the single most
            important artefact you carry into Session 4.</p>
@@ -4775,7 +4775,7 @@ SecurityEvent
           </div>
         </li>
         <li>
-          <strong>Attach your detection rule</strong> from Lab 7 as an appendix — the profile is attacker
+          <strong class="hl">Attach your detection rule</strong> from Lab 7 as an appendix — the profile is attacker
           <em>and</em> defender.
         </li>
       </ol>
@@ -4816,7 +4816,7 @@ SecurityEvent
 
       <div class="box warn">
         <span class="box-t">Read this first &mdash; the line you must not cross</span>
-        <p>Passive recon on public data is legal almost anywhere. <strong>Port scanning is not.</strong> In
+        <p>Passive recon on public data is legal almost anywhere. <strong class="hl hl-w">Port scanning is not.</strong> In
            Egypt, Law&nbsp;175/2018 on Anti-Cyber and Information Technology Crimes criminalises unauthorised
            access to and interference with information systems; equivalent laws exist in every country you
            will work in (UK Computer Misuse Act, US CFAA, UAE Federal Decree-Law 34/2021). A port scan
@@ -4866,7 +4866,7 @@ SecurityEvent
         <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>One host, on the real internet, that its owner has explicitly authorised you to scan. This is the only external target in the exercise &mdash; and the point is to feel the difference between a lab and the internet.</div>
         <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Now the real work. Four targets, four operating systems, the same methodology on each: discover &rarr; scan &rarr; version &rarr; enumerate &rarr; record.</div>
         <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Three more machines with genuinely different service profiles, so the team meets output it has not been shown on a slide.</div>
-        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The half that makes this a CEH exercise and not a scanning exercise. You hand your capture to another team, they hand you theirs, and each of you has to say <b>what was run, from where, and how you know</b>.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The half that makes this a CEH exercise and not a scanning exercise. You hand your capture to another team, they hand you theirs, and each of you has to say <b class="hl">what was run, from where, and how you know</b>.</div>
         <figcaption><b>This is the shape of a real internal test.</b> Scope, external check, internal sweep, deeper dive, then the defender&rsquo;s view. Session 4 picks up your report exactly where you leave it.</figcaption>
       </figure>
 
@@ -4905,7 +4905,7 @@ SecurityEvent
 
       <div class="box tip">
         <span class="box-t">Rules for Phase 1 &mdash; enforced</span>
-        <p><strong>One scan per team.</strong> Top 100 ports only. No <span class="mono">-p-</span>, no
+        <p><strong class="hl hl-w">One scan per team.</strong> Top 100 ports only. No <span class="mono">-p-</span>, no
            <span class="mono">-T5</span>, no <span class="mono">-A</span>, no NSE brute scripts, no repeats
            &ldquo;to check&rdquo;. Twenty teams hammering one volunteer host is exactly how a free resource
            gets taken away from the next class.</p>
@@ -5063,7 +5063,7 @@ nmap -sS --top-ports 100 -T3 scanme.nmap.org        # that is the whole phase
           <line x1="668" y1="66" x2="704" y2="66" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
           <rect x="708" y="40" width="196" height="52" rx="8" fill="var(--panel)" stroke="var(--line-soft)"/><text x="806" y="62" font-size="11.5" fill="#fff" text-anchor="middle" font-weight="700">S5 · Exploit</text><text x="806" y="80" font-size="10" class="d-sub" text-anchor="middle">access</text>
         </svg>
-        <figcaption><b>One target, all the way down.</b> Nothing you did today is thrown away — it's the input
+        <figcaption><b class="hl">One target, all the way down.</b> Nothing you did today is thrown away — it's the input
           to everything that follows.</figcaption>
       </figure>
 
@@ -5295,7 +5295,7 @@ enum4linux -a &lt;ip&gt;  →  peter, RNunemaker, elly, kathy, tim,
 
       <div class="box warn">
         <span class="box-t">Same safety rule</span>
-        <p>All three are intentionally vulnerable — <strong>host-only or isolated NAT only, never Bridged or
+        <p>All three are intentionally vulnerable — <strong class="hl hl-w">host-only or isolated NAT only, never Bridged or
            internet-facing.</strong> An exposed box is compromised in minutes.</p>
       </div>
     </div>
@@ -5336,7 +5336,7 @@ enum4linux -a &lt;ip&gt;  →  peter, RNunemaker, elly, kathy, tim,
 
       <div class="box lab-box">
         <span class="box-t">Plus your local practice range (previous page)</span>
-        <p>Offline and unlimited: <strong>Metasploitable 3</strong> (Windows web-service + SMB enum),
+        <p>Offline and unlimited: <strong class="hl">Metasploitable 3</strong> (Windows web-service + SMB enum),
            <strong>Kioptrix 1</strong> (version → exploit), <strong>Stapler 1</strong> (SMB user enum). Run the
            full workflow on each and add its profile to your notes — no subscription, no rate limit.</p>
       </div>
@@ -5370,13 +5370,13 @@ enum4linux -a &lt;ip&gt;  →  peter, RNunemaker, elly, kathy, tim,
 
       <h2><span class="h-t">The seven things to keep</span></h2>
       <ul class="takeaways">
-        <li><strong>Scanning is loud.</strong> It's the most commonly detected stage of an intrusion — every technique leaves a log.</li>
+        <li><strong class="hl">Scanning is loud.</strong> It's the most commonly detected stage of an intrusion — every technique leaves a log.</li>
         <li><strong>Learn the reflexes, not the flags.</strong> Open answers SYNs and ignores stealth flags; closed RSTs everything; filtered stays silent. Every scan type falls out of that.</li>
-        <li><strong>ICMP silence ≠ dead host.</strong> ARP on the segment, TCP probes through a router, <span class="mono">-Pn</span> when discovery lies.</li>
+        <li><strong class="hl">ICMP silence ≠ dead host.</strong> ARP on the segment, TCP probes through a router, <span class="mono">-Pn</span> when discovery lies.</li>
         <li><strong>Breadth then depth.</strong> masscan/rustscan to find ports fast, nmap to interrogate them deeply.</li>
         <li><strong>Enumeration is a conversation.</strong> "enum4linux returned nothing" is a hardening finding, not a failure — enumerate with credentials.</li>
         <li><strong>Verify the tool is alive before you teach the command.</strong> enum4linux-ng, NetExec (nxc) — not the dead names.</li>
-        <li><strong>You can catch yourself.</strong> One source, many ports, short window — that's the rule you wrote, and it's the job.</li>
+        <li><strong class="hl hl-d">You can catch yourself.</strong> One source, many ports, short window — that's the rule you wrote, and it's the job.</li>
       </ul>
 
       <div class="box key-takeaway">

@@ -1,6 +1,6 @@
 ---
 session: 3
-status: rebuilt 2026-09-07 — awaiting review
+status: rebuilt 2026-09-07, diagram fix + highlights 2026-09-09 — published
 ---
 
 # Session 3 — Build Log
@@ -236,3 +236,51 @@ are computed from these.
   are still placeholders; the 19 pcaps now carry that teaching in the meantime.
 - The team report (`report.html`) still has 11 S3 steps — it does not yet include Lab 9's four phases.
   Regenerating it needs `scripts/gen_session_report.py` and is a separate, safe change.
+
+## 2026-09-09 — protocol diagrams fixed, and every page highlighted
+
+**The bug the instructor found.** All 7 protocol packet-flow diagrams were dead: Play/Next
+did nothing and every step showed at once. Cause: `<b>` inside SVG `<text>`. `<b>` is a
+foreign-content **breakout** tag — the HTML parser closes the `<svg>` when it meets one, so
+everything after the first `<b>` landed outside the SVG. Measured escape rate:
+
+| Diagram | steps inside its `<svg>` |
+|---|---|
+| SMB | 1 of 9 |
+| LDAP · SNMP · FTP · SMTP | 1 of 8 each |
+| NFS | 2 of 7 |
+| RPC | 3 of 6 |
+| the 14 scan/lab diagrams | all correct (their labels are plain text) |
+
+**Why the 2026-09-07 verification missed it.** It asserted step-count == caption-count == 3
+controls. All still true — the elements existed, just in the wrong parent. The lesson, now
+written into `design/design_system.md` §5b-bis: *assert the element is inside the container
+that styles it, not merely that it exists.*
+
+**Fixed at the generator, not the output.** `gen.svgtext()` translates `<b>`→
+`<tspan font-weight="700">`, `<i>`/`<em>`→`<tspan font-style="italic">` and strips the rest
+of the breakout list; `gen.assert_svg_safe()` fails the build if one survives. All 7 protocol
+pages regenerated. Result: **0 of 21 figures have an escaped step, 0 HTML tags inside any
+`<svg>`.**
+
+**Permanent guard.** `scripts/audit_layout.js` gained **check 5** (HTML-in-SVG + escaped
+`.pf-step`/`.node`), with a `BREAK=svgbreakout` sabotage — confirmed to fail 0/24 when
+sabotaged and pass 30/30 clean, so the check is proven to bite.
+
+**Highlighting.** New shared `.hl` / `.hl hl-d` / `.hl hl-w` inline highlighter (amber = the
+rule, green = the SOC fact, red = the danger). **73 highlights across 38 of 40 pages** —
+`Break` and `Knowledge check` are deliberately excluded. Applied by `s3build/highlight.py`
+from a curated page→phrase map that asserts each phrase matches exactly once, that every map
+key matches a real page title, and that no page is left without one. Two defects in the first
+pass were caught by those assertions and fixed: `hl-d`/`hl-w` were being emitted without the
+base `hl` class (so they lost padding/colour and were invisible to an audit query), and one
+map key used `&middot;` where the page title has a literal `·`, which silently skipped a page.
+
+**First highlight treatment was wrong and was replaced.** A 55% gradient band cut through the
+glyphs and read as a strikethrough. Now a soft tint plus a 2px underline, with the wash
+dropped inside already-tinted boxes so two tints never stack.
+
+**Verification:** whole-site width+SVG audit **30/30** at 1920/1400/1100/900/700/480 · 40
+pages · 21/21 pktflow figures wired and stepping (ghost 0.085 → lit 1.0 confirmed by computed
+style) · 0 escaped steps · 0 HTML in SVG · 0 SVG text outside its viewBox · 23 interactive
+nodes, 0 orphans · 0 console errors · 0 failed requests.

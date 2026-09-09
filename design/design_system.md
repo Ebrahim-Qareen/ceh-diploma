@@ -160,6 +160,38 @@ Plays once on load, then on demand. Runs 3 cycles and stops (not infinite — a
 looping animation behind a lecturer is distracting).
 
 
+### 5b-bis. NEVER put an HTML tag inside an `<svg>` (learned the hard way, 2026-09-09)
+
+`<b>`, `<i>`, `<em>`, `<span>`, `<code>`, `<p>`, `<div>`, `<br>`, `<small>`, `<strong>`,
+`<sub>`, `<sup>`, `<s>`, `<u>`, `<var>`, `<ul>`, `<li>`, `<table>`, `<pre>`, `<nobr>` and
+`<font>` are **foreign-content breakout tags**. When the HTML parser meets one inside an
+`<svg>`, it *closes the SVG* and resumes in HTML — everything after that point lands
+**outside** the `<svg>` as ordinary markup.
+
+This shipped live and broke **all 7 protocol packet-flow diagrams** in Session 3: only 1 of
+9 SMB steps stayed inside the SVG, so `.dgm.pktflow svg .pf-step` stopped matching, every
+step rendered at full opacity, and Play/Next looked dead.
+
+**Use `<tspan>` instead** — it is the SVG-native equivalent:
+
+| Want | Write |
+|---|---|
+| bold | `<tspan font-weight="700">…</tspan>` |
+| italic | `<tspan font-style="italic">…</tspan>` |
+| a colour | `<tspan fill="var(--orange)">…</tspan>` |
+
+The session-3 build harness sanitises this automatically (`gen.svgtext()`), asserts it at
+build time (`gen.assert_svg_safe()`), and `scripts/audit_layout.js` **check 5** fails the
+whole site if any breakout tag or escaped `.pf-step` reaches a page. Sabotage it with
+`BREAK=svgbreakout` to confirm the check still bites.
+
+**Why the original verification missed it:** the checks counted `data-step` vs `data-cap`
+vs control buttons — all still correct in the DOM, because the elements existed, just in the
+wrong parent. *Always assert the element is inside the container that styles it*, not merely
+that it exists.
+
+---
+
 ### 5c. Stepped packet-flow diagrams (`.dgm.pktflow`) — added 2026-09-07
 
 The "what happens in the background" mechanic. A sequence diagram the student **steps through** with
@@ -246,6 +278,39 @@ for UDP), `.proto-facts` (a grid of `.pf-fact`, with `.good`/`.bad` to colour th
 in a `<span class="g-att">` ATT&CK id).
 
 `.pcap-bar` / `.pcap-card` is the capture-library grid on the Wireshark page.
+
+### 3c. Inline highlighter (`.hl`) — added 2026-09-09
+
+Marker-pen emphasis for the one or two things on a page a student must leave with. It rides
+on an **existing `<strong>`/`<b>`**, so applying it never re-flows the paragraph.
+
+```html
+<strong class="hl">Open / Closed / Filtered are not three commands.</strong>
+<strong class="hl hl-d">one-to-many in a short time</strong>
+<strong class="hl hl-w">Port scanning is not.</strong>
+```
+
+| Class | Tint | Means |
+|---|---|---|
+| `.hl` | amber | the fact to remember, the rule |
+| `.hl hl-d` | green | the defender / SOC fact |
+| `.hl hl-w` | red | the danger, the legal line, the thing that bites |
+
+**Rules**
+1. The tint carries meaning — never decorative. Always pair `hl-d`/`hl-w` **with** `hl`;
+   alone they inherit no padding or colour.
+2. **Budget 2–3 per page.** More than that and none of them are highlights.
+3. Inside an already-tinted box (`.box`, `.leads-to`, `.gain`, `.verify`, `.practice`) the
+   wash is dropped automatically and only the underline remains, so two tints never stack.
+4. Applied by `s3build/highlight.py` from a curated page→phrase map, **after** assembly and
+   after `gen_table_colgroups.py`. It asserts every phrase matches exactly once, that every
+   map key matches a real `data-title`, and that every page carries a highlight — except
+   `Break` (a timer) and `Knowledge check` (highlighting spoils an answer).
+
+**Session page build order (do not reorder):**
+`assemble.py` → `scripts/gen_table_colgroups.py` → `s3build/highlight.py` → `scripts/audit_layout.js`
+
+---
 
 ---
 

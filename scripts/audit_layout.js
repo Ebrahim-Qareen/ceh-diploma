@@ -7,12 +7,19 @@
  *   2. every .wrap has paddingLeft >= 14px     (catches the padding-shorthand trap)
  *   3. no cell of >55 chars renders < 190px    (catches a squeezed prose column)
  *   4. no document h-scroll, nothing outside a scroll container
+ *   5. NO HTML TAG INSIDE AN <svg>  (added 2026-09-09 after a live bug)
+ *      <b>, <i>, <em>, <span>, <code>, <p>, <div>, <br>… are foreign-content
+ *      BREAKOUT tags: the HTML parser closes the <svg> when it meets one, and
+ *      everything after it lands outside the SVG as plain HTML. This silently
+ *      killed all 7 protocol packet-flow diagrams in Session 3 — the steps
+ *      escaped the <svg>, `.dgm.pktflow svg .pf-step` stopped matching, every
+ *      step rendered at full opacity and Play/Next looked dead. Use <tspan>.
  *
  * 1920 is NOT optional: with a 1680px container cap, a rule that cancels the
  * container is invisible at 1400. That is exactly where the bug hides.
  *
  * BREAK values (each MUST fail — a check that has never failed proves nothing):
- *   edges · padding · nocolgroup · overflow · minwidth · tablemw
+ *   edges · padding · nocolgroup · overflow · minwidth · tablemw · svgbreakout
  * Note `cells` alone PASSES, because the per-table <colgroup> overrides
  * td:last-child{width:1%} — which is the point of having one.
  */
@@ -28,7 +35,7 @@ const CHROME = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linu
 const BREAK = process.env.BREAK || '';
 
 const AUDIT = () => {
-  const out = {edges:[], padding:[], cells:[], overflow:[], docScroll:null};
+  const out = {edges:[], padding:[], cells:[], overflow:[], docScroll:null, svgBreakout:[], escapedSteps:[]};
   const near = (a,b)=>Math.abs(a-b) < 1.5;
   const wraps = [...document.querySelectorAll('.wrap')].filter(el => el.offsetParent !== null || el.getClientRects().length);
   const lefts = wraps.map(el => ({sel: el.className, left: +el.getBoundingClientRect().left.toFixed(1),
@@ -44,6 +51,22 @@ const AUDIT = () => {
     const w = td.getBoundingClientRect().width;
     if (w > 0 && w < 190) out.cells.push(`${txt.slice(0,42).replace(/\s+/g,' ')}… w=${w.toFixed(0)} chars=${txt.length}`);
   }
+  // 5. HTML tags that break the parser out of an <svg>, and any stepped-diagram
+  //    group that has consequently escaped its SVG.
+  const BREAKOUT = 'b,big,blockquote,body,br,center,code,dd,div,dl,dt,em,embed,h1,h2,h3,h4,h5,h6,'
+                 + 'head,hr,i,img,li,listing,menu,meta,nobr,ol,p,pre,ruby,s,small,span,strong,'
+                 + 'strike,sub,sup,table,tt,u,ul,var,font';
+  for (const svg of document.querySelectorAll('svg')) {
+    for (const el of svg.querySelectorAll(BREAKOUT)) {
+      out.svgBreakout.push(el.tagName.toLowerCase() + ' in svg[' + (svg.getAttribute('aria-label')||'').slice(0,34) + ']');
+    }
+  }
+  out.svgBreakout = [...new Set(out.svgBreakout)].slice(0, 6);
+  for (const g of document.querySelectorAll('.pf-step,.node[data-node]')) {
+    if (!g.closest('svg')) out.escapedSteps.push((g.getAttribute('data-step')||g.getAttribute('data-node')||'?') + ' escaped its svg');
+  }
+  out.escapedSteps = [...new Set(out.escapedSteps)].slice(0, 6);
+
   out.docScroll = document.documentElement.scrollWidth - document.documentElement.clientWidth;
   const vw = document.documentElement.clientWidth;
   const scrolls = el => { const s = getComputedStyle(el); return s.overflowX === 'auto' || s.overflowX === 'scroll'; };
@@ -74,6 +97,9 @@ const AUDIT = () => {
       if (BREAK === 'minwidth') await page.addStyleTag({content:'.split>*,.grid>*,.tiles>*{min-width:auto}'});
       if (BREAK === 'tablemw')  await page.addStyleTag({content:'.tbl-scroll table{min-width:0}'});
       if (BREAK === 'overflow') await page.addStyleTag({content:'.tbl-scroll{overflow-x:visible}'});
+      if (BREAK === 'svgbreakout') await page.evaluate(() => {
+        const t = document.querySelector('.dgm svg text'); if (t) t.innerHTML = '<b>' + t.textContent + '</b>';
+      });
       if (BREAK === 'nocolgroup') {
         await page.evaluate(() => document.querySelectorAll('colgroup').forEach(c => c.remove()));
         await page.addStyleTag({content:'.content table{table-layout:auto}.content td:last-child{width:1%}'});
@@ -86,6 +112,8 @@ const AUDIT = () => {
       if (r.cells.length)    bad.push(`CELLS(${r.cells.length}): ${r.cells[0]}`);
       if (r.docScroll > 1)   bad.push(`DOC-SCROLL: +${r.docScroll}px`);
       if (r.overflow.length) bad.push(`OUTSIDE(${r.overflow.length}): ${r.overflow[0]}`);
+      if (r.svgBreakout.length)  bad.push(`HTML-IN-SVG(${r.svgBreakout.length}): ${r.svgBreakout[0]}`);
+      if (r.escapedSteps.length) bad.push(`ESCAPED-SVG(${r.escapedSteps.length}): ${r.escapedSteps[0]}`);
       checks++;
       if (bad.length) { fails++; console.log(`FAIL ${p} @${w}\n      ` + bad.join('\n      ')); }
       else console.log(`ok   ${p} @${w}`);
