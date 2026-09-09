@@ -21,6 +21,7 @@
     wireShots();
     wireInteractiveDiagrams();
     wireReplay();
+    wireSims();
     wirePacketFlows();
 
     var start = parseInt((location.hash || '').replace('#p', ''), 10);
@@ -33,6 +34,15 @@
     idx = n;
 
     pages.forEach(function (p, i) { p.classList.toggle('active', i === idx); });
+    var _ap = pages[idx];
+    if (_ap) setTimeout(function () {
+      _ap.querySelectorAll('.sim[data-animate]').forEach(function (s) {
+        if (s.__simPlay && !s.__simPlayed) {
+          var r = s.getBoundingClientRect();
+          if (r.top < (window.innerHeight || 800) && r.bottom > 0) s.__simPlay();
+        }
+      });
+    }, 80);
 
     document.querySelectorAll('#sessionNav li').forEach(function (li, i) {
       li.classList.toggle('now', i === idx);
@@ -234,6 +244,27 @@
         el.classList.remove('animate-run');
         void el.offsetWidth; // restart CSS animation
         el.classList.add('animate-run');
+      }
+    });
+  }
+
+  /* ---------- sim screens (animated tool/terminal windows) ----------
+     Lines are visible by default; when a sim scrolls into view (or its page
+     opens) they replay in sequence. Never leaves a blank terminal.        */
+  function wireSims() {
+    Array.prototype.slice.call(document.querySelectorAll('.sim[data-animate]')).forEach(function (sim) {
+      var lines = Array.prototype.slice.call(sim.querySelectorAll('.sim-body .l'));
+      var btn = sim.querySelector('.sim-replay'); var timers = [];
+      function reset() { timers.forEach(clearTimeout); timers = []; lines.forEach(function (l) { l.classList.remove('shown'); }); }
+      function play() {
+        reset(); sim.__simPlayed = true; sim.classList.add('playing'); var t = 0;
+        lines.forEach(function (l) { t += l.classList.contains('cmd') ? 300 : 150; timers.push(setTimeout(function () { l.classList.add('shown'); }, t)); });
+        timers.push(setTimeout(function () { sim.classList.remove('playing'); }, t + 260));
+      }
+      sim.__simPlay = play;
+      if (btn) btn.addEventListener('click', play);
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !sim.__simPlayed) play(); }); }, { threshold: 0.25 }).observe(sim);
       }
     });
   }
