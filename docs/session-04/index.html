@@ -1304,6 +1304,19 @@ john --show unshadowed.txt                           # print cracked
 # helpdesk:1002:aad3b...:&lt;nt-hash&gt;:::
 # take the 4th field (the NT hash) into a file, one per line
 awk -F: 'NF>3{print $4}' sam_dump.txt > sam.txt</code></pre>
+      <div class="sim" data-animate>
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">impacket-secretsdump</span></div>
+  <div class="sim-body">
+<span class="l cmd root">impacket-secretsdump ./Administrator@192.168.56.107</span>
+<span class="l dim">[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)</span>
+<span class="l">Administrator:500:aad3b...:<span class="dim">31d6cfe0d16ae931b73c59d7e0c089c0</span>:::</span>
+<span class="l">labuser:1001:aad3b...:<span class="hl">e19ccf75ee54e06b06a5907af13cef42</span>:::</span>
+<span class="l">helpdesk:1002:aad3b...:<span class="hl">64f12cddaa88057e06a81b54e73b949b</span>:::</span>
+<span class="l ok">[*] Done — SAM dumped</span>
+<span class="l cmd">awk -F: 'NF&gt;3{print $4}' sam_dump.txt &gt; sam.txt   # NT hashes → hashcat -m 1000</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note">The 4th field is the <b>NT hash</b> — that is what mode 1000 cracks.</span></div>
+</div>
           <div class="verify">
             <h4>✓ Verification</h4>
             <ul>
@@ -1513,11 +1526,20 @@ EOF</code></pre>
 # [+] ceh.lab\h.rashad:Autumn2025!
 # [-] ceh.lab\m.said           (distinct strong password — the spray misses it)
 # [-] ceh.lab\svc_backup       (its own password)</code></pre>
-          <figure class="shot">
-            <img src="assets/img/event-4625-spray.jpg" alt="Windows Event Viewer showing a burst of 4625 failed-logon events from one source in a short window — the password-spray signature">
-            <figcaption>The defender's view of your spray: a cluster of <span class="mono">4625</span> failed logons across
-               many accounts from one source, seconds apart. <em>(Ships as a labelled placeholder until captured on a monitored Windows DC.)</em></figcaption>
-          </figure>
+          <div class="sim sim-evt">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">Event Viewer — Windows Logs &#9656; Security</span><span class="sim-tool">DC01 · ceh.lab</span></div>
+  <div class="sim-body">
+    <table><thead><tr><th>Level</th><th>Date and Time</th><th>Event ID</th><th>Account</th><th>Source IP</th></tr></thead>
+    <tbody>
+      <tr class="hlrow"><td class="lvl-f">Audit Failure</td><td>09/09/2026 14:22:03</td><td class="k">4625</td><td>a.fahmy</td><td>192.168.56.50</td></tr>
+      <tr class="hlrow"><td class="lvl-f">Audit Failure</td><td>09/09/2026 14:22:03</td><td class="k">4625</td><td>n.gamal</td><td>192.168.56.50</td></tr>
+      <tr class="hlrow"><td class="lvl-f">Audit Failure</td><td>09/09/2026 14:22:04</td><td class="k">4625</td><td>h.rashad</td><td>192.168.56.50</td></tr>
+      <tr class="hlrow"><td class="lvl-f">Audit Failure</td><td>09/09/2026 14:22:04</td><td class="k">4625</td><td>m.said</td><td>192.168.56.50</td></tr>
+      <tr class="hlrow"><td class="lvl-f">Audit Failure</td><td>09/09/2026 14:22:05</td><td class="k">4625</td><td>svc_backup</td><td>192.168.56.50</td></tr>
+    </tbody></table>
+  </div>
+  <div class="sim-cta"><span class="sim-note"><b>4625 = failed logon.</b> Many accounts &middot; one source &middot; seconds apart &middot; status <span class="mono">0xC000006A</span> = the spray signature.</span></div>
+</div>
           <div class="verify">
             <h4>✓ Verification</h4>
             <ul>
@@ -1946,6 +1968,18 @@ evil-winrm -i 192.168.56.20 -u svc_backup -p '&lt;cracked&gt;'  # interactive Po
         <figcaption><b>Orange did it, green saw it.</b> Every credential attack has a matching auth-log signature — which
            is why authentication is where detection pays off most.</figcaption>
       </figure>
+      <div class="sim sim-evt">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">Event Viewer — Security</span><span class="sim-tool">DC01 · ceh.lab</span></div>
+  <div class="sim-body">
+    <table><thead><tr><th>Level</th><th>Time</th><th>Event ID</th><th>Service (SPN) requested</th><th>Ticket Enc.</th></tr></thead>
+    <tbody>
+      <tr class="hlrow"><td class="lvl-i">Information</td><td>15:41:10</td><td class="k">4769</td><td>MSSQL/dc.ceh.lab</td><td class="lvl-f">0x17 · RC4</td></tr>
+      <tr class="hlrow"><td class="lvl-i">Information</td><td>15:41:10</td><td class="k">4769</td><td>HTTP/web.ceh.lab</td><td class="lvl-f">0x17 · RC4</td></tr>
+      <tr><td class="lvl-i">Information</td><td>15:41:11</td><td class="k">4769</td><td>CIFS/dc.ceh.lab</td><td>0x12 · AES256</td></tr>
+    </tbody></table>
+  </div>
+  <div class="sim-cta"><span class="sim-note"><b>4769 with enc-type <span class="mono">0x17</span> (RC4)</b> requested for several SPNs by one user, seconds apart = Kerberoast. AES (0x12) tickets are normal traffic.</span></div>
+</div>
 
       <h2><span class="h-t">Where each credential lives — click a target</span></h2>
       <p>The same workflow, a different store per OS. This is the map behind everything today.</p>

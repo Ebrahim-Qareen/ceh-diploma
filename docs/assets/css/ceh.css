@@ -803,3 +803,16 @@ details.rep-group .rep-group-title{color:var(--text)}
 .sim-row .sim-find{font-size:13.5px;color:var(--text)}
 .sim-row .sim-cve{font-family:var(--mono);font-size:11.5px;color:var(--text-3);margin-left:auto;white-space:nowrap}
 @media(max-width:640px){.sim-row{flex-wrap:wrap}.sim-row .sim-cve{margin-left:0}}
+
+/* sim screens sit as medium, centered screenshots (not full-bleed) */
+.sim{max-width:1040px;margin-left:auto;margin-right:auto}
+/* Event Viewer variant — a tabular "screenshot" that always renders */
+.sim-evt .sim-body{padding:0;white-space:normal;overflow-x:auto}
+.sim-evt table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;min-width:560px}
+.sim-evt th{background:#161b24;color:var(--text-3);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;font-weight:700}
+.sim-evt td{padding:7px 12px;border-bottom:1px solid #171d29;color:#c9d1d9;white-space:nowrap}
+.sim-evt tr:last-child td{border-bottom:none}
+.sim-evt .lvl-f{color:#ff6b7a;font-weight:700}
+.sim-evt .lvl-i{color:#22d3ee}
+.sim-evt .hlrow td{background:rgba(230,57,70,.07)}
+.sim-evt .k{color:#fbbf24;font-weight:700}
