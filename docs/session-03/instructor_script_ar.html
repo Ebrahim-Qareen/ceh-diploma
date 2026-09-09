@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 03 — سكربت الشرح بالعربي | CEH · ITGate Academy</title>
+<style>
+:root{
+  --bg:#0d1117; --bg-alt:#131720; --panel:#1a1f2a; --panel-2:#1f2533;
+  --line:#252b38; --line-soft:#333b4c;
+  --red:#e63946; --red-soft:#ff6b7a; --cyan:#22d3ee; --orange:#ff7043;
+  --green:#4ade80; --purple:#a78bfa; --amber:#fbbf24;
+  --text:#e4e8ee; --text-2:#a0aab6; --text-3:#768290;
+  --mono:"JetBrains Mono","Fira Code",Consolas,"Courier New",monospace;
+  --ar:"Segoe UI","Tahoma","Noto Naskh Arabic","Arial",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--ar);
+     font-size:16.5px;line-height:1.95;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin-inline:auto;padding:0 22px}
+a{color:var(--cyan);text-decoration:none}
+a:hover{color:var(--red-soft)}
+
+/* --- English terms stay LTR inside Arabic prose --- */
+.en{direction:ltr;unicode-bidi:isolate;font-family:var(--mono);font-size:.9em;
+    color:var(--cyan);background:rgba(34,211,238,.07);
+    border:1px solid rgba(34,211,238,.18);border-radius:5px;padding:1px 6px;white-space:nowrap}
+.en.o{color:var(--orange);background:rgba(255,112,67,.07);border-color:rgba(255,112,67,.2)}
+.en.g{color:var(--green);background:rgba(74,222,128,.07);border-color:rgba(74,222,128,.2)}
+.en.a{color:var(--amber);background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.2)}
+.en.p{color:var(--text);background:transparent;border:none;padding:0}
+
+/* --- header --- */
+header.top{background:linear-gradient(180deg,#151a24,#0d1117);border-bottom:1px solid var(--line);
+   padding:34px 0 26px;margin-bottom:26px}
+header.top h1{margin:0 0 8px;font-size:29px;color:var(--red-soft);letter-spacing:.2px}
+header.top p{margin:0;color:var(--text-2);font-size:15.5px}
+.badges{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.badge{font-size:12.5px;padding:4px 11px;border-radius:20px;border:1px solid var(--line-soft);
+   color:var(--text-2);background:var(--panel)}
+
+/* --- how to use --- */
+.howto{background:var(--panel);border:1px solid var(--line-soft);border-radius:12px;
+   padding:18px 22px;margin-bottom:26px}
+.howto h3{margin:0 0 10px;font-size:17px;color:var(--amber)}
+.howto ul{margin:0;padding-inline-start:20px}
+.howto li{margin-bottom:5px;color:var(--text-2);font-size:15px}
+
+/* --- TOC --- */
+.toc{background:var(--bg-alt);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:34px}
+.toc h3{margin:0 0 12px;font-size:16px;color:var(--cyan)}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:30px}
+@media(max-width:760px){.toc ol{columns:1}}
+.toc li{margin-bottom:4px;font-size:14.5px}
+.toc a{color:var(--text-2)}
+.toc a:hover{color:var(--cyan)}
+
+/* --- section --- */
+section.blk{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+   margin-bottom:22px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+section.blk>.hd{background:var(--panel-2);border-bottom:1px solid var(--line);
+   padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hd .num{background:var(--red);color:#fff;font-weight:700;font-size:13px;
+   border-radius:7px;padding:3px 10px;font-family:var(--mono)}
+.hd h2{margin:0;font-size:19px;flex:1;min-width:220px}
+.hd .min{font-size:12.5px;color:var(--text-3);font-family:var(--mono)}
+.hd .src{font-size:12px;color:var(--text-3)}
+section.blk>.bd{padding:20px 22px}
+h3.sub{margin:22px 0 10px;font-size:16.5px;color:var(--amber);
+   border-bottom:1px dashed var(--line-soft);padding-bottom:6px}
+h3.sub:first-child{margin-top:0}
+p{margin:0 0 12px}
+
+/* --- speech --- */
+.say{border-inline-start:3px solid var(--orange);background:rgba(255,112,67,.05);
+   border-radius:0 8px 8px 0;padding:12px 16px;margin:0 0 12px}
+.say:before{content:"🎤 بتقول:";display:block;font-size:12px;color:var(--orange);
+   margin-bottom:6px;font-weight:600;letter-spacing:.4px}
+.say p:last-child{margin-bottom:0}
+
+/* --- point at slide --- */
+.slide{border-inline-start:3px solid var(--purple);background:rgba(167,139,250,.05);
+   border-radius:0 8px 8px 0;padding:11px 16px;margin:0 0 12px;font-size:15px;color:var(--text-2)}
+.slide:before{content:"🖥️ على السلايد:";display:block;font-size:12px;color:var(--purple);
+   margin-bottom:5px;font-weight:600}
+
+/* --- SOC flip --- */
+.soc{border-inline-start:3px solid var(--green);background:rgba(74,222,128,.05);
+   border-radius:0 8px 8px 0;padding:11px 16px;margin:0 0 12px;font-size:15px}
+.soc:before{content:"🛡️ الـ SOC flip:";display:block;font-size:12px;color:var(--green);
+   margin-bottom:5px;font-weight:600}
+
+/* --- warning / FAQ --- */
+.warn{border-inline-start:3px solid var(--amber);background:rgba(251,191,36,.05);
+   border-radius:0 8px 8px 0;padding:11px 16px;margin:0 0 12px;font-size:15px}
+.warn:before{content:"⚠️ خد بالك:";display:block;font-size:12px;color:var(--amber);
+   margin-bottom:5px;font-weight:600}
+
+/* --- lab --- */
+.lab{border:1px solid rgba(34,211,238,.28);background:rgba(34,211,238,.04);
+   border-radius:10px;padding:14px 18px;margin:14px 0}
+.lab h4{margin:0 0 10px;font-size:15.5px;color:var(--cyan)}
+.lab ol{margin:0;padding-inline-start:22px}
+.lab ol>li{margin-bottom:14px}
+.lab .expect{display:block;font-size:14px;color:var(--green);margin-top:5px}
+.lab .expect:before{content:"✓ المفروض تشوف: ";color:var(--green);font-weight:600}
+
+/* --- code --- */
+pre{direction:ltr;text-align:left;background:#0a0d13;border:1px solid var(--line-soft);
+   border-radius:8px;padding:12px 14px;overflow-x:auto;margin:8px 0;
+   font-family:var(--mono);font-size:13.3px;line-height:1.75;color:#c9d3e0}
+pre .c{color:var(--text-3)}
+pre .k{color:var(--orange)}
+
+/* --- steps (packet flow) --- */
+ol.steps{counter-reset:s;list-style:none;margin:10px 0;padding:0}
+ol.steps>li{counter-increment:s;position:relative;padding-inline-start:58px;margin-bottom:15px;min-height:20px}
+ol.steps>li:before{content:"STEP " counter(s);position:absolute;inset-inline-start:0;top:4px;
+   font-family:var(--mono);font-size:10px;color:var(--red-soft);background:rgba(230,57,70,.12);
+   border:1px solid rgba(230,57,70,.3);border-radius:5px;padding:2px 5px;line-height:1.4;
+   direction:ltr;unicode-bidi:isolate}
+
+/* --- tables --- */
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{border:1px solid var(--line-soft);padding:8px 11px;text-align:start;vertical-align:top}
+th{background:var(--panel-2);color:var(--amber);font-weight:600;font-size:13.5px}
+td .en{white-space:normal}
+
+/* --- key line --- */
+.key{background:linear-gradient(90deg,rgba(230,57,70,.13),transparent);
+   border-inline-start:3px solid var(--red);border-radius:0 8px 8px 0;
+   padding:12px 16px;margin:14px 0;font-size:16px;font-weight:600;color:#fff}
+.key:before{content:"🔑 الجملة اللي تسيبها معاهم: ";color:var(--red-soft);font-weight:700;font-size:13px;display:block;margin-bottom:4px}
+
+.brk{text-align:center;background:var(--bg-alt);border:1px dashed var(--line-soft);
+   border-radius:12px;padding:22px;margin:22px 0;color:var(--text-2)}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:24px 0 50px;
+   color:var(--text-3);font-size:13.5px;text-align:center}
+.why{background:#0f141c;border:1px dashed var(--line-soft);border-radius:8px;
+   padding:9px 13px;margin:-2px 0 10px;font-size:13.9px;color:var(--text-2);line-height:2.1}
+.why:before{content:"🔎 يعني إيه الأمر ده؟";color:var(--amber);font-weight:600;font-size:12.5px;display:block;margin-bottom:3px}
+.why b{color:var(--text);font-weight:600}
+.why .f{direction:ltr;unicode-bidi:isolate;font-family:var(--mono);font-size:.88em;color:var(--orange);
+   background:rgba(255,112,67,.09);border:1px solid rgba(255,112,67,.2);border-radius:4px;padding:0 5px;margin-inline-end:4px}
+.why .row{display:block;margin-bottom:2px}
+@media print{body{background:#fff;color:#000}section.blk{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <h1>Session 03 — Scanning &amp; Enumeration · سكربت الشرح</h1>
+    <p>الكلام اللي هتقوله للطلبة، سيكشن سيكشن، بالعربي المصري — والمصطلحات التقنية بالإنجليزي زي ما هي.</p>
+    <div class="badges">
+      <span class="badge">CEH Diploma · ITGate Academy</span>
+      <span class="badge">4 ساعات (256 دقيقة فعلية)</span>
+      <span class="badge">9 Labs · 19 pcap</span>
+      <span class="badge">مرجع الصفحة: index.html — 40 page</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="howto">
+  <h3>إزاي تستخدم الملف ده</h3>
+  <ul>
+    <li>كل بلوك هنا = صفحة (أو مجموعة صفحات) في <span class="en">index.html</span> بنفس الترتيب — افتح الصفحة على البروجيكتور والملف ده على شاشتك.</li>
+    <li>🎤 <strong>بتقول</strong> = الكلام حرفي. مش لازم تحفظه، بس المفروض تقوله بنفس المعنى ونفس الترتيب.</li>
+    <li>🖥️ <strong>على السلايد</strong> = تعمل إيه بإيدك وقت ما بتتكلم (تضغط Next، تشاور على سطر، تفتح pcap).</li>
+    <li>🧪 <strong>اللاب</strong> = الأوامر بالظبط من <span class="en">guided_lab.md</span>. غيّر الـ IPs لشبكتك.</li>
+    <li>الـ <span class="en">▶ Play</span> في الـ diagrams: <strong>متضغطش Play</strong>. اضغط <span class="en">Next</span> وتكلم — خطوة، جملة، خطوة.</li>
+    <li>حدود السيشن: بنقف عند الـ <strong>version string</strong>. الـ CVE والـ exploit ده Session 4 — لو حد سأل، قول له كده وكمّل.</li>
+  </ul>
+</div>
+
+<div class="toc">
+  <h3>محتويات السكربت</h3>
+  <ol>
+    <li><a href="#s1">افتتاحية — التقرير بيتحول لـ scan list</a></li>
+    <li><a href="#s2">Wireshark الأول</a></li>
+    <li><a href="#s3">Lab pre-flight</a></li>
+    <li><a href="#s4">The target zoo — أربع أنظمة</a></li>
+    <li><a href="#s5">Host discovery</a></li>
+    <li><a href="#s6">Lab 1 — الهوست اللي بيمثل ميت</a></li>
+    <li><a href="#s7">The scan-type reflex</a></li>
+    <li><a href="#s8">SYN &amp; Connect</a></li>
+    <li><a href="#s9">Stealth family &amp; ACK</a></li>
+    <li><a href="#s10">UDP scanning</a></li>
+    <li><a href="#s11">Lab 2 — تلات scans و Wireshark</a></li>
+    <li><a href="#s12">Timing · Version · OS</a></li>
+    <li><a href="#s13">Lab 3 — الـ full scan والنسخة الكدابة</a></li>
+    <li><a href="#s14">Scanning countermeasures</a></li>
+    <li><a href="#s15">Break + Evasion preview</a></li>
+    <li><a href="#s16">Enumeration concepts</a></li>
+    <li><a href="#s17">Protocol: SMB</a></li>
+    <li><a href="#s18">SMB enumeration</a></li>
+    <li><a href="#s19">Lab 4 — SMB: 2012 vs النهاردة</a></li>
+    <li><a href="#s20">Protocol: LDAP</a></li>
+    <li><a href="#s21">Protocol: SNMP</a></li>
+    <li><a href="#s22">SNMP &amp; LDAP enumeration</a></li>
+    <li><a href="#s23">Lab 5 — MIB walk + LDAP</a></li>
+    <li><a href="#s24">Protocol: RPC / Portmapper</a></li>
+    <li><a href="#s25">Protocol: NFS</a></li>
+    <li><a href="#s26">Protocol: FTP</a></li>
+    <li><a href="#s27">Protocol: SMTP</a></li>
+    <li><a href="#s28">NSE + netcat banner grabbing</a></li>
+    <li><a href="#s29">Lab 6 — Service sweep</a></li>
+    <li><a href="#s30">Enumeration countermeasures</a></li>
+    <li><a href="#s31">Lab 7 — اكتب الـ detection rule</a></li>
+    <li><a href="#s32">Lab 8 — Target profile</a></li>
+    <li><a href="#s33">Lab 9 — Team engagement</a></li>
+    <li><a href="#s34">القفلة + Homework</a></li>
+  </ol>
+</div>
+
+<!-- ================= 1 ================= -->
+<section class="blk" id="s1">
+  <div class="hd"><span class="num">01</span><h2>افتتاحية — التقرير بيتحول لـ scan list</h2><span class="min">8 min</span><span class="src">P02</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«السيشن اللي فاتت — Session 2 — قفلناها بحاجة اسمها <span class="en">ranked recon report</span>. جمعنا فيه أسماء hosts و IP ranges و technologies، وكل ده من مصادر عامة. الشركة اللي عملنا عليها recon <strong>معرفتش حاجة</strong>. مفيش سطر واحد اتكتب في أي log عندهم.»</p>
+    <p>«النهاردة التقرير ده بيتحول لحاجة تانية: بيبقى <span class="en">scan list</span>. أول تلات أعمدة فيه بتتحول لـ targets. وأول ما تبعت أول packet ناحية الـ target — الحكاية بتتغير تماماً.»</p>
+    <p>«Session 2 كانت <span class="en o">passive</span>. النهاردة <span class="en o">active</span>. الـ IP بتاعك بيوصل عندهم، آلاف المرات، بـ pattern مفيش client طبيعي بيعمله. ودي أعلى صوت الـ attacker بيعمله في حياته كلها — وكمان، ودي الحتة اللي الكتب بتعديها بسرعة: <strong>دي أكتر مرحلة بتتكشف فعلياً في أي intrusion حقيقي</strong>.»</p>
+    <p>«علشان كده السيشن دي مبنية على تراكين في نفس الوقت. أنا SOC analyst، وانتوا بتتعلموا CEH. فكل scan هتتعلم تعمله، هتتعلم كمان تكشفه. الترمينال بتاع الـ attacker على ناحية، والـ capture والـ log بتوع الـ defender على الناحية التانية.»</p>
+    <p>«والجملة الصادقة اللي لازم تسمعوها مني دلوقتي: أي <span class="en">EDR</span> أو <span class="en">IDS</span> حديث بيمسك <span class="en">nmap -A</span> الافتراضي في ثواني. اللي بيعلمك الـ flags من غير ما يقولك ده، بيعلمك أسطورة مش مهنة.»</p>
+  </div>
+
+  <div class="slide">افتح جدول الـ ATT&amp;CK وشاور على النقلة: Session 2 كانت <span class="en">TA0043 Reconnaissance</span>، النهاردة بندخل <span class="en">TA0007 Discovery</span>. اقرا سطرين بس من الجدول — <span class="en">T1595 Active Scanning</span> و <span class="en">T1046 Network Service Discovery</span> — وسيب الباقي مرجع.</div>
+
+  <div class="warn">متعيدش تشرح يعني إيه port أو يعني إيه TCP. الـ prerequisite بتاعنا CCNA + MCSA + Linux. لو حسيت حد تايه في الأساسيات، خده بعد السيشن — متوقفش الفصل كله.</div>
+
+  <div class="key">الـ recon كان قراية <em>عن</em> الـ target. الـ scanning هو إنك تخبط على كل باب وتكتب أنهي واحد فتح — وفيه حد جوه بيشوف الخبطات بتتراكم في log.</div>
+
+  </div>
+</section>
+
+<!-- ================= 2 ================= -->
+<section class="blk" id="s2">
+  <div class="hd"><span class="num">02</span><h2>Wireshark الأول — قبل أي scan</h2><span class="min">8 min</span><span class="src">P03</span></div>
+  <div class="bd">
+
+  <div class="warn">متعديش الصفحة دي علشان توفر وقت. هي اللي بتخلي كل <span class="en">In Wireshark</span> box بعد كده يوصل. اعمل الجزء ده <strong>على Wireshark شغال</strong>، مش على السلايد.</div>
+
+  <div class="say">
+    <p>«النهاردة هتشغّلوا حوالي 12 scan مختلف. كل واحد فيهم هيطبع في الترمينال بتاعك تلات أو أربع سطور — وهيحط على الـ wire من 4 لـ 2231 packet.»</p>
+    <p>«ركّزوا في الفرق ده: اللي في الترمينال ده <span class="en o">conclusion</span> — نتيجة. اللي على الـ wire ده <span class="en g">evidence</span> — دليل. والـ tier-1 SOC analyst عمره ما بيشوف الترمينال بتاعك. بيشوف الـ packets بس.»</p>
+    <p>«فعلشان كده Wireshark هيفضل مفتوح طول السيشن، وكل scan هنقراه مرتين: مرة كـ attacker شغّله، ومرة كـ analyst مسكه.»</p>
+    <p>«القاعدة الوحيدة النهاردة: <strong>capture الأول، scan تاني، قراية تالت</strong>. كل لاب في السيشن دي ماشي بالترتيب ده. الـ scan اللي معملتش له capture هو scan مش قادر تشرحه — وفي engagement حقيقي، مش قادر تثبته.»</p>
+  </div>
+
+  <h3 class="sub">الخمس حاجات اللي محتاجينها في Wireshark — ولا حاجة زيادة</h3>
+  <div class="say">
+    <p>«١ — <strong>اختار الـ interface الصح.</strong> لو اخترت غلط هتطلع بـ capture فاضي وتفتكر إن الـ scan فشل. الـ interface الصح هو اللي فيه الخط بيتحرك في شاشة البداية.»</p>
+    <p>«٢ — <strong>Display filter مش Capture filter.</strong> الـ capture filter بيرمي الـ packets للأبد. الـ display filter بيخبيها بس. وانت لسه بتتعلم: <strong>اعمل capture لكل حاجة، وفلتر العرض</strong>. الشريط الأخضر اللي فوق ده هو الـ display filter.»</p>
+    <p>«٣ — <strong>اقرا عمود الـ Info.</strong> Wireshark فك لك الـ flags خلاص: <span class="en">[SYN]</span>، <span class="en">[SYN, ACK]</span>، <span class="en">[RST, ACK]</span>. نادراً هتحتاج تفتح الـ packet نفسها.»</p>
+    <p>«٤ — <strong>Follow → TCP Stream.</strong> بيحوّل 20 packet لمحادثة زي ما بني آدم كتبها. ودي طريقتنا في قراية FTP و SMTP و HTTP النهاردة.»</p>
+    <p>«٥ — <strong>Statistics → Conversations.</strong> سطر لكل زوج hosts، ومعاه عدد الـ packets. ودي اللي بيها الـ SOC بيشوف "مصدر واحد بيكلم 254 destination" في ثانيتين.»</p>
+    <p>«وحاجة مجانية كمان: Wireshark بيلوّن الـ <span class="en">RST</span> أسود وأحمر. يعني في capture بتاع scan، <strong>شاشة سودا = شاشة بورتات مقفولة</strong>. تقدر تقرا نتيجة الـ scan من آخر الأوضة قبل ما تفلتر أي حاجة.»</p>
+  </div>
+
+  <div class="slide">اكتب قدامهم على capture شغال: <span class="en">tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0</span> وخليهم يشوفوا الليستة بتتقفل. بعدين افتح جدول الـ display filters وقول "الجدول ده خليه مفتوح جنبك طول النهاردة".</div>
+
+  <div class="say">
+    <p>«شايفين الـ <span class="en">capture library</span> دي؟ 19 capture حقيقي شاحنينهم مع السيشن — واحد لكل نوع scan وواحد لكل protocol. الـ attacker فيهم <span class="en">10.10.10.1</span> والـ target <span class="en">10.10.10.10</span>. يعني حتى لو الـ VM بتاعك باظ النهاردة، تقدر تعمل كل تمرين قراية في السيشن دي من الملفات دي.»</p>
+    <p>«والواجب: <strong>افتحوا تلاتة منهم النهاردة بالليل.</strong>»</p>
+    <p>«وجملة أمانة لازم تتقال: الـ <span class="en">pcap</span> ده <strong>دليل</strong>. والدليل جواه بيانات ناس تانية — باسوردات، session tokens، بيانات شخصية. متعملش capture على شبكة مش مصرح لك عليها، ومتبعتش pcap لحد من غير ما تقراه الأول.»</p>
+  </div>
+
+  <div class="key">nmap بيديك الـ verdict. Wireshark بيديك الـ evidence اللي الـ verdict اتبنى عليه.</div>
+
+  </div>
+</section>
+
+<!-- ================= 3 ================= -->
+<section class="blk" id="s3">
+  <div class="hd"><span class="num">03</span><h2>Lab pre-flight — أربع VMs، سبنت واحد</h2><span class="min">6 min</span><span class="src">P04 · hands-on</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«قبل ما نبدأ، كل واحد يتأكد إن اللاب بتاعه شغال. مش هنبدأ scanning وواحد الـ adapter بتاعه على NAT.»</p>
+  </div>
+
+  <div class="lab">
+    <h4>🧪 خطوات الـ pre-flight</h4>
+    <ol>
+      <li>اعرف الـ host-only IP بتاعك:
+        <pre>ip a | grep -A2 'ens\|eth'</pre>
+        <div class="why"><span class="row"><span class="f">ip a</span> بيعرض كل كروت الشبكة والـ IPs بتاعتها.</span><span class="row"><span class="f">grep -A2 'ens|eth'</span> يطلّع بس الكارت اللي اسمه ens أو eth ومعاه سطرين بعده — علشان نشوف الـ IP على طول.</span></div>
+        <span class="expect">IP في نفس الـ subnet بتاع اللاب (مثلاً <span class="en">192.168.56.x</span>).</span>
+      </li>
+      <li>اعمل sweep على الـ subnet:
+        <pre><span class="k">sudo</span> nmap -sn 192.168.56.0/24</pre>
+        <div class="why"><span class="row"><span class="f">sudo</span> لازم root علشان nmap يبعت raw packets.</span><span class="row"><span class="f">-sn</span> <b>ping scan بس</b> — دوّر على الأجهزة الحية ومتعملش scan للبورتات خالص.</span><span class="row"><span class="f">192.168.56.0/24</span> المدى كله من .1 لـ .254 (256 عنوان).</span></div>
+        <span class="expect">Metasploitable2 + الـ Windows boxes. <strong>واحد Windows ممكن ميظهرش — ده متوقع ومقصود.</strong></span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="say">
+    <p>«لو واحد Windows مش ظاهر عندك — <strong>ده مش عطل، ده الدرس</strong>. سيبه كده، هنرجع له في Lab 1 بعد شوية.»</p>
+    <p>«وحاجة مهمة: <strong>محدش يقفل الـ Windows Firewall</strong>. اللي هيقفله هيضيّع على نفسه أهم درس النهاردة.»</p>
+  </div>
+
+  <div class="warn">لو حد تايه فعلاً (مش الـ Windows الغايب المقصود): راجع معاه الـ troubleshooting table في الصفحة — عادةً adapter غلط، أو الـ VM على NAT بدل host-only، أو DHCP lease قديم.</div>
+
+  </div>
+</section>
+
+<!-- ================= 4 ================= -->
+<section class="blk" id="s4">
+  <div class="hd"><span class="num">04</span><h2>The target zoo — نفس الأمر، أربع إجابات</h2><span class="min">7 min</span><span class="src">P05</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«ليه أربع machines مش واحدة؟ لأن الـ scanning حاجة <span class="en">OS-agnostic</span> — الأمر مبيتغيرش. اللي بيتغير هو <strong>اللي راجع لك</strong>، وبيتغير تماماً. فاللاب مصمم مخصوص إنه يغطي المدى: Linux قديم جداً، Windows legacy، Windows حديث ومتقفل، و domain controller.»</p>
+  </div>
+
+  <div class="slide">اضغط على كل machine في الـ interactive box الواحدة ورا التانية، واقرا العمود بتاعها بصوت عالي.</div>
+
+  <div class="say">
+    <p>«<strong>Metasploitable2</strong> — كل حاجة مفتوحة. <span class="en">vsftpd 2.3.4</span>، <span class="en">OpenSSH 4.7p1</span>، telnet، Apache 2.2.8، Samba، MySQL 5.0.51a. اقراها كده: أغنى enumeration target ممكن تقابله. ده اللي الكتب اتكتبت عليه.»</p>
+    <p>«<strong>Windows 7</strong> — الـ <span class="en">SMBv1</span> شغال. يعني الحاجات الكلاسيكية لسه بتشتغل: <span class="en">enum4linux</span> لسه بيرجّع users و shares. ده المكان الوحيد اللي لسه بيطابق كتاب 2012.»</p>
+    <p>«<strong>Windows 10</strong> — نفس البورتات بالظبط زي Windows 7. بس الأبواب مقفولة. <span class="en">enum4linux-ng</span> هيرجع تقريباً لا حاجة. وده <strong>hardening finding</strong> مش فشل — وده اللي Lab 4 كله مبني عليه.»</p>
+    <p>«<strong>Server 2019</strong> — دي بصمة الـ domain controller: <span class="en">88</span> يعني Kerberos، <span class="en">389/636</span> يعني LDAP، <span class="en">3268</span> يعني Global Catalog. تشوف التلاتة دول مع بعض؟ انت لقيت الـ crown jewels.»</p>
+  </div>
+
+  <div class="key">الأمر ثابت، الـ OS هو اللي بيحدد النتيجة. اعمل fingerprint للجهاز من بورتاته قبل ما تختار خطوتك.</div>
+
+  </div>
+</section>
+
+<!-- ================= 5 ================= -->
+<section class="blk" id="s5">
+  <div class="hd"><span class="num">05</span><h2>Host discovery — مين موجود فعلاً</h2><span class="min">10 min</span><span class="src">P06</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«قبل ما تعمل scan للبورتات، لازم تقرر أنهي hosts تستاهل أصلاً. لو الـ recon report بتاعك فيه <span class="en">/24</span>، وانت عملت scan لـ 65,535 port على 256 عنوان وفيهم تلاتة بس عايشين — دي بطء وضوضاء على الفاضي.»</p>
+    <p>«وكمان دي أول حتة المبتدئين بيجاوبوا فيها غلط ومش واخدين بالهم: بيقولوا على Windows box حية إنها ميتة، ويمشوا ويسيبوا أغلى target في الأوضة.»</p>
+  </div>
+
+  <h3 class="sub">الطريقة — وده الجزء اللي يهم</h3>
+  <div class="say">
+    <p>«فيه طريقتين مختلفين تماماً علشان تسأل السؤال ده، والاختيار بينهم بيعتمد على حاجة واحدة: <strong>هل انت على نفس الـ segment، ولا فيه router بينك وبين الـ target؟</strong>»</p>
+    <p>«<strong>ARP — Layer 2.</strong> جهازك بيعمل broadcast: "مين معاه 192.168.56.102؟". والجهاز اللي معاه الـ IP دي <strong>لازم</strong> يرد علشان يكون موجود على الشبكة أصلاً. الـ ARP هو أساس شغل الشبكة، فمحدش يقدر يرفضه من غير ما يقع من على الشبكة. يعني: <strong>على الـ segment بتاعك، الأجهزة مش قادرة تختفي</strong>. العيب الوحيد: الـ ARP <strong>مبيعديش router</strong>. لكن ده بالظبط اللاب بتاعنا.»</p>
+    <p>«<strong>ICMP echo</strong> — الـ ping العادي. المشكلة إن الـ Windows Firewall بيبلوكه by default من أيام Vista، وأغلب الـ firewalls على الإنترنت بتـ drop له. يعني host حي هيفضل ساكت.»</p>
+    <p>«<strong>TCP ping</strong> — بدل ما تسأل الـ OS، اسأل بورت. <span class="en">-PS443</span> أو <span class="en">-PA80</span>. أي رد TCP — حتى لو <span class="en">RST</span> — بيثبت إن الجهاز حي. ودي الأفضل عبر الـ router، لأن firewall بيرمي الـ ICMP غالباً لسه سايب 80 و 443.»</p>
+    <p>«ولما مفيش حاجة بترد وانت <strong>عارف</strong> إن الجهاز موجود؟ <span class="en o">-Pn</span> — بيعدّي مرحلة الـ discovery خالص ويعمل scan على طول.»</p>
+  </div>
+
+  <div class="slide">شغّل الـ stepped diagram الأول (ARP). اضغط <span class="en">Next</span> خطوة خطوة واقرا التعليق. قف وقفة قوية على <strong>STEP 3</strong>.</div>
+
+  <ol class="steps">
+    <li>«الخطوة اللي الناس بتنسى إنها موجودة أصلاً: الـ Ethernet مش بيوصّل لـ IP، بيوصّل لـ MAC. فقبل ما أي packet تخرج، لازم الـ MAC يتحل.»</li>
+    <li>«والحل ده <strong>broadcast</strong>. كل جهاز على الـ segment بيستلمه.»</li>
+    <li>«وهنا الحقيقة المهمة: <strong>الـ ARP بيرد عليه الـ network stack، تحت الـ firewall</strong>. جهاز Windows معموله block لكل ICMP وكل بورتاته filtered — لسه هيرد على الـ ARP. لازم يرد، وإلا مش هيقدر يستخدم الشبكة.»</li>
+    <li>«الـ sweep بيكمل عنوان ورا التاني.»</li>
+    <li>«السكوت هنا معناه إن فعلاً مفيش حاجة على العنوان ده. قارن ده بسكوت الـ ICMP في الـ diagram اللي جاي — اللي معناه تقريباً لا حاجة.»</li>
+  </ol>
+
+  <div class="slide">شغّل الـ diagram التاني (ICMP عبر router)، وركّز على <strong>STEP 3 و 4</strong>.</div>
+
+  <ol class="steps">
+    <li>«بره الـ segment، مفيش ARP — الـ router بيرد عن الشبكة كلها. فـ nmap بينزل لـ IP-layer probes: ICMP echo، ICMP timestamp، TCP SYN على 443، و TCP ACK على 80.»</li>
+    <li>«الرد دليل. <strong>النتيجة الإيجابية عمرها ما بتكدب.</strong>»</li>
+    <li>«مفيش رد. وهنا كل طالب بيقف ويكتب "host down". ودي أشهر غلطة مبتدئين في السيشن دي.»</li>
+    <li>«Windows بيبلوك الـ inbound ICMP echo by default من Vista، وأغلب firewalls الشركات بترميه على الـ edge. يعني <strong>ping من غير رد مش دليل على أي حاجة</strong>. وده بالظبط سبب وجود <span class="en">-Pn</span>.»</li>
+  </ol>
+
+  <div class="key">النتيجة الإيجابية في الـ discovery دليل؛ النتيجة السلبية مجرد فرضية. في engagement حقيقي، اعمل scan للـ hosts "الميتة" بـ <span class="en p">-Pn</span> قبل ما تشطبها.</div>
+
+  <div class="soc">
+    الـ host sweep بيبان كـ <strong>fan-out pattern</strong>: مصدر واحد بيلمس destinations كتير في وقت قصير. الـ ARP sweep بيغرق الـ switch بـ who-has broadcasts — <span class="en">arpwatch</span> أو NIDS على الـ segment بيشوف عشرات الـ ARP requests من MAC واحد في ثواني. والـ ICMP/TCP sweeps عبر router بتبان في الـ firewall log كـ source IP واحد بيضرب عناوين متتالية.
+    <br><strong>البصمة مش packet واحدة — البصمة هي one-to-many في وقت قصير.</strong> احفظوا الجملة دي، دي اللي هنكتب عليها الـ rule في Lab 7.
+  </div>
+
+  <div class="slide">افتح <span class="en">01-arp-host-discovery.pcapng</span>، فلتر <span class="en">arp.opcode == 1</span>، وشاور على حاجتين بس: MAC واحد بيسأل عن كل العناوين بالترتيب، وإن nmap بيعيد الـ sweep مرتين (الـ frames 17-32 بتكرر 1-16) — والتكرار ده جزء من البصمة.</div>
+
+  </div>
+</section>
+
+<!-- ================= 6 ================= -->
+<section class="blk" id="s6">
+  <div class="hd"><span class="num">06</span><h2>Lab 1 — الهوست اللي بيمثل ميت</h2><span class="min">12 min</span><span class="src">hands-on</span></div>
+  <div class="bd">
+
+  <div class="say"><p>«دلوقتي هنثبت الكلام ده بإيدينا. تلات أوامر، والدرس في الفرق بينهم.»</p></div>
+
+  <div class="lab">
+    <h4>🧪 Lab 1 — Host discovery ← Profile: "live/dead + how confirmed"</h4>
+    <ol>
+      <li>الحقيقة المطلقة (ARP):
+        <pre><span class="k">sudo</span> nmap -sn 192.168.56.0/24 | tee hosts_arp.txt</pre>
+        <div class="why"><span class="row"><span class="f">-sn</span> على الـ segment بتاعك nmap بيستخدم <b>ARP</b> أوتوماتيك — ودي الحقيقة المطلقة.</span><span class="row"><span class="f">| tee hosts_arp.txt</span> يعرض النتيجة على الشاشة <b>و</b> يحفظها في ملف في نفس الوقت (هنحتاجه في خطوة الـ diff).</span></div>
+        <span class="expect">كل الـ targets ظاهرة، ومعاها الـ MAC vendor.</span>
+      </li>
+      <li>ICMP بس — من غير ARP:
+        <pre><span class="k">sudo</span> nmap -sn -PE --send-ip --disable-arp-ping 192.168.56.0/24 | tee hosts_icmp.txt</pre>
+        <div class="why"><span class="row"><span class="f">-PE</span> استخدم <b>ICMP echo</b> (الـ ping العادي) كطريقة الاكتشاف.</span><span class="row"><span class="f">--disable-arp-ping</span> اقفل الـ ARP بالعافية — علشان نجبر nmap يعتمد على ICMP بس.</span><span class="row"><span class="f">--send-ip</span> ابعت على مستوى IP مش Ethernet.</span><span class="row">النتيجة: بنشوف الشبكة بعين اللي بره الـ segment.</span></div>
+        <span class="expect">واحد Windows على الأقل اختفى.</span>
+      </li>
+      <li>الفرق — <strong>ودي لحظة الدرس</strong>:
+        <pre>diff &lt;(grep report hosts_arp.txt) &lt;(grep report hosts_icmp.txt)</pre>
+        <div class="why"><span class="row"><span class="f">grep report</span> يطلّع بس سطور "Nmap scan report for ..." يعني أسامي الأجهزة اللي لقاها.</span><span class="row"><span class="f">diff &lt;(..) &lt;(..)</span> يقارن مخرجات الأمرين على طول من غير ملفات وسيطة — والفرق اللي هيطلع هو الـ Windows host.</span></div>
+        <span class="expect">سطر واحد فرق: الـ Windows host.</span>
+      </li>
+      <li>اعمل scan للـ "ميت" برضه:
+        <pre><span class="k">sudo</span> nmap -Pn -p 135,139,445,3389 192.168.56.X</pre>
+        <div class="why"><span class="row"><span class="f">-Pn</span> <b>متسألش أصلاً هو حي ولا لأ</b> — اعتبره حي واعمل scan. ده الحل لما الـ ICMP بيتبلوك.</span><span class="row"><span class="f">-p 135,139,445,3389</span> البورتات دي بالذات (RPC · NetBIOS · SMB · RDP) — بصمة Windows.</span></div>
+        <span class="expect">بورتات مفتوحة — يعني الجهاز حي، والـ ICMP هو اللي كان بيكدب.</span>
+      </li>
+      <li>Cross-check بأداة تانية:
+        <pre><span class="k">sudo</span> arp-scan --localnet</pre>
+        <div class="why"><span class="row"><span class="f">arp-scan</span> أداة تانية بتعمل ARP sweep — بنستخدمها <b>cross-check</b> علشان نتأكد إن النتيجة مش خطأ في nmap.</span><span class="row"><span class="f">--localnet</span> اعمل sweep للـ subnet اللي انت عليه أوتوماتيك.</span></div>
+        <span class="expect">نفس ليستة الـ ARP.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="say">
+    <p>«خلوهم يقولوا القاعدة بصوت عالي معايا: <strong>سكوت الـ ICMP معناه "مفيش رد"، مش "مفيش host"</strong>.»</p>
+  </div>
+
+  <div class="warn">لو حد قفل الـ Windows Firewall علشان "يصلّح" المشكلة — رجّعه فوراً. الحل هو <span class="en">-Pn</span>، وده كل الدرس.</div>
+
+  </div>
+</section>
+
+<!-- ================= 7 ================= -->
+<section class="blk" id="s7">
+  <div class="hd"><span class="num">07</span><h2>The scan-type reflex — اتعلم تلات إجابات مش ست flags</h2><span class="min">13 min</span><span class="src">P08</span></div>
+  <div class="bd">
+
+  <div class="warn">في الصفحة دي <strong>متعلّمش ولا flag واحد</strong>. لو الطالب قدر يقول "المفتوح بيرد SYN/ACK، المقفول بيرد RST، الـ filtered بيسكت" من غير ما يبص — الصفحتين اللي بعديها هياخدوا نص الوقت.</div>
+
+  <div class="say">
+    <p>«فيه ست scan types في منهج الـ CEH، والطلبة بيحاولوا يحفظوا الـ flags. <strong>متحفظوش</strong>. اتعلم بس الـ port المفتوح والمقفول والـ filtered بيعملوا إيه <span class="en">reflexively</span> — وبعدها كل scan type، حتى اللي هيتخترع بعد الكورس ده، هيبقى بديهي.»</p>
+  </div>
+
+  <div class="slide">شغّل الـ diagram الأول (الـ handshake). أربع خطوات بس، بسرعة.</div>
+
+  <ol class="steps">
+    <li>«الـ client بيسأل. packet واحدة، الـ SYN flag متظبط. ودي الـ packet الوحيدة اللي الـ SYN scan فعلاً بيهتم بيها.»</li>
+    <li>«الـ TCP stack بتاع السيرفر بيرد <strong>reflexively</strong> — قبل ما الـ application تعرف حاجة أصلاً. البورت المفتوح <strong>لازم</strong> يرد SYN/ACK؛ دي الـ RFC مش اختيار. والـ reflex ده هو اللي بيخلي الـ scanning ممكن من أصله.»</li>
+    <li>«الـ client بيأكد والـ connection بتقوم. ودلوقتي بس الـ application — SSH، SMB، HTTP — بتشوف client وتبدأ تعمل logging.»</li>
+    <li>«ودي فكرة الـ scanning كلها: <strong>إجابة سؤال "البورت ده مفتوح؟" بتوصل في الـ packet رقم اتنين</strong>. أي حاجة بعد كده اختيارية. وكل scan type مجرد طريقة مختلفة إنك تستفز الـ packet رقم اتنين دي.»</li>
+  </ol>
+
+  <div class="slide">شغّل الـ diagram التاني — نفس الـ probe على مفتوح / مقفول / filtered.</div>
+
+  <ol class="steps">
+    <li>«probe واحدة، على بورت عليه service حقيقية.»</li>
+    <li>«<strong>OPEN</strong> — الـ stack رد SYN/ACK. ودي الإجابة الوحيدة اللي معناها "فيه حاجة هنا تتهاجم".»</li>
+    <li>«نفس الـ probe، على بورت مفيش عليه listener.»</li>
+    <li>«<strong>CLOSED</strong> — RST/ACK. يعني "الجهاز حي، بس مفيش حاجة على البورت ده". ومفيدة: <strong>البورت المقفول لسه بيثبت إن الجهاز موجود</strong>.»</li>
+    <li>«<strong>FILTERED</strong> — سكوت. firewall رمى الـ packet من غير ما يرد. ودي أكتر إجابة بتقول لك معلومة من التلاتة: السكوت بيقولك إن فيه <strong>security control</strong> بينك وبين الـ target.»</li>
+  </ol>
+
+  <h3 class="sub">الجدول اللي هو الفصل كله</h3>
+  <div class="tw"><table>
+    <thead><tr><th>حالة البورت</th><th>رد الفعل على SYN</th><th>على FIN/NULL/Xmas</th><th>على ACK</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Open</strong></td><td><span class="en g">SYN/ACK</span></td><td>سكوت</td><td><span class="en">RST</span></td></tr>
+      <tr><td><strong>Closed</strong></td><td><span class="en">RST</span></td><td><span class="en">RST</span></td><td><span class="en">RST</span></td></tr>
+      <tr><td><strong>Filtered</strong></td><td>سكوت أو ICMP unreachable</td><td>سكوت</td><td>سكوت</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="say">
+    <p>«اقرا الفصل كله من الجدول ده. الـ <span class="en">SYN</span> scan بيفصل المفتوح عن المقفول بنضافة. الـ <span class="en">FIN/NULL/Xmas</span> عمره ما هيقولك أكتر من "مش مقفول" — لأن المفتوح والـ filtered الاتنين بيسكتوا — بس بيعدّي من فلاتر بتبص على الـ SYN bit بس. والـ <span class="en">ACK</span> scan <strong>مش بيلاقي بورتات مفتوحة خالص</strong> — بيرسم لك الـ firewall.»</p>
+  </div>
+
+  <div class="warn"><strong>الاستثناء اللي بيوقع الكل:</strong> عمود الـ FIN/NULL/Xmas صحيح بس على stacks متوافقة مع RFC 793 — Linux و BSD وأغلب أجهزة الشبكة. <strong>Windows بيرد RST على كل حاجة</strong>، حتى البورتات المفتوحة. شغّل Xmas scan على Windows هيقولك كل البورتات مقفولة. ده مش scan باظ — <strong>ده fingerprint</strong>. انت لسه عرفت إن الجهاز Windows.</div>
+
+  </div>
+</section>
+
+<!-- ================= 8 ================= -->
+<section class="blk" id="s8">
+  <div class="hd"><span class="num">08</span><h2>SYN &amp; Connect — الاتنين اللي هتستخدمهم فعلاً</h2><span class="min">16 min</span><span class="src">P09</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«الطلبة بيتعلموا <span class="en">-sS</span> و <span class="en">-sT</span> كأمرين. هما في الحقيقة أمر واحد وقرار واحد: <strong>هكمّل الـ handshake ولا لأ؟</strong> الـ packet الواحدة دي بتغير مين اللي هيسجلك، وسرعتك، وهل محتاج root ولا لأ.»</p>
+  </div>
+
+  <h3 class="sub">١ — SYN scan (<span class="en">-sS</span>)</h3>
+  <ol class="steps">
+    <li>«SYN واحدة لكل بورت. بصوا على الـ window size: nmap بيستخدم <span class="en">Win=1024</span> وبيبعت <strong>MSS بس</strong> — بينما Linux client حقيقي بيبعت SACK_PERM و timestamps و window scale كمان. <strong>الفرق ده لوحده بيحدد إن ده scanner</strong>.»</li>
+    <li>«البورت مفتوح. <strong>خلاص عندك الإجابة</strong> وانت لسه في الـ packet التانية.»</li>
+    <li>«بدل الـ ACK اللي كان هيكمّل الـ connection، nmap بيبعت RST. الـ connection بتتهد قبل ما الـ application layer تشوف client أصلاً. ودي معنى كلمة <span class="en">half-open</span>.»</li>
+    <li>«البورت اللي بعده. مفيش حاجة شغالة على 9999.»</li>
+    <li>«RST/ACK — مقفول. packet-تين وخلاص. لاحظوا إن المفتوح والمقفول الاتنين بيكلفوا packet-تين: الـ SYN scanning سريع <strong>لأنه مبيخلّصش حاجة</strong>.»</li>
+    <li>«3389 الـ firewall رماه. مفيش رد خالص، فـ nmap بيبعت SYN تانية، يستنى، وبعدين يقول <span class="en">filtered</span>. <strong>البورتات الـ filtered هي البطيئة</strong> — الـ scan اللي بيعلّق غالباً بيضرب في firewall.»</li>
+  </ol>
+
+  <div class="say">
+    <p>«22 packet لسبع بورتات. المفتوح بـ 3، المقفول بـ 2، والـ filtered بـ SYN-تين و timeout. ده أرخص scan كامل الدقة موجود — وعلشان كده هو الافتراضي لما يكون معاك root.»</p>
+    <p>«احفظوها كده: <strong>"اخبط، اسمع، امشي"</strong>.»</p>
+  </div>
+
+  <div class="soc">
+    SYNs كتير من مصدر واحد لبورتات كتير، و<strong>مفيش ACK بيجي بعد أي SYN/ACK</strong>، و RSTs من ناحية الـ attacker. الـ pattern ده — SYN اترد عليه بس معملش complete — هو الـ signature الكلاسيكي للـ IDS (<span class="en">Suricata sfPortscan</span>، <span class="en">Zeek Scan::Port_Scan</span>).
+    <br>والبصمة الإضافية: <span class="en">Win=1024</span> مع MSS لوحده. مفيش OS حقيقي بيفتح connection كده.
+  </div>
+
+  <h3 class="sub">٢ — Connect scan (<span class="en">-sT</span>)</h3>
+  <ol class="steps">
+    <li>«نفس أول packet — بس nmap هنا مش بيكتب raw packets، هو بينادي <span class="en">connect()</span> بتاعة نظام التشغيل. فالـ OS بيبني SYN <strong>طبيعية تماماً</strong> بكل الـ options. والمفارقة إن ده بيخلي كل packet لوحدها <strong>أقل</strong> شكاً من probe الـ -sS.»</li>
+    <li>«البورت المفتوح بيرد زي العادة.»</li>
+    <li>«وهنا الفرق كله: <strong>الـ packet التالتة</strong>. الـ handshake بتكمل.»</li>
+    <li>«وعلشان كده بتفرق. الـ connection المكتملة بتوصل لـ <strong>الـ application</strong>. الـ sshd بيكتب سطر، Apache بيكتب access log entry، الـ database بتسجل محاولة auth فاشلة. الـ SYN scan مبيسبش حاجة فوق الـ network layer؛ الـ connect scan بيسيب أثر في <strong>كل service لمستها</strong>.»</li>
+    <li>«ودلوقتي بس الـ connection بتتهد. 26 packet لنفس السبع بورتات — أتقل، أبطأ، وضوضاء في مكان مختلف تماماً.»</li>
+  </ol>
+
+  <div class="say">
+    <p>«استخدمه لما ميكونش معاك root. الـ raw packets محتاجة صلاحيات، الـ <span class="en">connect()</span> لأ. على pivot box انت فيها user عادي، الـ <span class="en">-sT</span> هو الـ TCP scan الوحيد المتاح لك.»</p>
+    <p>«احفظوها: <strong>"اخبط، سلّم بإيدك، وبعدين امشي"</strong>.»</p>
+  </div>
+
+  <pre><span class="c"># half-open SYN — الافتراضي لما يكون معاك root</span>
+<span class="k">sudo</span> nmap -sS -p- 10.10.10.10
+
+<span class="c"># full TCP connect — مش محتاج root</span>
+nmap -sT -p 22,80,445 10.10.10.10</pre>
+
+  <div class="slide">افتح <span class="en">03-tcp-syn-scan.pcapng</span> و <span class="en">04-tcp-connect-scan.pcapng</span> جنب بعض، وحط في الاتنين الفلتر: <span class="en">tcp.flags.ack==1 &amp;&amp; tcp.flags.syn==0 &amp;&amp; tcp.len==0</span>. الـ connect scan بس هو اللي فيه ACKs من الـ attacker. <strong>الفلتر ده لوحده هو الفرق بين الـ scan-تين.</strong></div>
+
+  <div class="warn"><strong>التصحيح الصادق بتاع 2026:</strong> جملة "الـ SYN scan stealthy" دي كلام من التسعينات. الـ firewalls و IDS و NetFlow الحديثة بتشوف الـ SYN burst سواء كمّلت الـ handshake أو لأ — الكشف مبني على <strong>rate و fan-out</strong> مش على إتمام الـ handshake.
+  <br>اللي لسه صح: الـ <span class="en">-sS</span> <strong>أسرع</strong> و<strong>أخف</strong> و<strong>بيفضل بره application logs</strong>. دي مزايا حقيقية. الـ interviewer هيسألك أنهي أستيلث، وبعدين هيسألك <strong>ليه</strong>.</div>
+
+  <div class="key">معاك root؟ <span class="en p">-sS</span>. مش معاك؟ <span class="en p">-sT</span>. نفس الإجابة — بس الـ -sT كمان بيحط الـ IP بتاعك في كل application log لمسته.</div>
+
+  </div>
+</section>
+
+<!-- ================= 9 ================= -->
+<section class="blk" id="s9">
+  <div class="hd"><span class="num">09</span><h2>Stealth family &amp; ACK — المتخصصين</h2><span class="min">14 min</span><span class="src">P10</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«الـ SYN والـ connect بيجاوبوا "إيه المفتوح؟". الأربعة دول بيجاوبوا أسئلة أضيق: <strong>هعدي من الفلتر ده ولا لأ؟</strong> و <strong>فيه فلتر أصلاً ولا لأ؟</strong> أدوات ظرفية. أغلب أيامك مش هتستخدمهم — بس الامتحان بيسأل عنهم، واليوم اللي هتحتاجهم فيه، مفيش حاجة تانية هتنفع.»</p>
+  </div>
+
+  <h3 class="sub">١ — FIN · NULL · Xmas (<span class="en">-sF -sN -sX</span>)</h3>
+  <ol class="steps">
+    <li>«FIP فاضية بتقول "أنا بقفل الـ connection بتاعتنا" — بس مفيش connection أصلاً. الـ stack لازم يقرر يعمل إيه بالكلام الفارغ ده.»</li>
+    <li>«الـ RFC 793 بيقول: لو البورت <strong>مفتوح</strong>، ارميها في صمت. يعني السكوت معناه مفتوح — <strong>أو</strong> فيه firewall كلها. ومش قادر تفرق، فـ nmap بأمانة بيقول <span class="en">open|filtered</span>.»</li>
+    <li>«نفس الـ probe، على بورت مقفول.»</li>
+    <li>«الـ RFC بيقول البورت <strong>المقفول</strong> لازم يرد RST. يعني العيلة دي بتلاقي المقفول بيقين، وأي حاجة تانية غامضة. <strong>دي الصفقة اللي بتعملها.</strong>»</li>
+    <li>«الـ NULL نفس الحيلة بصفر flags. غير قانونية تماماً كـ traffic حقيقي — وده المقصود: بعض الفلاتر القديمة بتطابق على الـ SYN bit بس، فبتسيبها تعدي.»</li>
+    <li>«الـ Xmas بيحط FIN و PSH و URG مع بعض. نفس المنطق، شكل مختلف. التلاتة فكرة واحدة بتلات هدوم.»</li>
+  </ol>
+
+  <div class="warn"><strong>شغلتهم الحقيقية الوحيدة:</strong> يعدّوا من <span class="en">stateless filter</span> بيفحص الـ SYN bit بس. قدام أي حاجة <span class="en">stateful</span> — يعني كل حاجة حديثة — <strong>هما أعلى صوت من الـ SYN scan مش أهدى</strong>.</div>
+
+  <div class="soc">
+    دول <strong>شاذين بالتكوين</strong>. مفيش client شرعي بيبعت FIN فاضية لبورت معملش عليه connect، ومفيش حاجة في الدنيا بتبعت packet بصفر flags.
+    <br><strong>packet NULL أو Xmas واحدة بتكفي لوحدها</strong> — مش محتاج threshold rule، محتاج match واحد. والمفارقة: الـ "stealth" scans دول أسهل حاجة تعمل عليها alert.
+  </div>
+
+  <div class="warn"><strong>Windows بيكسر التلاتة.</strong> Microsoft بترد RST على كلهم، حتى البورتات المفتوحة. شغّل <span class="en">-sX</span> على Windows هيقولك كل الـ 65,535 مقفولين. متقراش ده "الجهاز متقفل" — اقراه <strong>"الجهاز Windows"</strong>. طلعت OS fingerprint مجاني من scan فشل.</div>
+
+  <h3 class="sub">٢ — ACK scan (<span class="en">-sA</span>)</h3>
+  <ol class="steps">
+    <li>«ACK جاية من العدم. أي جهاز بيستلمها لازم يرد RST — دي طريقة TCP في التعافي من connection ضايعة.»</li>
+    <li>«رجع RST، يبقى الـ packet <strong>وصلت للجهاز</strong>. مفيش حاجة بتفلتر بورت 80.»</li>
+    <li>«نفس الـ probe على بورت مقفول.»</li>
+    <li>«RST برضه. <strong>وهنا النقطة:</strong> الـ ACK scan مش قادر يفرق بين مفتوح ومقفول — الاتنين بيردوا RST. <strong>ده مش port scanner أصلاً.</strong>»</li>
+    <li>«مفيش RST خالص. firewall stateful شاف ACK من غير connection في الـ state table بتاعه ورماها. <strong>السكوت بيرسم قاعدة الـ firewall.</strong>»</li>
+  </ol>
+
+  <div class="say"><p>«استخدمه كـ scan تاني مش أول. اعمل <span class="en">-sS</span> علشان تلاقي البورتات، وبعدين <span class="en">-sA</span> على اللي رجعت <span class="en">filtered</span> — علشان تعرف فيه firewall في الطريق ولا الجهاز نفسه مش موجود.»</p>
+  <p>«احفظوها: <strong>"بيرسم الحيطة، مش الأبواب"</strong>.»</p></div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Scan</th><th>بيجاوب إيه</th><th>استخدمه لما</th><th>النقطة العمياء</th></tr></thead>
+    <tbody>
+      <tr><td><span class="en">-sS</span></td><td>open / closed / filtered</td><td>الافتراضي. معاك root.</td><td>—</td></tr>
+      <tr><td><span class="en">-sT</span></td><td>open / closed / filtered</td><td>مفيش root.</td><td>الـ application بتسجلك</td></tr>
+      <tr><td><span class="en">-sF -sN -sX</span></td><td>closed / open|filtered</td><td>stateless SYN-only filter في الطريق</td><td>مفيش فايدة ضد Windows</td></tr>
+      <tr><td><span class="en">-sA</span></td><td>filtered / unfiltered</td><td>ترسم قواعد الـ firewall بعد SYN scan</td><td>مش بيلاقي بورتات مفتوحة خالص</td></tr>
+      <tr><td><span class="en">-sU</span></td><td>open / open|filtered / closed</td><td>الخدمات اللي TCP عمره ما هيشوفها</td><td>بطيء — الصفحة الجاية</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="key">الـ stealth family مبقتش stealthy — بقت <strong>متخصصة</strong>. استخدمها تعدي stateless filter، واستخدم ACK علشان تلاقي الـ firewall، واستخدم SYN لكل حاجة تانية.</div>
+
+  </div>
+</section>
+
+<!-- ================= 10 ================= -->
+<section class="blk" id="s10">
+  <div class="hd"><span class="num">10</span><h2>UDP — بطيء، مؤلم، وفيه أحلى حاجة</h2><span class="min">7 min</span><span class="src">P11</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«كل اللي فات ده TCP. لكن الـ DNS و SNMP و DHCP كلهم UDP — وإنك تعدي الـ UDP معناه إنك بتفوّت أغنى enumeration targets في الكورس. لاب الـ SNMP النهاردة كله معتمد إنك تلاقي بورت 161 مفتوح، ومفيش غير UDP scan اللي بيلاقيه.»</p>
+    <p>«ليه صعب؟ لأن الـ UDP <span class="en">connectionless</span> — مفيش handshake ومفيش reflex تقراه. فالمنطق بينعكس وبيضعف:»</p>
+    <p>«<strong>مفتوح</strong> → الـ service <em>ممكن</em> ترد وممكن تسكت. السكوت غامض.<br>
+       <strong>مقفول</strong> → الـ OS بيرجّع <span class="en">ICMP port unreachable</span>.<br>
+       <strong>open|filtered</strong> → سكوت، لأن المفتوح والـ filtered شكلهم واحد.»</p>
+    <p>«والقاضية: أنظمة التشغيل بتعمل <span class="en">rate-limit</span> على ردود الـ ICMP unreachable دي — تقريباً واحدة في الثانية. فـ nmap لازم يستنى بين كل probe والتانية. حساب بسيط: واحدة في الثانية × 65,535 بورت = <strong>أكتر من 18 ساعة</strong>. علشان كده <span class="en">-sU -p-</span> مينفعش أبداً.»</p>
+  </div>
+
+  <ol class="steps">
+    <li>«مفيش handshake يعني مفيش reflex نستغله. حيلة nmap إنه يبعت <strong>payload خاص بالبروتوكول</strong> للبورتات المعروفة — SNMP get حقيقي، DNS query حقيقي — ويستنى الـ service ترد.»</li>
+    <li>«ردت. والرد ببروتوكول الـ service نفسها هو أقوى إثبات ممكن على "مفتوح" — وغالباً بيسرّب معلومة الـ version ببلاش.»</li>
+    <li>«البورت اللي بعده. مفيش حاجة على UDP 53 هنا.»</li>
+    <li>«<strong>الـ IP stack بتاع الجهاز</strong>، مش الـ service، بيرد ICMP port-unreachable. ودي الإشارة الوحيدة المؤكدة على "مقفول" في UDP.»</li>
+    <li>«بورت عليه service بتتجاهل الـ payloads اللي متعرفهاش، أو firewall رمى الـ packet.»</li>
+    <li>«سكوت. الـ datagram ضاع؟ اتفلتر؟ الـ service ساكتة؟ nmap مش قادر يعرف، فبيعيد ويستنى ويقول بأمانة <span class="en">open|filtered</span>.»</li>
+  </ol>
+
+  <pre><span class="c"># متعملش scan لكل بورتات UDP في الفصل — اضرب على اللي يهم</span>
+<span class="k">sudo</span> nmap -sU -p 53,67,123,161,137 192.168.56.102
+
+<span class="c"># زوّد version probes علشان open|filtered تتحول لـ open</span>
+<span class="k">sudo</span> nmap -sU -sV -p 161 192.168.56.102
+
+<span class="c"># الغلطة الكلاسيكية — للمرجع فقط، متشغلهاش في الفصل:</span>
+<span class="c"># sudo nmap -sU -p- 192.168.56.102   # ممكن تفضل ساعات</span></pre>
+
+  <div class="soc">
+    الـ SOC بيشوف <strong>وابل من ICMP port-unreachable خارج</strong> من الـ target ناحية مصدر واحد. الـ traffic الطبيعي عمره ما بينتج ده.
+    <br>القاعدة: <span class="en">"&gt;20 ICMP type-3/code-3 لنفس الوجهة خلال 60 ثانية"</span> — وقاعدة زي دي تقريباً مبتديش false positives.
+  </div>
+
+  <div class="key">UDP مشرط مش شبكة صيد. اعمل scan للخدمات اللي <strong>هتعملها enumerate فعلاً</strong> — 53، 161، 123، 137، 500 — وسيب TCP يشيل الاتساع.</div>
+
+  </div>
+</section>
+
+<!-- ================= 11 ================= -->
+<section class="blk" id="s11">
+  <div class="hd"><span class="num">11</span><h2>Lab 2 — تلات scans و Wireshark مفتوح</h2><span class="min">20 min</span><span class="src">hands-on · اللاب الأهم</span></div>
+  <div class="bd">
+
+  <div class="warn">ده اللاب اللي <strong>ممنوع</strong> يتقص. الـ <span class="en">lab2_syn.pcap</span> هو مدخل Lab 7. لو حد نسي يحفظه، Lab 7 بتاعه هيقع.</div>
+
+  <div class="say"><p>«افتحوا الـ capture <strong>الأول</strong>. الـ scan تاني. capture الأول، دايماً.»</p></div>
+
+  <div class="lab">
+    <h4>🧪 Lab 2 — Scan types + Wireshark ← Profile: "open ports"</h4>
+    <ol>
+      <li>ابدأ الـ capture — <strong>واحفظ الملف</strong>:
+        <pre><span class="k">sudo</span> tcpdump -i eth0 -w lab2_syn.pcap host 192.168.56.102 &amp;</pre>
+        <div class="why"><span class="row"><span class="f">-i eth0</span> اعمل capture على الكارت ده (غيّره لكارت اللاب عندك).</span><span class="row"><span class="f">-w lab2_syn.pcap</span> <b>اكتب في ملف</b> بدل ما تعرض على الشاشة — الملف ده مدخل Lab 7، متمسحوش.</span><span class="row"><span class="f">host 192.168.56.102</span> capture filter: سجّل بس الـ traffic الرايح والجاي من الـ target ده.</span><span class="row"><span class="f">&amp;</span> شغّله في الخلفية علشان الترمينال يفضل معاك.</span></div>
+        <span class="expect">الـ tcpdump شغال في الخلفية والملف بيكبر.</span>
+      </li>
+      <li>SYN scan:
+        <pre><span class="k">sudo</span> nmap -sS -p 22,80,443,445 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-sS</span> <b>SYN scan (half-open)</b> — ابعت SYN، اقرا الرد، وابعت RST من غير ما تكمّل الـ handshake.</span><span class="row"><span class="f">-p 22,80,443,445</span> أربع بورتات بس علشان الـ capture يفضل صغير وسهل نقراه.</span></div>
+        <span class="expect">في الـ capture: SYN → SYN/ACK → RST على البورتات المفتوحة.</span>
+      </li>
+      <li>Connect scan:
+        <pre><span class="k">sudo</span> nmap -sT -p 22,80,443,445 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-sT</span> <b>TCP connect scan</b> — بينادي connect() بتاعة النظام فبيكمّل الـ handshake كامل. مش محتاج root، بس الـ application بتسجلك.</span></div>
+        <span class="expect">نفس الحكاية + الـ ACK التالتة، والـ banner بيوصل.</span>
+      </li>
+      <li>Xmas scan:
+        <pre><span class="k">sudo</span> nmap -sX -p 22,80,443,445 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-sX</span> <b>Xmas scan</b> — packet فيها FIN و PSH و URG مع بعض. البورت المقفول بيرد RST، والمفتوح بيسكت.</span></div>
+        <span class="expect">FIN,PSH,URG — والبورتات المفتوحة بتسكت.</span>
+      </li>
+      <li>بص من ناحية الـ defender:
+        <pre>Wireshark filter:  tcp.flags.syn==1 and tcp.flags.ack==0</pre>
+        <span class="expect">سطر واحد لكل بورت اتسأل عنه — دي بصمة الـ scan.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="say">
+    <p>«المطلوب مني منكم مقارنة من تلات أعمدة: SYN، connect، Xmas. وكل واحد فيكم يقدر يشاور بصباعه في الـ capture <strong>بتاعه هو</strong> على: SYN→SYN/ACK→RST، والـ ACK الزيادة مع الـ banner، والبورتات المفتوحة الساكتة.»</p>
+  </div>
+
+  <div class="warn">آخر دقيقتين في اللاب: قف على الفلتر <span class="en">tcp.flags.syn==1 and tcp.flags.ack==0</span> وقول «الفلتر ده هو اللي هنبني عليه الـ detection rule في Lab 7». ده اللي بيربط نص السيشن الأول بآخرها.</div>
+
+  <div class="warn">لو الوقت ضيّق: اقص الحالة الاختيارية بتاعة Xmas ضد Windows وسيبها "جربوها في البيت" — بتوفر 4 دقايق من غير ما تخسر حاجة.</div>
+
+  </div>
+</section>
+
+<!-- ================= 12 ================= -->
+<section class="blk" id="s12">
+  <div class="hd"><span class="num">12</span><h2>Timing · Breadth-then-Depth · Version &amp; OS</h2><span class="min">12 min</span><span class="src">P13</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«انت دلوقتي بتعرف تلاقي البورتات المفتوحة. بس "445 مفتوح" مش بيقولك هو Server 2022 متحدّث ولا Server 2008 مش متحدّث. الـ version والـ OS detection هما اللي بيقفلوا الفجوة دي.»</p>
+  </div>
+
+  <h3 class="sub">الـ timing dial (<span class="en">-T</span>)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Template</th><th>الاسم</th><th>امتى</th></tr></thead>
+    <tbody>
+      <tr><td><span class="en">-T0 / -T1</span></td><td>paranoid / sneaky</td><td>تهرب من IDS — packet كل كام ثانية لكام دقيقة. بطيء جداً بالمقصود، تحت عتبة الكشف.</td></tr>
+      <tr><td><span class="en">-T2</span></td><td>polite</td><td>targets ضعيفة مش عايز تحمّل عليها.</td></tr>
+      <tr><td><span class="en">-T3</span></td><td>normal</td><td>الافتراضي.</td></tr>
+      <tr><td><span class="en">-T4</span></td><td>aggressive</td><td>LAN سليمة وسريعة — اختيارنا في اللاب.</td></tr>
+      <tr><td><span class="en">-T5</span></td><td>insane</td><td>أسرع حاجة، بس ممكن يضيّع بورتات ويوقّع services ضعيفة.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="say">
+    <p>«الـ timing مقايضة بين السرعة والدقة والتخفي. في اللاب استخدم <span class="en">-T4</span>. قدام target حقيقي هتنزل لـ <span class="en">-T2</span> أو أقل — مش من باب الأدب، لكن لأن <span class="en">-T4/-T5</span> صفارة إنذار في أي IDS.»</p>
+  </div>
+
+  <h3 class="sub">الـ workflow الحالي: اتساع الأول، عمق تاني</h3>
+  <div class="say">
+    <p>«الطريقة القديمة إنك تعمل <span class="en">nmap -A -p-</span> واحدة كبيرة على كل حاجة. الطريقة الحقيقية دلوقتي بتقسم الشغلانة: <span class="en">masscan</span> أو <span class="en">rustscan</span> بيكنسوا الـ 65,535 بورت في ثواني بس مبيقولوش عنهم حاجة تقريباً؛ و nmap غني بس بطيء على المدى الكامل. فـ: <strong>اتساع بـ rustscan، وعمق بـ nmap على البورتات المفتوحة بس</strong>.»</p>
+  </div>
+
+  <pre>rustscan -a 192.168.56.102 -- -sV</pre>
+  <div class="why"><span class="row"><span class="f">rustscan</span> بيكنس كل البورتات بسرعة جداً وبعدين <b>بيسلّم لـ nmap أوتوماتيك</b>.</span><span class="row"><span class="f">-a</span> العنوان (address) بتاع الـ target.</span><span class="row"><span class="f">--</span> كل اللي بعد الشرطتين دول بيتبعت لـ nmap زي ما هو — يعني <span class="f">-sV</span> هنا بتاعة nmap.</span></div>
+
+  <pre><span class="k">sudo</span> nmap -sS -sV -O -T4 -p 21,22,23,25,53,80,139,445,3306 192.168.56.102 -oN depth.txt</pre>
+  <div class="why"><span class="row"><span class="f">-sV</span> <b>version detection</b> — يتكلم مع كل service ويسألها اسمها ونسختها.</span><span class="row"><span class="f">-O</span> <b>OS detection</b> — يخمّن نظام التشغيل من تفاصيل الـ TCP/IP stack.</span><span class="row"><span class="f">-T4</span> سرعة عالية (اللاب بس).</span><span class="row"><span class="f">-p ...</span> البورتات المفتوحة اللي طلعت من الـ breadth scan — <b>مش كل البورتات</b>.</span><span class="row"><span class="f">-oN depth.txt</span> احفظ الناتج بصيغة normal في ملف — ده اللي هتبني منه الـ target profile.</span></div>
+
+  <h3 class="sub">Version detection على الـ wire</h3>
+  <ol class="steps">
+    <li>«دي أول scan النهاردة بيفتح connection حقيقي لكل بورت مفتوح. <strong>مفيش حاجة اسمها half-open version detection</strong> — مينفعش تعمل محادثة من غير ما تتصل.»</li>
+    <li>«أغلب الـ services بتعرّف بنفسها من غير ما تسألها. FTP و SSH و SMTP و POP3 كلهم بيبعتوا banner أول ما تتصل. <strong>والسطر ده هو أغلب حكاية الـ version detection</strong>.»</li>
+    <li>«الـ services الساكتة، nmap بيمشي على قاعدة بيانات probes بتاعته — ابعت حاجة، شوف بيرد إيه، ابعت حاجة تانية.»</li>
+    <li>«الرد بيتطابق مع ملف التوقيعات. لقى تطابق → منتج ونسخة. ملقاش → بيطبع الرد الخام ويطلب منك تبعته.»</li>
+    <li>«<span class="en">vsftpd 3.0.5</span> دي مش معلومة عامة — دي <strong>النص بالظبط</strong> اللي هتلزقه في searchsploit والـ NVD في Session 4. الصفحات اللي فاتت كانت عن لقيان الأبواب؛ الصفحة دي عن تسميتها.»</li>
+  </ol>
+
+  <div class="warn"><strong>الـ -sV بيكدب — واللاب هيثبتها.</strong> على الـ host بتاعنا قال <span class="en">vsftpd 2.0.8 or later</span> وهي 3.0.5، وقال <span class="en">OpenLDAP 2.2.X - 2.3.X</span> وهي 2.6، وقال MySQL على حاجة مش MySQL أصلاً — banner بس. الـ banners بتتعدّل وبتتزوّر وبتبقى قديمة.
+  <br><strong>عامل ناتج -sV كفرضية تتأكد منها، مش كحقيقة تكتبها في التقرير.</strong></div>
+
+  <h3 class="sub">سلم الضوضاء — أرقام حقيقية من اللاب</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Scan</th><th>Packets</th><th>مقارنة بـ SYN</th></tr></thead>
+    <tbody>
+      <tr><td><span class="en">-sn -PE</span> ICMP sweep</td><td>4</td><td>0.2×</td></tr>
+      <tr><td><span class="en">-sS</span> — 7 بورتات</td><td>22</td><td>الأساس</td></tr>
+      <tr><td><span class="en">-sT</span> — 7 بورتات</td><td>26</td><td>1.2×</td></tr>
+      <tr><td><span class="en">-sU</span> — 4 بورتات</td><td>26</td><td>1.2×</td></tr>
+      <tr><td><span class="en">-sV</span> — 5 بورتات</td><td>152</td><td>6.9×</td></tr>
+      <tr><td><span class="en">-sC</span> default NSE</td><td>933</td><td>42×</td></tr>
+      <tr><td><span class="en">-p 1-1000 -T4</span></td><td>2015</td><td>92×</td></tr>
+      <tr><td><span class="en">-O</span> OS detection</td><td><strong>2231</strong></td><td><strong>101×</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="say">
+    <p>«الجدول ده هو الإجابة الصادقة على سؤال "أنهي scan stealthy؟" — <strong>ولا واحد</strong>. فيه أرخص وفيه أغلى بس. والـ <span class="en">-A</span> اللي بيشغّل <span class="en">-sV -O -sC --traceroute</span> مع بعض بيكلفك ده كله في مرة واحدة.»</p>
+    <p>«2231 packet لجهاز <strong>واحد</strong> في الـ OS detection. لو التخفي يهمك أصلاً، ده أول flag تشيله.»</p>
+  </div>
+
+  <div class="slide">افتح <span class="en">09-os-detection.pcapng</span> ونزّل بالماوس بس. مفيش حاجة بتعلّم "الـ scanning صوته عالي" أسرع من إنك تشوف ألفين frame بيعدوا لجهاز واحد.</div>
+
+  </div>
+</section>
+
+<!-- ================= 13 ================= -->
+<section class="blk" id="s13">
+  <div class="hd"><span class="num">13</span><h2>Lab 3 — الـ full scan والنسخة الكدابة</h2><span class="min">15 min</span><span class="src">hands-on</span></div>
+  <div class="bd">
+
+  <div class="say"><p>«اللاب ده فيه <strong>فشلين مقصودين</strong>. الفشل هو الدرس، مش مشكلة تصلحها.»</p></div>
+
+  <div class="lab">
+    <h4>🧪 Lab 3 — Full scan ← Profile: "service + version, OS"</h4>
+    <ol>
+      <li>الاتساع (breadth):
+        <pre>rustscan -a 192.168.56.102 --range 1-65535 -- -Pn</pre>
+        <div class="why"><span class="row"><span class="f">--range 1-65535</span> كل البورتات.</span><span class="row"><span class="f">-- -Pn</span> اللي بعد الشرطتين بيروح لـ nmap: متعملش host discovery.</span><span class="row">النتيجة: ليستة البورتات المفتوحة في ثواني.</span></div>
+        <span class="expect">ليستة بورتات مفتوحة، من غير تفاصيل services.</span>
+      </li>
+      <li>العمق (depth) على المفتوح بس:
+        <pre><span class="k">sudo</span> nmap -sS -sV -O -T4 -p 21,22,23,25,53,80,139,445,3306 192.168.56.102 -oN depth.txt</pre>
+        <div class="why"><span class="row">نفس الأمر اللي شرحناه فوق — <b>لاحظ إننا بنحط البورتات المفتوحة بس</b>، مش <span class="f">-p-</span>.</span><span class="row"><span class="f">-oN depth.txt</span> الملف ده هو مصدر عمود "service + version" في الـ target profile.</span></div>
+        <span class="expect"><span class="en">depth.txt</span> فيه service + version بالظبط لكل بورت.</span>
+      </li>
+      <li><strong>الفشل الأول (مقصود)</strong> — UDP scan مفتوح:
+        <pre><span class="k">sudo</span> nmap -sU 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-sU</span> من غير <span class="f">-p</span> يعني nmap هيجرّب <b>1000 بورت UDP</b> افتراضياً، والـ rate-limit هيخليها تزحف.</span><span class="row">بصوا على الـ <b>ETA</b> وهي بتكبر — وبعدين <span class="f">Ctrl-C</span>.</span></div>
+        <span class="expect">الـ ETA بيطلع لدقايق/ساعات → اقفله بـ Ctrl-C.</span>
+      </li>
+      <li>الطريقة الصح:
+        <pre><span class="k">sudo</span> nmap -sU -p 53,111,161,137 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-p 53,111,161,137</span> DNS · portmapper/RPC · <b>SNMP</b> · NetBIOS — الأربعة اللي بنعمل عليهم enumeration فعلاً.</span><span class="row">بورت <b>161</b> هو مدخل Lab 5 كله.</span></div>
+        <span class="expect">خلص في ثواني، و 161 ظاهر.</span>
+      </li>
+      <li><strong>الفشل التاني (مقصود)</strong> — سجّل أي <span class="en">tcpwrapped</span> أو <span class="en">version?</span> في الناتج.
+        <span class="expect">حاجة واحدة على الأقل nmap مش متأكد منها — هنأكدها بإيدينا في Lab 6.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="key">الأداة بتديك فرضية. <strong>انت</strong> اللي بتأكدها. اللي بيكتب ناتج <span class="en p">-sV</span> في تقرير من غير تأكيد، بيكتب تخمين وبيسميه نتيجة.</div>
+
+  </div>
+</section>
+
+<!-- ================= 14 ================= -->
+<section class="blk" id="s14">
+  <div class="hd"><span class="num">14</span><h2>Scanning countermeasures — الـ target سجّل إيه</h2><span class="min">7 min</span><span class="src">P15 · defender</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«خدنا ساعة إحنا الـ attacker. الصفحة دي هي النقلة للمكتب اللي هتقعدوا عليه فعلاً. كل scan شغلتوه ساب أثر — والمهم إنك تعرف <strong>أنهي أثر، في أنهي log، بأنهي Event ID</strong>. ده بالظبط شغل الـ tier-1 analyst.»</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>فعل الـ attacker</th><th>الـ target بيشوف إيه</th><th>بيتسجل فين</th><th>العلامة</th></tr></thead>
+    <tbody>
+      <tr><td>ARP sweep</td><td>وابل who-has من MAC واحد</td><td>NIDS على الـ segment · <span class="en">arpwatch</span></td><td>عشرات ARP requests، مصدر واحد، ثواني</td></tr>
+      <tr><td>ICMP sweep</td><td>echo requests لعناوين متتالية</td><td>Firewall log</td><td>مصدر واحد ← وجهات كتير، ICMP type 8</td></tr>
+      <tr><td>SYN scan</td><td>SYNs كتير من غير handshakes مكتملة</td><td>Firewall · IDS · Win Firewall <span class="en">5156</span></td><td>SYN من غير ACK مطابق، بورتات كتير/ثانية</td></tr>
+      <tr><td>Connect scan</td><td>connections بتفتح وتقفل</td><td>كل اللي فوق <strong>+ application logs</strong></td><td>سطور auth/HTTP على كل بورت مفتوح</td></tr>
+      <tr><td>NULL / FIN / Xmas</td><td>flags غير قانونية</td><td>IDS</td><td>FIN لوحدها أو FIN+PSH+URG — مفيش client بيعمل كده</td></tr>
+      <tr><td>UDP scan</td><td>وابل ICMP port-unreachable خارج</td><td>Firewall · NIDS</td><td>ICMP type 3 code 3 كتير لجهة واحدة</td></tr>
+      <tr><td><span class="en">-sV</span> / <span class="en">-A</span></td><td>probe strings لكل service</td><td>Application logs على كل بورت</td><td>handshakes غريبة/مشوهة + عدد packets عالي</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="key">كل صف في الجدول ده نفس الشكل: <strong>مصدر واحد، وجهات كتير (أو بورتات كتير)، في نافذة زمنية قصيرة</strong>. ودي هي الـ universal port-scan signature — وهي اللي الـ rule بتاعتنا في Lab 7 هتمسك عليها.</div>
+
+  <div class="say">
+    <p>«الـ countermeasures بتاعة الـ blue team، بسرعة: <strong>rate-limit</strong> على محاولات الاتصال لكل مصدر · <strong>drop مش reject</strong> — الـ firewall اللي بيرمي في صمت بيدي الـ attacker "filtered" في كل حتة ومعلومة صفر · <strong>اقفل البورتات والخدمات غير المستخدمة</strong> · <strong>اعمل scan لنفسك الأول</strong> علشان تلاقي اللي الـ attacker هيلاقيه · <strong>حط IDS signatures</strong> للـ portscan والـ abnormal flags.»</p>
+    <p>«وكلمة عن الشغل: "IP خارجي عمل scan على الـ perimeter بتاعنا" ده من أكتر التذاكر اللي بيشتغل عليها الـ tier-1 analyst. إنك تبص في firewall log وتقول <strong>"ده SYN scan، مصدر واحد، 4000 بورت في 8 ثواني، وده الـ source IP"</strong> — وبعدين تكتب الـ rule اللي هتمسك اللي بعده أوتوماتيك — دي الشغلانة. وده Lab 7.»</p>
+  </div>
+
+  </div>
+</section>
+
+<!-- ================= 15 ================= -->
+<section class="blk" id="s15">
+  <div class="hd"><span class="num">15</span><h2>Break + Evasion preview</h2><span class="min">10 + 12 min</span><span class="src">P16 · P17</span></div>
+  <div class="bd">
+
+  <div class="brk">☕ <strong>بريك 10 دقايق</strong> — قول لهم: «سيبوا الـ VMs شغالة والـ Wireshark مفتوح، هنكمل على نفس الـ captures.»</div>
+
+  <div class="warn">الجزء ده <strong>preview مش فصل</strong>. 10-15 دقيقة بالظبط. الـ evasion الكامل Session 10 — متوسّعش هنا ومتشيلوش من هناك.</div>
+
+  <div class="say">
+    <p>«لسه متعلمين إن كل scan صوته عالي. فالسؤال الطبيعي: "طب الـ attackers بيعملوا scan من غير ما يتمسكوا إزاي؟" — وأنا هجاوب بصراحة دلوقتي والـ packets لسه في دماغكم.»</p>
+    <p>«<strong>Fragmentation</strong> (<span class="en">-f</span>): بيقسّم الـ TCP header على IP fragments صغيرة علشان الـ signature engine ميقدرش يطابق الـ header كله مرة واحدة. <strong>ليه بقى مش مفيد:</strong> أي IDS حديث <strong>بيعيد تجميع</strong> الـ fragments قبل الفحص. الحيلة دي بتغلب 2005 مش 2026.»</p>
+    <p>«<strong>Decoys</strong> (<span class="en">-D</span>): بيخلط الـ probes الحقيقية بتاعتك بـ source IPs مزوّرة، فالـ log عندهم بيوريهم عشر scanners. <strong>ليه بقى مش مفيد:</strong> المصدر الحقيقي هو الوحيد اللي بيستقبل الردود، والـ flow analysis بتطلّعه. بيلخبط الـ attribution، مش بيخفي الـ scan.»</p>
+    <p>«<strong>Slow timing</strong> (<span class="en">-T0/-T1</span>): بيوزّع الـ probes على دقايق علشان متعديش عتبة "اتصالات في الثانية". <strong>ودي جزئياً بتنفع فعلاً</strong> — القواعد المبنية على threshold ممكن تتزحف من تحتها. وعلشان كده الـ detections الكويسة بتستخدم نوافذ أطول و behavioural baselines، مش عدّاد بالثانية.»</p>
+    <p>«<strong>Source port</strong> (<span class="en">--source-port 53</span>): بتلبس رقم بورت موثوق. <strong>ليه بقى مش مفيد:</strong> الـ stateful firewalls بتتابع الاتصالات الحقيقية مش الأرقام — SYN "جاية من بورت 53" من غير DNS request قبلها لسه شاذة.»</p>
+    <p>«<strong><span class="en">-Pn</span></strong> — <strong>ده مش evasion، ده ضرورة</strong>. بيعدّي الـ discovery ويعمل scan كأن الجهاز حي. مش بيخفيك — بيمنع إنك <strong>انت</strong> اللي تتخدع. اتعلمه كإجباري مش كحيلة.»</p>
+  </div>
+
+  <div class="soc">اقراها كـ defender: SYNs مجزّأة، وأربع مصادر بتبعت probes متطابقة بايت ببايت في نفس الملي ثانية — دي <strong>أشذ</strong> من scan عادي مش أقل.
+  <br>والفضيحة الكبرى في الـ capture: <strong>الـ target بيعمل ARP لعناوين decoy مش موجودة على الـ segment أصلاً</strong>. الـ defender بيستبعد الـ decoys في ثواني بسؤال واحد: مين فيهم معاه MAC؟</div>
+
+  <div class="warn"><strong>ملاحظة قانونية لازم تتقال:</strong> الـ decoy scan بيحط scan باسم طرف تالت بريء. في بلاد كتير — ومنها مصر — تزوير الـ source address في هجوم <strong>جريمة منفصلة</strong> عن الـ scan نفسه. متشغلش <span class="en">-D</span> بره لاب انت مالكه.</div>
+
+  <div class="key">الـ evasion بيشتري لك <strong>وقت ولخبطة</strong>، مش اختفاء. بيرفع شغل الـ analyst؛ مش بيشيل الـ alert. قول الكلام ده في interview وهيبان إنك بصيت في الـ packets فعلاً.</div>
+
+  </div>
+</section>
+
+<div class="howto" style="border-color:var(--red);background:rgba(230,57,70,.06)">
+  <h3 style="color:var(--red-soft)">⬇ من هنا يبدأ نص السيشن التاني — Enumeration</h3>
+  <ul>
+    <li>القاعدة الحاكمة في الجزء ده: <strong>البروتوكول قبل الأداة</strong>. كل protocol ليه صفحة قبل الأداة اللي بتعمله enumerate — اشرح صفحة البروتوكول الأول، <strong>كل مرة</strong>. صفحة الأداة مبنية على إنك عملت كده.</li>
+    <li>خطة الـ 4 ساعات: <strong>اشرح SMB و LDAP live</strong> (24 دقيقة). و <strong>SNMP · RPC · NFS · FTP · SMTP</strong> اديهم <span class="en">pre-reading</span> قبل السيشن بيومين، و 8 دقايق Q&amp;A في الفصل بدل 42 دقيقة محاضرة.</li>
+    <li>ليه SMB و LDAP بالذات؟ لأنهم شايلين الميكانيزمين اللي الباقي بيعيد استخدامهم: <strong>session/auth</strong> و <strong>query/oracle</strong>. اللي فهم الاتنين دول، الخمسة الباقيين نفس الأشكال بأسامي مختلفة.</li>
+    <li>لو هتشرح واحد بس من الخمسة live، اشرح <strong>SMTP</strong> — الـ 252-vs-550 oracle هو نفس شكل الـ FTP 331-vs-530، ونفس شكل Kerberos user-enum في Session 4، ونفس شكل أي login form في Session 8.</li>
+  </ul>
+</div>
+
+<!-- ================= 16 ================= -->
+<section class="blk" id="s16">
+  <div class="hd"><span class="num">16</span><h2>Enumeration — من بورت مفتوح لطريق دخول</h2><span class="min">7 min</span><span class="src">P18</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«الـ scan بيقولك "445 مفتوح، SMB". دي <strong>مش كفاية</strong> علشان تهاجم أي حاجة. الـ enumeration هي الخطوة اللي بين "أنا عارف إن الـ service موجودة" و "أنا عارف أستغلها إزاي".»</p>
+    <p>«الفرق بالظبط: الـ <span class="en o">scanning</span> اتجاه واحد — بتبعت packets وتقرا ردود فعل، وعمرك ما بتعمل login. بيقولك <strong>إيه اللي حي ومفتوح</strong>.»</p>
+    <p>«الـ <span class="en o">enumeration</span> <strong>محادثة</strong> — انت بتتصل بالـ service فعلاً وتسألها أسئلة موجهة، أحياناً anonymous وأحياناً بـ credentials. بتقولك <strong>إيه اللي جوه</strong>: users، shares، group memberships، versions، الـ password policy.»</p>
+    <p>«والاتصال ده هو السبب إن الـ enumeration أعلى صوتاً وأكتر تسجيلاً من الـ scanning: <strong>انت مبقتش بتخبط، انت بتتكلم</strong>.»</p>
+  </div>
+
+  <h3 class="sub">قمع الـ enumeration — نفس الشكل لكل service</h3>
+  <div class="say">
+    <p>«<strong>Open port</strong> ← ناتج الـ scanning. رقم بورت و service متخمّنة. دي <em>خيط</em> مش نتيجة.»</p>
+    <p>«<strong>Service</strong> ← بتتصل وتأكد البروتوكول. 445 غالباً SMB، بس <strong>أكّد</strong> — الـ banners و الـ -sV بيغلطوا زي ما شوفنا في Lab 3.»</p>
+    <p>«<strong>Version</strong> ← ودي نقطة الارتكاز. "SMB" مش حاجة؛ "<span class="en">Samba 3.0.20</span>" دي نتيجة. وعلشان كده الـ version detection كان مهم بالشكل ده.»</p>
+    <p>«<strong>Users · Shares · Config</strong> ← الأسئلة الموجهة. اعرض الـ shares، اعرض الـ users، اقرا الـ password policy، اسحب الـ SNMP config. ودي المادة اللي بتهاجم بيها.»</p>
+    <p>«<strong>Way in</strong> ← Session 4 و 5. اسم user + password policy ضعيفة = هدف password spray. نسخة معروفة بثغرة = هدف exploit. <strong>الـ enumeration مش بيكسر الباب — بيسلّم السيشن الجاية كل اللي محتاجاه.</strong>»</p>
+  </div>
+
+  <div class="soc">
+    الـ scanning ممكن يتشال على إنه ضوضاء إنترنت عادية. الـ enumeration حكاية تانية: anonymous SMB session setups، SNMP GET floods، LDAP binds، failed logins — دي تفاعلات <strong>authenticated أو نص authenticated</strong>، وبتتخريط على ATT&amp;CK Discovery (<span class="en">T1087</span> · <span class="en">T1135</span> · <span class="en">T1069</span> · <span class="en">T1201</span>) وبترفع severity التذكرة.
+    <br>الـ defender اللي شاف enumeration عارف إن الـ attacker <strong>مبقاش بيتفرج على الفاترينة</strong>.
+  </div>
+
+  </div>
+</section>
+
+<!-- ================= 17 ================= -->
+<section class="blk" id="s17">
+  <div class="hd"><span class="num">17</span><h2>Protocol: SMB — البروتوكول قبل الـ scan</h2><span class="min">14 min</span><span class="src">P19 · اشرحها live</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«قبل ما تعمل enumerate لـ SMB، المفروض تكون قادر <strong>ترسمه</strong>. تقدر تحفظ <span class="en">enum4linux -a &lt;ip&gt;</span> في عشر ثواني — وهتبقى ملهاش لازمة في اليوم اللي هترجع فيه فاضية وانت مش عارف ليه.»</p>
+    <p>«<strong>إيه هو SMB؟</strong> هو الطريقة اللي جهاز Windows بيطلب بيها ملف من جهاز تاني. لما تكتب <span class="en">\\\\FILE01\\accounting</span> في الـ Explorer، أو login script بيـ map drive، أو Word بيفتح مستند من فولدر على الشبكة — ده كله SMB.»</p>
+    <p>«بس Microsoft فضلت تزوّد عليه، فالبروتوكول ده دلوقتي كمان شايل الطباعة، والتحكم في الـ services عن بعد، والـ registry، والـ event logs، والـ named pipes اللي أدوات زي PsExec بتركب عليها.»</p>
+    <p>«يعني: <strong>SMB مش بروتوكول ملفات بإضافات — SMB هو ناقل الإدارة عن بعد بتاع Windows</strong>. وعلشان كده بالظبط الـ attackers بيعشقوه.»</p>
+  </div>
+
+  <div class="say">
+    <p>«<strong>التشبيه اللي بيثبّت الفكرة:</strong> تخيل غرفة أرشيف مركزية في شركة. الـ <span class="en">Negotiate</span> ده إنك تتفق على اللغة اللي هتتكلموا بيها على الكاونتر. الـ <span class="en">Session setup</span> إنك تطلع الكارنيه بتاعك. الـ <span class="en">Tree connect</span> إنه يدخلك دولاب معيّن — <span class="en">accounting</span> مثلاً، مش <span class="en">HR</span>. والـ <span class="en">IPC$</span> ده <strong>مكتب الموظف نفسه</strong>: مش هتخزن فيه حاجة، بس تقدر <strong>تسأله أسئلة</strong> — "عندك أنهي دواليب؟"، "مين بيشتغل هنا؟".»</p>
+    <p>«والـ <span class="en">null session</span> هو إن الموظف يجاوب على الأسئلة دي <strong>من غير ما يبص على الكارنيه أصلاً</strong>.»</p>
+  </div>
+
+  <div class="slide">شغّل الـ diagram بتاع التسع خطوات بـ <span class="en">Next</span>. <strong>قف وقفة قوية عند STEP 4 و STEP 7</strong> — دول اللي هترجع لهم كل السيشن الجاية.</div>
+
+  <ol class="steps">
+    <li>«SMB بروتوكول <span class="en">stateful</span> وطبقات. قبل أي حاجة، الطرفين لازم يتفقوا على الـ <strong>dialect</strong>: SMB1 (2001)، SMB2 (Vista)، SMB3 (Win8/2012)، SMB 3.1.1 (Win10+). <strong>الـ dialect بيحدد أنهي هجمات ممكنة أصلاً.</strong>»</li>
+    <li>«رد السيرفر شايل الوضع الأمني كله: الـ dialect، وهل الـ <span class="en">signing</span> مطلوب (ده بيقتل الـ SMB relay)، وهل الـ encryption شغال. <strong>packet واحدة، وانت عارف الجهاز ده هيبقى صعب قد إيه.</strong>»</li>
+    <li>«دلوقتي الـ authentication. Windows بيستخدم <span class="en">NTLMSSP</span> جوه SMB — نظام <span class="en">challenge/response</span>، <strong>مش إرسال باسورد</strong>.»</li>
+    <li>«السيرفر بيولّد <span class="en">challenge</span> عشوائي 8 بايت. <strong>احفظوا الـ packet دي.</strong> كل اللي هنعمله في Session 4 بـ Responder و NTLM relay عايش هنا بالظبط.»</li>
+    <li>«الـ client بيعمل hash للـ challenge بالـ NT hash بتاع اليوزر ويرجّع الناتج. وبما إن <strong>الـ hash هو نفسه الـ credential</strong>، فسرقته زي سرقة الباسورد — ودي فكرة الـ <span class="en">pass-the-hash</span>.»</li>
+    <li>«الـ session اتعملت. من هنا ورايح، كل request بيركب جوه الـ session دي.»</li>
+    <li>«الـ <span class="en">tree connect</span> بيوصلك بـ share واحد. والـ <span class="en">IPC$</span> مميز: <strong>مش مساحة تخزين، ده named-pipe endpoint بتاع الإدارة عن بعد</strong> — وهو <strong>الباب اللي كل أداة SMB enumeration بتعدي منه</strong>.»</li>
+    <li>«فوق الـ IPC$، الـ client بيفتح الـ pipe اللي اسمه <span class="en">srvsvc</span> وبيعمل remote procedure call. <strong>الدالة <span class="en">NetShareEnumAll</span> هي اللي ورا</strong> <span class="en">smbclient -L</span> و <span class="en">enum4linux</span> و <span class="en">net view</span>. أدوات مختلفة، RPC واحد.»</li>
+    <li>«والسيرفر بيرد بليستة الـ shares. ولو رد عليها <strong>من غير</strong> session صالحة — يبقى عندك <span class="en">null session</span>، وهي النتيجة الكلاسيكية.»</li>
+  </ol>
+
+  <div class="key">تسع خطوات، أربعة منهم attack surface: <strong>الـ dialect</strong> (SMBv1؟) · <strong>الـ signing</strong> (relay؟) · <strong>الـ challenge</strong> (سرقة؟) · <strong>الـ IPC$</strong> (enumeration؟). لما تعمل scan لبورت 445، انت بتسأل عن الأربع حاجات دول.</div>
+
+  <h3 class="sub">فين بتقابله في شبكة حقيقية</h3>
+  <div class="tw"><table>
+    <thead><tr><th>بتشوف</th><th>يعني</th><th>اعمل إيه</th></tr></thead>
+    <tbody>
+      <tr><td>445 على workstation</td><td>Windows عادي، الـ file sharing شغال by default</td><td>شوف الـ shares والصلاحيات الضعيفة</td></tr>
+      <tr><td>445 على سيرفر اسمه FILE/FS/NAS</td><td>File server — غالباً أثمن حاجة في الشبكة</td><td>رتّبه أول الأولويات، الـ shares هنا فيها بيانات حقيقية</td></tr>
+      <tr><td><strong>445 + 88 + 389</strong></td><td><strong>Domain Controller</strong> — Kerberos + LDAP + SMB</td><td>كل حاجة في Session 4 و 6 بتستهدف الجهاز ده</td></tr>
+      <tr><td>139 مفتوح و 445 مقفول</td><td>قديم — NetBIOS-only SMB، عصر Win2000/XP</td><td>توقّع SMBv1 و null sessions شغالين</td></tr>
+      <tr><td>445 على Linux</td><td>Samba — غالباً NAS أو print server</td><td>شوف نسخة الـ Samba</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="sub">لو البورت ده مفتوح، الـ attacker كسب إيه؟</h3>
+  <div class="say">
+    <p>«<strong>ليستة الـ shares</strong> — وكمان حقل الـ comment. أسامي الـ shares لوحدها بتسرّب المؤسسة: <span class="en">IT_Backup</span>، <span class="en">accounting</span>، <span class="en">payroll_2026</span>. → <span class="en">T1135</span></p>
+    <p>«<strong>ليستة الـ users</strong> — عن طريق <span class="en">RID cycling</span> فوق الـ IPC$، تقدر تعدّ كل SID على الجهاز، ومنهم الـ service accounts. → <span class="en">T1087.002</span></p>
+    <p>«<strong>الـ password policy</strong> — lockout threshold، أقل طول، الـ history. <strong>ودي حرفياً اللي بتقرر هل تقدر تعمل password spray بأمان في Session 4 ولا لأ.</strong> → <span class="en">T1201</span></p>
+    <p>«<strong>الـ OS والـ domain name</strong> — <span class="en">smb-os-discovery</span> بيرجّع الـ build بالظبط والـ domain، <strong>من غير authentication</strong>. → <span class="en">T1082</span></p>
+    <p>«<strong>فحص الـ signing</strong> — لو رد الـ negotiate قال إن الـ signing <span class="en">not required</span>، يبقى الـ SMB relay على الطاولة. → <span class="en">T1557.001</span></p>
+    <p>«<strong>تنفيذ أوامر</strong>، بعد ما تبقى معاك credentials — psexec و smbexec و wmiexec كلهم بيركبوا على الـ pipes فوق الـ IPC$. → <span class="en">T1021.002</span></p>
+  </div>
+
+  <div class="key">بورت 445 هو أعلى بورت TCP قيمة في شبكة Windows. تلاقيه مفتوح، يبقى عندك طريق لـ <strong>بيانات</strong> (shares) و <strong>هوية</strong> (users, policy) وفي الآخر <strong>تنفيذ</strong> (admin pipes) — كل ده من بورت واحد.</div>
+
+  <div class="slide">افتح <span class="en">11-smb-enumeration.pcapng</span>، فلتر <span class="en">ntlmssp</span>، وافتح الـ NTLMSSP_CHALLENGE. شاور على حقل الـ <span class="en">NTLM Server Challenge</span> 8 بايت وقول: «الـ 8 بايت دول هما بالظبط اللي Responder بيزوّرهم في Session 4».</div>
+
+  <div class="soc">
+    الـ SOC بيقراها كده: session بتعمل authenticate، بتعمل tree connect على <strong>IPC$ وبس</strong>، بتفتح الـ <span class="en">srvsvc</span> pipe، بتنادي <span class="en">NetShareEnumAll</span>، وتقفل.
+    <br><strong>اليوزر الحقيقي بيتصل بـ share بالاسم ويقرا ملفات؛ الـ scanner بيتصل بـ IPC$ ويسأل أسئلة.</strong> الفرق ده — <span class="en">IPC$ tree connect من غير أي file I/O بعده</span> — من أوثق detections الـ SMB اللي ممكن تكتبها. على Windows دي Event ID <span class="en">5145</span>.
+  </div>
+
+  <div class="key">لما تروح لصفحة الأداة، كل أداة SMB هتقابلها بتعمل التسع خطوات دول وبتقرا الردود. ولما واحدة ترجع فاضية، اسأل: <strong>أنهي خطوة اللي فشلت؟</strong> dialect اترفض؟ session اترفضت؟ IPC$ مقفول؟ السؤال ده هو الفرق بين فني ومحلل.</div>
+
+  </div>
+</section>
+
+<!-- ================= 18 ================= -->
+<section class="blk" id="s18">
+  <div class="hd"><span class="num">18</span><h2>SMB enumeration — وليه بقى ساكت</h2><span class="min">10 min</span><span class="src">P20</span></div>
+  <div class="bd">
+
+  <div class="warn"><strong>تصحيح أسماء — قوله قبل أي أمر:</strong>
+  <br>• <span class="en">enum4linux</span> → <span class="en g">enum4linux-ng</span> — إعادة كتابة مصانة، بتطلّع JSON/YAML وبتعمل LDAP و password policy أصلاً.
+  <br>• <span class="en">crackmapexec</span> → <span class="en g">NetExec (nxc)</span> — الـ CME مش مصان من 2023، والـ fork النشط اسمه NetExec.
+  <br>الدرس مش الاسم الجديد — الدرس إنك <strong>تتأكد إن الأداة لسه عايشة قبل ما تعلّم الأمر</strong>.</div>
+
+  <div class="say">
+    <p>«الـ SMB تاريخياً كان بيسرّب أكتر من أي service تانية. وكل كورس CEH بيعلّم <span class="en">enum4linux</span> عليه. المشكلة إنك تشغّل الأمر ده على Windows 10 أو Server 2019 افتراضي النهاردة، هيرجع لك <strong>تقريباً لا حاجة</strong> — والطالب اللي شاف بس ناتج 2012 هيكتب في التقرير غلط: "no SMB findings".»</p>
+    <p>«الطريقة: <strong>جرّب null session الأول</strong>. لو مسموح، اعمل enumerate براحتك. لو لأ، جرّب credentials لقيتها. والنتيجة كتير بتبقى "null session refused" — وديها في حد ذاتها بتقولك إن الـ target حديث ومتقفل.»</p>
+  </div>
+
+  <pre>enum4linux-ng -A 192.168.56.102</pre>
+  <div class="why"><span class="row"><span class="f">enum4linux-ng</span> بيلف حوالين <span class="f">nmblookup</span> و <span class="f">net</span> و <span class="f">rpcclient</span> و <span class="f">smbclient</span> ويشغلهم كلهم بأمر واحد.</span><span class="row"><span class="f">-A</span> <b>All</b> — اعمل كل الفحوصات: users · shares · groups · password policy · OS info.</span></div>
+
+  <pre>smbclient -L //192.168.56.102/ -N</pre>
+  <div class="why"><span class="row"><span class="f">-L</span> <b>list</b> — اعرض الـ shares المتاحة بس، متدخلش على واحد.</span><span class="row"><span class="f">-N</span> <b>no password</b> — جرّب null / anonymous session.</span><span class="row">ورا الكواليس ده بيعمل بالظبط الـ 9 خطوات اللي شرحناها وبينادي <span class="f">NetShareEnumAll</span>.</span></div>
+
+  <pre>nxc smb 192.168.56.102
+nxc smb 192.168.56.102 -u '' -p '' --shares</pre>
+  <div class="why"><span class="row"><span class="f">nxc smb &lt;ip&gt;</span> من غير أي حاجة بيديك <b>نسخة الـ SMB والـ domain وحالة الـ signing</b> — وده بيشتغل حتى على Windows متقفل.</span><span class="row"><span class="f">-u '' -p ''</span> يوزر وباسورد فاضيين = <b>null session</b>.</span><span class="row"><span class="f">--shares</span> اعرض الـ shares والصلاحيات عليها.</span></div>
+
+  <pre>nmap --script smb-enum-shares,smb-enum-users,smb-os-discovery -p445 192.168.56.102</pre>
+  <div class="why"><span class="row"><span class="f">--script</span> شغّل NSE scripts بأسمائها.</span><span class="row"><span class="f">smb-os-discovery</span> بيطلّع الـ build بالظبط والـ domain <b>من غير authentication</b>.</span></div>
+
+  <div class="warn"><strong>ليه الجهاز الحديث بيرجع فاضي — السبب الحقيقي:</strong> موقف Microsoft نفسه: «SMBv1 مش متسطب افتراضياً في أي إصدار من Windows 11 أو Windows Server 2019 وبعده». والـ SMBv1 والـ anonymous null sessions — الميكانيزم اللي كان بيخلي dumps الـ enum4linux ممكنة — <strong>مقفولين افتراضياً</strong> في كل Windows حالي.
+  <br>يعني: على Metasploitable2 (Samba, 2012) هتاخد الـ dump كامل. وعلى Windows 10/2019 افتراضي هتاخد "null session denied" وليستة users فاضية — <strong>مش لأنك غلطت، لكن لأن الجهاز متقفل</strong>.</div>
+
+  <div class="key">«enum4linux رجع فاضي» دي <strong>مش نتيجة أبداً</strong>. النتيجة هي: «الجهاز بيرفض الـ null sessions ← متقفل ← نعمله enumerate بـ credentials». النتيجة الفاضية معلومة، مش طريق مسدود.</div>
+
+  </div>
+</section>
+
+<!-- ================= 19 ================= -->
+<section class="blk" id="s19">
+  <div class="hd"><span class="num">19</span><h2>Lab 4 — SMB ضد 2012، وضد النهاردة</h2><span class="min">16 min</span><span class="src">hands-on</span></div>
+  <div class="bd">
+
+  <div class="say"><p>«نفس الأمر بالظبط على تلات أجهزة. الفرق في النتيجة هو كل الدرس.»</p></div>
+
+  <div class="lab">
+    <h4>🧪 Lab 4 — SMB: 2012 vs النهاردة ← Profile: "shares, users"</h4>
+    <ol>
+      <li><strong>الهدف الغني</strong> — Metasploitable2:
+        <pre>enum4linux-ng -A 192.168.56.102 | tee smb_msf.txt
+smbclient -L //192.168.56.102/ -N</pre>
+        <div class="why"><span class="row"><span class="f">| tee smb_msf.txt</span> يعرض ويحفظ — الملف ده مصدر عمود "shares/users" في الـ profile.</span></div>
+        <span class="expect">Dump كامل: users، shares، groups، password policy.</span>
+      </li>
+      <li><strong>الهدف القديم</strong> — Windows 7:
+        <pre>enum4linux-ng -A 192.168.56.X | tee smb_win7.txt
+nmap -p445 --script smb-protocols 192.168.56.X</pre>
+        <div class="why"><span class="row"><span class="f">smb-protocols</span> بيقولك الـ <b>dialects</b> اللي الجهاز بيقبلها — وهنا هتشوف <span class="f">SMBv1</span> شغال.</span><span class="row">ده <b>finding نسجّله</b> في الـ target profile. الاستغلال مش دلوقتي.</span></div>
+        <span class="expect">الـ dump الكلاسيكي <strong>لسه بيظهر</strong> + SMBv1 مفعّل.</span>
+      </li>
+      <li><strong>الهدف المتقفل</strong> — Windows 10، نفس الأمر:
+        <pre>enum4linux-ng -A 192.168.56.X | tee smb_win.txt
+nxc smb 192.168.56.X</pre>
+        <div class="why"><span class="row">نفس الأمر بالحرف — والنتيجة قريبة من الصفر. <b>ده hardening finding مش فشل.</b></span><span class="row"><span class="f">nxc smb</span> لوحده لسه بيديك <b>النسخة والـ domain وحالة الـ signing</b> — يعني حتى المتقفل بيتكلم شوية.</span></div>
+        <span class="expect">"null session refused" / access denied — بس النسخة والـ domain ظهروا.</span>
+      </li>
+      <li><strong>اللي لسه بيشتغل</strong> — بـ credential:
+        <pre>nxc smb 192.168.56.X -u '&lt;LAB_USER&gt;' -p '&lt;LAB_PASS&gt;' --shares --users --pass-pol</pre>
+        <div class="why"><span class="row"><span class="f">-u / -p</span> يوزر وباسورد اللاب اللي المدرّس هيديهملك في الفصل.</span><span class="row"><span class="f">--users</span> ليستة الحسابات · <span class="f">--pass-pol</span> الـ password policy (lockout + أقل طول) — ودي اللي هتقرر سرعة الـ spray في Session 4.</span></div>
+        <span class="expect">الـ enumeration رجع بالكامل بمجرد وجود credential.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="warn">الـ credentials بتتقال شفوي في الفصل. <strong>متكتبش أي credential في أي ملف في الريبو.</strong></div>
+
+  <div class="key">التتابع اللي عايزهم يخرجوا بيه: <strong>Metasploitable2 = اقرا كل حاجة · Windows 7 = القديم لسه شغال · Windows 10 = متقفل، محتاج creds</strong>. وده اللي بيفرّق فني عن محلل.</div>
+
+  </div>
+</section>
+
+<!-- ================= 20 ================= -->
+<section class="blk" id="s20">
+  <div class="hd"><span class="num">20</span><h2>Protocol: LDAP — الدليل، وليه بيرد على الغرباء</h2><span class="min">12 min</span><span class="src">P22 · اشرحها live</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«الـ SMB بياخد الشهرة، بس الـ LDAP كتير بيبقى الجايزة الأكبر: هو <strong>الليستة الرسمية بمين موجود</strong>. users، groups، computers، service accounts، مين في الـ Domain Admins، ومين باسورده مش بينتهي. <strong>كل هجمة AD في Session 4 و 6 بتبدأ بـ LDAP query.</strong>»</p>
+    <p>«<strong>إيه هو؟</strong> الـ directory ده database متظبطة للقراية، مترتبة على شكل شجرة. والـ LDAP هو بروتوكول قراية الشجرة دي. كل object ليه <span class="en">distinguished name</span> — مسار كامل من الـ object لحد الجذر، زي <span class="en">uid=a.hassan,ou=People,dc=ceh,dc=lab</span> — ومعاه مجموعة attributes.»</p>
+    <p>«وفي شبكة Windows، <strong>الـ Active Directory هو LDAP server</strong>. بورت 389 على الـ domain controller بيرد على نفس الأسئلة زي أي directory تاني.»</p>
+    <p>«<strong>التشبيه:</strong> الـ LDAP هو دليل تليفونات الشركة، بس كمان بيقولك كل واحد في أنهي قسم، وكارنيهه بيفتح أنهي أبواب، وأنهي service accounts بتشغّل الـ backups، ومين في مجموعة المديرين. دلوقتي تخيّل الدليل ده مرمي على مكتب الاستقبال <strong>وأي حد يقدر يقراه من غير ما يوقّع</strong>. ده الـ anonymous bind.»</p>
+  </div>
+
+  <h3 class="sub">أي LDAP query = تلات حاجات بس</h3>
+  <div class="tw"><table>
+    <thead><tr><th>الجزء</th><th>معناه</th><th>مثال</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Base DN</strong></td><td>تبدأ منين في الشجرة</td><td><span class="en">-b "dc=ceh,dc=lab"</span></td></tr>
+      <tr><td><strong>Scope</strong></td><td>تنزل قد إيه: الـ object ده / مستوى واحد / كل اللي تحت</td><td><span class="en">-s base</span> · <span class="en">-s one</span> · <span class="en">-s sub</span></td></tr>
+      <tr><td><strong>Filter</strong></td><td>تطابق أنهي objects</td><td><span class="en">"(objectClass=user)"</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="say"><p>«اتعلم التلاتة دول وتقدر تكتب أي query على أي directory في الدنيا. والـ filter بيتكتب <span class="en">prefix</span>: <span class="en">(&amp;(A)(B))</span> يعني A و B، <span class="en">(|(A)(B))</span> يعني A أو B، <span class="en">(!(A))</span> يعني مش A.»</p></div>
+
+  <div class="slide">شغّل الـ diagram. <strong>كل الدرس في STEP 2</strong> — قف عليها وخليهم يقولوا الجملة بصوت عالي.</div>
+
+  <ol class="steps">
+    <li>«الـ LDAP بروتوكول استعلام، وأول رسالة فيه هي الـ authentication. اسمها <span class="en">bind</span>. والـ bind ممكن يشيل DN كامل وباسورد — <strong>وممكن ميشيلش أي حاجة خالص</strong>.»</li>
+    <li>«<strong>دي الـ packet اللي تهم.</strong> لو الـ client بعت DN <strong>فاضي</strong> والسيرفر برضه رد <span class="en g">success</span> — يبقى الـ directory بيسمح بـ <span class="en">anonymous bind</span>، وكل اللي بعد النقطة دي مبيكلفش الـ attacker حاجة.»</li>
+    <li>«الـ <span class="en">RootDSE</span> دي entry خاصة موجودة دايماً وبتوصف السيرفر نفسه. بتسألها بـ base DN فاضي. <strong>مش محتاج تعرف اسم الـ domain علشان تسأل السؤال ده — السيرفر هو اللي هيقولك.</strong>»</li>
+    <li>«وأهو: <span class="en">dc=ceh,dc=lab</span>. query واحد من غير authentication وبقيت عارف الـ naming context والـ controls المدعومة وغالباً اسم الـ DC نفسه.»</li>
+    <li>«ودلوقتي الـ query الحقيقي. Base = الـ DN اللي لسه عرفته، scope = الشجرة كلها، filter = طابق كل حاجة.»</li>
+    <li>«<span class="en">searchResEntry</span> واحدة لكل object. وفي Active Directory ده يعني كل user وكل group وكل computer، وكمان حقول <span class="en">description</span> و <span class="en">title</span> و <span class="en">telephoneNumber</span> و <span class="en">servicePrincipalName</span> و <span class="en">memberOf</span>. <strong>ده org chart ومعاه مسارات هجوم.</strong>»</li>
+    <li>«الـ search خلص.»</li>
+    <li>«التكلفة الإجمالية: connection واحد، وعلى directory متظبط غلط — <strong>صفر credentials</strong>.»</li>
+  </ol>
+
+  <div class="key">الهجمة كلها هي الـ <strong>packet رقم 2</strong>. كل اللي بعدها سلوك بروتوكول شرعي — الـ LDAP <em>مصمم</em> إنه يجاوب على الأسئلة دي. <strong>الثغرة هي مين مسموح له يسأل.</strong></div>
+
+  <div class="say">
+    <p>«خلوهم يقولوا الفرق ده بصوت عالي — ده الفرق بين <span class="en o">vulnerability</span> و <span class="en o">misconfiguration</span>، والـ interviewers بيسألوا عليه.»</p>
+  </div>
+
+  <h3 class="sub">لو البورت ده مفتوح، الـ attacker كسب إيه؟</h3>
+  <div class="say">
+    <p>«<strong>كل يوزرنيم في المؤسسة</strong> — مدخل الـ password spraying. مينفعش تعمل spray على ليستة معندكش. → <span class="en">T1087.002</span></p>
+    <p>«<strong>عضوية الـ groups</strong> — مين في Domain Admins و Backup Operators و Remote Desktop Users. دي ليستة أهدافك مرتبة. → <span class="en">T1069.002</span></p>
+    <p>«<strong>Service accounts بـ SPNs</strong> — الفلتر <span class="en">(servicePrincipalName=*)</span> بالظبط هو أول خطوة في الـ Kerberoasting في Session 4. → <span class="en">T1558.003</span></p>
+    <p>«<strong>باسوردات في حقل الـ description</strong> — لسه، في 2026، من أشهر النتائج الحقيقية. الأدمنز بيكتبوها هناك وبينسوا. → <span class="en">T1552.001</span></p>
+    <p>«<strong>الـ password policy وflags الحسابات</strong> — <span class="en">DONT_EXPIRE_PASSWORD</span>، <span class="en">DONT_REQ_PREAUTH</span>. → <span class="en">T1201</span></p>
+    <p>«<strong>Computer objects</strong> — كل hostname ونسخة OS في الـ domain، يعني خريطة شبكة ببلاش. → <span class="en">T1018</span></p>
+  </div>
+
+  <div class="soc">
+    <strong>anonymous bindRequest</strong> وبعدها <strong>wholeSubtree search بفلتر (objectClass=*)</strong>. مفيش تطبيق شرعي بيعدّ الـ directory كله في query واحد — التطبيقات بتعمل bind بـ service account وبتدور في OU ضيّق بفلتر محدد.
+    <br>على الـ DC دي Event ID <span class="en">1644</span> (expensive/inefficient LDAP search) — <strong>مقفولة افتراضياً وتستاهل تفتحها</strong>.
+    <br>وحاجة تانية: بورت 389 من غير TLS يعني الـ <span class="en">title</span> و <span class="en">mail</span> و <span class="en">telephoneNumber</span> كلهم مقروءين على الـ wire — <strong>وده finding لوحده</strong>.
+  </div>
+
+  <div class="slide">افتح <span class="en">12-ldap-enumeration.pcapng</span>، فلتر <span class="en">ldap</span>، واضغط frame 27 وافرد الـ entry — الحقول ظاهرة clear text.</div>
+
+  <div class="key">الـ LDAP مبيتهكرش — <strong>بيتسأل</strong>. أول ما تلاقي 389 مفتوح، سؤالك الأول مش «أنهي exploit؟» — سؤالك الأول: <strong>«هيرد عليّا من غير credentials؟»</strong></div>
+
+  </div>
+</section>
+
+<!-- ================= 21 ================= -->
+<section class="blk" id="s21">
+  <div class="hd"><span class="num">21</span><h2>Protocol: SNMP — الجهاز اللي بيبلّغ على نفسه</h2><span class="min">12 min</span><span class="src">P23 · مرشّح pre-reading</span></div>
+  <div class="bd">
+
+  <div class="warn">لو الوقت ضيّق، <strong>دي الصفحة اللي تديها pre-reading</strong>. ولو هتشرحها، اشرح <span class="en">sysDescr</span> و <span class="en">hrSWRunName</span> بس وسيب باقي جدول الـ OIDs مرجع.</div>
+
+  <div class="say">
+    <p>«الـ SNMP عايش على <strong>UDP</strong>. يعني لو الـ scan بتاعك كان <span class="en">nmap -sS -p-</span>، <strong>انت أصلاً معبصتش عليه</strong>. وده بالظبط سبب إنه لسه نتيجة مثمرة في 2026: الأجهزة اللي بتشغّله — الطابعات والسويتشات والـ UPS والكاميرات — هي الأجهزة اللي محدش بيعملها patch، والـ community string لسه <span class="en">public</span>.»</p>
+    <p>«<strong>إيه هو؟</strong> الـ SNMP بيخلي محطة إدارة تسأل جهاز عن نفسه. كل قيمة الجهاز يقدر يبلّغ عنها ليها عنوان رقمي اسمه <span class="en">OID</span>، والـ OIDs مترتبة في شجرة عالمية اسمها <span class="en">MIB</span>. يعني <span class="en">1.3.6.1.2.1.1.5.0</span> هو اسم الجهاز — <strong>على أي جهاز في الدنيا</strong>، لأن المسار ده معياري.»</p>
+    <p>«<strong>التشبيه:</strong> تخيّل مبنى فيه كل جهاز عليه لوحة باركود معيارية — نفس اللوحة ونفس الترقيم على التلاجة والأسانسير ولوحة الحريق. تمسح رقم، الجهاز يقرا لك المعلومة دي بصوت عالي. ودلوقتي تخيل إن الحاجة الوحيدة اللي بتمنعك هي <strong>كلمة مكتوبة على اللوحة نفسها</strong>، والمصنع بيحطها "public" على كل حاجة.»</p>
+  </div>
+
+  <h3 class="sub">الـ OIDs اللي تستاهل تتحفظ</h3>
+  <div class="tw"><table>
+    <thead><tr><th>OID</th><th>الاسم</th><th>بتاخد منه إيه</th></tr></thead>
+    <tbody>
+      <tr><td><span class="en">1.3.6.1.2.1.1.1.0</span></td><td>sysDescr</td><td>نسخة الـ OS/firmware بالظبط</td></tr>
+      <tr><td><span class="en">1.3.6.1.2.1.1.4.0</span></td><td>sysContact</td><td>إيميل داخلي مؤكد</td></tr>
+      <tr><td><span class="en">1.3.6.1.2.1.1.5.0</span></td><td>sysName</td><td>الـ hostname</td></tr>
+      <tr><td><span class="en">1.3.6.1.2.1.1.6.0</span></td><td>sysLocation</td><td>المكان الفعلي — رف وأوضة حقيقيين كتير</td></tr>
+      <tr><td><span class="en">1.3.6.1.2.1.25.4.2.1.2</span></td><td>hrSWRunName</td><td><strong>كل عملية شغالة</strong></td></tr>
+      <tr><td><span class="en">1.3.6.1.2.1.25.6.3.1.2</span></td><td>hrSWInstalledName</td><td>كل برنامج متسطب</td></tr>
+      <tr><td><span class="en">1.3.6.1.2.1.4.22.1.2</span></td><td>ipNetToMediaPhysAddress</td><td><strong>جدول الـ ARP</strong> — hosts حية تانية</td></tr>
+    </tbody>
+  </table></div>
+
+  <ol class="steps">
+    <li>«الـ "authentication" في v1 و v2c عبارة عن نص واحد مشترك اسمه <span class="en">community string</span>. وبيتبعت <strong>clear text في كل packet</strong>. والافتراضيين اللي على ملايين الأجهزة: <span class="en">public</span> للقراية و <span class="en">private</span> للكتابة.»</li>
+    <li>«أول object في المجموعة المعيارية هو <span class="en">sysDescr</span>. على راوتر بيقولك نسخة الـ IOS بالظبط؛ على طابعة الـ firmware. <strong>ده version string جاهز، من غير ولا TCP connection واحد.</strong>»</li>
+    <li>«الـ "walk" مش عملية خاصة — ده <span class="en">get-next</span> بيتنادى مرة ورا التانية، كل مرة بيسأل عن اللي بعد اللي فات. وعلشان كده الـ walk = packet لكل قيمة، وبيبان كمئات الـ UDP datagrams الصغيرة.»</li>
+    <li>«<span class="en">sysContact</span> المفروض يكون إيميل الأدمن. يعني <strong>عنوان داخلي مؤكد، بيتسلّم لغريب من غير authentication</strong>.»</li>
+    <li>«<span class="en">sysLocation</span> المفروض يكون رف الداتا سنتر. يعني بيرسم لك المكان الفعلي.»</li>
+    <li>«<span class="en">sysName</span> هو الـ hostname. بقيت عارف هوية الجهاز <strong>من غير ما تلمس SMB ولا DNS ولا أي بورت TCP</strong>.»</li>
+    <li>«وهنا بيبطّل يكون أداة جرد ويبقى استطلاع. الـ <span class="en">host resources MIB</span> بيكشف البرامج الشغالة والمتسطبة والتخزين والـ interfaces وجدول الـ ARP.»</li>
+    <li>«كل عملية بالاسم. تقدر تشوف هل فيه <strong>EDR agent</strong> شغال، وأنهي database متسطبة، وهل فيه backup client — <strong>قبل ما يكون عندك أي access على الجهاز أصلاً</strong>.»</li>
+  </ol>
+
+  <div class="key">232 packet، صفر credentials، صفر TCP connections. الـ SNMP هو أكتر finding مبخوس حقه في السيشن دي — الطلبة بيعدّوا من على UDP 161 لأنهم عملوا scan لـ TCP بس.</div>
+
+  <div class="say">
+    <p>«ولو الـ community string بتاع الكتابة (<span class="en">private</span>) افتراضي كمان؟ ساعتها تقدر <strong>تغيّر إعدادات الجهاز</strong>، تنزّل ملف الـ config عن طريق TFTP، أو تعمل reboot للجهاز. → <span class="en">T1602.001</span>»</p>
+  </div>
+
+  <div class="soc">
+    سلسلة سريعة من <span class="en">get-next-requests</span> من مصدر واحد، بيمشي على الـ OIDs بالترتيب، <strong>من عنوان مش سيرفر المراقبة</strong>.
+    <br>الـ SNMP الشرعي بييجي من واحد أو اتنين NMS معروفين على فترة polling ثابتة؛ walk الـ attacker متقطع، من IP غلط، وغالباً بيجرّب كذا community string الأول.
+    <br><strong>القاعدة: alert على أي SNMP من مصدر مش في الـ allow-list.</strong> الليستة قصيرة والقاعدة هادية جداً.
+  </div>
+
+  <div class="slide">افتح <span class="en">13-snmp-walk.pcapng</span>، فلتر <span class="en">snmp</span>، افرد أي packet وشاور على حقل الـ <span class="en">community</span> — مكتوب plain text. أي حد بيسمع على الـ segment معاه الـ credential.</div>
+
+  <div class="key">اعمل scan لـ UDP 161 دايماً. جرّب <span class="en p">public</span> و <span class="en p">private</span> دايماً. أمر واحد — وأنهى engagements بدري أكتر من أي exploit في المنهج.</div>
+
+  </div>
+</section>
+
+<!-- ================= 22 ================= -->
+<section class="blk" id="s22">
+  <div class="hd"><span class="num">22</span><h2>SNMP &amp; LDAP enumeration — الأدوات</h2><span class="min">6 min</span><span class="src">P24</span></div>
+  <div class="bd">
+
+  <h3 class="sub">SNMP</h3>
+  <pre>onesixtyone -c /usr/share/seclists/Discovery/SNMP/snmp.txt 192.168.56.X</pre>
+  <div class="why"><span class="row"><span class="f">onesixtyone</span> أداة بتجرّب community strings كتير بسرعة (brute-force خفيف).</span><span class="row"><span class="f">-c &lt;file&gt;</span> ملف الكلمات اللي هيجرّبها — لو واحدة نجحت هيطبع رد الجهاز.</span></div>
+
+  <pre>snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.1</pre>
+  <div class="why"><span class="row"><span class="f">-v2c</span> نسخة البروتوكول 2c (اللي بتستخدم community string).</span><span class="row"><span class="f">-c &lt;string&gt;</span> الـ community string اللي لقيتها.</span><span class="row"><span class="f">1.3.6.1.2.1.1</span> الفرع اللي عايز تمشي فيه — ده الـ <b>system group</b>: الاسم والنسخة والمكان وجهة الاتصال.</span></div>
+
+  <pre>snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.25.4.2.1.2</pre>
+  <div class="why"><span class="row">نفس الأمر بس على فرع <b>hrSWRunName</b> = <b>ليستة كل العمليات الشغالة</b> على الجهاز.</span></div>
+
+  <h3 class="sub">LDAP</h3>
+  <pre>ldapsearch -x -H ldap://192.168.56.X -s base namingContexts</pre>
+  <div class="why"><span class="row"><span class="f">-x</span> simple authentication (يعني من غير SASL) — ومع سيبان اليوزر فاضي بيبقى <b>anonymous bind</b>.</span><span class="row"><span class="f">-H ldap://...</span> عنوان السيرفر.</span><span class="row"><span class="f">-s base</span> scope = الـ entry دي بس (الـ RootDSE).</span><span class="row"><span class="f">namingContexts</span> الـ attribute اللي بيرجّع جذر الشجرة — <b>هو ده اللي هيقولك dc=ceh,dc=lab</b>.</span></div>
+
+  <pre>windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt</pre>
+  <div class="why"><span class="row"><span class="f">windapsearch</span> واجهة أسهل من ldapsearch مخصوصة لـ Active Directory.</span><span class="row"><span class="f">-d ceh.lab</span> اسم الـ domain · <span class="f">--dc-ip</span> عنوان الـ Domain Controller.</span><span class="row"><span class="f">-U</span> اطلّع الـ <b>Users</b> · <span class="f">-G</span> اطلّع الـ <b>Groups</b>.</span></div>
+
+  <div class="warn"><strong>ملاحظة أمانة قولها بصوت عالي:</strong> الـ SNMP <strong>مش</strong> متسطب افتراضياً على Windows Server. إحنا شغّلناه بـ community string ضعيف <strong>مخصوص</strong> علشان اللاب يعلّم حاجة. متعمّموش على "كل سيرفر بيسرّب SNMP" — السيرفر المتقفل مش بيشغّله أصلاً. <strong>اللاب ميدان رماية، مش صورة للواقع.</strong></div>
+
+  </div>
+</section>
+
+<!-- ================= 23 ================= -->
+<section class="blk" id="s23">
+  <div class="hd"><span class="num">23</span><h2>Lab 5 — امشي في الـ MIB، واسأل الـ directory</h2><span class="min">15 min</span><span class="src">hands-on</span></div>
+  <div class="bd">
+
+  <div class="lab">
+    <h4>🧪 Lab 5 — SNMP + LDAP ← Profile: "SNMP/LDAP findings"</h4>
+    <ol>
+      <li>أكّد إن UDP 161 مفتوح:
+        <pre><span class="k">sudo</span> nmap -sU -p161 192.168.56.X</pre>
+        <div class="why"><span class="row"><span class="f">-sU -p161</span> UDP scan لبورت واحد بس — ثواني، مش ساعات.</span></div>
+        <span class="expect">161/udp open أو open|filtered.</span>
+      </li>
+      <li>دوّر على الـ community string:
+        <pre>onesixtyone -c /usr/share/seclists/Discovery/SNMP/snmp.txt 192.168.56.X</pre>
+        <span class="expect">سطر فيه الـ string اللي نجح + رد الجهاز.</span>
+      </li>
+      <li>امشي في الـ system group:
+        <pre>snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.1</pre>
+        <span class="expect">sysDescr (النسخة) · sysName · sysContact · sysLocation.</span>
+      </li>
+      <li>امشي في العمليات:
+        <pre>snmpwalk -v2c -c &lt;SNMP_COMMUNITY&gt; 192.168.56.X 1.3.6.1.2.1.25.4.2.1.2</pre>
+        <span class="expect">ليستة العمليات الشغالة — دوّر فيها على EDR أو backup agent.</span>
+      </li>
+      <li>LDAP — هات جذر الشجرة:
+        <pre>ldapsearch -x -H ldap://192.168.56.X -s base namingContexts</pre>
+        <span class="expect"><span class="en">DC=ceh,DC=lab</span>.</span>
+      </li>
+      <li>هات الـ users والـ groups:
+        <pre>windapsearch -d ceh.lab --dc-ip 192.168.56.X -U | tee ldap_users.txt
+windapsearch -d ceh.lab --dc-ip 192.168.56.X -G</pre>
+        <span class="expect">الحسابات المزروعة: a.fahmy · m.said · n.gamal · <strong>svc_backup</strong> + المجموعات.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="warn"><strong>لو الـ DC مبنيش:</strong> شغّل الجزء B على غرفة TryHackMe <span class="en">networkservices2</span>، وخلي الـ LDAP <strong>مفهوم نظري بس</strong> — <strong>متزوّرش directory</strong>.</div>
+
+  <div class="key">الـ SNMP والـ LDAP هما "خدمات الـ org chart" — بيسلّموك أسامي وهيكل من غير ما تلمس SMB أصلاً. الـ community string الافتراضي أو الـ anonymous bind = مكسب مجاني، والليستة دي مدخل Session 4.</div>
+
+  </div>
+</section>
+
+<!-- ================= 24 ================= -->
+<section class="blk" id="s24">
+  <div class="hd"><span class="num">24</span><h2>Protocol: RPC / Portmapper — السنترال على بورت 111</h2><span class="min">9 min</span><span class="src">P26 · مرشّح pre-reading</span></div>
+  <div class="bd">
+
+  <div class="warn"><strong>RPC قبل NFS دايماً</strong> — الـ helper ports بتاعة NFS ملهاش أي معنى من غير الـ portmapper.</div>
+
+  <div class="say">
+    <p>«مينفعش تفهم enumeration الـ NFS من غير portmapper، لأن الـ services المساعدة بتاعة NFS <strong>مش عايشة على بورتات ثابتة</strong>. عشر دقايق هنا بتخلي التلات صفحات الجايين بديهيين.»</p>
+    <p>«<strong>إيه هو؟</strong> الـ RPC بيخلي برنامج ينادي دالة <strong>على جهاز تاني</strong> كأنها محلية. كل برنامج ليه <span class="en">program number</span> عالمي — NFS رقمه 100003، mountd رقمه 100005، الـ portmapper نفسه 100000 — وكل واحد بيشتغل على أي بورت خطفه وقت الإقلاع. والـ portmapper هو خدمة البحث اللي بتربط <strong>program number ← البورت الحالي</strong>. اسأله بأدب، هيقولك كل اللي عارفه، <strong>من غير أي authentication</strong>.»</p>
+    <p>«<strong>التشبيه:</strong> مكتب كبير كل قسم فيه بيغيّر أوضته كل صبح. الاستقبال ماسك الليستة. مش محتاج تلف على الممرات تجرّب الأبواب — تسأل الاستقبال، والاستقبال بيقولك على الكل.»</p>
+  </div>
+
+  <ol class="steps">
+    <li>«دي مشكلة التصميم بتاعة RPC. خدمة زي <span class="en">mountd</span> أو <span class="en">statd</span> ملهاش بورت ثابت — بتخطف بورت عالي فاضي كل مرة تشتغل. بكرة هيبقى بورت مختلف.»</li>
+    <li>«فـ Sun اخترعت directory: خدمة واحدة على بورت ثابت معروف شغلتها الوحيدة تجاوب "برنامج N فين النهاردة؟". ده الـ <span class="en">portmapper</span> — كمان اسمه <span class="en">rpcbind</span> — على بورت 111.»</li>
+    <li>«الـ <span class="en">DUMP</span> call بيطلب جدول التسجيل كله. <strong>من غير authentication بالتصميم.</strong>»</li>
+    <li>«وبتاخد الخريطة: program number، النسخة، TCP ولا UDP، والبورت الحي. <strong>لسه عملت enumerate لخدمات عمرك ما كنت هتلاقيها</strong> — scan للبورتات 1-1000 بيفوّت mountd على 45520 تماماً.»</li>
+    <li>«الـ <span class="en">GETADDR</span> هو النسخة الموجهة: اسأل عن program number واحد.»</li>
+    <li>«رد واحد، بورت واحد. دلوقتي تقدر تكلم mountd على طول — وده بالظبط اللي <span class="en">showmount</span> بيعمله بعد كده.»</li>
+  </ol>
+
+  <div class="key">بورت 111 خريطة مجانية للبورتات العالية. علشان كده <span class="en p">rpcinfo -p</span> من أعلى أوامر السيشن قيمة: تبادل packet واحد، وعندك خدمات مفيش نطاق بورتات كان هيكشفها.</div>
+
+  <div class="say">
+    <p>«ولو <span class="en">111/tcp open rpcbind</span> ظهر: شغّل <span class="en">rpcinfo -p</span> قبل أي حاجة. أمر واحد، مش محتاج credentials، وبيكشف خدمات على بورتات الـ scan بتاعك عمره ما لمسها. وكمان ده هدف لـ <span class="en">reflection DDoS</span> — الـ rpcbind على الإنترنت العام vector تضخيم معروف، ولقيانه مكشوف ده finding لوحده. → <span class="en">T1498.002</span>»</p>
+  </div>
+
+  <div class="soc">Portmap <span class="en">DUMP</span> من غير authentication من host مش NFS client، وبعدها <span class="en">MOUNT EXPORT</span> على طول. الـ NFS clients الشرعية بتعمل GETADDR للبرنامج اللي محتاجاه وبعدين mount — <strong>مبتعملش DUMP للجدول كله</strong>. DUMP بعدها EXPORT ومفيش MNT = enumeration مش استخدام.</div>
+
+  </div>
+</section>
+
+<!-- ================= 25 ================= -->
+<section class="blk" id="s25">
+  <div class="hd"><span class="num">25</span><h2>Protocol: NFS — الملفات اللي بتثق في جهازك</h2><span class="min">11 min</span><span class="src">P27 · مرشّح pre-reading</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«الـ NFS بيخلي سيرفر ينشر (<span class="en">export</span>) فولدر، ويخلي الـ clients تعمله <span class="en">mount</span> في شجرة ملفاتها. وبعد الـ mount بيتصرف زي disk محلي — <span class="en">ls</span> و <span class="en">cp</span> و <span class="en">vi</span> كلها شغالة عادي. قواعد الـ export عايشة في <span class="en">/etc/exports</span> وبتقول <strong>أنهي hosts</strong> يعملوا mount لـ <strong>إيه</strong>.»</p>
+    <p>«ركّزوا في الصياغة: <strong>أنهي hosts</strong>. الـ NFS الكلاسيكي ملوش أي مفهوم عن يوزر بيعمل login.»</p>
+    <p>«<strong>التشبيه:</strong> غرفة تخزين مشتركة، قفل بابها بيقرا <strong>رقم لوحة العربية</strong>، مش هوية السواق. هات اللوحة الصح وانت جوه — وأول ما تدخل، تقول لأمين المخزن انت رقم موظف كام، وهو بيكتبه <strong>من غير ما يتأكد</strong>.»</p>
+  </div>
+
+  <ol class="steps">
+    <li>«علشان mountd على بورت عشوائي، كل حاجة بتبدأ من الـ portmapper.»</li>
+    <li>«الـ <span class="en">EXPORT</span> call هو الـ enumeration. بيطلب من السيرفر يوصف جدول الـ exports بتاعه.»</li>
+    <li>«وأهو النتيجة. <span class="en">/srv/finance_share *</span> — النجمة دي ليستة الـ export بتقول <strong>أي IP في الدنيا</strong> يقدر يعمل mount للده. ومحتاجتش باسورد علشان تعرفها.»</li>
+    <li>«request للـ mount. وهنا الحاجة الحرجة: الـ NFS الكلاسيكي (v2/v3) بيعمل authenticate لـ <strong>الجهاز</strong> بالـ IP، مش اليوزر. لو الـ IP بتاعك في الليستة، انت جوه.»</li>
+    <li>«بتاخد file handle. ومن دلوقتي نظام الملفات متعلّق بجهازك.»</li>
+    <li>«ودلوقتي الضعف الحقيقي: <span class="en">AUTH_SYS</span>. الـ client بيقول للسيرفر انا بتصرف كـ أنهي UID. <strong>مفيش تحقق.</strong> لو انت root على Kali بتاعتك، بتبعت uid=0.»</li>
+    <li>«لو الـ export اتكتب بـ <span class="en">no_root_squash</span>، السيرفر بيعامل uid 0 بتاعك كـ root بتاعه هو. تقدر تقرا كل ملف، تكتب SSH key في <span class="en">.ssh</span> بتاع user، أو تحط SUID binary وتشغّله محلياً. <strong>ده مسار privilege escalation كامل من mount.</strong>»</li>
+  </ol>
+
+  <div class="key">الـ NFS بيثق في جهاز الـ client، مش في اليوزر. كل اللي بتهاجمه في NFS بيتفرّع من الجملة الواحدة دي.</div>
+
+  <h3 class="sub">لو البورت ده مفتوح، الـ attacker كسب إيه؟</h3>
+  <div class="say">
+    <p>«<strong>ليستة الـ exports ومين يعمل mount</strong> — <span class="en">showmount -e</span>. export لـ <span class="en">*</span> = finding فوري. → <span class="en">T1135</span></p>
+    <p>«<strong>قراية بيانات حقيقية</strong> — source code، backups، config files فيها باسوردات database، private keys. → <span class="en">T1039</span></p>
+    <p>«<strong>صلاحية كتابة</strong> — حط الـ public key بتاعك في <span class="en">~/.ssh/authorized_keys</span> بتاع user واعمل login بيه. → <span class="en">T1098.004</span></p>
+    <p>«<strong>root محلي</strong> عن طريق <span class="en">no_root_squash</span> — ده مسار OSCP/CTF كلاسيكي ولسه بيشتغل. → <span class="en">T1548.001</span></p>
+  </div>
+
+  <div class="soc">EXPORT أو DUMP من host <strong>عمره ما بيعمل MNT لأي حاجة</strong>. الـ client الحقيقي بيعمل mount؛ الـ scanner بيسأل ويمشي. على السيرفر، <span class="en">rpc.mountd</span> بيسجّل كل محاولة mount في الـ syslog مع IP الـ client — <strong>والـ log ده هو مكان الكشف الحقيقي، ومحدش تقريباً بيجمّعه</strong>.</div>
+
+  <div class="key">الـ enumeration بتاعك أمرين: <span class="en p">showmount -e</span> علشان تشوف الـ exports، وبعدين اقرا الـ options — لأن <span class="en p">*</span> و <span class="en p">no_root_squash</span> هما الـ findings.</div>
+
+  </div>
+</section>
+
+<!-- ================= 26 ================= -->
+<section class="blk" id="s26">
+  <div class="hd"><span class="num">26</span><h2>Protocol: FTP — كل حاجة clear text</h2><span class="min">9 min</span><span class="src">P28 · مرشّح pre-reading</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«ليه بروتوكول من 1971 لسه في المنهج؟ لأنه لسه <strong>موجود</strong>. الـ backup jobs، الـ NAS، الطابعات اللي بتـ scan لفولدر، الأجهزة المدمجة، والتطبيقات القديمة كلها لسه بتتكلم FTP — ولسه clear text.»</p>
+    <p>«<strong>إيه هو؟</strong> الـ client بيفتح <span class="en">control connection</span> على بورت 21 ويكتب أوامر ASCII قصيرة. السيرفر بيرد بكود من تلات أرقام ورسالة. ولما ملف فعلاً محتاج يتنقل، بيتفتح <strong>connection تاني للبيانات</strong> — والانقسام ده هو مصدر أغلب مشاكل FTP.»</p>
+    <p>«<strong>أكواد الردود هي اللغة كلها:</strong> <span class="en">2xx</span> = تم · <span class="en">3xx</span> = محتاج منك حاجة زيادة · <span class="en">4xx</span> = فشل مؤقت · <span class="en">5xx</span> = فشل دائم. يعني <span class="en">331</span> (محتاج باسورد) مقابل <span class="en">530</span> (login غلط) = الفرق بين "اليوزر ده موجود" و "مش موجود".»</p>
+  </div>
+
+  <ol class="steps">
+    <li>«سيرفرات FTP بتسلّم عليك. سطر الـ 220 بيتبعت لحظة ما الـ TCP handshake يخلص — علشان كده banner-grabbing لـ FTP بياخد <span class="en">nc</span> واحد وصفر معرفة بالبروتوكول.»</li>
+    <li>«الأوامر ASCII عادي، أمر في السطر. تقدر تشغّل FTP كله بإيدك.»</li>
+    <li>«بص على أكواد الردود. سيرفرات كتير بترد <span class="en">331</span> لليوزر الموجود و <span class="en">530</span> للمش موجود. الفرق ده <strong>username oracle</strong> — نفس الفكرة اللي هتقابلها في SMTP تحت وفي Kerberos في Session 4.»</li>
+    <li>«وأهو سبب إن FTP على كل ليستة "اقفلوا ده". الباسورد <strong>مش hashed ولا encrypted ولا حتى encoded</strong>. أي حد بيسمع على الـ segment بيقراه. في Session 9 هتسحبه بالظبط من capture.»</li>
+    <li>«230 يعني دخلت anonymous. دلوقتي اسأل: فيه إيه هنا، وتقدر تكتب؟»</li>
+    <li>«FTP مجموعة أوامر صغيرة إنسانية: SYST, PWD, LIST, RETR, STOR, CWD. اتعلم ست كلمات ومش هتحتاج client أبداً.»</li>
+  </ol>
+
+  <h3 class="sub">لو البورت ده مفتوح، الـ attacker كسب إيه؟</h3>
+  <div class="say">
+    <p>«<strong>النسخة بالظبط</strong> من الـ banner — <span class="en">vsftpd 2.3.4</span> هو البناء المشهور بالـ backdoor. → <span class="en">T1592.002</span></p>
+    <p>«<strong>anonymous read</strong> — واللي الناس بتسيبه في فولدر anonymous مذهل: backups، configs، database dumps. → <span class="en">T1078.001</span></p>
+    <p>«<strong>anonymous <em>write</em></strong> — لو الـ FTP root هو نفسه الـ web root، بترفع web shell وعندك تنفيذ أوامر. اختبر دايماً بـ <span class="en">STOR</span>. → <span class="en">T1505.003</span></p>
+    <p>«<strong>يوزرنيمز صح</strong> من فرق الـ 331-vs-530 — وديها على طول لـ Session 4. → <span class="en">T1087</span></p>
+  </div>
+
+  <div class="soc">credentials في العلن، و pattern login يستاهل alert: <strong>530 كتير من مصدر واحد</strong> (brute force)، أو <strong>anonymous 230 من عنوان عمره ما استخدم FTP</strong>. على السيرفر، vsftpd/ProFTPD بيكتبوا كل login في الـ syslog — وده المصدر الأعلى دقة.</div>
+
+  <div class="slide">افتح <span class="en">14-ftp-anonymous.pcapng</span>، right-click أي packet → <span class="en">Follow → TCP Stream</span>. هتقرا الـ session كله كمحادثة، الباسورد وكل حاجة. وريها لأي حد لسه فاكر إن FTP كويس على شبكة داخلية.</div>
+
+  <div class="key">FTP بيديك تلات حاجات من connection واحد: version string، احتمال anonymous login، و username oracle. اعمل <span class="en p">nc</span> على بورت 21 قبل أي أداة — الـ banner مستنيك خلاص.</div>
+
+  </div>
+</section>
+
+<!-- ================= 27 ================= -->
+<section class="blk" id="s27">
+  <div class="hd"><span class="num">27</span><h2>Protocol: SMTP — السيرفر اللي بيأكد مين بيشتغل هنا</h2><span class="min">10 min</span><span class="src">P29 · لو هتشرح واحد بس، اشرح ده</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«Session 2 علّمتك تحصد إيميلات من الإنترنت وتخمّن الصيغة. الـ SMTP بيخليك <strong>تتأكد</strong> من التخمينات دي ضد سيرفر الشركة نفسه — بيحوّل ليستة "يمكن" لليستة "مؤكد". دي جودة استخبارات مختلفة تماماً.»</p>
+    <p>«<strong>إيه هو؟</strong> الـ SMTP بينقل البريد بين السيرفرات. الـ client بيتصل ببورت 25 ويكتب تتابع قصير: <span class="en">EHLO</span> يعرّف نفسه، <span class="en">MAIL FROM</span> يسمّي المُرسل، <span class="en">RCPT TO</span> لكل مستقبل، <span class="en">DATA</span> للنص، وبعدين نقطة لوحدها للنهاية. كل واحد فيهم نص ASCII تكتبه بإيدك.»</p>
+    <p>«<strong>التشبيه:</strong> موظف غرفة بريد مبسوط إنه يقولك أنهي "منى سعيد" بتشتغل في المبنى ولا لأ — لأن البروتوكول اتكتب وكل اللي على الشبكة كانوا زملاء.»</p>
+  </div>
+
+  <ol class="steps">
+    <li>«زي FTP، الـ SMTP بيسلّم عليك. الـ 220 banner بيسمّي الـ MTA (Postfix, Exim, Sendmail, Exchange) وكتير الـ hostname الداخلي الحقيقي.»</li>
+    <li>«الـ <span class="en">EHLO</span> هو التحية الحديثة. السيرفر بيرد بكل اللي بيدعمه.»</li>
+    <li>«اقرا ليستة القدرات بعناية. <strong>VRFY موجودة في الليستة = VRFY مفعّلة.</strong> ولاحظ هل STARTTLS معروضة، وهل <span class="en">AUTH</span> بيظهر قبل TLS (ده هيعني إن الـ credentials ممكن تسافر في العلن).»</li>
+    <li>«الـ <span class="en">VRFY</span> موجودة علشان الأدمن يتأكد من عنوان. ملهاش أي متطلب authentication في البروتوكول الأساسي.»</li>
+    <li>«252 يعني الـ mailbox حقيقي. <strong>لسه أكّدت هوية موظف بسطر نص واحد.</strong>»</li>
+    <li>«ودلوقتي الضابط: اسم أكيد مش موجود.»</li>
+    <li>«550 مع "User unknown". <strong>الفرق بين 252 و 550 هو الثغرة</strong> — مش bug في الكود، لكن فرق في السلوك بيسرّب معلومة. الـ pattern ده — إجابتين مختلفتين لسؤال yes/no — هو اللي الأمنيين بيسموه <span class="en o">oracle</span>.»</li>
+    <li>«غذّيه بـ wordlist وعندك ليستة يوزرات الشركة. service accounts، مديرين، الكل. الليستة دي بتروح لـ password spray في Session 4 و phishing في Session 9.»</li>
+  </ol>
+
+  <div class="warn"><strong>الـ VRFY متقفلة؟</strong> استخدم <span class="en">RCPT TO</span>. ابدأ رسالة وهمية بـ <span class="en">MAIL FROM:</span> وبعدين <span class="en">RCPT TO:&lt;user@domain&gt;</span> — 250 يعني الـ mailbox موجود، 550 يعني لأ. نفس الـ oracle، باب مختلف.</div>
+
+  <div class="key">الـ pattern ده — إجابتين مختلفتين لسؤال yes/no — هو نفسه في الـ FTP والـ Kerberos وكل login form. <strong>سمّي الـ pattern مرة واحدة هنا، وهو بيدفع تمن باقي الدبلومة.</strong></div>
+
+  <div class="soc">VRFY متكررة، أو RCPT TO كتير بنسبة 550 عالية، من مصدر واحد. ده من أسهل detections السيشن: <strong>عدّ ردود الـ 550 لكل مصدر في الدقيقة</strong>. Postfix و Exchange بيسجّلوا كل مستقبل مرفوض.
+  <br><strong>لاحظ الـ PIPELINING:</strong> الـ client بعت أربع أوامر في TCP segment واحد والسيرفر رد عليهم واحد واحد. ده SMTP قانوني — وعلشان كده قاعدة "أمر لكل packet" الساذجة بتفوّته. <strong>عدّ الردود مش الطلبات.</strong></div>
+
+  </div>
+</section>
+
+<!-- ================= 28 ================= -->
+<section class="blk" id="s28">
+  <div class="hd"><span class="num">28</span><h2>NSE + الـ netcat banner grab</h2><span class="min">6 min</span><span class="src">P30</span></div>
+  <div class="bd">
+
+  <div class="say"><p>«ورا كل enumerator أوتوماتيك، حركة واحدة يدوية: افتح connection خام واقرا اللي الـ service بتعلن عنه. لما أداة تديك إجابة غامضة — فاكرين <span class="en">tcpwrapped</span> في Lab 3؟ — دي طريقتك للحقيقة.»</p></div>
+
+  <h3 class="sub">NSE — nmap كمحرك enumeration</h3>
+  <pre>nmap -sC -p- 192.168.56.102</pre>
+  <div class="why"><span class="row"><span class="f">-sC</span> شغّل الـ <b>default scripts</b> — باقة كويسة كأول تمريرة.</span></div>
+
+  <pre>ls /usr/share/nmap/scripts/ | grep smb
+nmap --script-help smb-enum-shares</pre>
+  <div class="why"><span class="row"><span class="f">ls ... | grep smb</span> يدوّر على كل الـ scripts اللي فيها كلمة smb.</span><span class="row"><span class="f">--script-help</span> يقرا لك الـ script بيعمل إيه <b>قبل</b> ما تشغّله.</span></div>
+
+  <h3 class="sub">المهارة اليدوية: اقرا الـ banner بنفسك</h3>
+  <pre>nc -nv 192.168.56.102 22
+nc -nv 192.168.56.102 25</pre>
+  <div class="why"><span class="row"><span class="f">nc</span> netcat — بيفتح connection خام على البورت.</span><span class="row"><span class="f">-n</span> متعملش DNS resolve · <span class="f">-v</span> verbose (يعرض التفاصيل).</span><span class="row">بورت 22 = SSH يعلن نسخته · بورت 25 = SMTP بيسلّم وتقدر تكتب VRFY بإيدك.</span></div>
+
+  <pre>printf 'HEAD / HTTP/1.0\r\n\r\n' | nc 192.168.56.102 80</pre>
+  <div class="why"><span class="row"><span class="f">HEAD / HTTP/1.0</span> بيطلب رأس الصفحة بس (مش المحتوى) — علشان نشوف الـ <b>Server:</b> header.</span><span class="row"><span class="f">| nc ... 80</span> بيبعت الطلب اليدوي ده للبورت 80.</span></div>
+
+  <div class="key">الأدوات الأوتوماتيك للسرعة؛ الـ netcat banner للحقيقة. لما الـ <span class="en p">-sV</span> يتلكك، اتصل بإيدك واقرا النسخة بنفسك. العادة دي بتحل أغلب لحظات "الـ scanner كدب عليا".</div>
+
+  </div>
+</section>
+
+<!-- ================= 29 ================= -->
+<section class="blk" id="s29">
+  <div class="hd"><span class="num">29</span><h2>Lab 6 — كنس الخدمات (absorb-to-homework)</h2><span class="min">12 min</span><span class="src">hands-on</span></div>
+  <div class="bd">
+
+  <div class="warn">ده <strong>اللاب اللي بيتحوّل واجب</strong> لو انت متأخر في الوقت — بيتشغّل لوحده على Metasploitable2، والطلبة قابلوها قبل كده في Session 1.</div>
+
+  <div class="lab">
+    <h4>🧪 Lab 6 — Service sweep ← Profile: "notable services"</h4>
+    <ol>
+      <li>NFS exports:
+        <pre>showmount -e 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-e</span> اعرض ليستة الـ <b>exports</b> ومين مسموح له يعمل mount — دوّر على <span class="f">*</span>.</span></div>
+        <span class="expect">فولدرات مُصدّرة + الـ allow-list بتاعها.</span>
+      </li>
+      <li>Anonymous FTP:
+        <pre>nmap --script ftp-anon -p21 192.168.56.102
+ftp 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">ftp-anon</span> بيتأكد أوتوماتيك من الـ anonymous login. بعدين <span class="f">ftp</span> يدوي لتأكيد النسخة (vsftpd 2.3.4).</span></div>
+        <span class="expect">anonymous login مقبول + banner النسخة.</span>
+      </li>
+      <li>SMTP user enum:
+        <pre>smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-M VRFY</span> استخدم أمر VRFY كطريقة · <span class="f">-U</span> ملف اليوزرنيمز · <span class="f">-t</span> الـ target.</span><span class="row">بيفرّق 252 (موجود) عن 550 (مش موجود) أوتوماتيك.</span></div>
+        <span class="expect">يوزرنيمز مؤكدة.</span>
+      </li>
+      <li>RPC null session:
+        <pre>rpcclient -U "" -N 192.168.56.102</pre>
+        <div class="why"><span class="row"><span class="f">-U ""</span> يوزر فاضي · <span class="f">-N</span> من غير باسورد = null session.</span><span class="row">جوه اكتب: <span class="f">enumdomusers</span> · <span class="f">srvinfo</span> · <span class="f">querydominfo</span>.</span></div>
+        <span class="expect">users + info الـ domain لو الـ null session مسموح.</span>
+      </li>
+      <li>تأكيد يدوي بـ netcat:
+        <pre>nc -nv 192.168.56.102 22</pre>
+        <span class="expect">النسخة الحقيقية — قارنها باللي الـ -sV قاله.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="key">أربع بروتوكولات، أربع أسئلة، أربع إجابات — وولا واحدة محتاجة باسورد. دي أماكن تسريب الـ Linux estates.</div>
+
+  </div>
+</section>
+
+<!-- ================= 30 ================= -->
+<section class="blk" id="s30">
+  <div class="hd"><span class="num">30</span><h2>Enumeration countermeasures</h2><span class="min">5 min</span><span class="src">P32 · defender</span></div>
+  <div class="bd">
+
+  <div class="say"><p>«كل مكسب النهاردة جه من default أو إعداد قديم. الـ countermeasures مش نظرية — دي الإعدادات اللي كانت هتخلي اللابات بتاعتك ترجع فاضية.»</p></div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Service</th><th>اللي دخّلك</th><th>الحل</th></tr></thead>
+    <tbody>
+      <tr><td>SMB</td><td>SMBv1 / null sessions</td><td>اقفل SMBv1 · اطلب signing · امنع anonymous enum (<span class="en">RestrictAnonymous</span>)</td></tr>
+      <tr><td>SNMP</td><td>community string ضعيف، v2c</td><td>SNMPv3 (auth+encryption) · غيّر الـ string · قيّد الـ managers · أو متشغّلوش</td></tr>
+      <tr><td>LDAP</td><td>anonymous bind مسموح</td><td>اقفل الـ anonymous binds · اطلب authenticated، ويفضّل LDAPS</td></tr>
+      <tr><td>NFS</td><td>export للكل (<span class="en">*</span>)</td><td>export لـ hosts محددة · <span class="en">root_squash</span> · اطلب Kerberos</td></tr>
+      <tr><td>FTP</td><td>anonymous login</td><td>اقفل anonymous · استخدم SFTP/FTPS · patch الـ daemon</td></tr>
+      <tr><td>SMTP</td><td>VRFY / EXPN مفعّلين</td><td>اقفل VRFY/EXPN · متسرّبش valid-vs-invalid</td></tr>
+      <tr><td>RPC</td><td>null session</td><td>قيّد anonymous RPC · firewall لـ 135-139 على الـ perimeter</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="key">تلات حركات بتغطي أغلب الجدول: <strong>اقفل البروتوكولات القديمة</strong> (SMBv1, SNMPv2c, anonymous binds) · <strong>غيّر كل default</strong> (community strings, أسامي admin) · <strong>قيّد مين يقدر يوصل للخدمة أصلاً</strong> (host firewall, segmentation). وورا كل ده: <strong>راقب أنماط الـ enumeration</strong> — استعلامات سريعة متتالية one-to-many — وده بالظبط اللي هنكتب له rule بعد شوية.</div>
+
+  <div class="say"><p>«الشغل: نص شغل الـ GRC والـ hardening هو الجدول ده. الـ scanner (انت في تقييم) بيلاقي التسريب، وتذكرة العلاج هي أحد الصفوف دي. إنك تكتب الـ <strong>finding والـ fix</strong> مع بعض، ده اللي بيخلي تقرير التقييم يستاهل فلوس.»</p></div>
+
+  </div>
+</section>
+
+<!-- ================= 31 ================= -->
+<section class="blk" id="s31">
+  <div class="hd"><span class="num">31</span><h2>Lab 7 — اقرا ضوضاءك، واكتب الـ rule اللي تمسكها</h2><span class="min">16 min</span><span class="src">P33 · اللاب اللي السيشن اتعملت علشانه</span></div>
+  <div class="bd">
+
+  <div class="warn">اللاب ده <strong>ممنوع يتقص</strong>. ده سبب وجود السيشن — الطالب هاجم، عمل capture، كشف، وكتب الـ rule، <strong>لنفس الـ packets</strong>. ده بالظبط شغل الـ tier-1 → tier-2 اللي بيتوظّفوا عليه.</div>
+
+  <div class="say">
+    <p>«خدتوا النهاردة كله الـ attacker. دلوقتي ابقوا الـ SOC analyst اللي بيمسككم — باستخدام الـ packets والـ logs اللي الـ scans بتاعتكم نفسها ولّدتها.»</p>
+    <p>«هتحتاجوا <span class="en">lab2_syn.pcap</span> من Lab 2. اللي نسيه، فيه <span class="en">saved/lab2_syn.pcap</span> احتياطي — بس انتوا ولّدتوا الحقيقي من ساعة، استخدموه.»</p>
+  </div>
+
+  <div class="lab">
+    <h4>🧪 Lab 7 — الخطوة 1: حدّد الـ scan من الدليل بس</h4>
+    <ol>
+      <li>افتح الـ capture وفلتر الـ SYNs اللي معملتش handshake:
+        <pre>tcp.flags.syn==1 and tcp.flags.ack==0</pre>
+        <div class="why"><span class="row">بيوري بس الـ probes اللي انت بعتها (SYN من غير ACK) — سطر لكل بورت.</span></div>
+      </li>
+      <li>عدّ البورتات في الوقت:
+        <pre>tshark -r lab2_syn.pcap -Y 'tcp.flags.syn==1 &amp;&amp; tcp.flags.ack==0' \
+  -T fields -e tcp.dstport | sort -un | wc -l</pre>
+        <div class="why"><span class="row"><span class="f">tshark -r</span> يقرا ملف capture من غير GUI.</span><span class="row"><span class="f">-Y</span> display filter · <span class="f">-T fields -e tcp.dstport</span> اطلّع عمود البورت الوجهة بس.</span><span class="row"><span class="f">sort -un | wc -l</span> شيل التكرار وعدّ = <b>كام بورت مختلف اتسأل عنه</b>.</span></div>
+        <span class="expect">رقم كبير من البورتات في ثواني قليلة → SYN scan.</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="say"><p>«خليهم يقولوا، من الدليل بس: <strong>نوع الـ scan</strong> (SYNs كتير، RSTs من الـ scanner، مفيش handshakes مكتملة → SYN scan)، والـ <strong>source IP</strong>، وعدد الـ <strong>البورتات المختلفة</strong>، والـ <strong>نافذة الوقت</strong>.»</p></div>
+
+  <h3 class="sub">الخطوة 2 — اكتب الـ rule (اختيارك للغة)</h3>
+  <div class="say"><p>«الـ pattern اللي هنكوّده هو اللي تحت كل scan النهاردة: <strong>مصدر واحد بيلمس بورتات كتير مختلفة في نافذة قصيرة</strong>. أهو Sigma جاهز — بعدين كمّلوا انتوا skeleton الـ SPL أو الـ KQL.»</p></div>
+
+  <pre>title: Horizontal TCP Port Scan (single source, many ports)
+logsource:
+  product: windows
+  service: security          <span class="c"># WFP connection events</span>
+detection:
+  selection:
+    EventID: 5156            <span class="c"># WFP سمح باتصال</span>
+  timeframe: 30s
+  condition: selection | count(DestPort) by SourceAddress > 100
+level: medium
+tags: [attack.discovery, attack.t1046, attack.t1595]</pre>
+  <div class="why"><span class="row">السطرين الحاملين: <span class="f">timeframe: 30s</span> و <span class="f">count(DestPort) by SourceAddress > 100</span>.</span><span class="row">دي بالظبط "بورتات كتير، مصدر واحد، نافذة قصيرة" متحوّلة لـ threshold.</span></div>
+
+  <pre><span class="c"># Splunk SPL — كمّل الفراغ</span>
+index=firewall (action=allowed OR action=teardown)
+| bin _time span=30s
+| stats dc(dest_port) AS distinct_ports by src_ip, _time
+| where distinct_ports > ______</pre>
+  <div class="why"><span class="row"><span class="f">bin _time span=30s</span> قسّم الوقت لشرائح 30 ثانية.</span><span class="row"><span class="f">dc(dest_port)</span> عدّ البورتات المختلفة لكل مصدر · <span class="f">where > __</span> عتبتك.</span></div>
+
+  <pre><span class="c"># Sentinel KQL — كمّل الفراغ</span>
+SecurityEvent
+| where EventID == 5156
+| summarize distinct_ports = dcount(DestPort) by SourceAddress, bin(TimeGenerated, __m)
+| where distinct_ports > ______</pre>
+  <div class="why"><span class="row"><span class="f">dcount(DestPort)</span> عدد البورتات المختلفة · <span class="f">bin(TimeGenerated, __m)</span> نافذتك الزمنية · <span class="f">where > __</span> عتبتك.</span></div>
+
+  <div class="lab">
+    <h4>✅ التسليم — لازم يكون فيه</h4>
+    <ol>
+      <li>rule واحدة <strong>كاملة شغالة</strong> بـ Sigma أو SPL أو KQL تفير على الـ SYN scan بتاع Lab 2.</li>
+      <li><strong>عتبة ونافذة زمنية</strong> محددة، + جملة واحدة ليه اخترتهم وإيه اللي هيعمل false positive.</li>
+      <li>الـ <strong>ATT&amp;CK mapping</strong> (T1046 / T1595) على الـ rule.</li>
+      <li>جملة واحدة: إزاي attacker بـ <span class="en">-T0</span> يعدّي من تحت عتبتك — وهتغيّر إيه علشان تمسكه.</li>
+    </ol>
+  </div>
+
+  <div class="say"><p>«ادفعوهم على العتبة وتكلفة الـ false positive: عتبة واطية أوي وأي web server مزحوم أو vuln scanner انت مالكه هيوقّعها. وده بالظبط اللي بيفرّق rule من أمنية.»</p></div>
+
+  <div class="key">هاجمت، عملت capture، كشفت، وكتبت الـ rule — لنفس الـ packets. الـ loop الكامل ده على لوحة واحدة هو المهارة اللي بتتوظّف عليها. احتفظوا بالـ rule — بتروح في appendix الـ target profile وبتبقى قطعة portfolio.</p></div>
+
+  </div>
+</section>
+
+<!-- ================= 32 ================= -->
+<section class="blk" id="s32">
+  <div class="hd"><span class="num">32</span><h2>Lab 8 — جمّع الـ Target Profile</h2><span class="min">12 min</span><span class="src">P34 · التسليم الأساسي</span></div>
+  <div class="bd">
+
+  <div class="say">
+    <p>«دلوقتي جمّعوا كل حاجة لكل host، مرتّبة. نفس معيار الـ pass/needs-review بتاع تقرير الـ recon في Session 2: <strong>استنتاجات مش dumps</strong>. ودي حرفياً مدخل Session 4 — خلوهم يخلّصوها واجب لو الوقت خلص.»</p>
+  </div>
+
+  <div class="lab">
+    <h4>🧪 Lab 8 — بلوك واحد لكل host حي</h4>
+    <ol>
+      <li>افتح <span class="en">exercises/session-03/target_profile_template.md</span>.</li>
+      <li>لكل host، من ملفات Lab 1-6 (<span class="en">hosts_arp.txt</span>, <span class="en">depth.txt</span>, <span class="en">smb_*.txt</span>, <span class="en">ldap_users.txt</span>...):
+        <ul style="margin-top:6px">
+          <li>live/dead + إزاي اتأكد</li>
+          <li>بورتات TCP/UDP مفتوحة</li>
+          <li>service + version (بالظبط)</li>
+          <li>تخمين الـ OS + درجة الثقة</li>
+          <li>shares · users · SNMP/LDAP findings</li>
+          <li><strong>"أرجح طريق دخول" مرتّب</strong></li>
+          <li>rule الـ Lab 7 كـ appendix</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="key">مرتّب، مصدره واضح، نسخ بالظبط، ثقة محددة — <strong>مش dumps خام من nmap</strong>. ده اللي بيفرّق تقرير محترف عن copy-paste.</div>
+
+  </div>
+</section>
+
+<!-- ================= 33 ================= -->
+<section class="blk" id="s33">
+  <div class="hd"><span class="num">33</span><h2>Lab 9 — الـ Team Engagement (غالباً مش النهاردة)</h2><span class="min">45 min</span><span class="src">P35</span></div>
+  <div class="bd">
+
+  <div class="warn"><strong>اقرا ملاحظة التوزيع الأول:</strong> اللاب ده بيتشغّل في <strong>بداية Session 4</strong>، أو ورشة ساعة منفصلة — <strong>مش</strong> في آخر سيشن 4 ساعات. لو عندك slot 5 ساعات، شغّله هنا. ده engagement كامل مش لاب.</div>
+
+  <div class="say">
+    <p>«فرق من 3-4، والأدوار بتتبدّل كل مرحلة: <span class="en">Operator / Capture / Analyst / Scribe</span>. أربع مراحل.»</p>
+  </div>
+
+  <div class="lab">
+    <h4>🧪 Lab 9 — أربع مراحل</h4>
+    <ol>
+      <li><strong>PHASE 0 — البوابة. مفيش حاجة بتشتغل قبلها.</strong>
+        <div class="why"><span class="row">افتح <span class="f">report.html</span>، اكتب بلوك الـ scope (A1): التاريخ، كل target، وليه كل واحد <b>قانوني</b>.</span></div>
+        <span class="expect">بلوك الـ scope متوقّع قبل أي packet.</span>
+      </li>
+      <li><strong>PHASE 1 — الـ host الوحيد المصرّح على الإنترنت. scan واحد للفريق.</strong>
+        <pre><span class="k">sudo</span> tcpdump -i eth0 -w team-phase1.pcap host scanme.nmap.org &amp;
+nmap -sS --top-ports 100 -T3 scanme.nmap.org</pre>
+        <div class="why"><span class="row"><span class="f">--top-ports 100</span> أشهر 100 بورت بس · <span class="f">-T3</span> سرعة عادية مؤدبة.</span><span class="row"><b>مفيش</b> <span class="f">-p-</span>، مفيش <span class="f">-T5</span>، مفيش <span class="f">-A</span>. الموقع ده تطوّعي.</span></div>
+        <span class="expect">جاوبوا من الـ capture: عدد الـ packets؟ الـ TTL؟ أنهي بورتات ردت؟</span>
+      </li>
+      <li><strong>PHASE 2 — حديقة اللاب، نفس الطريقة على الأربعة.</strong>
+        <pre><span class="k">sudo</span> nmap -sn 10.10.10.0/24
+<span class="k">sudo</span> nmap -sS -p- -T4 &lt;host&gt; -oA scan-&lt;host&gt;
+<span class="k">sudo</span> nmap -sV -sC -p &lt;open ports only&gt; &lt;host&gt;
+<span class="k">sudo</span> nmap -sU -p 53,69,123,137,161,500 &lt;host&gt;</pre>
+        <div class="why"><span class="row"><span class="f">-oA scan-&lt;host&gt;</span> احفظ بكل الصيغ التلاتة مرة واحدة.</span><span class="row"><span class="f">-sV -sC -p &lt;open&gt;</span> عمق على المفتوح بس — <b>عمرك ما تعمل -sV -p-</b>.</span></div>
+        <span class="expect">enumerate كل service ردّ، أمر لكل protocol.</span>
+      </li>
+      <li><strong>PHASE 3 — ميدان التمرين:</strong> Metasploitable 3, Kioptrix 1, Stapler 1 (موزّعين على الفريق).</li>
+      <li><strong>PHASE 4 — الـ SOC swap. النقطة كلها هنا.</strong> بدّلوا pcap مع فريق تاني وجاوبوا من الـ packets بس: (1) المصدر، on-segment؟ (2) نوع الـ scan وأنهي packet يثبته؟ (3) كام بورت وفي أنهي نافذة؟ (4) أنهي ردّ وعرفوا إيه؟ (5) عملوا <strong>enumerate</strong> ولا وقفوا عند الـ scanning؟
+        <div class="why"><span class="row">أسرع طريق: <span class="f">Statistics → Conversations</span> بعدين <span class="f">Statistics → Protocol Hierarchy</span>.</span></div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="warn"><strong>تلات حاجات تراقبها:</strong> (1) بوابة الـ scope مش اختيارية — محدش بيعمل scan قبل ما A1 يتملّى وكل عضو يقدر يقول ليه كل target قانوني. (2) scan واحد لكل فريق على <span class="en">scanme.nmap.org</span> — nmap نفسه بيطلب احترام. (3) الـ capture swap هو النقطة — احمِ آخر 12 دقيقة له. لو الوقت خلص، اقص Phase 3 مش Phase 4.</div>
+
+  <div class="say"><p>«سؤال الـ <span class="en">HackerOne</span> <strong>هيتسأل</strong> — والإجابة على الصفحة مخصوص علشان متبتكرش: برامج الـ bug-bounty بتمنع network scanning تقريباً دايماً، وعلشان كده Session 2 استخدمت domain bounty للـ recon السلبي والسيشن دي لأ.»</p></div>
+
+  </div>
+</section>
+
+<!-- ================= 34 ================= -->
+<section class="blk" id="s34">
+  <div class="hd"><span class="num">34</span><h2>القفلة — الجسر لـ Session 4 + Homework</h2><span class="min">21 min</span><span class="src">P36-P40</span></div>
+  <div class="bd">
+
+  <h3 class="sub">السبع حاجات اللي تسيبها معاهم</h3>
+  <div class="say">
+    <p>«١ — <strong>الـ scanning صوته عالي.</strong> أكتر مرحلة بتتكشف في intrusion — كل تقنية بتسيب log.»</p>
+    <p>«٢ — <strong>اتعلم ردود الأفعال مش الـ flags.</strong> المفتوح بيرد SYN ويتجاهل الـ stealth؛ المقفول بيرد RST على كل حاجة؛ الـ filtered بيسكت. كل scan بيتفرّع من ده.»</p>
+    <p>«٣ — <strong>سكوت الـ ICMP ≠ host ميت.</strong> ARP على الـ segment، TCP عبر router، و<span class="en">-Pn</span> لما الـ discovery يكدب.»</p>
+    <p>«٤ — <strong>اتساع الأول، عمق تاني.</strong> masscan/rustscan للسرعة، nmap للعمق.»</p>
+    <p>«٥ — <strong>الـ enumeration محادثة.</strong> "enum4linux رجع فاضي" = hardening finding مش فشل.»</p>
+    <p>«٦ — <strong>اتأكد إن الأداة عايشة قبل ما تعلّم الأمر.</strong> enum4linux-ng، NetExec (nxc) — مش الأسماء الميتة.»</p>
+    <p>«٧ — <strong>تقدر تمسك نفسك.</strong> مصدر واحد، بورتات كتير، نافذة قصيرة — دي الـ rule اللي كتبتها، ودي الشغلانة.»</p>
+  </div>
+
+  <h3 class="sub">Homework — قبل Session 4</h3>
+  <div class="say">
+    <p>«١ — <strong>خلّص الـ target profile</strong> (Lab 8) للأربع hosts — نسخ بالظبط، ثقة، طريق دخول مرتّب، detection rule مرفقة. ده مدخل Session 4 — تعالوا من غيره هتبنوه وكل الناس بتهاجم.»</p>
+    <p>«٢ — <strong>تقرير صفحة واحدة:</strong> مقارنة SYN-vs-connect-vs-Xmas من الـ captures بتاعتك + جملتين عن كل scan ساب إيه في log.»</p>
+    <p>«٣ — <strong>تمرين:</strong> خلّصوا غرفتي <span class="en">Nmap</span> و <span class="en">Network Services</span> المجانيتين على TryHackMe. هاتوا حاجة اتعلمتوها من كل واحدة مكانتش في السيشن دي.»</p>
+    <p>«٤ — <strong>ميدان تمرين محلي:</strong> اعملوا scan و enumerate لاتنين على الأقل من Metasploitable 3, Kioptrix 1, Stapler 1، وضيفوا profile قصير لكل واحد.»</p>
+    <p>«٥ — <strong>Stretch (اختياري):</strong> حسّنوا rule الـ Lab 7 علشان تمسك <span class="en">-T1</span> scan بطيء — وجملة واحدة عن تكلفة الـ false positive.»</p>
+  </div>
+
+  <h3 class="sub">الجسر لـ Session 4</h3>
+  <div class="say">
+    <p>«Session 4 — <strong>Vulnerability Analysis، Authentication و Password Attacks</strong>. هاتوا الـ target profile. هناخد الـ version strings بتاعته لـ CVE/CVSS و <span class="en">searchsploit</span>، والـ user list لـ password spraying و hash cracking — <strong>وعلشان WINSRV19 بقى domain controller</strong>، هنعمل NTLM/Kerberos و LLMNR poisoning حقيقي ضد الـ domain مش جهاز standalone. الـ AD lab اللي بنيتوه النهاردة هو اللي بيفتح ده.»</p>
+  </div>
+
+  <div class="key">هاجمت شبكة وكشفت الهجوم في نفس بعد الضهر، على نفس الـ packets. السوق بيدفع للناس اللي بتقدر تقعد على الجهتين — وانتوا لسه أثبتّوا إنكم تقدروا. نشوفكم في Session 4.</div>
+
+  </div>
+</section>
+
+<footer>
+  ITGate Academy · CEH Diploma · Session 03 — سكربت الشرح بالعربي المصري<br>
+  مرجع الصفحة: <span class="en p" style="color:var(--text-3)">docs/session-03/index.html</span> · EC-Council 312-50 · Modules 3 &amp; 4<br>
+  الحدّ: السيشن دي بتقف عند الـ version string — CVE و exploit في Session 4.
+</footer>
+
+</div>
+</body>
+</html>
