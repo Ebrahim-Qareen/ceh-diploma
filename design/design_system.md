@@ -378,6 +378,20 @@ either rule.
 
 ## 7b. Width discipline (added 2026-08-31 — the page must FILL the browser)
 
+> **Amended 2026-09-09 — prose fills its column.** The original `--prose:96ch`
+> cap left a wide dead gutter down the right of every section on a desktop
+> screen. `.content p`, `.content>ul`, `.content>ol` and `.page-head .lede` are
+> now `max-width:none`, so prose fills its track exactly like tables, diagrams
+> and boxes already did, and `.wrap`'s `--maxw` is the only width limit.
+> Reading text was enlarged to compensate for the longer measure
+> (`16.5px/1.78`, lede `17px`) — this page is projected in a classroom, so
+> bigger type at full width beats small type in a narrow column. `--prose` is
+> now `150ch` and survives only for the dashboard hero and section
+> descriptions. Measured after the change: **0px gutter at 1920 and 1400**,
+> ~159 and ~125 characters per line respectively. If a future reader finds that
+> too wide, the single knob is `--prose` plus re-adding the cap on that one
+> rule — do not reintroduce it silently.
+
 **One container, and only one.** `.wrap` is it: `max-width:var(--maxw)` (1680px),
 `margin-inline:auto`, `padding-inline:var(--gutter)` = `clamp(16px,3vw,40px)`. Header,
 progress bar, hero, main and footer all use it, so every left edge lines up.

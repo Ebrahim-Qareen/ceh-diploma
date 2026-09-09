@@ -31,7 +31,7 @@
   --radius-sm:8px;
   --maxw:1680px;
   --gutter:clamp(16px,3vw,40px);
-  --prose:96ch;
+  --prose:150ch;   /* was 96ch — see 'prose fills the column', 2026-09-09 */
   /* one shared depth token — every raised surface uses it */
   --depth:inset 0 1px 0 rgba(255,255,255,.045),0 2px 12px rgba(0,0,0,.38);
   --depth-hi:inset 0 1px 0 rgba(255,255,255,.075),0 10px 26px rgba(0,0,0,.5);
@@ -442,7 +442,16 @@ hr{border:none;border-top:1px solid var(--line);margin:28px 0}
    Width discipline — added 2026-08-31
    Prose is capped; tables, grids, figures and cards fill the container.
    ========================================================================== */
-.content p,.content>ul,.content>ol,.page-head .lede{max-width:var(--prose)}
+/* CHANGED 2026-09-09 — prose fills the column.
+   The 96ch cap left a wide dead gutter on the right of every section on a
+   desktop screen. Prose now fills its track like tables, diagrams and boxes
+   already did; the .wrap container (--maxw) is the only width limit.
+   To compensate for the longer measure, reading text is a little larger and
+   more leaded — this page is projected in a classroom, so bigger type at full
+   width beats small type in a narrow column. */
+.content p,.content>ul,.content>ol,.page-head .lede{max-width:none}
+.content p,.content li{font-size:16.5px;line-height:1.78}
+.page-head .lede{font-size:17px;line-height:1.65}
 /* structured objects are NOT prose — they fill their panel */
 .content .box p,.content .box ul,.content .box ol,
 .content .practice p,.content .practice ul,
