@@ -104,67 +104,67 @@
 
     <a class="card p-access" href="session-05/index.html">
       <div class="card-top"><span class="snum">S05</span><h3>System Hacking II — Exploitation, Shells &amp; Payloads</h3></div>
-      <p>The manual exploitation workflow, msfvenom payload generation, bind versus reverse shells, and buffer overflow to remote code execution.</p>
+      <p>Turn the Session 4 access plan into a shell — manual exploitation then Metasploit, EternalBlue to SYSTEM, bind vs reverse, staged vs stageless payloads with msfvenom, a guided buffer overflow, and a reverse-shell detection rule you write yourself. Every attack carried to its process/network SOC flip, ending in a per-host foothold record.</p>
       <div class="card-meta">
-        <span class="tag offensive">Metasploit</span>
-        <span class="tag">msfvenom</span>
-        <span class="tag">Buffer overflow</span>
-        <span class="status soon">Planned</span>
+        <span class="tag offensive">Metasploit · EternalBlue</span>
+        <span class="tag">msfvenom · shells</span>
+        <span class="tag defensive">SOC flip</span>
+        <span class="status done">Delivered</span>
       </div>
     </a>
 
     <a class="card p-post" href="session-06/index.html">
       <div class="card-top"><span class="snum">S06</span><h3>System Hacking III — Privilege Escalation &amp; CTF Capstone</h3></div>
-      <p>From user to root and user to SYSTEM — linpeas, SUID, GTFOBins, cron, winPEAS, Mimikatz, token abuse — then prove the whole chain on capstone machines.</p>
+      <p>Turn every low-priv foothold into root and SYSTEM — linPEAS, SUID + GTFOBins, sudo/cron, winPEAS, token abuse (SeImpersonate/potato), and Mimikatz on LSASS — then run two full capstone chains end to end and write the engagement report that closes the offensive half.</p>
       <div class="card-meta">
-        <span class="tag offensive">Privesc</span>
-        <span class="tag">Mimikatz</span>
+        <span class="tag offensive">Privesc · Mimikatz</span>
         <span class="tag activity">CTF capstone</span>
-        <span class="status soon">Planned</span>
+        <span class="tag defensive">SOC flip</span>
+        <span class="status done">Delivered</span>
       </div>
     </a>
 
     <a class="card p-post" href="session-07/index.html">
       <div class="card-top"><span class="snum">S07</span><h3>Malware Threats &amp; Analysis</h3></div>
-      <p>Malware classification, static analysis with strings and VirusTotal, dynamic analysis in a sandbox, and building then detecting your own backdoor.</p>
+      <p>Sit in both chairs on one sample — classify malware by behaviour, walk the 5-stage lifecycle, then build a controlled trojan and take it apart: static (hash, VirusTotal, strings, PE imports) and dynamic (isolated sandbox, ProcMon/TCPView). Map every behaviour to ATT&amp;CK and ship the YARA + Sigma rules that catch it, closing with an incident triage report.</p>
       <div class="card-meta">
-        <span class="tag offensive">Trojans</span>
-        <span class="tag defensive">Static · dynamic</span>
-        <span class="tag">Sandbox</span>
-        <span class="status soon">Planned</span>
+        <span class="tag offensive">Trojans · RATs</span>
+        <span class="tag defensive">Static · dynamic · YARA/Sigma</span>
+        <span class="tag activity">Sandbox</span>
+        <span class="status done">Delivered</span>
       </div>
     </a>
 
     <a class="card p-web" href="session-08/index.html">
       <div class="card-top"><span class="snum">S08</span><h3>Web Application Hacking &amp; SQL Injection</h3></div>
-      <p>HTTP and Burp, web enumeration, then the attacks themselves — XSS, file upload, command injection, IDOR, and SQL injection from manual to sqlmap.</p>
+      <p>See the web as three tiers and intercept every request with Burp, then work each injection family to impact — XSS, file upload to shell, command injection, IDOR, and SQL injection from a manual auth bypass through UNION and blind extraction to sqlmap. Every attack ends at its access-log SOC flip, closing with detection rules and a prioritised web-app finding report.</p>
       <div class="card-meta">
-        <span class="tag offensive">OWASP</span>
-        <span class="tag">Burp Suite</span>
-        <span class="tag">SQLi · XSS</span>
-        <span class="status soon">Planned</span>
+        <span class="tag offensive">OWASP Top 10</span>
+        <span class="tag">Burp · sqlmap</span>
+        <span class="tag defensive">Access-log detection</span>
+        <span class="status done">Delivered</span>
       </div>
     </a>
 
     <a class="card p-net" href="session-09/index.html">
       <div class="card-top"><span class="snum">S09</span><h3>Sniffing, MITM, Session Hijacking, Social Engineering &amp; DoS</h3></div>
-      <p>Own the wire — ARP and DNS poisoning, machine-in-the-middle with Wireshark and ettercap, steal live sessions, then the human layer and denial of service.</p>
+      <p>Attack the four surfaces around the app: sniff and ARP-poison the wire (become the MITM, strip HTTPS), steal and replay a live session (plus CSRF and TCP hijack), phish the human with SET on the psychology of authority/urgency/trust, and flood a service offline (SYN flood, Slowloris). Every attack ends at its detection SOC flip, closing with rules and a four-surface assessment report.</p>
       <div class="card-meta">
-        <span class="tag offensive">MITM</span>
-        <span class="tag">Wireshark</span>
-        <span class="tag">Phishing · DoS</span>
-        <span class="status soon">Planned</span>
+        <span class="tag offensive">MITM · Hijacking</span>
+        <span class="tag">Phishing (SET) · DoS</span>
+        <span class="tag defensive">4-surface detection</span>
+        <span class="status done">Delivered</span>
       </div>
     </a>
 
     <a class="card p-net" href="session-10/index.html">
       <div class="card-top"><span class="snum">S10</span><h3>Evasion, Wireless &amp; Emerging Tech</h3></div>
-      <p>Get past what's watching — IDS, firewalls and honeypots — then wireless attacks with the aircrack-ng suite, and an overview sweep of mobile, IoT/OT and cloud.</p>
+      <p>The final session. Evade the defences that watch you (IDS/firewall/honeypot, with fragmentation, decoys and tunnelling), break Wi-Fi (WPA2 handshake capture and offline crack, evil twin), sweep the modern surface (mobile, IoT/OT, cloud misconfig) and audit the cryptography under it all — then tie every session into a defence-in-depth capstone. Graduation.</p>
       <div class="card-meta">
-        <span class="tag offensive">Evasion</span>
-        <span class="tag">aircrack-ng</span>
-        <span class="tag">Mobile · IoT · Cloud</span>
-        <span class="status soon">Planned</span>
+        <span class="tag offensive">Evasion · aircrack-ng</span>
+        <span class="tag">Mobile · IoT · Cloud · Crypto</span>
+        <span class="tag defensive">Defence-in-depth capstone</span>
+        <span class="status done">Delivered</span>
       </div>
     </a>
 
@@ -192,6 +192,36 @@
       <span class="ico">🔑</span>
       <h4>S4 · Vulnerability &amp; Access Report</h4>
       <p>Version&rarr;CVE mapping and credential attacks on the lab domain. 9 steps.</p>
+    </a>
+    <a class="tile" href="session-05/report.html">
+      <span class="ico">🐚</span>
+      <h4>S5 · Exploitation &amp; Foothold Report</h4>
+      <p>Turn the access plan into shells; record the user context landed as per host. 7 steps.</p>
+    </a>
+    <a class="tile" href="session-06/report.html">
+      <span class="ico">👑</span>
+      <h4>S6 · Privesc &amp; Engagement Report</h4>
+      <p>Low-priv to root/SYSTEM, loot, and the full capstone chain. 7 steps.</p>
+    </a>
+    <a class="tile" href="session-07/report.html">
+      <span class="ico">🦠</span>
+      <h4>S7 · Malware Triage Report</h4>
+      <p>Build a sample, analyse it static + dynamic, and ship the YARA + Sigma rules. 5 steps.</p>
+    </a>
+    <a class="tile" href="session-08/report.html">
+      <span class="ico">🕸️</span>
+      <h4>S8 · Web-App Finding Report</h4>
+      <p>Prove each injection flaw, dump the DB, and ship a prioritised finding report. 5 steps.</p>
+    </a>
+    <a class="tile" href="session-09/report.html">
+      <span class="ico">🕵️</span>
+      <h4>S9 · Network &amp; Human Assessment</h4>
+      <p>MITM, hijack, phish, and flood the lab; ship a four-surface assessment. 5 steps.</p>
+    </a>
+    <a class="tile" href="session-10/report.html">
+      <span class="ico">🎓</span>
+      <h4>S10 · Defence-in-Depth Capstone</h4>
+      <p>Assess every layer and tie all ten sessions into one defence-in-depth report. 5 steps.</p>
     </a>
   </div>
 </section>

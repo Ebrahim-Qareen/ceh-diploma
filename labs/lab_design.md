@@ -207,6 +207,12 @@ The S3 seed created `svc_backup` but gave it no SPN and the shared lab password,
 - adds a second service account `svc_sql` with an SPN **and a strong random password** → the
   honest **"Kerberoast that never cracks"** case (a strong service password is the countermeasure).
 
+### 1b. AS-REP roasting needs a no-pre-auth account (`-Stage ASREPRoast`, on the DC)
+Creates `svc_legacy` with **"Do not require Kerberos pre-authentication"** set and a
+**deliberately weak** password. That flag is what lets `GetNPUsers -no-pass` request the
+account's AS-REP with **no starting credential** → `hashcat -m 18200` cracks it in class.
+A long/random password (or removing the flag) is the countermeasure — teach it as the fix.
+
 ### 2. Password spraying needs a shared weak password + a lockout policy (`-Stage SprayPolicy`, DC)
 A spray finds nothing unless several accounts share one guessable password — but an *all-same*
 seed is unrealistic. The S4 script sets **one weak password on a defined subset** (`a.fahmy`,
@@ -281,3 +287,174 @@ outside `CEH_Course/`, excluded from git.
   standalone Windows.
 - DVWA/BWAPP and named CTF boxes (Blue, Academy, DoubleTrouble, Blackpearl)
   not yet added — add via `ceh-lab-build` when Sessions 6 and 8 are built.
+
+## Session 5 target preparation (exploitation, shells & payloads)
+
+Session 5 turns the Session 4 access plan into shells. Most targets are already in place from
+S3/S4; only the buffer-overflow target is new. Take a `pre-s5` snapshot on every VM first —
+EternalBlue and the BOF **crash** their targets and you will revert between attempts.
+
+### 1. Reused, already prepared
+- **METASPLOITABLE2** (192.168.56.102) — vsftpd 2.3.4 backdoor (Lab 1/2), plus Samba/UnrealIRCd for the practice range. No change.
+- **WIN7-TGT01** (192.168.56.107) — unpatched, SMBv1 on, **MS17-010 vulnerable** (from S3). Confirm with `auxiliary/scanner/smb/smb_ms17_010` before Lab 3. This is the EternalBlue target.
+- **ceh.lab DC** (192.168.56.20) + accounts — the S4 credentials (`m.said`, cracked `svc_backup`, etc.) drive the credential-access lab (Lab 7). Confirm one still authenticates with `nxc smb`.
+- **Kali** (192.168.56.101) — `msfdb init` once so `db_status` is Connected.
+
+### 2. Buffer-overflow target (NEW — `-Stage Vulnserver`, on WIN10-TGT01)
+Primary BOF lab is the classic **vulnserver + Immunity Debugger + mona.py** chain:
+- Install **vulnserver** (thegreycorner) and **Immunity Debugger**, then drop `mona.py` into Immunity's PyCommands folder (manual GUI installs — the script only starts vulnserver and opens its port).
+- `scripts/lab_s5_setup.ps1 -Stage Vulnserver` starts `vulnserver.exe` listening on **9999** and adds an inbound firewall rule for 9999 so the fuzzer reaches it. (Leave the rest of the host firewall **on** — Lab 4 needs the bind shell to be blocked.)
+- Keep Immunity attached to vulnserver during the lab so students watch EIP.
+
+### 3. Buffer-overflow fallback (no VM — on Kali)
+A tiny vulnerable binary for students whose Immunity misbehaves, same fuzz→offset→control→shellcode logic:
+```bash
+# provided as labs/bof/vuln.c — compile the deliberately-unsafe way (LAB ONLY):
+gcc -m32 -fno-stack-protector -z execstack -no-pie -o vuln vuln.c
+# disable ASLR for the demo only, in the lab shell:
+echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
+gdb -q ./vuln       # with pwndbg: cyclic / cyclic -l to find the offset
+```
+
+### 4. Saved-state fallbacks (so a stuck student still finishes)
+Provide under `saved/`: `lab3_eternalblue_sysmon.evtx`, `lab5_revshell_sysmon.evtx` (for the Lab 9 detection exercise), and for Lab 8 `offset.txt`, `badchars.txt`, `jmpesp.txt` and a pre-built `final_buffer.py`. A student can load any milestone and keep moving.
+
+## Session 6 target preparation (privilege escalation & CTF capstone)
+
+Session 6 takes the low-priv shells from Session 5 up to root/SYSTEM, then runs a
+two-box capstone. Two layers of targets: (a) **teaching boxes** with hand-seeded
+misconfigs so each privesc vector is demonstrable in a mini-lab, and (b) the two
+**capstone CTF VMs** students solve end-to-end. Snapshot `pre-s6` on every VM
+first — the seeded misconfigs and the capstone exploits leave the boxes dirty.
+
+### 1. Linux privesc teaching box (`-Stage LinuxPrivesc`, on METASPLOITABLE2 or a dedicated Ubuntu)
+Seed three demonstrable vectors, one per mini-lab:
+- **SUID / GTFOBins** — set the SUID bit on a GTFOBins-abusable binary (e.g. `chmod u+s /usr/bin/find`). Lab 1 escalates via `find . -exec /bin/sh -p \; -quit`.
+- **Sudo misconfig** — a NOPASSWD sudo entry on a GTFOBins binary for the student user (`<STUDENT_USER> ALL=(ALL) NOPASSWD: /usr/bin/less`). Lab drives `sudo less /etc/profile` → `!/bin/sh`.
+- **Writable cron** — a root cron job running a world-writable script (`/opt/backup.sh`, `chmod 777`). Lab appends a reverse-shell one-liner and waits for the tick.
+- Run **linPEAS** first in every lab so students correlate the tool output with the vector they then exploit.
+
+### 2. Windows privesc teaching box (reuse WIN10-TGT01, `-Stage WindowsPrivesc`)
+- **Token abuse** — confirm the service account / shell context holds `SeImpersonatePrivilege` (default for many service accounts) so **PrintSpoofer / Potato** works. The script only reports privileges; it does not weaken the host.
+- **Credential access** — the S4 `ceh.lab` accounts + a cached logon so **Mimikatz `sekurlsa::logonpasswords`** and `lsadump` return material in Lab 4. Run from an elevated context only (post-token-abuse).
+- Run **winPEAS** first, same correlate-then-exploit flow.
+
+### 3. Steganography mini-lab (no VM — on Kali)
+- Provide `labs/stego/brief.jpg` with a flag hidden via `steghide embed` (passphrase in the local creds file, **not** here). Lab uses `steghide extract` + `stegseek` wordlist crack.
+
+### 4. Capstone CTF VMs (NEW — student-solved end to end)
+- **DoubleTrouble** (VulnHub) — web foothold → creds → SUID/sudo privesc. Import the OVA, host-only NIC, snapshot clean. Verify it boots and pulls a DHCP lease on the lab subnet.
+- **Blackpearl** (VulnHub) — DNS/vhost enum → PHP reverse shell → `teehee`/`gtfobins` root. Same import + snapshot.
+- Both are **freely downloadable VulnHub boxes**; no seeding — they ship vulnerable. Keep the flags server-side; students submit `user.txt` + `root.txt` to the engagement report.
+
+### 5. Saved-state fallbacks
+Under `saved/`: `lab4_lsass_sysmon.evtx` (Sysmon Event ID 10 on LSASS — for the Lab 8 detection rule), `linpeas_sample.txt` / `winpeas_sample.txt` (so a stuck student still has tool output to analyse), and per-capstone `walkthrough_hints.md` (progressive hints, flags redacted).
+
+## Session 7 target preparation (malware threats & analysis)
+
+Session 7 needs no *victim* VMs — it needs a **build box** and an **isolated analysis
+chamber**. The sample is built in-house (controlled), so there is nothing to
+pre-seed; the whole risk is containment. Snapshot everything before any detonation.
+
+### 1. Build box (reuse Kali — no change)
+- `msfvenom` (already present from S5) builds the controlled trojan in Lab A. No new install.
+- Keep the sample under a single lab folder (e.g. `/tmp/lab/`), never emailed or uploaded, deleted at session end.
+
+### 2. Analysis chamber (NEW — an isolated VM with a clean snapshot)
+Two supported options; either works for the whole session:
+- **Windows analysis VM** — install **Sysinternals** (Process Monitor, TCPView, Autoruns), a PE viewer (**PE-bear** / PEStudio), and `strings`. This is the closest to the deck's tool list (ProcMon/TCPView/CurrPorts).
+- **Linux analysis VM** — `scripts/lab_s7_setup.sh` installs `yara`, `python3-pefile`, `binutils` (strings), `ssdeep`, and network monitors. Lighter and scriptable.
+- **Isolation is the point:** host-only NIC (or an INetSim/FakeNet "fake internet" so the beacon is visible without touching the real one), no shared folders/clipboard, and a **clean snapshot** taken before detonation and reverted after. The Lab C checklist requires `ping 8.8.8.8` to FAIL on the chamber before anything runs.
+
+### 3. Detection tooling (on the analysis box / Kali)
+- `yara` for Lab D file rules; a text editor for the Sigma rule (validated by reasoning, not a live SIEM — optional: load into the S9/S10 Elastic/Wazuh if available).
+- Sysmon on the Windows chamber makes the SOC-flip evidence (Event IDs 1/3/10/13) real if you want to show the log side live.
+
+### 4. Saved-state fallbacks (so a student with no sandbox still finishes)
+Under `saved/`: `lab_a_sample_iocs.txt` (hash + strings + imports of the reference sample), `lab_c_beacon.pcap` (a recorded C2 callback), `lab_c_procmon.csv` (persistence + drop events), and `session7_solution.yar` (a reference YARA rule). Every analysis and both rules can be completed from these.
+
+### 5. Safety gate
+The instructor confirms each chamber cannot reach the real network **before** any detonation. Live third-party samples (homework: MalwareBazaar/theZoo) are analysed **only** inside this chamber — never on a host machine.
+
+## Session 8 target preparation (web app hacking & SQL injection)
+
+Session 8 needs one deliberately-vulnerable web app on the lab network and Kali's
+web toolchain. Nothing to seed by hand — the apps ship vulnerable; the work is
+standing them up and pointing the browser through Burp.
+
+### 1. Primary target — DVWA (`-Stage dvwa`)
+- **DVWA** (Damn Vulnerable Web Application) is the labs' main target — it has all five families (XSS, file upload, command injection, SQLi, plus CSRF/brute) and four **security levels** (Low/Medium/High/Impossible) that make the "why blocklists fail" point concrete.
+- `scripts/lab_s8_setup.sh dvwa` runs the `vulnerables/web-dvwa` Docker image on port 80. First run: browse to `/setup.php`, **Create/Reset Database**, login `admin` / `password` (lab default — placeholder, documented, not a secret).
+- Set the browser proxy to Burp (127.0.0.1:8080) or use Burp's embedded browser.
+
+### 2. Secondary targets (optional, `-Stage juiceshop`)
+- **OWASP Juice Shop** (`bkimminich/juice-shop`, port 3000) — a modern JS/Node app for the SQLi login bypass and XSS challenges; shows how a real SPA differs from DVWA.
+- **bWAPP** — broadest bug list including good **IDOR** scenarios.
+- **PortSwigger Web Security Academy** — free, online, world-class SQLi/XSS labs with solutions (no local install; needs internet).
+
+### 3. Toolchain (already on Kali)
+- Burp Suite (Community is fine), `gobuster`/`ffuf`/`dirb`, `sqlmap`, `hashcat` (S4), and a PHP webshell (`/usr/share/webshells/php/php-reverse-shell.php`). No new installs.
+
+### 4. Saved-state fallbacks
+Under `saved/`: `session8_access.log` (a web-server log containing the attack traffic — XSS/SQLi/enumeration — for the Lab E detection exercise), and `web_findings_sample.md` (a reference finding for anyone whose app won't start). Every attack and the detection can be completed from these.
+
+### 5. Safety gate
+DVWA/Juice Shop are **self-hosted and legal to attack**. The exact payloads are a crime against any site the student does not own; the instructor states this before Lab A and it is on the "Where next" page. Delete any uploaded webshell at session end.
+
+## Session 9 target preparation (sniffing, MITM, hijacking, social eng, DoS)
+
+Session 9 attacks the environment around the app: the wire, the session, the human,
+and availability. It needs the existing lab plus a couple of small additions and,
+above all, **isolation discipline** — MITM, phishing, and DoS are crimes off-lab.
+
+### 1. Reused lab (no change)
+- **Kali** (bettercap/ettercap, Wireshark, SET/setoolkit, hping3, slowhttptest — all default on Kali) as the attacker.
+- Two host-only VMs as **victim** + **gateway/target**. An HTTP (not HTTPS) service to sniff a cleartext credential (any lab web app on port 80 works — DVWA is fine).
+
+### 2. Session-hijack targets (reuse DVWA)
+- **DVWA** provides the CSRF page and a session cookie to steal/replay (Lab B). To show the fix, toggle the app/cookie between insecure and `Secure; HttpOnly; SameSite`.
+
+### 3. Additions (`scripts/lab_s9_setup.sh`)
+- **arpwatch** on the victim/monitor VM so the ARP-anomaly detection (Lab A defender step) is real — `lab_s9_setup.sh detect` installs it and prints the alert to watch for.
+- **A throwaway lab web VM** for the DoS lab (Lab D) — any nginx/apache container on the host-only net; `lab_s9_setup.sh dos-target` starts one. Never point hping3/slowhttptest at anything else.
+- The script is host-only-aware and reprints the isolation gate before the DoS/phishing stages.
+
+### 4. Ethics gate (Labs A, C, D)
+- The instructor states the legal line out loud before each: **isolated lab, consenting test accounts, never a real person/brand/network.** The SET phishing lab clones a **lab** login page only; the credential captured is one the student types.
+
+### 5. Saved-state fallbacks
+Under `saved/`: `session9_mitm.pcap` (a MITM capture containing a cleartext credential — for the sniffing exercise without a working MITM), `arpwatch_alert.txt` (a sample ARP-anomaly alert), and `phish_sample.eml` (a real, defanged phishing email for the analysis homework). Every exercise and the detections can be completed from these.
+
+## Session 10 target preparation (evasion, wireless & emerging tech — FINAL)
+
+The final session sweeps the last of the surface. It needs a few additions to the
+existing lab plus, for wireless, real hardware. Isolation/ownership discipline is
+paramount — evasion, wireless, cloud, and device attacks are crimes off-lab.
+
+### 1. IDS target for evasion (Lab A) — `-Stage ids`
+- A lab host running **Snort or Suricata** with default rules so a plain nmap scan alerts and evasion (fragmentation/decoys/timing/source-port) can be shown to drop the alerts. `scripts/lab_s10_setup.sh ids` points to a docker Suricata or a notes-only reminder if one already exists in the SOC lab.
+- The defender step re-enables full stream/frag reassembly + anomaly rules to re-detect — the "evasion beats a naive sensor only" lesson.
+
+### 2. Wireless (Lab B) — REAL HARDWARE
+- A **monitor-mode-capable Wi-Fi adapter** (e.g. Alfa AWUS036) and a **dedicated test AP** the students own, set to a **deliberately weak WPA2 passphrase from rockyou** for the crack demo. Never any other network.
+- No script can provide the RF hardware; `lab_s10_setup.sh wireless-check` verifies an adapter supports monitor mode and reminds of the own-AP-only rule. **Fallback:** `saved/wpa2_handshake.cap` lets students crack a handshake with no adapter.
+
+### 3. Emerging surface (Lab C) — the students' own cloud/devices
+- A **test object-storage bucket** the student creates (make public → detect anonymously → re-apply Block Public Access). `lab_s10_setup.sh bucket-note` prints the exact create/misconfig/detect/fix steps (it does NOT create cloud resources — that is the student's own account).
+- A **lab IoT device or VM** with vendor-default credentials to test with hydra/default lists. Own devices only.
+
+### 4. Crypto (Lab D)
+- Only `openssl` and `nmap --script ssl-enum-ciphers` (both on Kali) against an **authorised** host — plus the students' own certs/keys for the hash/encrypt/sign exercises. No new targets.
+
+### 5. Capstone (Lab E)
+- Re-uses the **whole lab** built across Sessions 1–9 (Kali, WIN10/WINSRV19 DC, WIN7, Metasploitable2, DVWA, the capstone CTFs) — the capstone assesses the environment the diploma already stands up. No new machines.
+
+### 6. Saved-state fallbacks
+Under `saved/`: `wpa2_handshake.cap`, `suricata_scan_alerts.log`, `open_bucket_listing.txt`, and a weak-cipher `ssl_enum_sample.txt`. Every lab and the audit can be completed from these.
+
+### 7. Ethics gate (Labs A/B/C)
+The instructor states the line before each: **lab hosts, your own AP/adapter, and your own cloud/devices ONLY.** Attacking others' networks, Wi-Fi, cloud, or IoT is illegal.
+
+---
+
+**Lab design complete for all ten sessions.** The environment built in Session 1 and extended through Session 10 supports the entire CEH Diploma end to end.
