@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 10 — Evasion, Wireless &amp; Emerging Tech | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 10 (final) — the sweep: evading IDS, firewalls and honeypots; wireless attacks (WEP/WPA2 handshake capture, evil twin); the emerging-tech surface (mobile, IoT/OT, cloud); and the cryptography that underpins all of it — every attack carried to its detection, closing the diploma with a defense-in-depth capstone.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s10">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 10</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 10 · Pages</h5>
+    <ol id="sessionNav"></ol>
+    <div class="side-cta">
+      <h5>Deliverable</h5>
+      <a href="report.html">📋 Open Team Report</a>
+    </div>
+  </aside>
+
+  <article>
+
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="ar-o" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7043"/></marker>
+      <marker id="ar-c" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="ar-g" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#768290"/></marker>
+      <marker id="ar-r" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#e63946"/></marker>
+      <marker id="ar-grn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/></marker>
+      <marker id="ar-am" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#fbbf24"/></marker>
+      <marker id="ar-pu" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/></marker>
+    </defs>
+  </svg>
+
+  <section class="page" data-title="Cover">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10</span><span class="tag cover"></span></div>
+      <h1>Session 10 &mdash; Evasion, Wireless &amp; Emerging Tech</h1>
+      <p class="lede">The final session. Slip past the defences that watch you, break into the air, sweep the modern surface &mdash; mobile, IoT, cloud &mdash; and meet the crypto under all of it.</p>
+    </div>
+    <div class="content">
+<div class="cover-hero">
+      <p>Nine sessions in, you can find a foothold, escalate, analyse malware, break a web app, and own the network around it. This last
+      session covers everything that is left &mdash; and it is a lot: the <strong class="hl">defences that watch you</strong> (IDS, firewalls,
+      honeypots) and how attackers slip past them, the <strong class="hl">wireless</strong> air you can attack without a cable, the
+      <strong class="hl">emerging surface</strong> every organisation now runs on (mobile, IoT/OT, cloud), and the
+      <strong class="hl">cryptography</strong> that quietly underpins the whole diploma.</p>
+      <p>You will evade a lab IDS with fragmented and decoyed scans, capture and crack a <strong>WPA2 handshake</strong>, find an exposed
+      <strong>cloud bucket</strong> and a default-credentialed <strong>IoT</strong> device, and get your hands on real
+      <strong>crypto</strong> &mdash; then close the diploma with a <strong class="hl hl-d">defence-in-depth capstone</strong> that ties all ten
+      sessions together.</p>
+      <div class="cover-meta">
+        <span>&#9201; ~4 hours</span><span>&#9670; 13 mini-labs + 5 labs</span><span>&#127891; Deliverable: a defence-in-depth capstone report</span>
+      </div>
+    </div><div class="box intro"><span class="box-t">How this final session runs</span><p>Four blocks &mdash; evasion, wireless, emerging tech, crypto &mdash; each with theory, a diagram that <strong>plays</strong>, and a <strong>&#9654; Prove it</strong> mini-lab. It is a <em>sweep</em>: broad by design, so you know the surface exists and where to go deeper. Everything on the isolated lab or your own kit. Then we graduate.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Everything, and what&#39;s left">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P02</span><span class="tag bridge">Recap &middot; the whole arc</span><span class="time">&#9201; 4 min</span></div>
+      <h1>Nine Sessions Down &mdash; The Last Surface</h1>
+      <p class="lede">You have covered the core attack chain end to end. This session is the perimeter around it &mdash; the defences, the air, the new platforms, and the math.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The arc so far</span><p>Recon (S2), scanning (S3), enumeration/access (S4), exploitation (S5), escalation (S6), malware (S7), web apps (S8), and the network/human surface (S9). That is a complete offensive chain and its defensive mirror. What remains are the pieces that touch <em>all</em> of it: the <strong>monitoring you must evade</strong>, the <strong>wireless entry point</strong>, the <strong>modern platforms</strong> that moved the data off the traditional network, and the <strong>cryptography</strong> that has been under every session (hashes in S4, TLS in S8&ndash;9, payload encoding in S5&ndash;7).</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 316" role="img" aria-label="Where this final session sits: around the whole nine-session attack chain — the defences to evade, the wireless entry, the emerging platforms, and the cryptography beneath everything.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">YOUR SKILLS (S2&ndash;9)</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">the core chain</text>
+          <line x1="185" y1="80" x2="185" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">THE PERIMETER (S10)</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">evasion + wireless</text>
+          <line x1="520" y1="80" x2="520" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--red)">THE MODERN SURFACE (S10)</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">mobile/IoT/cloud + crypto</text>
+          <line x1="890" y1="80" x2="890" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">you can already: recon &rarr; exploit &rarr; escalate &rarr; web &rarr; network</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">but defences watch: IDS, firewalls, honeypots</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">and the surface moved: wireless, mobile, IoT, cloud</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--purple)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--purple)">under all of it: cryptography (hashes, TLS, signatures)</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The complete chain from Sessions 2&ndash;9 &mdash; the foundation this session extends.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Real targets are monitored. Evasion is how the chain survives contact with a defended network.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Data left the wired LAN &mdash; into the air, onto phones, into devices and the cloud. Each is a new attack surface.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Every session touched crypto. This one finally names how it works &mdash; and where it breaks.</div>
+        </figure>
+      <div class="box key-takeaway"><span class="box-t">The last mile of the map</span><p><strong class="hl">You have the chain; this is the terrain around it.</strong> Defences to evade, air to attack, new platforms to sweep, and the crypto beneath everything. Breadth now; depth is the career.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Why the sweep">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P03</span><span class="tag theory">Why &middot; the expanding surface</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Why a Sweep &mdash; The Surface Keeps Growing</h1>
+      <p class="lede">An attacker only needs one way in, and the ways multiply every year. Knowing the whole surface is what stops you missing the open door.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">One way in, a hundred doors</span><p>A defender must cover every surface; an attacker needs one. As organisations moved to <strong>Wi-Fi</strong>, <strong>phones</strong>, <strong>smart devices</strong>, and the <strong>cloud</strong>, they multiplied the doors &mdash; often faster than they secured them. And all of it runs on <strong>cryptography</strong> that is strong in theory but frequently mis-deployed (weak Wi-Fi, an old hash, a misconfigured bucket). This session is a sweep so you never miss the surface that is actually open.</p></div>      <div class="stat-row">
+        <div class="stat"><span class="stat-n">Cloud misconfig</span><span class="stat-l">public storage buckets remain one of the most common real-world data-exposure causes</span></div>
+        <div class="stat"><span class="stat-n">Wi-Fi + IoT</span><span class="stat-l">default credentials and weak/old wireless crypto are everywhere &mdash; a physical-proximity way in</span></div>
+        <div class="stat"><span class="stat-n">Evasion</span><span class="stat-l">defended networks watch you &mdash; the same attack, wrapped to slip past IDS/firewall, is the difference between caught and not</span></div>
+      </div><div class="box case"><span class="box-t">Real-world anchor &mdash; the misconfigured bucket</span><p>Countless breaches trace to a single cloud storage bucket set to &quot;public&quot; &mdash; no exploit, no malware, just a checkbox. The data was encrypted at rest and in transit; the crypto was fine. The <em>access control</em> was not. It is the perfect emblem of this session: the new surface fails not because the math is weak, but because it is deployed wrong.</p></div><div class="box key-takeaway"><span class="box-t">Cover the whole surface</span><p><strong class="hl">The open door is the one you did not check.</strong> Evasion, wireless, mobile, IoT, cloud, crypto &mdash; a sweep of all of them means you find the way in before an attacker does.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="IDS, IPS &amp; how they see">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P04</span><span class="tag theory">Method &middot; the watchers</span><span class="time">&#9201; 7 min</span></div>
+      <h1>The Defences That Watch &mdash; IDS, IPS, Detection Methods</h1>
+      <p class="lede">Before you evade the monitoring, understand how it detects. The method it uses decides how you get past it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Know the sensor to beat the sensor</span><p>An <strong>IDS</strong> watches traffic and <em>alerts</em>; an <strong>IPS</strong> sits inline and <em>blocks</em>. Both detect one of two ways: <strong>signature-based</strong> (match known-bad patterns &mdash; blind to anything new) or <strong>anomaly-based</strong> (flag deviations from a learned baseline &mdash; noisier). Evasion targets the detection method: defeat a signature by changing the bytes; defeat anomaly detection by looking normal or going slow. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="IDS versus IPS and signature versus anomaly detection. Click each.">
+          <g class="node" data-node="ids" tabindex="0"><rect x="30" y="40" width="270" height="66" rx="10" fill="#12241c" stroke="#4ade80"/><text class="d-title" x="165" y="68" text-anchor="middle" font-size="13" fill="#4ade80">IDS &mdash; detect &amp; alert</text><text class="d-sub" x="165" y="88" text-anchor="middle">out-of-band, passive</text></g>
+          <g class="node" data-node="ips" tabindex="0"><rect x="330" y="40" width="270" height="66" rx="10" fill="#241417" stroke="#ff7043"/><text class="d-title" x="465" y="68" text-anchor="middle" font-size="13" fill="#ff7043">IPS &mdash; detect &amp; block</text><text class="d-sub" x="465" y="88" text-anchor="middle">inline, active</text></g>
+          <g class="node" data-node="hn" tabindex="0"><rect x="630" y="40" width="280" height="66" rx="10" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="770" y="68" text-anchor="middle" font-size="13" fill="#fbbf24">HIDS / NIDS</text><text class="d-sub" x="770" y="88" text-anchor="middle">host vs network scope</text></g>
+          <g class="node" data-node="sig" tabindex="0"><rect x="120" y="126" width="320" height="60" rx="10" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="280" y="152" text-anchor="middle" font-size="13">SIGNATURE-based</text><text class="d-sub" x="280" y="172" text-anchor="middle">matches known patterns &mdash; misses zero-days</text></g>
+          <g class="node" data-node="anom" tabindex="0"><rect x="500" y="126" width="320" height="60" rx="10" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="660" y="152" text-anchor="middle" font-size="13">ANOMALY-based</text><text class="d-sub" x="660" y="172" text-anchor="middle">flags deviation &mdash; more false positives</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; and note which evasion technique beats which detection method.</div>
+        <div class="dgm-detail" data-detail="ids"><h5><span class="dd-tag">IDS</span>Watches and warns</h5><p><b>Sits out-of-band on mirrored traffic, detects, and raises an alert &mdash; it does not block.</b> Failure mode = a missed alert. This is the Wazuh/Snort/Suricata role from your SOC-flip pages. You evade it to avoid the <em>alert</em>.</p></div>
+        <div class="dgm-detail" data-detail="ips"><h5><span class="dd-tag">IPS</span>Watches and stops</h5><p><b>Sits inline &mdash; all traffic passes through it &mdash; and blocks what it detects.</b> Failure mode = it may block legitimate traffic. Because it is inline, evading it is about not being detected <em>at all</em>, or your attack is dropped.</p></div>
+        <div class="dgm-detail" data-detail="hn"><h5><span class="dd-tag">HIDS / NIDS</span>Host vs network</h5><p><b>NIDS watches network traffic (whole-network view); HIDS watches one host (file integrity, local logs &mdash; catches insider/endpoint activity).</b> Defence-in-depth uses both; evasion that beats the network sensor may still trip the host one.</p></div>
+        <div class="dgm-detail" data-detail="sig"><h5><span class="dd-tag">SIGNATURE</span>Match the known-bad</h5><p><b>Compares traffic to a database of known attack patterns.</b> Precise and low-false-positive, but blind to anything without a signature (zero-days) and beaten by <em>changing the bytes</em> &mdash; encoding, fragmentation, polymorphism. Most evasion targets this.</p></div>
+        <div class="dgm-detail" data-detail="anom"><h5><span class="dd-tag">ANOMALY</span>Learn normal, flag the rest</h5><p><b>Builds a baseline of normal and alerts on deviation.</b> Can catch novel attacks, but is noisier (false positives) and beaten by <em>looking normal</em> &mdash; blending into allowed ports/protocols, or going slow enough to stay under the rate threshold.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; classify a real detector and its blind spot</span><pre><code># For any IDS you meet, ask two questions:
+#   1. inline (IPS, blocks) or out-of-band (IDS, alerts)?
+#   2. signature (beat by changing bytes) or anomaly (beat by looking normal / slow)?
+# Snort/Suricata = mostly signature NIDS -> fragmentation & encoding evade it
+# an ML anomaly engine -> low-and-slow, blend-in traffic evades it</code></pre><p style="margin-top:8px"><b>You should see:</b> the two questions &mdash; where it sits and how it decides &mdash; tell you exactly which evasion technique applies. Evasion is not magic; it is matching your method to the detector&#39;s blind spot.</p></div><div class="box key-takeaway"><span class="box-t">Evasion targets the method</span><p><strong class="hl">Signature &rarr; change the bytes; anomaly &rarr; look normal or go slow.</strong> Know whether the sensor matches patterns or learns baselines, and the evasion picks itself. Defence-in-depth (both, plus HIDS) is why one trick rarely wins.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="IDS evasion">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P05</span><span class="tag attack">Attack &middot; slip past the sensor</span><span class="time">&#9201; 7 min</span></div>
+      <h1>IDS Evasion &mdash; Same Attack, Invisible Wrapper</h1>
+      <p class="lede">The payload is the same; the wrapper hides it. Learn the techniques that make a malicious packet look benign to the sensor.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Exploit the gap between IDS and target</span><p>Most IDS evasion exploits one idea: the <strong>IDS and the target reassemble traffic differently</strong>. Split a payload across fragments the IDS won&#39;t reassemble, encode it so the signature won&#39;t match, or craft packets one of them accepts and the other rejects &mdash; and the attack reaches the target while the sensor sees nothing. Click each technique.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="IDS evasion techniques: fragmentation, session splicing, encoding, insertion/evasion, TTL manipulation, and obfuscation. Click each.">
+          <rect x="360" y="12" width="220" height="38" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="37" text-anchor="middle" font-size="14">HIDE THE PAYLOAD</text>
+          <g class="node" data-node="frag" tabindex="0"><rect x="20" y="78" width="205" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="122" y="100" text-anchor="middle" font-size="12.5">Fragmentation</text><text class="d-sub" x="122" y="116" text-anchor="middle">split across packets</text></g>
+          <g class="node" data-node="splice" tabindex="0"><rect x="245" y="78" width="205" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="347" y="100" text-anchor="middle" font-size="12.5">Session splicing</text><text class="d-sub" x="347" y="116" text-anchor="middle">tiny pieces, slow</text></g>
+          <g class="node" data-node="enc" tabindex="0"><rect x="470" y="78" width="205" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="572" y="100" text-anchor="middle" font-size="12.5">Encoding</text><text class="d-sub" x="572" y="116" text-anchor="middle">unicode / polymorphic</text></g>
+          <g class="node" data-node="ins" tabindex="0"><rect x="695" y="78" width="225" height="46" rx="8" fill="#241417" stroke="#e63946"/><text class="d-lbl" x="807" y="100" text-anchor="middle" font-size="12.5">Insertion / evasion</text><text class="d-sub" x="807" y="116" text-anchor="middle">IDS &ne; target parsing</text></g>
+          <g class="node" data-node="ttl" tabindex="0"><rect x="150" y="140" width="260" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="280" y="162" text-anchor="middle" font-size="12.5">TTL manipulation</text><text class="d-sub" x="280" y="178" text-anchor="middle">expire after the IDS</text></g>
+          <g class="node" data-node="obf" tabindex="0"><rect x="530" y="140" width="260" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="660" y="162" text-anchor="middle" font-size="12.5">Obfuscation / tunneling</text><text class="d-sub" x="660" y="178" text-anchor="middle">encrypt (SSH/VPN)</text></g>
+          <path d="M430,50 L120,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M455,50 L347,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M485,50 L572,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M510,50 L807,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; how it hides the payload and which detection it beats.</div>
+        <div class="dgm-detail" data-detail="frag"><h5><span class="dd-tag">FRAGMENTATION</span>Split it up</h5><p><b>Break the malicious payload across IP fragments; if the IDS does not reassemble them the way the target does, it never sees the full signature.</b> <span class="mono">nmap -f</span> / <span class="mono">fragroute</span>. Beats signature IDS that skips or mis-reassembles fragments. Countermeasure: full packet reassembly in the IDS.</p></div>
+        <div class="dgm-detail" data-detail="splice"><h5><span class="dd-tag">SESSION SPLICING</span>Below the threshold</h5><p><b>Deliver the attack in many tiny packets over time, each too small (or too slow) to trip the sensor.</b> A cousin of low-and-slow. Beats rate/size-based detection. Countermeasure: stream reassembly + stateful analysis.</p></div>
+        <div class="dgm-detail" data-detail="enc"><h5><span class="dd-tag">ENCODING</span>Change the bytes</h5><p><b>Encode the payload (URL/unicode/hex) or make it polymorphic so the exact signature bytes never appear.</b> The web-attack version you saw as WAF bypass in S8. Beats signature matching. Countermeasure: normalise/decode before matching.</p></div>
+        <div class="dgm-detail" data-detail="ins"><h5><span class="dd-tag">INSERTION / EVASION</span>Parse-difference tricks</h5><p><b>Insertion: send packets the IDS accepts but the target rejects (IDS sees benign). Evasion: packets the IDS rejects but the target accepts (IDS misses the attack).</b> Both exploit the IDS and host disagreeing on what is valid &mdash; the deepest class. Countermeasure: target-aware normalisation.</p></div>
+        <div class="dgm-detail" data-detail="ttl"><h5><span class="dd-tag">TTL MANIPULATION</span>Expire in between</h5><p><b>Set the IP TTL so a decoy packet expires <em>after</em> the IDS but <em>before</em> the target (or vice versa), so the two see different data streams.</b> A precise insertion technique. Countermeasure: the IDS understanding path TTLs.</p></div>
+        <div class="dgm-detail" data-detail="obf"><h5><span class="dd-tag">OBFUSCATION / TUNNELING</span>Encrypt past it</h5><p><b>Wrap the traffic in an encrypted channel (SSH tunnel, VPN, TLS) so the IDS cannot inspect the payload at all.</b> The most robust &mdash; you cannot signature what you cannot read. Countermeasure: TLS inspection where policy allows, and flagging the tunnel itself as anomalous.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; wrap a scan so a signature IDS misses it</span><pre><code># same nmap scan, made harder to fingerprint:
+nmap -f 192.168.56.20             # fragment packets
+nmap -D 10.0.0.5,10.0.0.6,ME target   # decoys — hide your real IP in the noise
+nmap --source-port 53 target      # masquerade as DNS (source-port trick)
+nmap -T2 target                   # slow timing — under rate thresholds</code></pre><p style="margin-top:8px"><b>You should see:</b> the scan is identical; the <em>wrapper</em> (fragments, decoys, a trusted source port, slow timing) is what a signature/rate IDS misses. Evasion is packaging, not a different attack &mdash; which is why full reassembly and anomaly detection are the counters.</p></div><div class="box key-takeaway"><span class="box-t">Exploit the reassembly gap</span><p><strong class="hl">The IDS and the target don&#39;t always agree.</strong> Fragment, splice, encode, or tunnel, and the sensor sees something different from the victim. Defence: reassemble fully, normalise, and inspect encrypted traffic where you can.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Firewalls &amp; evasion">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P06</span><span class="tag attack">Attack &middot; through the wall</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Firewalls and How Traffic Slips Through Them</h1>
+      <p class="lede">A firewall filters by rules; attackers hide inside the traffic the rules allow. Watch blocked traffic ride an allowed protocol.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Hide in what&#39;s permitted</span><p>A firewall allows some traffic (port 80/443 out, say) and blocks the rest. Evasion means making forbidden traffic look like the permitted kind: <strong>port hopping</strong> onto 80/443, <strong>tunnelling</strong> a blocked protocol inside an allowed one (a shell over DNS or HTTP), or <strong>spoofing</strong> a trusted source. The firewall&#39;s rule is satisfied; your traffic is inside. Watch a DNS tunnel carry a shell out of a network that blocks everything but DNS.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Firewall evasion by tunneling: a blocked reverse shell is encapsulated inside allowed DNS queries, so it passes the firewall that only permits DNS.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER C2</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">outside</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">FIREWALL</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">allows DNS only</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">inside, restricted</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--text-3)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">firewall policy: block all outbound EXCEPT DNS (53) &amp; web</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:26px">
+          <text x="705" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">shell data encoded inside DNS queries</text>
+          <path d="M884,174 L526,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="352" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">firewall permits it (it is just DNS)</text>
+          <path d="M514,228 L191,228" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">C2 answers in DNS responses &rarr; two-way shell</text>
+          <path d="M191,282 L884,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: abnormal DNS &mdash; huge volume, long random labels</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>A locked-down egress policy &mdash; the kind that should stop a reverse shell. But DNS is almost always allowed.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The victim&#39;s implant encodes command output into subdomain labels: <data>.attacker.com &mdash; a legitimate-looking DNS lookup.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The firewall matches its rule &mdash; port 53, DNS protocol &mdash; and lets it out. The tunnel rides the allowed protocol.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The attacker&#39;s authoritative server replies with commands encoded in DNS answers. A full shell over a protocol the firewall trusts.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>DNS tunneling has a signature: unusually high query volume to one domain and long, high-entropy subdomains. A DNS-analytics rule catches it.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; spot the tunnel &mdash; the defender&#39;s view of DNS abuse</span><pre><code># DNS tunneling hides in allowed traffic, but the PATTERN betrays it:
+#   * hundreds/thousands of queries to ONE domain
+#   * long, random-looking subdomains (base32/hex-encoded data)
+#   * TXT/NULL record types at high volume
+# a quick hunt over DNS logs:
+sort dns.log | awk '{print $domain}' | uniq -c | sort -rn | head</code></pre><p style="margin-top:8px"><b>You should see:</b> the tunnel satisfies the firewall rule, but the <em>volume and entropy</em> of the DNS give it away. Firewall evasion hides the traffic type; it cannot hide the abnormal behaviour &mdash; which is why detection moves to analytics.</p></div><div class="box key-takeaway"><span class="box-t">Rules pass traffic; behaviour betrays it</span><p><strong class="hl">Hide forbidden traffic in an allowed protocol.</strong> Port-hop, tunnel, spoof &mdash; the firewall rule is satisfied. But the tunnel&#39;s <em>behaviour</em> (volume, entropy, timing) is anomalous, so egress filtering + DNS analytics are the real defence.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Honeypots">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P07</span><span class="tag theory">Method &middot; the trap</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Honeypots &mdash; The Trap That Watches Back</h1>
+      <p class="lede">Not every easy target is a gift. Learn how defenders lure attackers into decoys &mdash; and how attackers try to spot the trap.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">A target that is bait</span><p>A <strong>honeypot</strong> is a decoy system with no real purpose except to be attacked &mdash; so <em>any</em> interaction with it is suspicious by definition, making it a very high-signal detector. For the attacker, that inverts the usual logic: an unusually easy, unusually exposed target might be a trap that is logging your every move. Both sides play the same game &mdash; the defender makes it look real, the attacker checks whether it is.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:23%"><col style="width:36%"><col style="width:41%"></colgroup>
+      <thead><tr><th>Interaction level</th><th>What it simulates</th><th>Trade-off</th></tr></thead>
+      <tbody>
+      <tr><td>Low-interaction</td><td>a few fake services / banners (Honeyd)</td><td>safe &amp; cheap, but shallow data &mdash; easy to fingerprint</td></tr>
+      <tr><td>Medium-interaction</td><td>a broader emulated service (Cowrie SSH)</td><td>more data, still emulated</td></tr>
+      <tr><td>High-interaction</td><td>a real OS/services, monitored</td><td>richest data, but real risk if the attacker escapes it</td></tr>
+      <tr><td>Pure / honeynet</td><td>a whole decoy network</td><td>maximum realism and cost</td></tr>
+      </tbody></table></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; fingerprint a possible honeypot (the attacker&#39;s check)</span><pre><code># clues that an 'easy' target is a trap:
+nmap -sV --script banner target   # default/odd banners, too many open ports
+# * response times too consistent (emulated), or a VM-vendor MAC OUI
+# * services that accept ANY credential, or replies that don't fully implement the protocol
+# a box that is TOO open and TOO helpful is suspicious</code></pre><p style="margin-top:8px"><b>You should see:</b> a target that is implausibly exposed, answers too perfectly, or has emulated-looking services may be a honeypot logging you. The defender&#39;s goal is realism; yours is to notice what a real system would never do.</p></div><div class="box key-takeaway"><span class="box-t">Easy can mean bait</span><p><strong class="hl hl-d">Any touch of a honeypot is a detection.</strong> For defenders it is a near-zero-false-positive sensor; for attackers an implausibly soft target is a reason to slow down and check, not celebrate.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab A: evade the IDS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P08</span><span class="tag lab">Hands-on &middot; everyone &middot; attack</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab A &mdash; Scan Past a Watching IDS</h1>
+      <p class="lede">Run a scan a signature IDS catches, then wrap it &mdash; fragments, decoys, timing, source port &mdash; and watch the alerts stop.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Prove evasion against a real sensor</span><p>You will point a noisy scan at a lab host running <strong>Snort/Suricata</strong>, confirm it alerts, then re-run the same scan with evasion options and watch the alerts drop &mdash; seeing both the attacker and defender side of the reassembly gap.</p></div><div class="box warn"><span class="box-t">Isolated lab only</span><p>A lab target running an IDS you control. Evasion scanning of a network you do not own is hostile and often illegal.</p></div>
+      <ol class="steps">
+<li>
+<b>Baseline</b> &mdash; run a normal scan and confirm the IDS alerts:
+<pre><code>nmap -sS -sV 192.168.56.20
+# on the IDS host, watch alerts fire:
+tail -f /var/log/suricata/fast.log      # 'ET SCAN Nmap' etc.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The plain scan lights up the IDS &mdash; your baseline. Now you will make the same scan quieter.</li></ul></div>
+</li>
+<li>
+<b>Fragment + source-port</b> &mdash; defeat signature/port heuristics:
+<pre><code>nmap -f --source-port 53 -sS 192.168.56.20
+# fragmented packets + traffic that looks like DNS source-port</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Fragmentation can slip past a sensor that doesn&#39;t fully reassemble; the source-port trick makes the traffic look like a trusted service. Fewer/less-specific alerts.</li></ul></div>
+</li>
+<li>
+<b>Decoys + slow timing</b> &mdash; hide in noise and stay under thresholds:
+<pre><code>nmap -D RND:10 -T2 -sS 192.168.56.20
+# 10 random decoy source IPs; -T2 slow to dodge rate-based detection</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Decoys bury your real IP among ten fakes, and slow timing avoids rate triggers. To an anomaly/rate sensor, the scan blends in.</li></ul></div>
+</li>
+<li>
+<b>Flip to defender</b> &mdash; make the IDS win again:
+<pre><code># in Suricata: enable stream/frag reassembly + anomaly rules
+# now the fragmented scan is reassembled and re-detected.
+# lesson: evasion beats a NAIVE sensor; a well-configured, layered one still catches it.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Turning on full reassembly and anomaly detection re-catches the evaded scan &mdash; proving evasion targets misconfiguration, and defence-in-depth is the counter.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Evasion is a config battle</span><p><strong class="hl">The same scan, wrapped, beats a naive sensor &mdash; and a hardened one re-catches it.</strong> Fragments, decoys, timing, source-port on offence; full reassembly, anomaly rules, layering on defence.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Wireless security">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P09</span><span class="tag theory">Method &middot; the air</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Wireless &mdash; WEP, WPA2, WPA3 and Where They Break</h1>
+      <p class="lede">Wi-Fi extends the network into the air, where anyone in range is on the wire. Learn which protocol resists attack and which hands you the keys.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The network with no cable</span><p>Wireless removes the physical barrier: anyone within radio range can capture your frames. The only thing protecting the traffic is the <strong>security protocol</strong>, and they are not equal. <strong>WEP</strong> is broken (crackable in minutes). <strong>WPA2</strong> is the common standard but its handshake can be captured and cracked <em>offline</em>. <strong>WPA3</strong> resists that offline attack. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 170" role="img" aria-label="Wireless security protocols WEP, WPA2, and WPA3 from broken to strongest. Click each.">
+          <g class="node" data-node="wep" tabindex="0"><rect x="30" y="45" width="270" height="90" rx="12" fill="#241417" stroke="#e63946"/><text class="d-title" x="165" y="80" text-anchor="middle" font-size="15" fill="#e63946">WEP</text><text class="d-sub" x="165" y="104" text-anchor="middle">BROKEN &mdash; crack in minutes</text><text class="d-sub" x="165" y="122" text-anchor="middle">never use</text></g>
+          <g class="node" data-node="wpa2" tabindex="0"><rect x="335" y="45" width="270" height="90" rx="12" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="470" y="80" text-anchor="middle" font-size="15" fill="#fbbf24">WPA2</text><text class="d-sub" x="470" y="104" text-anchor="middle">common standard (AES)</text><text class="d-sub" x="470" y="122" text-anchor="middle">handshake capture &rarr; offline crack</text></g>
+          <g class="node" data-node="wpa3" tabindex="0"><rect x="640" y="45" width="270" height="90" rx="12" fill="#12241c" stroke="#4ade80"/><text class="d-title" x="775" y="80" text-anchor="middle" font-size="15" fill="#4ade80">WPA3</text><text class="d-sub" x="775" y="104" text-anchor="middle">SAE handshake</text><text class="d-sub" x="775" y="122" text-anchor="middle">resists offline dictionary attack</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; how strong it is and how it falls.</div>
+        <div class="dgm-detail" data-detail="wep"><h5><span class="dd-tag">WEP</span>Broken by design</h5><p><b>Uses RC4 with a tiny, reused initialisation vector; enough captured traffic reveals the key in minutes.</b> Cryptographically dead &mdash; if you find WEP in the wild it is an immediate critical finding. Never deploy it.</p></div>
+        <div class="dgm-detail" data-detail="wpa2"><h5><span class="dd-tag">WPA2</span>Strong crypto, capturable handshake</h5><p><b>WPA2-AES is solid in transit, but the 4-way handshake exchanged when a client joins can be captured &mdash; and then attacked <em>offline</em> against a wordlist.</b> A weak Wi-Fi password falls to <span class="mono">aircrack</span>/<span class="mono">hashcat</span>. This is the attack in Lab B. Defence: a long, random passphrase (or enterprise 802.1X).</p></div>
+        <div class="dgm-detail" data-detail="wpa3"><h5><span class="dd-tag">WPA3</span>The offline attack fixed</h5><p><b>WPA3 uses SAE (Simultaneous Authentication of Equals / Dragonfly), which does not expose a crackable handshake &mdash; an attacker cannot take the exchange offline and brute-force it.</b> It also adds forward secrecy. The current best choice; migrate to it where hardware allows.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; read the security of nearby networks (your own gear)</span><pre><code># put the adapter in monitor mode and scan (on YOUR hardware only):
+sudo airmon-ng start wlan0
+sudo airodump-ng wlan0mon        # the ENC column: WEP / WPA2 / WPA3
+# WEP = critical; WPA2 = crackable if the passphrase is weak; WPA3 = resists offline</code></pre><p style="margin-top:8px"><b>You should see:</b> the encryption column tells you the risk at a glance &mdash; WEP is a finding on sight, WPA2 depends entirely on passphrase strength, WPA3 resists the offline attack. Only ever scan networks you own.</p></div><div class="box key-takeaway"><span class="box-t">The protocol decides the risk</span><p><strong class="hl">WEP is dead, WPA2 is only as strong as its passphrase, WPA3 fixes the offline attack.</strong> Wireless security is a protocol-and-passphrase problem &mdash; and the handshake is the thing the attacker wants.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Wireless attacks">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P10</span><span class="tag attack">Attack &middot; deauth, twin, capture</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Wireless Attacks &mdash; Deauth, Evil Twin, Handshake</h1>
+      <p class="lede">Most Wi-Fi attacks start with one primitive: forcibly disconnecting a client. Learn how deauth enables capture and the evil twin.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">One primitive, several attacks</span><p>The key wireless move is the <strong>deauthentication</strong> frame &mdash; in older Wi-Fi it is unauthenticated, so an attacker can spoof it and kick clients off an access point. That single primitive powers the rest: kick a client so you can <strong>capture its handshake</strong> when it reconnects, or kick it off the real AP so it joins your <strong>evil twin</strong> clone instead. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 180" role="img" aria-label="Wireless attacks: deauthentication, handshake capture, evil twin, and replay. Click each.">
+          <g class="node" data-node="deauth" tabindex="0"><rect x="30" y="45" width="270" height="90" rx="12" fill="#241417" stroke="#ff7043"/><text class="d-title" x="165" y="78" text-anchor="middle" font-size="14" fill="#ff7043">DEAUTH</text><text class="d-sub" x="165" y="100" text-anchor="middle">forge deauth frames</text><text class="d-sub" x="165" y="120" text-anchor="middle">kick clients off (wireless DoS)</text></g>
+          <g class="node" data-node="hs" tabindex="0"><rect x="335" y="45" width="270" height="90" rx="12" fill="#1a1f2a" stroke="#fbbf24"/><text class="d-title" x="470" y="78" text-anchor="middle" font-size="14">HANDSHAKE CAPTURE</text><text class="d-sub" x="470" y="100" text-anchor="middle">deauth &rarr; catch the reconnect</text><text class="d-sub" x="470" y="120" text-anchor="middle">crack offline</text></g>
+          <g class="node" data-node="twin" tabindex="0"><rect x="640" y="45" width="270" height="90" rx="12" fill="#1a1f2a" stroke="#e63946"/><text class="d-title" x="775" y="78" text-anchor="middle" font-size="14" fill="#e63946">EVIL TWIN</text><text class="d-sub" x="775" y="100" text-anchor="middle">clone the AP + deauth real</text><text class="d-sub" x="775" y="120" text-anchor="middle">clients join YOUR AP</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; how it works and what it enables.</div>
+        <div class="dgm-detail" data-detail="deauth"><h5><span class="dd-tag">DEAUTH</span>The enabling primitive</h5><p><b>Management deauth frames are unauthenticated in WPA2, so an attacker spoofs them to disconnect clients from an AP.</b> By itself it is a wireless denial-of-service; its real value is <em>forcing a reconnection</em> you can exploit. (WPA3 / 802.11w Protected Management Frames fix this.)</p></div>
+        <div class="dgm-detail" data-detail="hs"><h5><span class="dd-tag">HANDSHAKE CAPTURE</span>Deauth, then catch the 4-way</h5><p><b>Deauth a client, and when it automatically reconnects you capture the WPA2 4-way handshake &mdash; which contains the material to test passphrases <em>offline</em>.</b> No further interaction with the AP needed; you crack it at your leisure with a wordlist. This is Lab B.</p></div>
+        <div class="dgm-detail" data-detail="twin"><h5><span class="dd-tag">EVIL TWIN</span>Become the access point</h5><p><b>Stand up a clone AP with the same SSID, deauth the real one, and clients reconnect to <em>yours</em> &mdash; now you are the MITM (Session 9) over the air, and a captive portal can phish the Wi-Fi password.</b> Combines wireless + MITM + social engineering. Defence: WPA3, PMF, and client-side network validation.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; watch a deauth&#39;s effect (concept, your own AP)</span><pre><code># the classic capture chain (YOUR network only):
+sudo airodump-ng -c 6 --bssid <AP_MAC> -w cap wlan0mon   # listen on the AP's channel
+sudo aireplay-ng --deauth 5 -a <AP_MAC> wlan0mon         # kick clients
+# airodump shows 'WPA handshake: <AP_MAC>' when a client reconnects -> captured</code></pre><p style="margin-top:8px"><b>You should see:</b> the deauth forces a reconnect and airodump flags <span class="mono">WPA handshake</span> when it catches the 4-way &mdash; the whole point of the deauth. From there the crack is offline (Lab B). Only ever against your own AP.</p></div><div class="box key-takeaway"><span class="box-t">Deauth is the master key</span><p><strong class="hl">One unauthenticated frame enables capture, DoS, and the evil twin.</strong> WPA3 and Protected Management Frames close it; until then, the handshake is one deauth away.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Handshake capture flow">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P11</span><span class="tag attack">Attack &middot; deauth to crack</span><span class="time">&#9201; 6 min</span></div>
+      <h1>The WPA2 Attack &mdash; Deauth, Capture, Crack Offline</h1>
+      <p class="lede">Watch the full wireless attack: force a reconnect, grab the 4-way handshake, and crack the passphrase away from the network.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why offline is the danger</span><p>The WPA2 attack is dangerous because the expensive part happens <strong>offline</strong>. You only need a few seconds near the network to capture the handshake; the passphrase cracking then happens on your own hardware, at GPU speed, with no further contact &mdash; and no rate limit or lockout to stop you. Watch the flow.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="WPA2 handshake attack: the attacker deauthenticates a client, captures the 4-way handshake on reconnect, and cracks the passphrase offline against a wordlist.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">monitor mode</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">CLIENT</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">reconnecting</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">ACCESS POINT</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">WPA2</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">1 · deauth frames &rarr; kick the client off</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="705" y="160" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">2 · client re-does the 4-way handshake</text>
+          <path d="M526,174 L884,174" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="537" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">3 · attacker captures the handshake</text>
+          <path d="M884,228 L191,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">4 · crack OFFLINE: aircrack/hashcat + wordlist</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">DEFENCE: long random passphrase / WPA3 / 802.1X</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Spoofed deauth disconnects the client. It will reconnect automatically within seconds.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>On reconnect, client and AP perform the WPA2 4-way handshake to derive session keys.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The attacker, listening on the AP&#39;s channel, records the 4-way handshake &mdash; it contains what is needed to test passphrases.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>No more contact with the network. GPU cracking against rockyou/masks &mdash; a weak passphrase falls quickly. No lockout, no rate limit.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>A 20+ char random passphrase makes offline cracking infeasible; WPA3-SAE removes the crackable handshake entirely.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; crack a captured handshake (your own capture)</span><pre><code># after capturing cap-01.cap from your own AP:
+aircrack-ng cap-01.cap -w /usr/share/wordlists/rockyou.txt
+# or convert + GPU crack:
+hcxpcapngtool -o hash.hc22000 cap-01.cap ; hashcat -m 22000 hash.hc22000 rockyou.txt
+# a weak passphrase falls in seconds; a long random one does not</code></pre><p style="margin-top:8px"><b>You should see:</b> the crack runs entirely offline against your wordlist &mdash; the network never knows. That is why WPA2 security lives or dies on <b>passphrase length/randomness</b>, and why WPA3 (no offline-crackable handshake) is the real fix.</p></div><div class="box key-takeaway"><span class="box-t">Seconds online, hours offline</span><p><strong class="hl">Capture is quick; cracking is offline and unstoppable.</strong> A weak WPA2 passphrase is the whole vulnerability. Long random passphrases, 802.1X, or WPA3 are the defences &mdash; there is no lockout to save a weak one.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab B: crack WPA2">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P12</span><span class="tag lab">Hands-on &middot; everyone &middot; own gear</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab B &mdash; Capture and Crack a WPA2 Handshake</h1>
+      <p class="lede">Run the full wireless chain on your own access point: monitor, deauth, capture the handshake, and crack a (deliberately weak) passphrase.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The whole aircrack-ng chain</span><p>You will use the Aircrack-ng suite end to end on <strong>your own test AP</strong> with a deliberately weak passphrase: monitor mode, target the AP, deauth to force a handshake, capture it, and crack it &mdash; then see why a strong passphrase or WPA3 defeats you.</p></div><div class="box warn"><span class="box-t">Your own access point only</span><p>Wireless attacks require a monitor-mode adapter and must only target an AP you own. Attacking any other network is illegal. Set your test AP&#39;s passphrase to something in rockyou for the demo.</p></div>
+      <ol class="steps">
+<li>
+<b>Monitor mode + find the AP</b>:
+<pre><code>sudo airmon-ng start wlan0
+sudo airodump-ng wlan0mon          # note your test AP's BSSID + channel</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The adapter now captures raw 802.11; airodump lists APs and clients with their channels &mdash; you target your own.</li></ul></div>
+</li>
+<li>
+<b>Target the AP</b> and start capturing on its channel:
+<pre><code>sudo airodump-ng -c <CH> --bssid <AP_MAC> -w cap wlan0mon
+# leave this running — it writes cap-01.cap and shows connected clients</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Focused capture on your AP&#39;s channel &mdash; this is where the handshake will land when a client reconnects.</li></ul></div>
+</li>
+<li>
+<b>Deauth</b> to force a handshake, then confirm capture:
+<pre><code>sudo aireplay-ng --deauth 5 -a <AP_MAC> -c <CLIENT_MAC> wlan0mon
+# watch airodump's top-right: 'WPA handshake: <AP_MAC>' = captured</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The deauth kicks the client; on reconnect airodump flags the captured handshake. A few seconds of contact is all it took.</li></ul></div>
+</li>
+<li>
+<b>Crack offline</b> &mdash; then note the defence:
+<pre><code>aircrack-ng cap-01.cap -w /usr/share/wordlists/rockyou.txt
+# KEY FOUND! [ <your weak passphrase> ]
+# now change the AP to a 20-char random passphrase and re-run: it won't crack.
+# WPA3 removes the crackable handshake entirely.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The weak passphrase falls; a long random one does not, and WPA3 removes the attack. You have proven the whole chain and its only real defence.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Wireless = passphrase strength</span><p><strong class="hl hl-d">The handshake is one deauth away; the crack is offline.</strong> A weak WPA2 passphrase is the vulnerability. Length + randomness, 802.1X, or WPA3 are the fixes &mdash; nothing else stops the offline crack.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Break &amp; checkpoint">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P13</span><span class="tag break">Pause &middot; 10 min</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Halfway &mdash; From the Perimeter to the Platform</h1>
+      <p class="lede">You evaded the defences and broke into the air. After the break: the modern surface &mdash; mobile, IoT, cloud &mdash; and the crypto beneath it all.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you have done</span><p>First half attacked the <strong>perimeter</strong>: you learned how IDS/IPS detect and evaded them (fragmentation, decoys, tunnelling), understood firewalls and honeypots, and ran the full <strong>wireless</strong> attack &mdash; deauth, handshake capture, offline crack. Second half sweeps the <strong>emerging surface</strong> &mdash; mobile, IoT/OT, and cloud, where most modern data now lives &mdash; and finishes with the <strong>cryptography</strong> that underpins the entire diploma, before the graduation capstone.</p></div><div class="box do"><span class="box-t">Stretch-break checklist</span><p>Stop any monitor-mode capture and restore your adapter (<span class="mono">airmon-ng stop wlan0mon</span>). Save your evasion notes and the cracked-handshake result for the capstone report. One block of new surface and the crypto foundation to go &mdash; then you graduate. Back in five.</p></div><div class="box key-takeaway"><span class="box-t">The surface moved; follow it</span><p><strong class="hl">Perimeter, then platform.</strong> You have slipped the defences and taken the air. The data itself now lives on phones, in devices, and in the cloud &mdash; the second half goes where it went.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Mobile">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P14</span><span class="tag theory">Sweep &middot; the phone</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Mobile &mdash; The Computer in Every Pocket</h1>
+      <p class="lede">Phones hold the crown-jewel data and travel everywhere. Learn the mobile attack surface and why the app store is the new perimeter.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">A trusted device outside your walls</span><p>A phone is a full computer holding email, MFA tokens, corporate data &mdash; and it lives outside the office network, on untrusted Wi-Fi, installing code from an app store. The attack surface spans the <strong>app</strong> (insecure storage, weak crypto), the <strong>device</strong> (jailbreak/root, lost/stolen), the <strong>network</strong> (the MITM you already know), and the <strong>platform</strong> (malicious or over-permissioned apps). The <strong>OWASP Mobile Top 10</strong> is the map. Click each surface.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 180" role="img" aria-label="The mobile attack surface: the app, the device, the network, and the platform. Click each.">
+          <g class="node" data-node="app" tabindex="0"><rect x="20" y="55" width="210" height="70" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="125" y="86" text-anchor="middle" font-size="13">APP</text><text class="d-sub" x="125" y="106" text-anchor="middle">insecure storage, weak crypto</text></g>
+          <g class="node" data-node="dev" tabindex="0"><rect x="248" y="55" width="210" height="70" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="353" y="86" text-anchor="middle" font-size="13">DEVICE</text><text class="d-sub" x="353" y="106" text-anchor="middle">jailbreak/root, lost/stolen</text></g>
+          <g class="node" data-node="net" tabindex="0"><rect x="476" y="55" width="210" height="70" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="581" y="86" text-anchor="middle" font-size="13">NETWORK</text><text class="d-sub" x="581" y="106" text-anchor="middle">MITM on untrusted Wi-Fi</text></g>
+          <g class="node" data-node="plat" tabindex="0"><rect x="704" y="55" width="216" height="70" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="812" y="86" text-anchor="middle" font-size="13">PLATFORM</text><text class="d-sub" x="812" y="106" text-anchor="middle">malicious / over-permissioned apps</text></g>
+        </svg>
+        <div class="dgm-hint">Click each surface &mdash; the risk and the control.</div>
+        <div class="dgm-detail" data-detail="app"><h5><span class="dd-tag">APP</span>Where the data leaks</h5><p><b>Insecure local storage (credentials/tokens in plaintext), weak or home-rolled crypto, hardcoded secrets, and no certificate pinning (so your S9 MITM reads the traffic).</b> Top OWASP Mobile items. Test by decompiling the APK and inspecting storage/network. Control: encrypted storage, platform keystore, TLS + pinning.</p></div>
+        <div class="dgm-detail" data-detail="dev"><h5><span class="dd-tag">DEVICE</span>Rooted or in the wrong hands</h5><p><b>A jailbroken/rooted device removes the OS security model; a lost/stolen phone exposes everything on it.</b> Both bypass app-level controls. Control: MDM, device encryption, remote wipe, root/jailbreak detection, screen-lock policy.</p></div>
+        <div class="dgm-detail" data-detail="net"><h5><span class="dd-tag">NETWORK</span>The MITM you already know</h5><p><b>Phones roam onto untrusted Wi-Fi, where Session 9&#39;s ARP/MITM and SSL-strip apply directly.</b> An app without certificate pinning hands you its traffic. Control: TLS everywhere, certificate pinning, VPN on untrusted networks.</p></div>
+        <div class="dgm-detail" data-detail="plat"><h5><span class="dd-tag">PLATFORM</span>The app is the malware</h5><p><b>A malicious or over-permissioned app &mdash; sideloaded on Android, or abusing granted permissions &mdash; reads contacts, messages, location.</b> The app store is the new perimeter. Control: install from official stores only, review permissions, MDM app allow-lists, Play Protect / notarisation.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; read what an app really does (static, on your own APK)</span><pre><code># pull an APK you own and inspect it — the mobile version of static analysis (S7):
+unzip -o app.apk -d app_out           # AndroidManifest + resources
+# look at requested PERMISSIONS in AndroidManifest.xml (does a torch app need SMS + contacts?)
+# strings the compiled code for hardcoded URLs / keys:
+strings app_out/classes.dex | grep -Ei 'http|api|key|secret' | head</code></pre><p style="margin-top:8px"><b>You should see:</b> over-broad permissions and hardcoded secrets are the two fastest mobile findings &mdash; and both come from static inspection you already know from Session 7. A torch app asking for SMS + contacts is the tell.</p></div><div class="box key-takeaway"><span class="box-t">The perimeter is in every pocket</span><p><strong class="hl">Mobile moves trusted data outside your walls.</strong> App storage, device state, untrusted networks, and the app store are the four surfaces &mdash; and MDM + pinning + official-store-only cover most of them.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="IoT &amp; OT">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P15</span><span class="tag theory">Sweep &middot; devices &amp; industry</span><span class="time">&#9201; 6 min</span></div>
+      <h1>IoT and OT &mdash; When the Target Is a Thing</h1>
+      <p class="lede">Cameras, sensors, and factory controllers rarely get patched and often ship with default passwords. And when OT fails, the world feels it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Cheap devices, high stakes</span><p>The <strong>Internet of Things</strong> put cheap, rarely-patched computers everywhere &mdash; cameras, thermostats, routers &mdash; often with <strong>default credentials</strong> and old firmware. <strong>OT</strong> (Operational Technology: the ICS/SCADA that runs factories, power, water) is worse: decades-old protocols with <em>no authentication</em>, systems that cannot be taken down to patch, and physical consequences when they fail. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 180" role="img" aria-label="IoT and OT attack surface: default credentials, unpatched firmware, insecure protocols, and physical/OT impact. Click each.">
+          <g class="node" data-node="cred" tabindex="0"><rect x="20" y="55" width="210" height="70" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="125" y="86" text-anchor="middle" font-size="13">DEFAULT CREDS</text><text class="d-sub" x="125" y="106" text-anchor="middle">admin/admin, never changed</text></g>
+          <g class="node" data-node="fw" tabindex="0"><rect x="248" y="55" width="210" height="70" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="353" y="86" text-anchor="middle" font-size="13">OLD FIRMWARE</text><text class="d-sub" x="353" y="106" text-anchor="middle">unpatched, known CVEs</text></g>
+          <g class="node" data-node="proto" tabindex="0"><rect x="476" y="55" width="210" height="70" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="581" y="86" text-anchor="middle" font-size="13">WEAK PROTOCOLS</text><text class="d-sub" x="581" y="106" text-anchor="middle">MQTT/Modbus, no auth</text></g>
+          <g class="node" data-node="ot" tabindex="0"><rect x="704" y="55" width="216" height="70" rx="10" fill="#241417" stroke="#e63946"/><text class="d-title" x="812" y="86" text-anchor="middle" font-size="13" fill="#e63946">OT / PHYSICAL</text><text class="d-sub" x="812" y="106" text-anchor="middle">real-world consequences</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the weakness and why it persists.</div>
+        <div class="dgm-detail" data-detail="cred"><h5><span class="dd-tag">DEFAULT CREDS</span>The number-one IoT flaw</h5><p><b>Countless devices ship with <span class="mono">admin/admin</span> and are deployed without changing it.</b> The Mirai botnet built a record-breaking DDoS army purely from default-credentialed cameras and routers. Test: try the vendor defaults; search Shodan for the device. Control: force a password change on setup, unique per-device creds.</p></div>
+        <div class="dgm-detail" data-detail="fw"><h5><span class="dd-tag">OLD FIRMWARE</span>Never updated</h5><p><b>IoT firmware is rarely patched &mdash; no auto-update, no one responsible &mdash; so known CVEs linger for years.</b> Firmware can also be extracted and analysed for hardcoded keys and backdoors. Control: firmware update programme, network isolation for un-updatable devices.</p></div>
+        <div class="dgm-detail" data-detail="proto"><h5><span class="dd-tag">WEAK PROTOCOLS</span>Auth was an afterthought</h5><p><b>IoT/OT protocols (MQTT, CoAP, Modbus, Profinet) were designed for constrained or trusted networks and often have <em>no authentication or encryption</em>.</b> On a reachable network, commands can be read and forged directly. Control: segment these networks, add gateways that enforce auth, monitor the protocols.</p></div>
+        <div class="dgm-detail" data-detail="ot"><h5><span class="dd-tag">OT / PHYSICAL</span>Bits move atoms</h5><p><b>OT runs physical processes &mdash; power grids, water, manufacturing &mdash; so a compromise has real-world, safety consequences (Stuxnet, the Ukraine grid attacks, Colonial Pipeline&#39;s IT/OT shutdown).</b> Systems are old and cannot be taken offline to patch. Control: strict IT/OT segmentation (the Purdue model), read-only monitoring, and safety-first change control.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; try the default &mdash; the fastest IoT finding</span><pre><code># on a lab IoT device (your own), the first test is always the vendor default:
+hydra -l admin -P defaults.txt <device-ip> http-get /   # or just try admin/admin
+# and check exposure the way attackers do (conceptually):
+#   Shodan search for the device banner/model -> how many are on the internet?</code></pre><p style="margin-top:8px"><b>You should see:</b> default credentials are the single most productive IoT test &mdash; try them first, every time. The reason Mirai worked at scale is that this one check succeeds on millions of devices. Only ever test devices you own.</p></div><div class="box key-takeaway"><span class="box-t">The dumb device is the way in</span><p><strong class="hl hl-d">IoT/OT fails on the basics: default creds, old firmware, no-auth protocols &mdash; with physical stakes.</strong> Segmentation, credential hygiene, and monitoring beat most of it; for OT, isolation and safety come before everything.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Cloud">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P16</span><span class="tag theory">Sweep &middot; someone else&#39;s computer</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Cloud &mdash; Where the Data Actually Lives Now</h1>
+      <p class="lede">Most data moved to the cloud, and most cloud breaches are misconfiguration, not exploitation. Learn the shared-responsibility line and the classic mistakes.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The provider secures the cloud; you secure what&#39;s in it</span><p>The cloud is not inherently insecure &mdash; but security is <strong>shared</strong>. The provider secures the infrastructure (&quot;security <em>of</em> the cloud&quot;); <strong>you</strong> secure your configuration and data (&quot;security <em>in</em> the cloud&quot;). Most cloud breaches are not exploits &mdash; they are the customer&#39;s side of that line done wrong: a public bucket, an over-permissioned key, an exposed management port. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 190" role="img" aria-label="Cloud security: shared responsibility, storage misconfiguration, IAM, and container/serverless. Click each.">
+          <g class="node" data-node="shared" tabindex="0"><rect x="20" y="55" width="210" height="80" rx="10" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="125" y="88" text-anchor="middle" font-size="13">SHARED RESP.</text><text class="d-sub" x="125" y="108" text-anchor="middle">of vs in the cloud</text></g>
+          <g class="node" data-node="bucket" tabindex="0"><rect x="248" y="55" width="210" height="80" rx="10" fill="#241417" stroke="#e63946"/><text class="d-title" x="353" y="88" text-anchor="middle" font-size="13" fill="#e63946">STORAGE MISCONFIG</text><text class="d-sub" x="353" y="108" text-anchor="middle">public S3 bucket</text></g>
+          <g class="node" data-node="iam" tabindex="0"><rect x="476" y="55" width="210" height="80" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="581" y="88" text-anchor="middle" font-size="13">IAM</text><text class="d-sub" x="581" y="108" text-anchor="middle">over-permissioned keys</text></g>
+          <g class="node" data-node="cont" tabindex="0"><rect x="704" y="55" width="216" height="80" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="812" y="88" text-anchor="middle" font-size="13">CONTAINERS</text><text class="d-sub" x="812" y="108" text-anchor="middle">images, secrets, escape</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the mistake and the fix.</div>
+        <div class="dgm-detail" data-detail="shared"><h5><span class="dd-tag">SHARED RESPONSIBILITY</span>Know your half</h5><p><b>The provider secures the hardware, hypervisor, and managed-service internals; you secure your data, access, network config, and OS (depending on IaaS/PaaS/SaaS).</b> Most incidents are the customer&#39;s half. The first cloud question is always &quot;whose responsibility is this control?&quot;</p></div>
+        <div class="dgm-detail" data-detail="bucket"><h5><span class="dd-tag">STORAGE MISCONFIG</span>The public bucket</h5><p><b>An object-storage bucket (S3/Blob/GCS) set to public exposes its contents to the whole internet &mdash; no exploit needed.</b> One of the most common real-world breach causes. Test: check the ACL/policy and try anonymous access. Control: block-public-access defaults, least-privilege policies, continuous config scanning.</p></div>
+        <div class="dgm-detail" data-detail="iam"><h5><span class="dd-tag">IAM</span>Keys to everything</h5><p><b>Over-permissioned identities and leaked access keys (in a repo, an app, a bucket) let an attacker do anything the key can.</b> Cloud privilege escalation is IAM-policy analysis, not memory corruption. Control: least privilege, short-lived credentials, no long-lived keys, secret scanning, MFA on the console.</p></div>
+        <div class="dgm-detail" data-detail="cont"><h5><span class="dd-tag">CONTAINERS / SERVERLESS</span>New packaging, old bugs</h5><p><b>Vulnerable base images, secrets baked into images, an exposed Docker/Kubernetes API, or a container escape to the host.</b> The app inside can still have every flaw from Sessions 5&ndash;8. Control: scan images, keep secrets out of images (use a secrets manager), lock down the orchestrator API, drop privileges.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; check a bucket the way an attacker does (your own)</span><pre><code># the classic cloud finding — anonymous access to object storage (YOUR bucket):
+aws s3 ls s3://your-test-bucket --no-sign-request     # does it list WITHOUT creds?
+curl https://your-test-bucket.s3.amazonaws.com/       # anonymous HTTP listing?
+# if either returns contents, the bucket is public — the #1 cloud misconfig.</code></pre><p style="margin-top:8px"><b>You should see:</b> if the bucket lists or serves objects with <em>no credentials</em>, it is public &mdash; the single most common cloud data-exposure. No exploit, just a wrong setting, which is the whole lesson of cloud security: configuration is the attack surface.</p></div><div class="box key-takeaway"><span class="box-t">Misconfiguration, not exploitation</span><p><strong class="hl">Secure the cloud <em>of</em> vs <em>in</em>.</strong> Public buckets, over-permissioned keys, exposed APIs &mdash; the cloud mostly fails on your side of the line, through settings. Least privilege + config scanning + block-public-by-default is most of the defence.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab C: the modern surface">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P17</span><span class="tag lab">Hands-on &middot; everyone &middot; contained</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab C &mdash; Find the Open Bucket and the Default Device</h1>
+      <p class="lede">Practise the two fastest emerging-surface findings on your own resources: an exposed storage bucket and a default-credentialed device.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The findings that need no exploit</span><p>The emerging surface fails on configuration, so the highest-yield tests are checks, not exploits. You will confirm an open storage bucket and a default-credentialed device on <strong>your own</strong> lab resources &mdash; the exact moves behind a huge share of real incidents.</p></div><div class="box warn"><span class="box-t">Your own resources only</span><p>Use a test bucket you created and a lab IoT device/VM you own. Probing other people&#39;s cloud or devices is illegal even when it&#39;s &quot;just a listing.&quot;</p></div>
+      <ol class="steps">
+<li>
+<b>Open bucket</b> &mdash; create a test bucket, misconfigure it, and detect it anonymously:
+<pre><code># (your own test bucket) make it public, then check WITHOUT credentials:
+aws s3 ls s3://ceh-lab-test-bucket --no-sign-request
+curl -s https://ceh-lab-test-bucket.s3.amazonaws.com/ | head
+# contents returned = public = finding. Then re-apply Block Public Access and re-test.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Anonymous access confirms the misconfiguration; re-enabling Block Public Access closes it &mdash; you have seen the finding and the fix.</li></ul></div>
+</li>
+<li>
+<b>Least-privilege check</b> &mdash; inspect an IAM policy for over-permission:
+<pre><code># a policy with Action:* Resource:* is a red flag — scope it down:
+aws iam list-attached-user-policies --user-name lab-user
+# look for wildcards; least privilege = only the actions/resources actually needed.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Wildcard IAM policies are the cloud equivalent of running as root &mdash; the finding is over-permission, the fix is scoping it down.</li></ul></div>
+</li>
+<li>
+<b>Default credentials</b> &mdash; test a lab device/service for vendor defaults:
+<pre><code># on your lab IoT device/VM:
+hydra -l admin -P defaults.txt <lab-device-ip> http-get /
+# or just try admin/admin, root/root, the vendor default from the manual</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Default creds are the fastest device finding &mdash; the same check that built the Mirai botnet. On your own device, then change them and re-test.</li></ul></div>
+</li>
+<li>
+<b>Write it up</b> &mdash; these are report findings, not exploits:
+<pre><code># finding format:
+#   'S3 bucket ceh-lab-test-bucket is publicly listable (anonymous) — data exposure'
+#   'lab-user IAM policy grants Action:* — violates least privilege'
+#   'device at .50 accepts admin/admin — default credentials'
+# fix each in one line. This is real cloud/IoT assessment output.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Each is a one-line finding with a one-line fix &mdash; exactly what an emerging-surface assessment delivers. No exploit, high impact.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Check, don&#39;t exploit</span><p><strong class="hl">The modern surface fails on settings.</strong> A public bucket, a wildcard IAM policy, a default password &mdash; found by checking, not exploiting, and fixed by configuration. That is most of cloud/IoT security.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Cryptography">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P18</span><span class="tag theory">Foundation &middot; the math beneath</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Cryptography &mdash; The Foundation Under Everything</h1>
+      <p class="lede">Every session touched it: hashes in S4, TLS in S8&ndash;9, WPA2 here. Now learn the three tools &mdash; and what each one is actually for.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Three tools, three jobs</span><p>Cryptography is not one thing; it is three tools for three jobs. <strong>Symmetric</strong> encryption (one shared key) provides <em>confidentiality</em> fast. <strong>Asymmetric</strong> encryption (a public/private key pair) solves <em>key distribution</em> and enables <em>signatures</em>. <strong>Hashing</strong> (one-way) provides <em>integrity</em>. Almost every security control you have used is a combination of these three. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 190" role="img" aria-label="The three cryptographic tools: symmetric encryption, asymmetric encryption, and hashing, with their purposes. Click each.">
+          <g class="node" data-node="sym" tabindex="0"><rect x="30" y="45" width="270" height="100" rx="12" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="165" y="78" text-anchor="middle" font-size="14" fill="#22d3ee">SYMMETRIC</text><text class="d-sub" x="165" y="100" text-anchor="middle">one shared key</text><text class="d-sub" x="165" y="120" text-anchor="middle">AES &mdash; fast, bulk data</text><text class="d-sub" x="165" y="138" text-anchor="middle">job: confidentiality</text></g>
+          <g class="node" data-node="asym" tabindex="0"><rect x="335" y="45" width="270" height="100" rx="12" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="470" y="78" text-anchor="middle" font-size="14" fill="#fbbf24">ASYMMETRIC</text><text class="d-sub" x="470" y="100" text-anchor="middle">public + private key pair</text><text class="d-sub" x="470" y="120" text-anchor="middle">RSA/ECC &mdash; slow</text><text class="d-sub" x="470" y="138" text-anchor="middle">job: key exchange + signatures</text></g>
+          <g class="node" data-node="hash" tabindex="0"><rect x="640" y="45" width="270" height="100" rx="12" fill="#12241c" stroke="#4ade80"/><text class="d-title" x="775" y="78" text-anchor="middle" font-size="14" fill="#4ade80">HASHING</text><text class="d-sub" x="775" y="100" text-anchor="middle">one-way, fixed length</text><text class="d-sub" x="775" y="120" text-anchor="middle">SHA-256 &mdash; irreversible</text><text class="d-sub" x="775" y="138" text-anchor="middle">job: integrity</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; what it does, its algorithm, and its one job.</div>
+        <div class="dgm-detail" data-detail="sym"><h5><span class="dd-tag">SYMMETRIC</span>One key, both ways</h5><p><b>The same secret key encrypts and decrypts. Fast &mdash; used for bulk data (files, the body of a TLS session, WPA2).</b> <span class="mono">AES</span> is the standard (AES-256 for high security); <span class="mono">DES/3DES</span> are legacy/broken. The catch: both sides need the same key, so how do you share it safely? That is what asymmetric solves.</p></div>
+        <div class="dgm-detail" data-detail="asym"><h5><span class="dd-tag">ASYMMETRIC</span>A pair that solves distribution</h5><p><b>A public key (shareable) and a private key (secret). Encrypt with the public key &mdash; only the private key decrypts; or sign with the private key &mdash; anyone verifies with the public.</b> <span class="mono">RSA</span>/<span class="mono">ECC</span>. Slow, so it is used to <em>exchange a symmetric key</em> and to make <em>signatures</em>, not to encrypt bulk data. Security rests on hard math (factoring / discrete logs).</p></div>
+        <div class="dgm-detail" data-detail="hash"><h5><span class="dd-tag">HASHING</span>One-way integrity</h5><p><b>Maps any input to a fixed-length digest that cannot be reversed and changes completely if the input changes &mdash; so it proves <em>integrity</em>, not confidentiality.</b> <span class="mono">SHA-256</span> is current; <span class="mono">MD5</span>/<span class="mono">SHA-1</span> are broken (collisions). You used it in S4 (password hashes) and S7 (file identity). It is not encryption &mdash; there is no key and no decryption.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; use all three tools in three commands</span><pre><code>echo -n 'secret' | sha256sum                 # HASHING: integrity, irreversible
+openssl enc -aes-256-cbc -in f.txt -out f.enc    # SYMMETRIC: confidentiality (AES)
+openssl genrsa -out priv.pem 2048                 # ASYMMETRIC: key pair (RSA)
+openssl rsa -in priv.pem -pubout -out pub.pem     #   -> public key to share</code></pre><p style="margin-top:8px"><b>You should see:</b> three commands, three tools, three jobs: a SHA-256 digest you cannot reverse, an AES-encrypted file you can, and an RSA key pair for exchange/signatures. Knowing <em>which job</em> each does is the whole point &mdash; confidentiality, key-exchange, integrity.</p></div><div class="box key-takeaway"><span class="box-t">Match the tool to the job</span><p><strong class="hl">Symmetric = confidentiality (fast), asymmetric = key exchange + signatures (slow), hashing = integrity (one-way).</strong> Every protocol you have met combines them; naming the job each does is how you reason about any crypto.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Hybrid crypto &amp; TLS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P19</span><span class="tag theory">Method &middot; how HTTPS works</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Hybrid Cryptography &mdash; How TLS Actually Works</h1>
+      <p class="lede">HTTPS isn&#39;t one algorithm &mdash; it&#39;s all three tools working together. Watch asymmetric set up a symmetric channel.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The best of both</span><p>Asymmetric crypto is secure but slow; symmetric is fast but needs a shared key. <strong>TLS</strong> (the S in HTTPS) uses both: asymmetric crypto to <em>exchange a symmetric session key</em> safely, then fast symmetric AES for the actual data &mdash; with a signature-backed certificate proving the server&#39;s identity. This is the &quot;hybrid&quot; model, and it is why HTTPS defeated the sniffing and SSL-strip attacks from Session 9. Watch it.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="The TLS hybrid handshake: the client verifies the server's certificate, uses asymmetric crypto to agree a symmetric session key, then both switch to fast AES for the data.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">CLIENT</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">browser</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">TLS HANDSHAKE</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">asymmetric + certs</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--red)">SERVER</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">has the cert</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:26px">
+          <text x="537" y="106" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">1 · server sends its certificate (signed by a CA)</text>
+          <path d="M884,120 L191,120" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">2 · client verifies the signature chain</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="537" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">3 · agree a symmetric session key (asymmetric/DH)</text>
+          <path d="M191,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">4 · switch to fast AES for all the data</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">why S9&#39;s sniffing/SSL-strip failed against it</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The certificate contains the server&#39;s public key and a CA signature proving its identity &mdash; asymmetric signatures at work (S4-era PKI).</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The client checks the CA signature &mdash; if it does not verify, the padlock breaks. This is what an attacker cannot forge.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Using the server&#39;s public key or Diffie-Hellman, both sides derive a shared symmetric key &mdash; without ever sending it in the clear.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The slow asymmetric part is over; the session now uses fast symmetric AES. Confidentiality + integrity for the whole conversation.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Sniffing sees only AES ciphertext; SSL-strip is defeated by HSTS forcing this handshake. The hybrid model is the defence you kept meeting.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; watch a real TLS handshake and its certificate</span><pre><code>openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null | openssl x509 -noout -issuer -subject -dates
+# you see: the CA that signed it (issuer), the identity (subject), and validity dates
+# the whole hybrid dance happened before any data — asymmetric to set up, symmetric to run</code></pre><p style="margin-top:8px"><b>You should see:</b> the certificate&#39;s issuer/subject/validity are the asymmetric-signature half of TLS; once verified, the session drops to fast AES. This one handshake is why every S8&ndash;9 defence (TLS, HSTS, cert pinning) works.</p></div><div class="box key-takeaway"><span class="box-t">All three tools, one protocol</span><p><strong class="hl">TLS = asymmetric to exchange the key + signatures for identity + symmetric for speed.</strong> The hybrid model is why HTTPS is both secure and fast &mdash; and why it defeated the network attacks you ran in Session 9.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Hashing &amp; where crypto breaks">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P20</span><span class="tag theory">Method &middot; integrity &amp; failure</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Hashing, Signatures, and How Crypto Fails in Practice</h1>
+      <p class="lede">The math is rarely broken; the deployment is. Learn integrity and signatures &mdash; and the weak algorithms and mistakes that actually cause breaches.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Crypto fails at the edges</span><p>Modern algorithms (AES, SHA-256, RSA-2048) are not broken by brute force. Crypto fails in <strong>deployment</strong>: an <em>old</em> algorithm (MD5, SHA-1, WEP, DES), a <em>weak key/passphrase</em> (your WPA2 crack), <em>no salt</em> on password hashes (S4), or <em>trusting an unverified</em> signature. Knowing where it breaks is what makes you useful &mdash; both to attack weak crypto and to recommend the fix.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:23%"><col style="width:25%"><col style="width:52%"></colgroup>
+      <thead><tr><th>Mechanism</th><th>Provides</th><th>How it fails in practice</th></tr></thead>
+      <tbody>
+      <tr><td>Hashing (SHA-256)</td><td>integrity</td><td>using MD5/SHA-1 (collisions); no salt on password hashes &rarr; rainbow tables (S4)</td></tr>
+      <tr><td>Digital signature</td><td>authenticity + non-repudiation</td><td>not verifying the signature; trusting a self-signed / expired cert</td></tr>
+      <tr><td>Symmetric (AES)</td><td>confidentiality</td><td>legacy DES/3DES; ECB mode; a hardcoded/reused key</td></tr>
+      <tr><td>Asymmetric (RSA/ECC)</td><td>key exchange + signatures</td><td>short keys (RSA-1024); a leaked private key; no cert validation</td></tr>
+      <tr><td>Wireless (WPA2)</td><td>Wi-Fi confidentiality</td><td>a weak passphrase &rarr; offline handshake crack (this session)</td></tr>
+      </tbody></table></div>
+      <div class="box intro"><span class="box-t">Signatures in one line</span><p>A <strong>digital signature</strong> is a hash of the message encrypted with the sender&#39;s <em>private</em> key. Anyone with the <em>public</em> key can verify it &mdash; proving the message is authentic and unmodified. It is how your browser trusts a certificate and how software updates are verified. The failure is not the math; it is <em>not checking</em> it.</p></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; catch a weak hash and prove integrity</span><pre><code># identify a broken algorithm by its digest length / format:
+echo -n x | md5sum      # 32 hex chars = MD5  (BROKEN — flag it)
+echo -n x | sha1sum     # 40 hex chars = SHA-1 (deprecated — flag it)
+echo -n x | sha256sum   # 64 hex chars = SHA-256 (good)
+# integrity check: change one byte of a file and watch the whole hash change</code></pre><p style="margin-top:8px"><b>You should see:</b> the digest length fingerprints the algorithm &mdash; 32 hex = MD5 and 40 = SHA-1 are immediate findings. And flipping one byte changes the entire hash, which is exactly the integrity property that makes hashing useful for tamper-detection.</p></div><div class="box key-takeaway"><span class="box-t">Attack the deployment, not the math</span><p><strong class="hl hl-d">Modern crypto is strong; its use is often weak.</strong> Old algorithms, weak keys, missing salt, unverified signatures &mdash; that is where you find (and fix) crypto failures. Recommend current algorithms and, above all, <em>verify</em>.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab D: crypto in practice">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P21</span><span class="tag lab">Hands-on &middot; everyone &middot; foundation</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab D &mdash; Hash, Encrypt, Sign, and Spot the Weakness</h1>
+      <p class="lede">Get your hands on all three tools with OpenSSL, then audit a target&#39;s crypto for the weak algorithms that are real findings.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">From theory to command line</span><p>You will use each cryptographic tool directly, then do what a pentester does: <strong>audit</strong> a target&#39;s crypto &mdash; certificate, cipher suites, hash algorithms &mdash; and flag the weak ones. Crypto findings are real report items, and they are found by inspection.</p></div>
+      <ol class="steps">
+<li>
+<b>The three tools</b> &mdash; run each and see the job it does:
+<pre><code>echo -n 'data' | sha256sum                      # integrity (one-way)
+openssl enc -aes-256-cbc -pbkdf2 -in f -out f.enc     # confidentiality (symmetric)
+openssl genrsa -out k.pem 2048 && openssl rsa -in k.pem -pubout -out k.pub  # key pair</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Hash, symmetric encryption, and an asymmetric key pair &mdash; the three jobs in three commands, now under your own hands.</li></ul></div>
+</li>
+<li>
+<b>Sign and verify</b> &mdash; the mechanism behind certificates and updates:
+<pre><code>openssl dgst -sha256 -sign k.pem -out sig f      # sign a file with the PRIVATE key
+openssl dgst -sha256 -verify k.pub -signature sig f  # verify with the PUBLIC key -> 'Verified OK'</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Signing with the private key and verifying with the public proves authenticity + integrity &mdash; exactly how your browser trusts a TLS certificate.</li></ul></div>
+</li>
+<li>
+<b>Audit a target&#39;s crypto</b> &mdash; the pentester&#39;s move (your own/authorised host):
+<pre><code># certificate + protocol/cipher review:
+openssl s_client -connect TARGET:443 </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates
+nmap --script ssl-enum-ciphers -p 443 TARGET   # lists supported TLS versions + weak ciphers</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">ssl-enum-ciphers</span> grades every cipher suite &mdash; SSLv3/TLS1.0, RC4, or export ciphers are immediate findings, as are expired/self-signed certs.</li></ul></div>
+</li>
+<li>
+<b>Report the weaknesses</b> &mdash; crypto findings are one-liners:
+<pre><code># example findings:
+#   'TLS 1.0 + RC4 supported — deprecated, downgrade risk -> disable, require TLS 1.2+'
+#   'password hashes are unsalted MD5 -> migrate to bcrypt/argon2 (S4)'
+#   'WPA2 passphrase weak -> long random passphrase or WPA3'
+# each: the weak crypto + the modern replacement.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Weak protocol/cipher/hash + the modern fix &mdash; that is a crypto finding. You now audit and remediate the foundation under every other session.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">You can now use and audit crypto</span><p><strong class="hl">Three tools, one audit skill.</strong> Hash, encrypt, sign &mdash; and grade a target&#39;s certificate and ciphers for the weak deployments that are real findings. The foundation under all ten sessions is now yours to inspect.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The everywhere SOC flip">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P22</span><span class="tag defensive">Defender &middot; detect across the sweep</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Every Attack Today, and How It&#39;s Caught</h1>
+      <p class="lede">Four new surfaces, four detections. The defender&#39;s view of the whole sweep &mdash; and the theme that unifies the diploma.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Detection follows the surface</span><p>Evasion, wireless, the modern surface &mdash; each still leaves a signal to the right sensor. Learn the four and you can monitor the terrain you attacked in this session. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Interactive map: four attacks in orange on the left, each paired with its detection in green on the right. Click each.">
+          <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">ATTACK</text>
+          <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees</text>
+          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <g class="node" data-node="ev" tabindex="0"><rect x="20" y="48" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="70" font-size="12">IDS/FW evasion (frag, tunnel)</text><text class="d-sub" x="38" y="90" class="d-mono">fragmented scan / DNS tunnel</text></g>
+          <rect x="490" y="48" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="70" font-size="13" fill="#4ade80" class="d-mono">reassembly + DNS analytics</text><text class="d-sub" x="508" y="90">full frag reassembly; high-volume/high-entropy DNS</text><path d="M450,74 L488,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="wifi" tabindex="0"><rect x="20" y="112" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="134" font-size="12">Wireless (deauth, evil twin)</text><text class="d-sub" x="38" y="154" class="d-mono">deauth flood / rogue AP</text></g>
+          <rect x="490" y="112" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="134" font-size="13" fill="#4ade80" class="d-mono">WIDS</text><text class="d-sub" x="508" y="154">deauth-frame flood + a duplicate/rogue SSID/BSSID</text><path d="M450,138 L488,138" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="cloud" tabindex="0"><rect x="20" y="176" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="198" font-size="12">Cloud/IoT (open bucket, default creds)</text><text class="d-sub" x="38" y="218" class="d-mono">anonymous access / vendor login</text></g>
+          <rect x="490" y="176" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="198" font-size="13" fill="#4ade80" class="d-mono">CSPM + access logs</text><text class="d-sub" x="508" y="218">config scan flags public bucket; anonymous GETs logged</text><path d="M450,202 L488,202" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="crypto" tabindex="0"><rect x="20" y="240" width="430" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="262" font-size="12">Weak crypto (downgrade, old cipher)</text><text class="d-sub" x="38" y="279" class="d-mono">TLS 1.0 / RC4 / MD5</text></g>
+          <rect x="490" y="240" width="430" height="46" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="260" font-size="12.5" fill="#4ade80">scanner + TLS inventory</text><text class="d-sub" x="508" y="278">ssl-enum-ciphers / continuous cert &amp; cipher inventory</text><path d="M450,263 L488,263" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the sensor that catches the evaded/emerging attack.</div>
+        <div class="dgm-detail" data-detail="ev"><h5><span class="dd-tag">EVASION &rarr; reassembly + analytics</span>Beat the wrapper</h5><p><b>A well-configured IDS with full stream/fragment reassembly re-detects the fragmented scan; DNS tunneling is caught by analytics on query volume and subdomain entropy to a single domain.</b> Evasion beats a naive sensor, not a layered, well-tuned one &mdash; the Lab A lesson.</p></div>
+        <div class="dgm-detail" data-detail="wifi"><h5><span class="dd-tag">WIRELESS &rarr; WIDS</span>The air has sensors too</h5><p><b>A Wireless IDS flags a flood of deauthentication frames (the attack primitive) and the appearance of a rogue AP broadcasting a duplicate SSID/BSSID (the evil twin).</b> Controls: 802.11w Protected Management Frames and WPA3 remove the deauth primitive entirely.</p></div>
+        <div class="dgm-detail" data-detail="cloud"><h5><span class="dd-tag">CLOUD/IoT &rarr; CSPM + logs</span>Config is the sensor</h5><p><b>Cloud Security Posture Management continuously scans for public buckets and over-permissioned IAM; access logs record the anonymous GETs; device inventories flag default-credentialed and unpatched IoT.</b> Because the flaw is configuration, detection is continuous config scanning, not payload matching.</p></div>
+        <div class="dgm-detail" data-detail="crypto"><h5><span class="dd-tag">CRYPTO &rarr; inventory + scan</span>Find the weak deployment</h5><p><b>A TLS/cipher scanner (<span class="mono">ssl-enum-ciphers</span>, testssl.sh) and a continuous certificate/cipher inventory surface deprecated protocols (TLS 1.0), weak ciphers (RC4), and expiring/old-algorithm certs.</b> The failure is deployment, so the detection is auditing the deployment.</p></div>
+      </figure>
+      <div class="box key-takeaway"><span class="box-t">Every surface has a sensor</span><p><strong class="hl hl-d">Evasion, wireless, cloud, crypto &mdash; each leaves a signal to the right tool.</strong> Reassembly + DNS analytics, WIDS, CSPM, and TLS inventory. The diploma&#39;s theme, one last time: every attack is detectable if you know where to look.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab E: the capstone">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P23</span><span class="tag lab">Hands-on &middot; deliverable &middot; capstone</span><span class="time">&#9201; 20 min</span></div>
+      <h1>Lab E &mdash; The Defence-in-Depth Capstone</h1>
+      <p class="lede">Tie all ten sessions together: assess a target across every layer and write the report that shows how the defences fit &mdash; and fail &mdash; as one system.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The whole diploma in one deliverable</span><p>This is the capstone. Take a lab environment and assess it across <strong>every layer you have learned</strong> &mdash; recon, exploitation, privesc, malware, web, network, evasion, wireless, cloud, crypto &mdash; then write a <strong>defence-in-depth report</strong> that shows how the controls layer, where the gaps are, and what to fix first. This is what a real assessment produces, and it is your graduation piece.</p></div>
+      <ol class="steps">
+<li>
+<b>Assess across the layers</b> &mdash; walk the whole chain against the lab, noting findings at each:
+<pre><code># recon/scan (S2-3) -> exposure ; access/exploit (S4-5) -> footholds
+# privesc (S6) -> escalation paths ; malware (S7) -> detection gaps
+# web (S8) -> injection ; network (S9) -> MITM/session/DoS
+# this session (S10) -> evasion posture, wireless, cloud config, crypto</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A single pass across all ten sessions produces a layered picture &mdash; not a list of unrelated bugs, but how an attacker would chain them.</li></ul></div>
+</li>
+<li>
+<b>Map the defence-in-depth</b> &mdash; for each finding, which layer of control failed and which caught it:
+<pre><code># e.g. web SQLi got a foothold (app control failed) BUT
+#   the LSASS dump was caught by Sysmon 10 (endpoint control held).
+# show the chain: where defence failed, where it held, where it would have stopped the attack.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Framing findings as a defence-in-depth chain &mdash; what failed, what held &mdash; is the difference between a bug list and an assessment a leader can act on.</li></ul></div>
+</li>
+<li>
+<b>Prioritise by risk and leverage</b> &mdash; the fixes that close the most attack paths first:
+<pre><code># top-leverage controls across the diploma:
+#   MFA (kills phished pw + limits stolen tokens) ; patching (kills S5 exploits)
+#   least privilege (limits S6 escalation) ; TLS+cookie flags (kills S9 sniffing)
+#   parameterised queries (kills S8 SQLi) ; config scanning (kills S10 cloud misconfig)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A prioritised, leverage-ranked plan &mdash; the handful of controls that each close many attack paths &mdash; is the most valuable page in any report.</li></ul></div>
+</li>
+<li>
+<b>Write the capstone report</b> using the template &mdash; the artifact that proves the diploma:
+<pre><code># structure: exec summary -> attack narrative (the chain) -> findings by layer
+#   -> defence-in-depth analysis -> prioritised remediation -> detections
+# this is a portfolio piece — the thing you show an employer.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The finished report demonstrates everything: you can attack across the stack, think in defence-in-depth, and communicate to a decision-maker. That is a job-ready deliverable.</li></ul></div>
+</li>
+</ol>
+      <div class="box do"><span class="box-t">Deliverable &mdash; your graduation piece</span><p>Produce the capstone using <span class="mono">exercises/session-10/capstone_report_template.md</span>. It spans all ten sessions and is the single best artifact for your portfolio &mdash; keep it, refine it, show it.</p></div><div class="box key-takeaway"><span class="box-t">Ten sessions, one system</span><p><strong class="hl">Security is layers, not a checklist.</strong> The capstone shows how attacks chain and how controls layer to break the chain. Thinking in defence-in-depth &mdash; not isolated bugs &mdash; is what makes you the professional this diploma set out to build.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Defence in depth">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P24</span><span class="tag defensive">Defensive &middot; the whole stack</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Defence in Depth &mdash; The Idea Behind Every Session</h1>
+      <p class="lede">No single control stops a determined attacker. The whole diploma has been building one idea: layer the defences so a gap in one is covered by the next.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The unifying principle</span><p>Every session ended in the same place: not one magic fix, but a <strong>layer</strong> that catches what the previous one missed. Patch to stop the exploit; least-privilege to limit the escalation; EDR to catch the malware; parameterised queries to kill the injection; TLS to protect the session; MFA to defang the phish; segmentation to contain the spread; monitoring to see it all. Attackers chain weaknesses; defenders chain controls.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:16%"><col style="width:44%"><col style="width:40%"></colgroup>
+      <thead><tr><th>Layer</th><th>Control</th><th>Stops (which session)</th></tr></thead>
+      <tbody>
+      <tr><td>Perimeter</td><td>firewall + IDS/IPS + egress filtering</td><td>scanning/evasion (S3, S10), C2 (S7)</td></tr>
+      <tr><td>Identity</td><td>MFA + least privilege + strong auth</td><td>phishing (S9), escalation (S6), cred reuse (S4)</td></tr>
+      <tr><td>Application</td><td>parameterised queries, output encoding, input validation</td><td>web injection (S8)</td></tr>
+      <tr><td>Endpoint</td><td>EDR/AV + patching + app allow-listing</td><td>exploitation (S5), malware (S7)</td></tr>
+      <tr><td>Network</td><td>TLS + segmentation + DAI + cookie flags</td><td>sniffing/MITM/hijack (S9)</td></tr>
+      <tr><td>Data</td><td>encryption + backups + access control</td><td>ransomware (S7), cloud exposure (S10)</td></tr>
+      <tr><td>Detection</td><td>SIEM + logging + a SOC that reads it</td><td><em>everything</em> &mdash; the SOC flip of every session</td></tr>
+      </tbody></table></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; trace one attack through the layers</span><pre><code># take the web-to-domain chain and mark each control that could break it:
+#   SQLi foothold      -> parameterised queries (app layer) would stop it
+#   privesc to SYSTEM  -> least privilege (identity) would limit it
+#   LSASS dump         -> EDR/Sysmon 10 (endpoint+detection) catches it
+#   lateral movement   -> segmentation (network) contains it
+# ONE control at any layer breaks the chain — that is defence in depth.</code></pre><p style="margin-top:8px"><b>You should see:</b> an attack needs every link; a defender needs to break just one. Tracing a real chain through the layers shows why no single control matters as much as <em>having a control at every layer</em>.</p></div><div class="box key-takeaway"><span class="box-t">Layers beat any single line</span><p><strong class="hl hl-d">Attackers chain weaknesses; defenders chain controls.</strong> A gap in one layer is covered by the next, and detection sits under all of it. That principle &mdash; not any one tool &mdash; is the real lesson of the diploma.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="What you can now do">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P25</span><span class="tag summary">Capstone &middot; the whole map</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Ten Sessions &mdash; The Whole Map</h1>
+      <p class="lede">Step back and see it: from your first ping sweep to a full-stack, both-chairs security professional. Here is everything you can now do.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The complete picture</span><p>You started by finding hosts on a network. You can now assess an organisation across every layer an attacker touches &mdash; and you can sit in the defender&#39;s chair for all of it. This is the arc:</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:12%"><col style="width:44%"><col style="width:44%"></colgroup>
+      <thead><tr><th>Session</th><th>You can attack</th><th>You can defend</th></tr></thead>
+      <tbody>
+      <tr><td>S1&ndash;2</td><td>footprint &amp; recon a target (OSINT, passive/active)</td><td>reduce your org&#39;s attack surface &amp; exposure</td></tr>
+      <tr><td>S3</td><td>scan networks &amp; read the protocols behind each service</td><td>detect scanning; read what the SOC sees on the wire</td></tr>
+      <tr><td>S4</td><td>enumerate, attack AD, crack &amp; roast credentials</td><td>catch enumeration &amp; credential attacks (4768/4769)</td></tr>
+      <tr><td>S5&ndash;6</td><td>exploit to a shell, then escalate to root/SYSTEM</td><td>detect exploitation, privesc &amp; LSASS access (Sysmon 10)</td></tr>
+      <tr><td>S7</td><td>build &amp; analyse malware, static and dynamic</td><td>write YARA/Sigma; run a sandbox &amp; triage</td></tr>
+      <tr><td>S8</td><td>break web apps &mdash; XSS, upload, SQLi to sqlmap</td><td>access-log detection; parameterise &amp; encode</td></tr>
+      <tr><td>S9</td><td>MITM, hijack sessions, phish, DoS</td><td>ARP/hijack/phish/flood detection; TLS+MFA+DAI</td></tr>
+      <tr><td>S10</td><td>evade defences, break Wi-Fi, sweep cloud/IoT, audit crypto</td><td>reassembly, WIDS, CSPM, TLS inventory &mdash; defence in depth</td></tr>
+      </tbody></table></div>
+      <div class="box key-takeaway"><span class="box-t">Both chairs, full stack</span><p><strong class="hl">You can attack across the whole stack and defend it.</strong> That dual fluency &mdash; the attacker&#39;s method and the defender&#39;s detection, on every layer &mdash; is exactly what makes a SOC analyst, a pentester, or a security engineer. It is yours now.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Where next">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P26</span><span class="tag resources">Practice &middot; the career</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Where Next &mdash; From Diploma to Career</h1>
+      <p class="lede">You have the map. Here is how to deepen it, prove it, and turn it into a role &mdash; the certifications, paths, and practice that follow CEH.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Breadth done &mdash; now choose depth</span><p>This diploma gave you <strong>breadth</strong>: the whole surface, both chairs. A career is <strong>depth</strong> in the part you love. Pick a direction, prove it with hands-on practice and a certification, and keep the capstone report as your portfolio anchor.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:18%"><col style="width:29%"><col style="width:53%"></colgroup>
+      <thead><tr><th>Direction</th><th>What it is</th><th>Next steps</th></tr></thead>
+      <tbody>
+      <tr><td>Offensive / pentest</td><td>find &amp; exploit, professionally</td><td>OSCP (hands-on), PNPT, HTB/PG practice; build the S8/S10 reports into a portfolio</td></tr>
+      <tr><td>Defensive / SOC (your track)</td><td>detect &amp; respond &mdash; the blue team</td><td>BTL1 / CySA+ / the SOC-analyst path; deepen Wazuh/Sigma/Splunk from every SOC-flip page</td></tr>
+      <tr><td>DFIR</td><td>forensics &amp; incident response</td><td>GCFA/GCIH-style paths; build on the S7 malware-analysis workflow</td></tr>
+      <tr><td>GRC</td><td>governance, risk &amp; compliance</td><td>ISO 27001 / risk frameworks; the report-writing you practised all diploma</td></tr>
+      </tbody></table></div>
+      <div class="box do"><span class="box-t">Keep the reps going (free)</span><p>The habits that made this diploma stick: <strong>TryHackMe</strong> and <strong>Hack The Box</strong> for hands-on rooms across every topic; <strong>PortSwigger Web Security Academy</strong> (free) for web depth; <strong>LetsDefend</strong> / <strong>Blue Team Labs Online</strong> for the defensive side; and build a <strong>home lab</strong> &mdash; the one you used all diploma &mdash; to try anything safely. One room a week keeps the edge.</p></div><div class="box key-takeaway"><span class="box-t">Breadth to depth to role</span><p><strong class="hl">You have the whole map; now go deep where it grabs you.</strong> Pick a direction, prove it hands-on, certify it, and let the capstone report open the door. The diploma was the foundation &mdash; the career is the build.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P27</span><span class="tag assess">Assess &middot; 6 questions</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Final Knowledge Check</h1>
+      <p class="lede">Six questions across the session. Answer before you reveal &mdash; each explains the reasoning, not just the letter.</p>
+    </div>
+    <div class="content">
+<div class="quiz"><div class="q mcq" data-correct="c" data-why="A signature-based IDS matches known-bad patterns, so it is beaten by changing the bytes (fragmentation, encoding); an anomaly-based IDS learns a baseline, so it is beaten by looking normal or going low-and-slow. The detection method dictates the evasion.">
+  <p><span class="qn">Q1</span>Which evasion technique defeats a signature-based IDS specifically?</p>
+  <ul class="opts"><li data-opt="a">Going low-and-slow under a rate threshold</li><li data-opt="b">Blending into normal traffic patterns</li><li data-opt="c">Fragmenting/encoding the payload so the exact signature bytes never appear together</li><li data-opt="d">Sending traffic during business hours</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="b" data-why="DNS tunneling encapsulates blocked traffic inside allowed DNS queries, so it passes a firewall that permits DNS — but the abnormal volume and long high-entropy subdomains to one domain give it away to DNS analytics. Firewall rules pass traffic; behaviour betrays it.">
+  <p><span class="qn">Q2</span>An attacker gets a shell out of a network that blocks everything except DNS. How, and how is it caught?</p>
+  <ul class="opts"><li data-opt="a">They crack the firewall; caught by the firewall logs</li><li data-opt="b">DNS tunneling; caught by DNS analytics (high volume, long random subdomains)</li><li data-opt="c">They disable the firewall; caught by a config alert</li><li data-opt="d">Port scanning; caught by an IDS signature</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="d" data-why="The WPA2 handshake attack is dangerous because cracking happens offline: a few seconds near the AP captures the 4-way handshake, then the passphrase is brute-forced on the attacker's own hardware with no rate limit or lockout. A weak passphrase is the whole vulnerability.">
+  <p><span class="qn">Q3</span>Why is capturing a WPA2 handshake so dangerous even though WPA2 uses strong AES?</p>
+  <ul class="opts"><li data-opt="a">AES is actually broken</li><li data-opt="b">The handshake contains the plaintext password</li><li data-opt="c">It lets you decrypt all past traffic instantly</li><li data-opt="d">The passphrase can then be cracked offline — no rate limit, no lockout</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="a" data-why="Most cloud breaches are misconfiguration on the customer's side of shared responsibility — a public storage bucket, over-permissioned IAM — not provider exploits. The bucket's data may be encrypted; the access control is what failed.">
+  <p><span class="qn">Q4</span>What causes the majority of real-world cloud data exposures?</p>
+  <ul class="opts"><li data-opt="a">Customer misconfiguration (e.g. a public storage bucket), not provider exploits</li><li data-opt="b">Weak encryption algorithms in the cloud provider</li><li data-opt="c">The provider's hypervisor being hacked</li><li data-opt="d">DDoS attacks on the data centre</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="b" data-why="TLS is hybrid: asymmetric crypto (plus a signed certificate for identity) securely exchanges a symmetric session key, then fast symmetric AES encrypts the bulk data. This combines asymmetric security with symmetric speed.">
+  <p><span class="qn">Q5</span>How does TLS combine the cryptographic tools?</p>
+  <ul class="opts"><li data-opt="a">It uses only RSA for everything</li><li data-opt="b">Asymmetric exchanges a symmetric key (with a signed cert for identity), then symmetric AES encrypts the data</li><li data-opt="c">It hashes the data and sends the hash</li><li data-opt="d">It uses only AES with a pre-shared key</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="c" data-why="Modern algorithms (AES, SHA-256, RSA-2048) aren't broken by brute force — crypto fails in deployment: old algorithms (MD5/SHA-1/WEP), weak keys/passphrases, missing salt, or unverified signatures. Attack and audit the deployment, not the math.">
+  <p><span class="qn">Q6</span>Where does cryptography most commonly fail in practice?</p>
+  <ul class="opts"><li data-opt="a">The core algorithms are brute-forced</li><li data-opt="b">Quantum computers break it routinely today</li><li data-opt="c">In deployment — old algorithms, weak keys, missing salt, unverified signatures</li><li data-opt="d">Hashing is reversible</li></ul>
+  <div class="mcq-fb"></div>
+</div></div><div class="box key-takeaway"><span class="box-t">Score yourself</span><p><strong class="hl">5&ndash;6 right:</strong> you have swept the whole surface &mdash; go deep on your chosen track. <strong>3&ndash;4:</strong> re-read the evasion and crypto pages. <strong>&lt;3:</strong> rewatch the wireless and TLS diagrams &mdash; they anchor the session.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Takeaways">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S10 &middot; P28</span><span class="tag summary">Wrap-up &middot; graduation</span><span class="time">&#9201; 4 min</span></div>
+      <h1>Session 10 &mdash; And the Whole Diploma</h1>
+      <p class="lede">Ten things from this session, and one from the whole journey. You started with a ping sweep; you finish a full-stack security professional.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The final durable core</span><p>This session swept the last of the surface &mdash; the defences to evade, the air, the modern platforms, the crypto beneath &mdash; and tied ten sessions into one way of thinking. Here is what you keep.</p></div>
+      <ol class="takeaways">
+        <li><strong>Evasion targets the detection method.</strong> Signature &rarr; change the bytes; anomaly &rarr; look normal or go slow.</li>
+        <li><strong>Firewall rules pass traffic; behaviour betrays it.</strong> Tunnel through an allowed protocol, but the volume/entropy is the tell.</li>
+        <li><strong>An implausibly easy target may be a honeypot.</strong> Any touch of it is a detection.</li>
+        <li><strong>Wireless security = the protocol and the passphrase.</strong> WEP is dead, WPA2 falls to a weak passphrase offline, WPA3 fixes it.</li>
+        <li><strong>Deauth is the master primitive.</strong> It enables handshake capture, wireless DoS, and the evil twin &mdash; PMF/WPA3 close it.</li>
+        <li><strong>The perimeter is in every pocket.</strong> Mobile moves trusted data outside the walls; MDM + pinning + official stores cover it.</li>
+        <li><strong>The dumb device is the way in.</strong> IoT/OT fails on default creds, old firmware, no-auth protocols &mdash; with physical stakes.</li>
+        <li><strong>Cloud fails on configuration, not exploitation.</strong> Public buckets, over-permissioned keys &mdash; secure <em>in</em> the cloud.</li>
+        <li><strong>Match the crypto tool to the job.</strong> Symmetric = confidentiality, asymmetric = key exchange + signatures, hashing = integrity.</li>
+        <li><strong>Crypto fails in deployment.</strong> Old algorithms, weak keys, missing salt, unverified signatures &mdash; attack and audit the use, not the math.</li>
+      </ol><div class="box bridge"><span class="box-t">The one takeaway from the whole diploma</span><p><strong>Security is layers, and every attack is detectable if you know where to look.</strong> You can now attack across the entire stack &mdash; recon to cloud &mdash; and sit in the defender&#39;s chair for all of it. Attackers chain weaknesses; you have learned to chain controls, and to read the signal every attack leaves behind. That dual fluency is the whole point &mdash; and it is yours.</p></div><div class="box key-takeaway"><span class="box-t">Congratulations &mdash; you finished the CEH Diploma</span><p><strong class="hl">Ten sessions, both chairs, the full stack.</strong> From your first ping sweep to a defence-in-depth capstone, you built the complete picture. Now pick your depth, keep the reps going, and go do the work. &#127891;</p></div>
+    </div>
+  </section>
+
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">&mdash;</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">&mdash;</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap"><p>CEH Diploma · ITGate Academy · Session 10 — Evasion, Wireless & Emerging Tech</p></div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
