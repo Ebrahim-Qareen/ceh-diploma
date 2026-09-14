@@ -133,3 +133,49 @@ card flipped to Delivered), `labs/lab_design.md`, `labs/setup_guide.md`, `design
 - Run `lab_s4_dc_setup.ps1` on the real lab and confirm the labs return data; capture the three deferred shots.
 - `git push` via GitHub Desktop (Cowork has no push credentials) — commit is staged locally per logical change.
 - Note: **Session 3 is also still uncommitted** in the working tree — review both S3 and S4 in GitHub Desktop before pushing.
+
+
+---
+
+## Rebuild 2026-09-11 (stronger / more visual — "watch it, don't read it")
+
+Raised S4 to S3's structural standard and increased motion + real imagery, per the S4-rebuild brief.
+Edited **in place** (no `_v2`). Verification below is green.
+
+**Protocol-first (biggest lift).** NTLM, Kerberos and LLMNR mechanism diagrams converted from
+whole-figure `animate-run` replays to **stepped `.dgm.pktflow`** Back/Play/Next flows (shared S3
+component, no new JS): NTLM 4 steps (negotiate/challenge/response + Responder insertion), Kerberos
+5 steps across 3 actors (AS/TGS with both bleed badges revealed in place), LLMNR 6 steps
+(DNS-fail → broadcast → poison → capture). A student can now *step* each protocol and see exactly
+where it bleeds.
+
+**Interactive defender map.** The static P23 attacker→log pairing rebuilt as a **click-to-reveal
+`.dgm.interactive`** map, 5 rows (spray→4625, Kerberoast→4769/0x17, **AS-REP→4768**, LLMNR→network/EDR,
+**pass-the-hash→4624 LogonType 3**), each panel giving the exact field a Lab 7 rule keys on. Node keys
+namespaced `lg-*` to stay unique against the P13 taxonomy.
+
+**Real web captures (the vuln-analysis half).** Three live screenshots captured via the instructor's
+browser and wired as `<figure class="shot">` (total ~90 KB): **NVD** CVE-2017-0144 (8.8 HIGH + vector)
+and the **FIRST CVSS calculator** with that vector loaded (P5), and the **Exploit-DB** entry 42315
+(EternalBlue, EDB-Verified ✓, REMOTE) on P6. One worked CVE — NVD → CVSS → Exploit-DB → *fired in S5*.
+The three domain/Event-Viewer panels stay as self-contained HTML sims (no Windows/AD in this env).
+
+**Highlighter pass.** 14 → **43 highlights**, ≥1 on every teaching page (amber rule / green SOC /
+red danger), riding existing bold; `Break` + `Knowledge check` excluded.
+
+**New hands-on: AS-REP roasting.** Added as **Lab 6 · Step 3** (page) + `impacket-GetNPUsers -no-pass`
+→ `hashcat -m 18200`, with a seeded target: new **`-Stage ASREPRoast`** in `scripts/lab_s4_dc_setup.ps1`
+creates `svc_legacy` with pre-auth disabled + a weak password (secrets prompted, credential-scanned clean).
+`labs/lab_design.md` (§1b) and `docs/session-04/guided_lab.md` updated to match.
+
+**Verification (container Playwright, chromium-1194):**
+- `scripts/audit_layout.js` **18/18** at 1920/1400/1100/900/700/480 (edges, padding, colgroup, overflow,
+  **SVG-breakout check 5**) — S4 + S3 + dashboard all clean.
+- 3 pktflow figures wire correctly (steps in-SVG = caps, counts 1/4·1/5·1/6, Next advances); **0** SVG text
+  outside viewBox; **33 interactive nodes, 0 orphans**; **0 duplicate ids**; **0 page/console errors**;
+  all 4 `.shot` images load; sims play/replay.
+- `gen_table_colgroups.py` re-run: 18 tables / 18 colgroups, 0 widened.
+
+**Still deferred (unchanged):** the three domain captures (Responder / GetUserSPNs / Event Viewer) need the
+instructor's monitored Windows lab; the polished HTML panels stand in and cannot 404. Instructor review →
+`git push` via GitHub Desktop (no push credentials in Cowork).

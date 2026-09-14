@@ -816,3 +816,40 @@ details.rep-group .rep-group-title{color:var(--text)}
 .sim-evt .lvl-i{color:#22d3ee}
 .sim-evt .hlrow td{background:rgba(230,57,70,.07)}
 .sim-evt .k{color:#fbbf24;font-weight:700}
+
+/* ==========================================================================
+   Tool card — original tool badge + goal/how/example (S4 tools; reusable)
+   Original themed icons (NOT vendor logos). Accent via data-accent.
+   ========================================================================== */
+.toolcard{--tc:var(--orange);display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;
+  border:1px solid var(--line);border-left:3px solid var(--tc);border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+  padding:14px 18px;margin:22px 0 10px;box-shadow:var(--depth)}
+.toolcard[data-accent="orange"]{--tc:var(--orange)}
+.toolcard[data-accent="green"]{--tc:var(--green)}
+.toolcard[data-accent="cyan"]{--tc:var(--cyan)}
+.toolcard[data-accent="purple"]{--tc:var(--purple)}
+.toolcard[data-accent="amber"]{--tc:var(--amber)}
+.toolcard[data-accent="red"]{--tc:var(--red)}
+.tool-badge{display:flex;align-items:center;gap:13px;min-width:210px}
+.tool-ico{width:46px;height:46px;flex:0 0 46px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line-soft);padding:7px;display:block}
+.tool-ico svg{width:100%;height:100%;display:block}
+.tool-id{display:flex;flex-direction:column;line-height:1.15}
+.tool-name{font-family:var(--mono);font-weight:800;font-size:20px;color:var(--tc);letter-spacing:.3px}
+.tool-tag{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3);margin-top:3px}
+.tool-meta{flex:1 1 320px;min-width:0;font-size:14px}
+.tool-meta p{margin:0 0 6px}
+.tool-meta p:last-child{margin-bottom:0}
+.tm-k{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--tc);background:rgba(255,255,255,.05);
+  border:1px solid var(--line-soft);border-radius:5px;padding:1px 7px;margin-right:8px;vertical-align:1px}
+/* how-to steps + example under a toolcard */
+.tool-how{margin:6px 0 4px;padding-left:0;list-style:none;counter-reset:th}
+.tool-how li{position:relative;padding:5px 0 5px 30px;font-size:14px;border-bottom:1px solid var(--line)}
+.tool-how li:last-child{border-bottom:0}
+.tool-how li::before{counter-increment:th;content:counter(th);position:absolute;left:0;top:5px;
+  width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--line-soft);
+  color:var(--text-2);font-family:var(--mono);font-size:11px;font-weight:700;display:grid;place-items:center}
+.tool-eg{margin:4px 0 0}
+.tool-eg .eg-k{font-family:var(--mono);font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--text-3);display:block;margin:10px 0 4px}

