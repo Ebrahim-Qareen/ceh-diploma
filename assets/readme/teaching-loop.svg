@@ -1,68 +1,69 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-label="How every CEH topic is taught — attack paired with detection">
 <title>How every CEH topic is taught — attack paired with detection</title>
 <defs>
-<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B1220"/><stop offset="1" stop-color="#111C33"/></linearGradient>
-<linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
-<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#1E2A45" stroke-width="1"/></pattern>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d1117"/><stop offset="1" stop-color="#131720"/></linearGradient>
+<linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#ff7043"/></linearGradient>
+<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#252b38" stroke-width="1"/></pattern>
 <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-<marker id="arrow-1E3A5F" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1E3A5F"/></marker>
+<marker id="arrow-333b4c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#333b4c"/></marker>
 </defs>
 <rect width="1200" height="300" rx="16" fill="url(#bg)"/>
+<rect x="0.75" y="0.75" width="1198.5" height="298.5" rx="16" fill="none" stroke="#252b38" stroke-width="1.5"/>
 <rect width="1200" height="300" rx="16" fill="url(#grid)" opacity="0.55"/>
 <rect x="0" y="0" width="6" height="300" rx="3" fill="url(#accent)"/>
-<text x="34" y="38" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" fill="#E2E8F0">Teaching loop</text>
-<text x="34" y="60" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#94A3B8">Every offensive technique is paired with what the defender sees</text>
+<text x="34" y="38" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" fill="#e4e8ee">Teaching loop</text>
+<text x="34" y="60" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#a0aab6">Every offensive technique is paired with what the defender sees</text>
 <g transform="translate(34,100)">
-<rect width="170" height="80" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
-<rect width="4" height="80" rx="2" fill="#3B82F6"/>
-<g transform="translate(14,12)"><path d="M4 4h8a3 3 0 013 3v17a2 2 0 00-2-2H4zM24 4h-8a3 3 0 00-3 3v17a2 2 0 012-2h9z" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linejoin="round"/></g>
-<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">Concept</text>
-<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">why it works</text>
+<rect width="170" height="80" rx="10" fill="#1a1f2a" stroke="#333b4c" stroke-width="1.5"/>
+<rect width="4" height="80" rx="2" fill="#ff7043"/>
+<g transform="translate(14,12)"><path d="M4 4h8a3 3 0 013 3v17a2 2 0 00-2-2H4zM24 4h-8a3 3 0 00-3 3v17a2 2 0 012-2h9z" fill="none" stroke="#ff7043" stroke-width="2" stroke-linejoin="round"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#e4e8ee">Concept</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#a0aab6">why it works</text>
 </g>
 <g transform="translate(230,100)">
-<rect width="170" height="80" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
-<rect width="4" height="80" rx="2" fill="#EF4444"/>
-<g transform="translate(14,12)"><circle cx="14" cy="14" r="9" fill="none" stroke="#EF4444" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="#EF4444"/><path d="M14 1v6M14 21v6M1 14h6M21 14h6" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/></g>
-<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">Attack</text>
-<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">run it on the lab</text>
+<rect width="170" height="80" rx="10" fill="#1a1f2a" stroke="#333b4c" stroke-width="1.5"/>
+<rect width="4" height="80" rx="2" fill="#e63946"/>
+<g transform="translate(14,12)"><circle cx="14" cy="14" r="9" fill="none" stroke="#e63946" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="#e63946"/><path d="M14 1v6M14 21v6M1 14h6M21 14h6" stroke="#e63946" stroke-width="2" stroke-linecap="round"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#e4e8ee">Attack</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#a0aab6">run it on the lab</text>
 </g>
 <g transform="translate(426,100)">
-<rect width="170" height="80" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
-<rect width="4" height="80" rx="2" fill="#22D3EE"/>
-<g transform="translate(14,12)"><path d="M2 14s4.5-8 12-8 12 8 12 8-4.5 8-12 8S2 14 2 14z" fill="none" stroke="#22D3EE" stroke-width="2"/><circle cx="14" cy="14" r="3.5" fill="#22D3EE"/></g>
-<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">Defender view</text>
-<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">logs · alert</text>
+<rect width="170" height="80" rx="10" fill="#1a1f2a" stroke="#333b4c" stroke-width="1.5"/>
+<rect width="4" height="80" rx="2" fill="#22d3ee"/>
+<g transform="translate(14,12)"><path d="M2 14s4.5-8 12-8 12 8 12 8-4.5 8-12 8S2 14 2 14z" fill="none" stroke="#22d3ee" stroke-width="2"/><circle cx="14" cy="14" r="3.5" fill="#22d3ee"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#e4e8ee">Defender view</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#a0aab6">logs · alert</text>
 </g>
 <g transform="translate(622,100)">
-<rect width="170" height="80" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
-<rect width="4" height="80" rx="2" fill="#F59E0B"/>
-<g transform="translate(14,12)"><path d="M6 26V3M6 4h16l-4 5 4 5H6" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></g>
-<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">ATT&amp;CK ID</text>
-<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">technique mapped</text>
+<rect width="170" height="80" rx="10" fill="#1a1f2a" stroke="#333b4c" stroke-width="1.5"/>
+<rect width="4" height="80" rx="2" fill="#fbbf24"/>
+<g transform="translate(14,12)"><path d="M6 26V3M6 4h16l-4 5 4 5H6" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#e4e8ee">ATT&amp;CK ID</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#a0aab6">technique mapped</text>
 </g>
 <g transform="translate(818,100)">
-<rect width="170" height="80" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
-<rect width="4" height="80" rx="2" fill="#A78BFA"/>
-<g transform="translate(14,12)"><circle cx="14" cy="14" r="11" fill="none" stroke="#A78BFA" stroke-width="2"/><path d="M3 14h22M14 3c-4 4-4 18 0 22M14 3c4 4 4 18 0 22" fill="none" stroke="#A78BFA" stroke-width="1.6"/></g>
-<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">Practice</text>
-<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">THM · HTB · OTW</text>
+<rect width="170" height="80" rx="10" fill="#1a1f2a" stroke="#333b4c" stroke-width="1.5"/>
+<rect width="4" height="80" rx="2" fill="#a78bfa"/>
+<g transform="translate(14,12)"><circle cx="14" cy="14" r="11" fill="none" stroke="#a78bfa" stroke-width="2"/><path d="M3 14h22M14 3c-4 4-4 18 0 22M14 3c4 4 4 18 0 22" fill="none" stroke="#a78bfa" stroke-width="1.6"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#e4e8ee">Practice</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#a0aab6">THM · HTB · OTW</text>
 </g>
 <g transform="translate(1014,100)">
-<rect width="170" height="80" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
-<rect width="4" height="80" rx="2" fill="#4ADE80"/>
-<g transform="translate(14,12)"><path d="M7 2h9l6 6v18H7z" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linejoin="round"/><path d="M16 2v6h6M10 14h8M10 19h8" stroke="#4ADE80" stroke-width="1.8" stroke-linecap="round"/></g>
-<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">Check</text>
-<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">quiz · homework</text>
+<rect width="170" height="80" rx="10" fill="#1a1f2a" stroke="#333b4c" stroke-width="1.5"/>
+<rect width="4" height="80" rx="2" fill="#4ade80"/>
+<g transform="translate(14,12)"><path d="M7 2h9l6 6v18H7z" fill="none" stroke="#4ade80" stroke-width="2" stroke-linejoin="round"/><path d="M16 2v6h6M10 14h8M10 19h8" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#e4e8ee">Check</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#a0aab6">quiz · homework</text>
 </g>
-<path d="M204,140.0 L230,140.0" fill="none" stroke="#1E3A5F" stroke-width="2" opacity="1" marker-end="url(#arrow-1E3A5F)"/>
-<path d="M400,140.0 L426,140.0" fill="none" stroke="#1E3A5F" stroke-width="2" opacity="1" marker-end="url(#arrow-1E3A5F)"/>
-<path d="M596,140.0 L622,140.0" fill="none" stroke="#1E3A5F" stroke-width="2" opacity="1" marker-end="url(#arrow-1E3A5F)"/>
-<path d="M792,140.0 L818,140.0" fill="none" stroke="#1E3A5F" stroke-width="2" opacity="1" marker-end="url(#arrow-1E3A5F)"/>
-<path d="M988,140.0 L1014,140.0" fill="none" stroke="#1E3A5F" stroke-width="2" opacity="1" marker-end="url(#arrow-1E3A5F)"/>
-<path d="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204" stroke="#1E3A5F" stroke-width="2" fill="none" stroke-dasharray="4 6"/>
-<circle r="4" fill="#EF4444" filter="url(#glow)"><animateMotion dur="4.5s" begin="0.0s" repeatCount="indefinite" path="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204"/></circle>
-<circle r="4" fill="#22D3EE" filter="url(#glow)"><animateMotion dur="4.5s" begin="1.5s" repeatCount="indefinite" path="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204"/></circle>
-<circle r="4" fill="#4ADE80" filter="url(#glow)"><animateMotion dur="4.5s" begin="3.0s" repeatCount="indefinite" path="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204"/></circle>
-<text x="600" y="250" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#94A3B8" text-anchor="middle">students continue into the SOC and IR tracks — so the blue side is never skipped</text>
-<text x="34" y="286" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#64748B">ceh-diploma · assets/readme/teaching-loop.svg</text>
+<path d="M204,140.0 L230,140.0" fill="none" stroke="#333b4c" stroke-width="2" opacity="1" marker-end="url(#arrow-333b4c)"/>
+<path d="M400,140.0 L426,140.0" fill="none" stroke="#333b4c" stroke-width="2" opacity="1" marker-end="url(#arrow-333b4c)"/>
+<path d="M596,140.0 L622,140.0" fill="none" stroke="#333b4c" stroke-width="2" opacity="1" marker-end="url(#arrow-333b4c)"/>
+<path d="M792,140.0 L818,140.0" fill="none" stroke="#333b4c" stroke-width="2" opacity="1" marker-end="url(#arrow-333b4c)"/>
+<path d="M988,140.0 L1014,140.0" fill="none" stroke="#333b4c" stroke-width="2" opacity="1" marker-end="url(#arrow-333b4c)"/>
+<path d="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204" stroke="#333b4c" stroke-width="2" fill="none" stroke-dasharray="4 6"/>
+<circle r="4" fill="#e63946" filter="url(#glow)"><animateMotion dur="4.5s" begin="0.0s" repeatCount="indefinite" path="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204"/></circle>
+<circle r="4" fill="#22d3ee" filter="url(#glow)"><animateMotion dur="4.5s" begin="1.5s" repeatCount="indefinite" path="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204"/></circle>
+<circle r="4" fill="#4ade80" filter="url(#glow)"><animateMotion dur="4.5s" begin="3.0s" repeatCount="indefinite" path="M119.0,204 L315.0,204 L511.0,204 L707.0,204 L903.0,204 L1099.0,204"/></circle>
+<text x="600" y="250" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11.5" fill="#a0aab6" text-anchor="middle">students continue into the SOC and IR tracks — so the blue side is never skipped</text>
+<text x="34" y="286" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#768290">ceh-diploma · assets/readme/teaching-loop.svg</text>
 </svg>
