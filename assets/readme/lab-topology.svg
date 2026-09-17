@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-label="CEH lab topology — one host-only network, four targets">
+<title>CEH lab topology — one host-only network, four targets</title>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B1220"/><stop offset="1" stop-color="#111C33"/></linearGradient>
+<linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#1E2A45" stroke-width="1"/></pattern>
+<filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<marker id="arrow-64748B" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748B"/></marker>
+<marker id="arrow-EF4444" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#EF4444"/></marker>
+</defs>
+<rect width="1200" height="560" rx="16" fill="url(#bg)"/>
+<rect width="1200" height="560" rx="16" fill="url(#grid)" opacity="0.55"/>
+<rect x="0" y="0" width="6" height="560" rx="3" fill="url(#accent)"/>
+<text x="34" y="38" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" fill="#E2E8F0">Lab topology</text>
+<text x="34" y="60" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#94A3B8">One host-only network · one attacker · four targets that answer the same scan differently</text>
+<rect x="34" y="76" width="110" height="28" rx="14" fill="#64748B" fill-opacity="0.06" stroke="#64748B" stroke-opacity="0.7"/>
+<text x="89.0" y="95" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B" text-anchor="middle">SOC Analyst</text>
+<path d="M148,90 L158,90" stroke="#64748B" stroke-width="2" marker-end="url(#arrow-64748B)"/>
+<rect x="168" y="76" width="50" height="28" rx="14" fill="#22D3EE" fill-opacity="0.18" stroke="#22D3EE" stroke-opacity="0.7"/>
+<text x="193.0" y="95" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#22D3EE" text-anchor="middle">CEH</text>
+<rect x="168" y="76" width="50" height="28" rx="14" fill="none" stroke="#22D3EE" stroke-width="2"><animate attributeName="opacity" values="1;0.2;1" dur="1.8s" repeatCount="indefinite"/></rect>
+<path d="M222,90 L232,90" stroke="#64748B" stroke-width="2" marker-end="url(#arrow-64748B)"/>
+<rect x="242" y="76" width="58" height="28" rx="14" fill="#64748B" fill-opacity="0.06" stroke="#64748B" stroke-opacity="0.7"/>
+<text x="271.0" y="95" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B" text-anchor="middle">eCIR</text>
+<path d="M304,90 L314,90" stroke="#64748B" stroke-width="2" marker-end="url(#arrow-64748B)"/>
+<rect x="324" y="76" width="65" height="28" rx="14" fill="#64748B" fill-opacity="0.06" stroke="#64748B" stroke-opacity="0.7"/>
+<text x="356.5" y="95" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B" text-anchor="middle">eCDFP</text>
+<text x="405" y="95" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#64748B">ITGate Academy path</text>
+<rect x="80" y="140" width="1040" height="340" rx="14" fill="#3B82F6" fill-opacity="0.05" stroke="#3B82F6" stroke-opacity="0.55" stroke-width="1.5" stroke-dasharray="6 5"/>
+<rect x="92" y="129" width="350" height="21" rx="10.5" fill="#0B1220"/>
+<rect x="92" y="129" width="350" height="21" rx="10.5" fill="#3B82F6" fill-opacity="0.14" stroke="#3B82F6" stroke-opacity="0.6"/>
+<text x="100" y="143" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" font-weight="600" fill="#3B82F6">Host-only  192.2.56.0/24  ·  VMware Workstation</text>
+<g transform="translate(120,260)">
+<rect x="-3" y="-3" width="286" height="106" rx="13" fill="none" stroke="#EF4444" stroke-width="2" opacity="0.7"><animate attributeName="opacity" values="0.8;0.15;0.8" dur="1.8s" repeatCount="indefinite"/></rect>
+<rect width="280" height="100" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
+<rect width="4" height="100" rx="2" fill="#EF4444"/>
+<g transform="translate(14,12)"><circle cx="14" cy="14" r="9" fill="none" stroke="#EF4444" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="#EF4444"/><path d="M14 1v6M14 21v6M1 14h6M21 14h6" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">KALI-ATK01</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">Kali Linux · attacker</text>
+<text x="52" y="58" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">nmap · metasploit · hydra</text>
+<text x="52" y="72" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">burp · john · responder</text>
+<rect x="242" y="8" width="30" height="16" rx="8" fill="#EF4444" fill-opacity="0.18" stroke="#EF4444" stroke-opacity="0.6"/>
+<text x="257.0" y="20" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="9.5" font-weight="700" fill="#EF4444" text-anchor="middle">RED</text>
+</g>
+<circle cx="148" cy="286" r="10" fill="none" stroke="#EF4444" stroke-width="2"><animate attributeName="r" from="10" to="34" dur="2.2s" begin="0s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.9" to="0" dur="2.2s" begin="0s" repeatCount="indefinite"/></circle>
+<g transform="translate(640,165)">
+<rect width="420" height="60" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
+<rect width="4" height="60" rx="2" fill="#4ADE80"/>
+<g transform="translate(14,12)"><rect x="3" y="3" width="22" height="7" rx="2" fill="none" stroke="#4ADE80" stroke-width="2"/><rect x="3" y="12" width="22" height="7" rx="2" fill="none" stroke="#4ADE80" stroke-width="2"/><rect x="3" y="21" width="22" height="5" rx="2" fill="none" stroke="#4ADE80" stroke-width="2"/><circle cx="8" cy="6.5" r="1.4" fill="#4ADE80"/><circle cx="8" cy="15.5" r="1.4" fill="#4ADE80"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">METASPLOITABLE2</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">Linux 2012 · everything open · 15+ ports</text>
+</g>
+<path d="M400,310.0 L540,310.0 L540,195.0 L640,195.0" fill="none" stroke="#EF4444" stroke-width="1.5" opacity="0.7" marker-end="url(#arrow-EF4444)"/>
+<circle r="3.5" fill="#EF4444" filter="url(#glow)"><animateMotion dur="2.4s" begin="0.0s" repeatCount="indefinite" path="M400,310.0 L540,310.0 L540,195.0 L640,195.0"/></circle>
+<g transform="translate(640,241)">
+<rect width="420" height="60" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
+<rect width="4" height="60" rx="2" fill="#F59E0B"/>
+<g transform="translate(14,12)"><rect x="2" y="4" width="24" height="15" rx="2" fill="none" stroke="#F59E0B" stroke-width="2"/><path d="M9 25h10M14 19v6" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">WIN7-TGT01</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">legacy Windows · SMBv1 on · MS17-010</text>
+</g>
+<path d="M400,310.0 L540,310.0 L540,271.0 L640,271.0" fill="none" stroke="#EF4444" stroke-width="1.5" opacity="0.7" marker-end="url(#arrow-EF4444)"/>
+<circle r="3.5" fill="#EF4444" filter="url(#glow)"><animateMotion dur="2.4s" begin="0.6s" repeatCount="indefinite" path="M400,310.0 L540,310.0 L540,271.0 L640,271.0"/></circle>
+<g transform="translate(640,317)">
+<rect width="420" height="60" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
+<rect width="4" height="60" rx="2" fill="#22D3EE"/>
+<g transform="translate(14,12)"><rect x="2" y="4" width="24" height="15" rx="2" fill="none" stroke="#22D3EE" stroke-width="2"/><path d="M9 25h10M14 19v6" stroke="#22D3EE" stroke-width="2" stroke-linecap="round"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">WIN10-TGT01</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">modern Windows · hardened defaults</text>
+</g>
+<path d="M400,310.0 L540,310.0 L540,347.0 L640,347.0" fill="none" stroke="#EF4444" stroke-width="1.5" opacity="0.7" marker-end="url(#arrow-EF4444)"/>
+<circle r="3.5" fill="#EF4444" filter="url(#glow)"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M400,310.0 L540,310.0 L540,347.0 L640,347.0"/></circle>
+<g transform="translate(640,393)">
+<rect width="420" height="60" rx="10" fill="#0F172A" stroke="#1E3A5F" stroke-width="1.5"/>
+<rect width="4" height="60" rx="2" fill="#A78BFA"/>
+<g transform="translate(14,12)"><rect x="3" y="3" width="22" height="7" rx="2" fill="none" stroke="#A78BFA" stroke-width="2"/><rect x="3" y="12" width="22" height="7" rx="2" fill="none" stroke="#A78BFA" stroke-width="2"/><rect x="3" y="21" width="22" height="5" rx="2" fill="none" stroke="#A78BFA" stroke-width="2"/><circle cx="8" cy="6.5" r="1.4" fill="#A78BFA"/><circle cx="8" cy="15.5" r="1.4" fill="#A78BFA"/></g>
+<text x="52" y="28" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0">WINSRV19-TGT01</text>
+<text x="52" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#94A3B8">Windows Server 2019 · DC for ceh.lab</text>
+</g>
+<path d="M400,310.0 L540,310.0 L540,423.0 L640,423.0" fill="none" stroke="#EF4444" stroke-width="1.5" opacity="0.7" marker-end="url(#arrow-EF4444)"/>
+<circle r="3.5" fill="#EF4444" filter="url(#glow)"><animateMotion dur="2.4s" begin="1.8s" repeatCount="indefinite" path="M400,310.0 L540,310.0 L540,423.0 L640,423.0"/></circle>
+<text x="540" y="158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10.5" fill="#EF4444" text-anchor="middle">same nmap · four different answers</text>
+<text x="600" y="510" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#64748B" text-anchor="middle">Student laptop is the analyst workstation  ·  defender view (logs · events · ATT&amp;CK ID) shown for every attack</text>
+<text x="34" y="546" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#64748B">ceh-diploma · assets/readme/lab-topology.svg</text>
+</svg>
