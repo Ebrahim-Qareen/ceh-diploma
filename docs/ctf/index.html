@@ -1,0 +1,1209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student CTF — Capture the Flags | CEH · ITGate Academy</title>
+<meta name="description" content="IT-Gate CEH student CTF portal — register your team, submit flags from each machine, write your solution report per machine, and export it. Flags are graded automatically in the browser.">
+<style id="ceh">
+/* ==========================================================================
+   ITGate Academy — CEH Diploma design system
+   Dark offensive-security theme · charcoal / red / cyan / green
+   Shared by the course dashboard and every session page.
+   Change a token here and all 10 sessions follow.
+   ========================================================================== */
+:root{
+  --bg:#0d1117;
+  --bg-alt:#131720;
+  --panel:#1a1f2a;
+  --panel-2:#1f2533;
+  --line:#252b38;
+  --line-soft:#333b4c;
+
+  /* CEH identity */
+  --red:#e63946;          /* primary accent — brand, headings, active state */
+  --red-soft:#ff6b7a;
+  --red-dim:#c4323e;
+  --cyan:#22d3ee;         /* links, lab / build */
+  --orange:#ff7043;       /* attacker view */
+  --green:#4ade80;        /* defender / SOC / verified */
+  --purple:#a78bfa;       /* activities */
+  --amber:#fbbf24;        /* recall / prior knowledge */
+
+  --text:#e4e8ee;
+  --text-2:#a0aab6;
+  --text-3:#768290;
+  --text-4:#5a6472;
+
+  --radius:12px;
+  --radius-sm:8px;
+  --maxw:1680px;
+  --gutter:clamp(16px,3vw,40px);
+  --prose:150ch;   /* was 96ch — see 'prose fills the column', 2026-09-09 */
+  /* one shared depth token — every raised surface uses it */
+  --depth:inset 0 1px 0 rgba(255,255,255,.045),0 2px 12px rgba(0,0,0,.38);
+  --depth-hi:inset 0 1px 0 rgba(255,255,255,.075),0 10px 26px rgba(0,0,0,.5);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:"JetBrains Mono","Fira Code",Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--cyan);text-decoration:none}
+a:hover{color:var(--red-soft);text-decoration:underline}
+img{max-width:100%}
+
+/* THE container. Nothing else in this file may set max-width on a layout
+   element, and no section may use the `padding` shorthand — either one
+   silently cancels the gutter and the text lands on the screen edge. */
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gutter)}
+.section{padding-block:48px}
+.section-sm{padding-block:34px}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,17,23,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{display:flex;align-items:center;gap:16px;height:64px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.brand:hover{text-decoration:none}
+.brand img{width:40px;height:40px;border-radius:8px;object-fit:contain;background:#fff;padding:3px;flex:0 0 40px}
+.brand-text{display:flex;flex-direction:column;line-height:1.2}
+.brand-name{color:var(--text);font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand-sub{color:var(--red);font-size:11px;letter-spacing:1.4px;text-transform:uppercase}
+.topnav{margin-left:auto;display:flex;gap:22px;align-items:center}
+.topnav a{color:var(--text-2);font-size:14px;font-weight:500}
+.topnav a:hover,.topnav a.active{color:var(--red-soft);text-decoration:none}
+
+/* ---------- hero (dashboard) ---------- */
+.hero{border-bottom:1px solid var(--line);padding-block:66px 52px;
+  background:radial-gradient(900px 380px at 18% 0%,rgba(230,57,70,.16),transparent 65%),
+             radial-gradient(760px 340px at 82% 10%,rgba(34,211,238,.10),transparent 62%),var(--bg)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:var(--red);margin-bottom:16px}
+.hero h1{margin:0 0 16px;font-size:52px;line-height:1.1;font-weight:800;letter-spacing:-1px}
+.hero h1 span{color:var(--red)}
+.hero p{margin:0;max-width:var(--prose);color:var(--text-2);font-size:17.5px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,178px),1fr));gap:14px;margin-top:32px}
+.stat{background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);padding:14px 22px;min-width:104px}
+.stat b{display:block;font-size:26px;color:var(--red);font-weight:800;line-height:1.15}
+.stat span{font-size:11.5px;color:var(--text-3);letter-spacing:.8px;text-transform:uppercase}
+@media(max-width:640px){.hero h1{font-size:33px}.hero{padding-block:44px 36px}}
+
+/* ---------- section headings ---------- */
+h2.sec{font-size:26px;margin:0 0 8px;font-weight:800}
+/* the gradient rule — this one detail is most of what separates
+   "designed" from "stretched". .h-t keeps inline children in normal flow. */
+h2.sec,.content h2{display:flex;align-items:center;gap:16px}
+h2.sec>.h-t,.content h2>.h-t{flex:0 1 auto;min-width:0}
+h2.sec::after,.content h2::after{content:"";flex:1 1 auto;height:1px;
+  background:linear-gradient(90deg,var(--line-soft),transparent)}
+.sec-desc{color:var(--text-2);margin:0 0 26px;max-width:var(--prose)}
+
+/* ---------- session card grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,350px),1fr));gap:18px}
+.card{display:flex;flex-direction:column;background:var(--bg-alt);border:1px solid var(--line);border-left:3px solid var(--line-soft);
+  border-radius:var(--radius);padding:20px;text-decoration:none;color:inherit;transition:border-color .18s,transform .18s,background .18s}
+.card:hover{border-color:var(--line-soft);border-left-color:var(--red);transform:translateY(-3px);text-decoration:none;background:var(--panel)}
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.card h3{margin:0;font-size:17.5px;font-weight:700;line-height:1.3;color:var(--text)}
+.card:hover h3{color:var(--red-soft)}
+.card p{margin:0 0 14px;color:var(--text-2);font-size:14px;line-height:1.6}
+.card .snum{flex:0 0 auto}
+.card-meta{display:flex;flex-wrap:wrap;gap:7px;align-items:flex-start;margin-top:auto;padding-top:4px}
+/* pillar accents */
+.card.p-found{border-left-color:var(--red)}
+.card.p-recon{border-left-color:var(--cyan)}
+.card.p-access{border-left-color:var(--orange)}
+.card.p-post{border-left-color:var(--purple)}
+.card.p-web{border-left-color:var(--green)}
+.card.p-net{border-left-color:var(--amber)}
+
+/* ---------- tags / badges ---------- */
+.snum{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--red);background:rgba(230,57,70,.10);
+  border:1px solid rgba(230,57,70,.30);padding:3px 9px;border-radius:6px;letter-spacing:.5px}
+.time{font-family:var(--mono);font-size:11.5px;color:var(--red-dim);border:1px solid rgba(230,57,70,.3);border-radius:6px;padding:2px 8px}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--line-soft);color:var(--text-3);letter-spacing:.3px}
+.tag.offensive{color:var(--orange);border-color:rgba(255,112,67,.4);background:rgba(255,112,67,.08)}
+.tag.defensive{color:var(--green);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08)}
+.tag.lab{color:var(--cyan);border-color:rgba(34,211,238,.4);background:rgba(34,211,238,.08)}
+.tag.theory{color:var(--red);border-color:rgba(230,57,70,.4);background:rgba(230,57,70,.08)}
+.tag.activity{color:var(--purple);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.08)}
+.tag.recall{color:var(--amber);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+.status{margin-left:auto;font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:20px}
+.status.done{color:var(--green);background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35)}
+.status.soon{color:var(--text-3);background:var(--panel-2);border:1px solid var(--line-soft)}
+
+/* ---------- tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,236px),1fr));gap:16px}
+.tile{background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);padding:20px;text-decoration:none;color:inherit;transition:border-color .18s,transform .18s}
+.tile:hover{border-color:var(--red);transform:translateY(-3px);text-decoration:none}
+.tile .ico{font-size:24px;display:block;margin-bottom:10px}
+.tile h4{margin:0 0 6px;font-size:15.5px;color:var(--text)}
+.tile:hover h4{color:var(--red-soft)}
+.tile p{margin:0;font-size:13.5px;color:var(--text-3);line-height:1.55}
+
+/* ---------- progress bar ---------- */
+.progress-wrap{position:sticky;top:64px;z-index:40;background:rgba(13,17,23,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.progress-inner{display:flex;align-items:center;gap:14px;padding-block:9px}
+.pbar{flex:1;height:5px;background:var(--panel-2);border-radius:20px;overflow:hidden}
+.pbar-fill{height:100%;width:0;border-radius:20px;transition:width .3s ease;background:linear-gradient(90deg,var(--red),var(--cyan))}
+.pbar-label{font-family:var(--mono);font-size:11.5px;color:var(--text-3);white-space:nowrap}
+
+/* ---------- session layout ---------- */
+.page-layout{display:grid;grid-template-columns:250px 1fr;gap:36px;align-items:start}
+.page-layout>*{min-width:0}
+/* LOAD-BEARING: grid/flex children default to min-width:auto, so one long
+   unbreakable line (a <pre> command) forces the track to min-content and
+   pushes the whole page wider than the viewport. */
+.split>*,.grid>*,.tiles>*,.stats>*,.bio>*,.footer-inner>*,.card-meta>*{min-width:0}
+@media(max-width:900px){.page-layout{grid-template-columns:1fr}.sidebar{display:none}}
+.sidebar{position:sticky;top:88px;background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);padding:16px;font-size:13.5px;max-height:calc(100vh - 110px);overflow-y:auto}
+.sidebar h5{margin:0 0 10px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--red)}
+.sidebar ol{margin:0;padding-left:18px;color:var(--text-3)}
+.sidebar li{margin-bottom:5px}
+.sidebar a{color:var(--text-2)}
+.sidebar a:hover{color:var(--red-soft)}
+.sidebar li.now a{color:var(--red);font-weight:700}
+.sidebar ol li.seen a{color:var(--text-4)}
+.sidebar ol li.seen a::after{content:" ✓";color:var(--green);font-size:11px}
+
+/* ---------- page engine ---------- */
+.page{display:none;animation:fade .22s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.page-head{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:26px}
+.page-head .kicker{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;margin-bottom:10px}
+.page-head h1{margin:0 0 8px;font-size:32px;font-weight:800;line-height:1.2}
+.page-head .lede{margin:0;color:var(--text-2);font-size:16px}
+
+/* ---------- content typography ---------- */
+.content h2{font-size:22px;margin:38px 0 14px;font-weight:700}
+.content h2:first-child{margin-top:0}
+.content h3{font-size:17px;margin:22px 0 8px;font-weight:700;color:var(--red-soft)}
+.content p{margin:0 0 14px}
+.content ul,.content ol{margin:0 0 16px;padding-left:22px}
+.content li{margin-bottom:6px}
+.content strong{color:#fff}
+
+.oneline{background:linear-gradient(90deg,rgba(230,57,70,.12),transparent);border-left:3px solid var(--red);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:14px 18px;margin:0 0 20px;font-size:17px;color:#fff}
+
+/* ---------- callout boxes ---------- */
+.box{border:1px solid var(--line);border-left-width:3px;border-radius:var(--radius-sm);padding:14px 18px;margin:18px 0;background:var(--bg-alt);font-size:14.5px}
+.box .box-t{font-weight:700;font-size:13px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;display:block}
+.box p:last-child,.box ul:last-child,.box ol:last-child{margin-bottom:0}
+.box.soc{border-left-color:var(--cyan)}                                        .box.soc .box-t{color:var(--cyan)}
+.box.warn{border-left-color:var(--orange);background:rgba(255,112,67,.06)}      .box.warn .box-t{color:var(--orange)}
+.box.tip{border-left-color:var(--green);background:rgba(74,222,128,.06)}        .box.tip .box-t{color:var(--green)}
+.box.note{border-left-color:var(--red)}                                         .box.note .box-t{color:var(--red)}
+.box.attacker-view{border-left-color:var(--orange);background:rgba(255,112,67,.06)} .box.attacker-view .box-t{color:var(--orange)}
+.box.defender-view{border-left-color:var(--green);background:rgba(74,222,128,.06)}  .box.defender-view .box-t{color:var(--green)}
+.box.lab-box{border-left-color:var(--cyan)}                                     .box.lab-box .box-t{color:var(--cyan)}
+.box.key-takeaway{border-left-color:var(--red);background:rgba(230,57,70,.07)}   .box.key-takeaway .box-t{color:var(--red)}
+.box.recall{border-left-color:var(--amber);background:rgba(251,191,36,.07)}      .box.recall .box-t{color:var(--amber)}
+.box.intro{border-left-color:var(--purple);background:rgba(167,139,250,.07)}     .box.intro .box-t{color:var(--purple)}
+
+/* ---------- instructor bio card ---------- */
+.bio{display:grid;grid-template-columns:172px 1fr;gap:24px;align-items:start;
+  background:linear-gradient(120deg,rgba(230,57,70,.07),transparent 60%),var(--bg-alt);
+  border:1px solid var(--line);border-left:3px solid var(--red);
+  border-radius:var(--radius);padding:22px 24px;margin:20px 0}
+.bio-photo{width:172px;height:172px;border-radius:var(--radius);object-fit:cover;object-position:center top;
+  border:1px solid var(--line-soft);background:var(--panel-2)}
+.bio h3{margin:0 0 2px;font-size:21px;color:#fff;font-weight:800}
+.bio .bio-role{margin:0 0 4px;color:var(--red-soft);font-size:14px;font-weight:600}
+.bio .bio-meta{margin:0 0 14px;color:var(--text-3);font-size:12.5px;font-family:var(--mono)}
+.bio ul{list-style:none;padding:0;margin:0 0 14px}
+.bio ul li{position:relative;padding-left:20px;margin-bottom:9px;font-size:14.5px;color:var(--text-2)}
+.bio ul li::before{content:"▸";position:absolute;left:0;color:var(--red);font-size:13px}
+.bio ul li strong{color:#fff}
+.bio .bio-close{margin:0;padding-top:12px;border-top:1px solid var(--line);font-size:14.5px;color:var(--text-2)}
+.bio .bio-close em{color:var(--red-soft);font-style:normal;font-weight:600}
+@media(max-width:720px){
+  .bio{grid-template-columns:1fr;gap:16px;justify-items:center;text-align:center}
+  .bio ul{text-align:left}
+  .bio ul li{text-align:left}
+}
+
+/* ---------- ask-first prompt (ice-breaker mechanic) ---------- */
+.ask{border:1px dashed rgba(251,191,36,.5);background:rgba(251,191,36,.05);border-radius:var(--radius-sm);padding:16px 18px;margin:18px 0}
+.ask .ask-t{display:block;font-size:11.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px}
+.ask .ask-q{font-size:16px;color:#fff;margin:0 0 10px;font-weight:600}
+.ask details{border-top:1px dashed rgba(251,191,36,.3);padding-top:10px;margin-top:4px}
+.ask summary{cursor:pointer;color:var(--amber);font-size:13.5px;font-weight:600;list-style:none}
+.ask summary::-webkit-details-marker{display:none}
+.ask summary::before{content:"▸ ";}
+.ask details[open] summary::before{content:"▾ ";}
+.ask details>*:not(summary){margin-top:10px}
+.ask p{margin:0 0 10px;font-size:14.5px;color:var(--text-2)}
+
+/* ---------- tables ---------- */
+/* every table sits in a rounded, bordered panel that scrolls on a phone
+   instead of squeezing an ID column into four lines. Column widths are
+   declared PER TABLE via <colgroup> — never a blanket td rule. */
+.tbl-scroll{overflow-x:auto;margin:22px 0;background:var(--bg-alt);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--depth)}
+.content table{width:100%;border-collapse:separate;border-spacing:0;margin:22px 0;font-size:14px;table-layout:fixed}
+.tbl-scroll table{margin:0;min-width:660px}
+.content th{text-align:left;background:var(--panel-2);color:var(--red);font-family:var(--mono);
+  font-weight:700;font-size:11.5px;letter-spacing:.9px;text-transform:uppercase;
+  padding:11px 14px;border-bottom:1px solid var(--line-soft);overflow-wrap:anywhere}
+.content td{padding:11px 14px;border-bottom:1px solid var(--line);color:var(--text-2);
+  vertical-align:top;overflow-wrap:anywhere}
+.content tbody tr:last-child td{border-bottom:none}
+.content tbody tr:hover td{background:rgba(255,255,255,.025)}
+.cast-ico{width:30px;height:30px;object-fit:contain;vertical-align:middle;margin-right:9px;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.55));position:relative;top:-1px}
+.cast-name{white-space:nowrap}
+
+/* ---------- code ---------- */
+code{font-family:var(--mono);font-size:13px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--red-soft)}
+pre{background:#0d1218;border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;margin:16px 0}
+pre code{background:none;border:none;padding:0;color:#c9d1d9;font-size:13px;line-height:1.7}
+
+/* ---------- diagrams ---------- */
+.dgm{background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);padding:22px 20px 16px;margin:22px 0;overflow-x:auto}
+.dgm svg{display:block;margin:0 auto;width:100%;height:auto;min-width:780px}
+.dgm figcaption{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);color:var(--text-3);font-size:13px;text-align:center}
+.dgm figcaption b{color:var(--text-2)}
+/* shared SVG text defaults so every diagram reads the same */
+.dgm text{font-family:var(--font);fill:var(--text-2)}
+.dgm .d-title{fill:#fff;font-weight:700}
+.dgm .d-lbl{fill:var(--text-2)}
+.dgm .d-sub{fill:var(--text-3);font-size:11px}
+.dgm .d-mono{font-family:var(--mono)}
+
+/* ---------- interactive diagrams (click-to-reveal) ---------- */
+.dgm.interactive svg [data-node]{cursor:pointer}
+.dgm.interactive svg [data-node] rect,
+.dgm.interactive svg [data-node] polygon{transition:filter .15s,transform .15s;transform-origin:center;transform-box:fill-box}
+.dgm.interactive svg [data-node]:hover rect,
+.dgm.interactive svg [data-node]:hover polygon{filter:brightness(1.25);transform:scale(1.015)}
+.dgm.interactive svg [data-node].active rect,
+.dgm.interactive svg [data-node].active polygon{filter:brightness(1.4);stroke-width:3}
+.dgm-hint{font-size:11.5px;color:var(--text-3);text-align:center;margin-top:8px;letter-spacing:.2px}
+.dgm-hint::before{content:"👆 "}
+.dgm-detail{display:none;margin-top:14px;border:1px solid var(--line-soft);border-left:3px solid var(--red);
+  background:var(--panel-2);border-radius:var(--radius-sm);padding:14px 16px}
+.dgm-detail.open{display:block;animation:dgmIn .18s ease-out}
+.dgm-detail h5{margin:0 0 6px;color:#fff;font-size:13.5px}
+.dgm-detail p{margin:0;font-size:13.5px;color:var(--text-2)}
+.dgm-detail .dd-tag{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:.5px;margin-right:8px}
+@keyframes dgmIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- animated / replayable diagrams ---------- */
+.dgm-replay{display:block;margin:12px auto 0;font-family:var(--mono);font-size:12px;color:var(--cyan);
+  background:transparent;border:1px solid var(--cyan);border-radius:20px;padding:5px 16px;cursor:pointer}
+.dgm-replay:hover{background:rgba(34,211,238,.1)}
+.dgm.animate-run .flow-line{stroke-dasharray:8 6;animation:flowdash 1.1s linear 3}
+.dgm.animate-run .flow-pulse{animation:flowpop .55s ease-out both}
+@keyframes flowdash{to{stroke-dashoffset:-56}}
+@keyframes flowpop{0%{opacity:0}15%{opacity:1}100%{opacity:1}}
+
+/* ---------- practice / resource cards ---------- */
+.res-tag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.4px;padding:2px 8px;
+  border-radius:10px;border:1px solid;text-transform:uppercase;white-space:nowrap}
+.res-tag.free{color:var(--green);border-color:rgba(74,222,128,.5);background:rgba(74,222,128,.08)}
+.res-tag.freetier{color:var(--cyan);border-color:rgba(34,211,238,.5);background:rgba(34,211,238,.08)}
+.res-tag.premium{color:var(--amber);border-color:rgba(251,191,36,.5);background:rgba(251,191,36,.08)}
+
+/* practice block — external platform rooms tied to the topic on this page */
+.practice{border:1px solid var(--line);border-left:3px solid var(--green);background:rgba(74,222,128,.045);
+  border-radius:var(--radius-sm);padding:16px 18px;margin:22px 0}
+.practice-h{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.practice-h .pr-t{color:var(--green);font-size:11.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+.practice-h .pr-plat{font-family:var(--mono);font-size:11px;color:var(--text-3)}
+.practice>p.pr-why{margin:0 0 14px;font-size:13.5px;color:var(--text-2)}
+.practice ul.pr-list{list-style:none;padding:0;margin:0}
+.practice ul.pr-list>li{border-top:1px solid var(--line);padding:11px 0 11px 0;margin:0}
+.practice ul.pr-list>li:first-child{border-top:none;padding-top:2px}
+.pr-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:3px}
+.pr-row a{font-weight:600;font-size:14.5px}
+.pr-meta{font-family:var(--mono);font-size:11px;color:var(--text-4);white-space:nowrap}
+.pr-note{margin:0;font-size:13px;color:var(--text-3);line-height:1.6}
+.pr-note b{color:var(--text-2)}
+
+/* screenshot slots — render a labelled placeholder until the file exists */
+.shot{margin:22px 0;background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.shot img{display:block;width:100%;border-radius:var(--radius-sm);border:1px solid var(--line-soft);background:var(--panel-2)}
+.shot figcaption{margin-top:11px;color:var(--text-3);font-size:13px;text-align:center}
+
+/* ---------- lab steps ---------- */
+.steps{counter-reset:step;list-style:none;padding:0;margin:18px 0}
+.steps>li{counter-increment:step;position:relative;padding:0 0 20px 44px;margin:0;border-left:1px solid var(--line)}
+.steps>li:last-child{border-left-color:transparent;padding-bottom:0}
+.steps>li::before{content:counter(step);position:absolute;left:-14px;top:-2px;width:28px;height:28px;border-radius:50%;
+  background:var(--panel-2);border:1px solid var(--red);color:var(--red);font-family:var(--mono);font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+
+/* ---------- verification checklist ---------- */
+.verify{border:1px solid rgba(74,222,128,.4);background:rgba(74,222,128,.06);border-radius:var(--radius-sm);padding:16px 18px;margin:20px 0}
+.verify h4{margin:0 0 10px;color:var(--green);font-size:14px;letter-spacing:.5px}
+.verify ul{list-style:none;padding:0;margin:0;font-size:14px}
+.verify li{padding-left:26px;position:relative;margin-bottom:7px;color:var(--text-2)}
+.verify li::before{content:"☐";position:absolute;left:0;color:var(--green);font-size:15px}
+
+/* ---------- knowledge check ---------- */
+.q{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-alt);padding:14px 18px;margin:12px 0}
+.q .qn{color:var(--red);font-family:var(--mono);font-size:12px;font-weight:700;margin-right:8px}
+.q p{margin:0 0 8px}
+.q details{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+.q summary{cursor:pointer;color:var(--cyan);font-size:13.5px;font-weight:600;list-style:none}
+.q summary::-webkit-details-marker{display:none}
+.q summary::before{content:"▸ ";color:var(--red)}
+.q details[open] summary::before{content:"▾ "}
+.q details p{margin:8px 0 0;color:var(--text-2);font-size:14px}
+
+.q.mcq .opts{list-style:none;padding:0;margin:10px 0 0}
+.q.mcq .opts li{border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:8px;cursor:pointer;
+  font-size:14px;color:var(--text-2);background:var(--panel-2);transition:.16s;display:flex;align-items:center;gap:10px}
+.q.mcq .opts li:hover{border-color:var(--red);color:var(--text)}
+.q.mcq .opts li::before{content:attr(data-opt);text-transform:uppercase;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--red);
+  border:1px solid var(--line-soft);border-radius:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex:0 0 22px}
+.q.mcq.answered .opts li{cursor:default}
+.q.mcq .opts li.correct{border-color:var(--green);background:rgba(74,222,128,.12);color:var(--green)}
+.q.mcq .opts li.correct::before{border-color:var(--green);color:var(--green)}
+.q.mcq .opts li.wrong{border-color:var(--orange);background:rgba(255,112,67,.10);color:var(--orange)}
+.q.mcq .opts li.wrong::before{border-color:var(--orange);color:var(--orange)}
+.q.mcq .opts li.muted-opt{opacity:.45}
+.mcq-fb{margin-top:10px;font-size:13.5px;padding:10px 14px;border-radius:var(--radius-sm);display:none}
+.mcq-fb.show{display:block}
+.mcq-fb.ok{background:rgba(74,222,128,.10);border:1px solid rgba(74,222,128,.35);color:var(--text-2)}
+.mcq-fb.no{background:rgba(255,112,67,.08);border:1px solid rgba(255,112,67,.35);color:var(--text-2)}
+.mcq-fb b{color:var(--red)}
+.quiz-score{margin:18px 0 0;padding:14px 18px;border-radius:var(--radius-sm);background:var(--panel-2);border:1px solid var(--line-soft);
+  font-family:var(--mono);font-size:14px;color:var(--text-2);text-align:center}
+.quiz-score b{color:var(--red);font-size:18px}
+
+/* ---------- takeaways ---------- */
+.takeaways{list-style:none;padding:0;margin:18px 0}
+.takeaways li{background:var(--bg-alt);border:1px solid var(--line);border-left:3px solid var(--red);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 16px;margin-bottom:10px;font-size:15px}
+
+/* ---------- break timer ---------- */
+.timer-card{text-align:center;border:1px solid var(--red);border-radius:var(--radius);
+  background:radial-gradient(700px 260px at 50% 0%,rgba(230,57,70,.12),transparent 70%),var(--bg-alt);
+  padding:40px 24px;margin:24px 0;transition:border-color .3s,background .3s}
+.timer-card.running{border-color:var(--cyan);background:radial-gradient(700px 260px at 50% 0%,rgba(34,211,238,.12),transparent 70%),var(--bg-alt)}
+.timer-card.warning{border-color:var(--orange);background:radial-gradient(700px 260px at 50% 0%,rgba(255,112,67,.14),transparent 70%),var(--bg-alt)}
+.timer-card.finished{border-color:var(--green);background:radial-gradient(700px 260px at 50% 0%,rgba(74,222,128,.14),transparent 70%),var(--bg-alt)}
+.timer-card.flash{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.10)}
+.timer-ring{position:relative;width:190px;height:190px;margin:0 auto 18px}
+.timer-ring svg{transform:rotate(-90deg);width:190px;height:190px}
+.timer-ring-bg{fill:none;stroke:var(--line);stroke-width:8}
+.timer-ring-fill{fill:none;stroke:var(--red);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .3s}
+.timer-card.running .timer-ring-fill{stroke:var(--cyan)}
+.timer-card.warning .timer-ring-fill{stroke:var(--orange)}
+.timer-card.finished .timer-ring-fill{stroke:var(--green)}
+.timer-display{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:44px;font-weight:800;color:var(--red);letter-spacing:-1px}
+.timer-card.running .timer-display{color:var(--cyan)}
+.timer-card.warning .timer-display{color:var(--orange)}
+.timer-card.finished .timer-display{color:var(--green)}
+.timer-card h3{margin:0 0 6px;font-size:21px}
+.timer-note{margin:0 0 18px;color:var(--text-3);font-size:14px;min-height:20px}
+.timer-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;background:var(--panel-2);color:var(--text);
+  border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:10px 22px;transition:border-color .18s,color .18s,background .18s}
+.btn:hover{border-color:var(--red);color:var(--red-soft)}
+.btn.primary{border-color:var(--red);color:var(--red-soft);background:rgba(230,57,70,.10)}
+.btn.primary:hover{background:rgba(230,57,70,.18)}
+
+/* ---------- page nav ---------- */
+.pagenav{display:flex;justify-content:space-between;gap:14px;margin:40px 0 0;border-top:1px solid var(--line);padding-top:20px}
+.pagenav a{background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 18px;font-size:14px;color:var(--text-2);flex:1;transition:border-color .18s}
+.pagenav a:hover{border-color:var(--red);color:var(--red-soft);text-decoration:none}
+.pagenav a small{display:block;color:var(--text-4);font-size:11px;letter-spacing:.6px;text-transform:uppercase}
+.pagenav .next{text-align:right}
+.pagenav a.disabled{opacity:.35;pointer-events:none}
+.pagenav a .lbl{display:block;font-weight:600;color:var(--text)}
+.pagenav a:hover .lbl{color:var(--red-soft)}
+.kbd-hint{text-align:center;color:var(--text-4);font-size:11.5px;margin-top:14px}
+.kbd{font-family:var(--mono);background:var(--panel-2);border:1px solid var(--line-soft);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--text-3)}
+
+/* ---------- footer ---------- */
+.footer{border-top:1px solid var(--line);margin-top:56px;padding-block:28px;color:var(--text-4);font-size:13px}
+.footer-inner{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+
+/* ---------- utility ---------- */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+@media(max-width:768px){.split{grid-template-columns:1fr}}
+.mono{font-family:var(--mono)}
+.center{text-align:center}
+.muted{color:var(--text-3)}
+hr{border:none;border-top:1px solid var(--line);margin:28px 0}
+
+@media(max-width:640px){
+  .page-head h1{font-size:25px}
+  .topnav{display:none}
+}
+
+@media print{
+  .topbar,.sidebar,.progress-wrap,.pagenav,.kbd-hint,.footer,.timer-btns{display:none!important}
+  .page{display:none!important}
+  .page.active{display:block!important}
+  .page-layout{display:block!important}
+  body{background:#fff;color:#000}
+  .box,table,.dgm,.shot{break-inside:avoid}
+  .ask details,.q details{display:block}
+}
+
+/* ==========================================================================
+   Width discipline — added 2026-08-31
+   Prose is capped; tables, grids, figures and cards fill the container.
+   ========================================================================== */
+/* CHANGED 2026-09-09 — prose fills the column.
+   The 96ch cap left a wide dead gutter on the right of every section on a
+   desktop screen. Prose now fills its track like tables, diagrams and boxes
+   already did; the .wrap container (--maxw) is the only width limit.
+   To compensate for the longer measure, reading text is a little larger and
+   more leaded — this page is projected in a classroom, so bigger type at full
+   width beats small type in a narrow column. */
+.content p,.content>ul,.content>ol,.page-head .lede{max-width:none}
+.content p,.content li{font-size:16.5px;line-height:1.78}
+.page-head .lede{font-size:17px;line-height:1.65}
+/* structured objects are NOT prose — they fill their panel */
+.content .box p,.content .box ul,.content .box ol,
+.content .practice p,.content .practice ul,
+.content .q p,.content .q ul,.content .ask p,
+.content .verify ul,.content .takeaways,.content .steps,
+.content .bio p,.content .bio ul,.content .dgm-detail p,
+.content td p,.content td ul,.content th p,.content li p{max-width:none}
+
+/* one shared depth token on every raised surface */
+.card,.tile,.stat,.box,.dgm,.tbl-scroll,.practice,.shot,
+.q,.verify,.ask,.bio,.timer-card,.oneline,.takeaways li{box-shadow:var(--depth)}
+.card:hover,.tile:hover{box-shadow:var(--depth-hi)}
+
+/* wide objects scroll inside their own container, never the document */
+.dgm,.tbl-scroll,pre{max-width:100%}
+
+/* ==========================================================================
+   Session report — interactive per-session team deliverable (report.js)
+   Fills the container like everything else; prints as a clean light document.
+   ========================================================================== */
+.rep-head{background:var(--bg-alt);border:1px solid var(--line);border-left:3px solid var(--red);
+  border-radius:var(--radius);box-shadow:var(--depth);padding:20px 22px;margin:0 0 22px}
+.rep-head h2{margin:0 0 4px;font-size:19px;font-weight:800}
+.rep-head p{margin:0 0 16px;color:var(--text-3);font-size:13.5px}
+.rep-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px 18px}
+.rep-fields>*{min-width:0}
+.rep-field{display:flex;flex-direction:column;gap:5px}
+.rep-field.wide{grid-column:1/-1}
+.rep-field label{font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:var(--text-3);font-weight:700}
+.rep-field input,.rep-field textarea,.rep-notes,.rep-free textarea{
+  font-family:var(--font);font-size:14px;color:var(--text);background:var(--panel-2);
+  border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:9px 12px;width:100%;resize:none}
+.rep-field input:focus,.rep-field textarea:focus,.rep-notes:focus,.rep-free textarea:focus{
+  outline:none;border-color:var(--red);background:#0f1420}
+.rep-field input::placeholder,.rep-notes::placeholder,.rep-free textarea::placeholder{color:var(--text-4)}
+
+/* action + progress bar */
+.rep-bar{position:sticky;top:64px;z-index:30;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  background:rgba(13,17,23,.94);backdrop-filter:blur(10px);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--depth);padding:12px 16px;margin:0 0 8px}
+.rep-prog{flex:1;min-width:180px;display:flex;align-items:center;gap:12px}
+.rep-prog .pbar{flex:1;height:5px;background:var(--panel-2);border-radius:20px;overflow:hidden}
+.rep-prog .pbar span{display:block;height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--red),var(--green));transition:width .3s}
+.rep-prog b{font-family:var(--mono);font-size:12px;color:var(--text-2);white-space:nowrap}
+.rep-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rep-saved{font-family:var(--mono);font-size:11.5px;color:var(--green);opacity:0;transition:opacity .2s}
+.rep-saved.show{opacity:1}
+.rep-btn{font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;background:var(--panel-2);
+  color:var(--text);border:1px solid var(--line-soft);border-radius:var(--radius-sm);padding:8px 14px;
+  transition:border-color .16s,color .16s,background .16s}
+.rep-btn:hover{border-color:var(--red);color:var(--red-soft)}
+.rep-btn.primary{border-color:var(--green);color:var(--green);background:rgba(74,222,128,.10)}
+.rep-btn.primary:hover{background:rgba(74,222,128,.18)}
+.rep-btn.ghost{color:var(--text-3)}
+.rep-btn.ghost.arm{border-color:var(--orange);color:var(--orange)}
+
+/* scope gate warning */
+.rep-gate{display:none;border:1px solid rgba(255,112,67,.5);background:rgba(255,112,67,.10);
+  border-radius:var(--radius-sm);padding:12px 16px;margin:0 0 18px;color:var(--text-2);font-size:13.5px}
+.rep-gate.show{display:block}
+.rep-gate b{color:var(--orange)}
+
+/* section heading — same gradient rule as content h2 */
+.rep-sec{display:flex;align-items:center;gap:16px;font-size:15px;font-weight:800;letter-spacing:.4px;
+  text-transform:uppercase;color:var(--red);margin:30px 0 12px}
+.rep-sec::after{content:"";flex:1 1 auto;height:1px;background:linear-gradient(90deg,var(--line-soft),transparent)}
+
+/* a step row */
+.rep-step{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+  background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--depth);padding:14px 16px;margin:0 0 10px;transition:border-color .16s}
+.rep-step>*{min-width:0}
+.rep-step.done{border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.045)}
+.rep-check{cursor:pointer;padding-top:2px}
+.rep-check input{position:absolute;opacity:0;width:0;height:0}
+.rep-box{display:block;width:22px;height:22px;border:1.5px solid var(--line-soft);border-radius:6px;
+  background:var(--panel-2);transition:.15s;position:relative}
+.rep-check input:focus-visible+.rep-box{border-color:var(--red)}
+.rep-check input:checked+.rep-box{background:var(--green);border-color:var(--green)}
+.rep-check input:checked+.rep-box::after{content:"";position:absolute;left:7px;top:3px;width:5px;height:10px;
+  border:solid #0d1117;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.rep-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.rep-name{font-weight:700;font-size:15px;color:var(--text)}
+.rep-step.done .rep-name{color:var(--green)}
+.rep-cmd{font-family:var(--mono);font-size:12.5px;color:var(--red-soft);background:var(--panel-2);
+  border:1px solid var(--line);border-radius:5px;padding:2px 9px;overflow-wrap:anywhere}
+.rep-toggle{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--cyan);background:transparent;
+  border:1px solid rgba(34,211,238,.4);border-radius:20px;padding:3px 12px;cursor:pointer;white-space:nowrap;transition:.16s}
+.rep-toggle:hover{background:rgba(34,211,238,.10)}
+.rep-toggle::before{content:"▸ example ";}
+.rep-step.open .rep-toggle::before{content:"▾ example ";}
+
+/* the reference panel (revealed on click) */
+.rep-detail{display:none;margin-top:12px}
+.rep-step.open .rep-detail{display:block;animation:dgmIn .16s ease-out}
+.rep-lbl{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:700;margin:0 0 5px}
+.rep-out .rep-lbl{color:var(--cyan)}
+.rep-detail pre{margin:0 0 12px}
+.rep-collect{margin:0 0 10px}
+.rep-collect .rep-lbl{color:var(--green)}
+.rep-collect ul{list-style:none;padding:0;margin:0}
+.rep-collect li{position:relative;padding-left:20px;margin-bottom:4px;font-size:13.5px;color:var(--text-2)}
+.rep-collect li::before{content:"▸";position:absolute;left:0;color:var(--green);font-size:12px}
+.rep-why{font-size:13px;color:var(--text-2);border-left:3px solid var(--amber);
+  background:rgba(251,191,36,.06);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 14px}
+.rep-why b{color:var(--amber)}
+
+/* findings box — always visible, quick to fill */
+.rep-notes{margin-top:12px;min-height:40px;font-size:13.5px;line-height:1.6}
+
+/* free block (ranked list, summary) */
+.rep-free{background:var(--bg-alt);border:1px solid var(--line);border-left:3px solid var(--cyan);
+  border-radius:var(--radius);box-shadow:var(--depth);padding:16px 18px;margin:0 0 10px}
+.rep-free-label{display:block;font-weight:700;font-size:14.5px;color:var(--text);margin-bottom:4px}
+.rep-free-hint{font-size:12.5px;color:var(--text-3);margin:0 0 10px}
+.rep-free textarea{min-height:96px;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+
+/* ---------- print: a clean light deliverable ---------- */
+@media print{
+  .topbar,.rep-bar,.rep-toggle,.rep-detail,.footer,.rep-gate{display:none!important}
+  body{background:#fff;color:#111}
+  .wrap{max-width:none;padding-inline:0}
+  .rep-head,.rep-step,.rep-free{background:#fff!important;border:1px solid #ccc!important;
+    box-shadow:none!important;break-inside:avoid}
+  .rep-head h2,.rep-name,.rep-free-label{color:#111!important}
+  .rep-sec{color:#b3202c!important}
+  .rep-field label,.rep-free-hint{color:#555!important}
+  .rep-field input,.rep-notes,.rep-free textarea{color:#111!important;background:#fff!important;border:1px solid #ddd!important}
+  .rep-cmd{color:#b3202c!important;background:#f4f4f4!important;border-color:#ddd!important}
+  .rep-box{background:#fff!important;border-color:#888!important}
+  .rep-check input:checked+.rep-box{background:#0a8f3c!important;border-color:#0a8f3c!important}
+  .rep-step.done{background:#f6fff8!important}
+}
+
+/* ---------- sidebar deliverable CTA (last section in the left bar) ---------- */
+.side-cta{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.side-cta h5{margin:0 0 8px;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--red)}
+.side-cta a{display:block;text-align:center;font-size:13px;font-weight:700;color:var(--red-soft);
+  border:1px solid rgba(230,57,70,.4);background:rgba(230,57,70,.08);border-radius:var(--radius-sm);
+  padding:9px 12px;transition:border-color .16s,background .16s,color .16s}
+.side-cta a:hover{background:rgba(230,57,70,.16);border-color:var(--red);color:#fff;text-decoration:none}
+
+/* ---------- cumulative report: prior-session groups ---------- */
+details.rep-group{border:1px solid var(--line);border-radius:var(--radius);background:var(--bg-alt);box-shadow:var(--depth);overflow:hidden;margin:0 0 10px}
+details.rep-group>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:14px 18px;font-weight:700;font-size:14.5px;color:var(--text-2)}
+details.rep-group>summary::-webkit-details-marker{display:none}
+details.rep-group>summary::before{content:"▸";color:var(--red);font-size:13px}
+details.rep-group[open]>summary::before{content:"▾"}
+details.rep-group[open]>summary{border-bottom:1px solid var(--line)}
+details.rep-group .rep-group-title{color:var(--text)}
+.rep-group-tag{font-family:var(--mono);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-4);border:1px solid var(--line-soft);border-radius:20px;padding:2px 9px;margin-left:auto;white-space:nowrap}
+.rep-group-tag.now{color:var(--red);border-color:rgba(230,57,70,.45);margin-left:0}
+.rep-group-body{padding:2px 18px 14px}
+.rep-group.current{margin:8px 0 10px}
+.rep-group-title--cur{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:17px;font-weight:800;color:#fff;margin:26px 0 6px}
+@media print{ details.rep-group,details.rep-group[open]{border-color:#ccc!important} details.rep-group>summary{color:#111!important} .rep-group-title--cur{color:#111!important} }
+
+/* ==========================================================================
+   ADDED 2026-09-07 — Session 3 teaching components
+   1. .pktflow   step-through packet-flow player (what happens on the wire)
+   2. .leads-to  "what this scan gets you" — the memory box
+   3. .wsbox     "in Wireshark / what the SOC sees" + capture download
+   4. .proto-*   protocol-first page furniture
+   All are shared components: any later session may reuse them unchanged.
+   ========================================================================== */
+
+/* ---------- 1. packet-flow player ---------- */
+.dgm.pktflow svg .pf-step{opacity:.085;transition:opacity .25s ease-out}
+.dgm.pktflow svg .pf-step.on{opacity:1}
+.dgm.pktflow svg .pf-step.now{animation:pfIn .42s cubic-bezier(.22,.9,.3,1) both}
+@keyframes pfIn{from{opacity:0;transform:translateX(var(--pf-dx,-26px))}to{opacity:1;transform:translateX(0)}}
+.dgm.pktflow svg .pf-step{transform-box:view-box}
+.pf-ctl{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.pf-ctl button{font-family:var(--mono);font-size:12px;color:var(--cyan);background:transparent;
+  border:1px solid var(--cyan);border-radius:20px;padding:5px 15px;cursor:pointer;transition:background .15s}
+.pf-ctl button:hover:not(:disabled){background:rgba(34,211,238,.12)}
+.pf-ctl button:disabled{opacity:.35;cursor:default}
+.pf-ctl button[data-pf="play"]{color:var(--red);border-color:var(--red);font-weight:700}
+.pf-ctl button[data-pf="play"]:hover{background:rgba(230,57,70,.12)}
+.pf-count{font-family:var(--mono);font-size:11.5px;color:var(--text-4);letter-spacing:.4px;min-width:52px;text-align:center}
+.pf-cap{display:none;margin-top:12px;border:1px solid var(--line-soft);border-left:3px solid var(--cyan);
+  border-radius:var(--radius-sm);background:var(--panel-2);padding:12px 16px;font-size:13.5px;color:var(--text-2)}
+.pf-cap.open{display:block;animation:dgmIn .18s ease-out}
+.pf-cap .pf-n{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.5px;margin-right:8px}
+.pf-cap b{color:#fff}
+
+/* ---------- 2. "what this scan gets you" memory box ---------- */
+.leads-to{border:1px solid var(--line-soft);border-left:3px solid var(--amber);border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,rgba(251,191,36,.075),rgba(251,191,36,.02));padding:15px 18px 13px;margin:22px 0}
+.leads-to .lt-t{display:block;color:var(--amber);font-size:11.5px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;margin-bottom:11px}
+.leads-to .lt-t::before{content:"➜ "}
+.lt-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.lt-grid>*{min-width:0}
+.lt-cell{background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 13px}
+.lt-cell .lt-k{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--text-4);margin-bottom:4px}
+.lt-cell p{margin:0;font-size:13.5px;color:var(--text-2);line-height:1.55}
+.lt-cell p b{color:#fff}
+.lt-mem{margin:12px 0 0;font-size:14px;color:var(--text);border-top:1px dashed var(--line-soft);padding-top:10px;max-width:none}
+.lt-mem b{color:var(--amber)}
+
+/* ---------- 3. Wireshark / SOC view box ---------- */
+.wsbox{border:1px solid var(--line-soft);border-left:3px solid var(--cyan);border-radius:var(--radius-sm);
+  background:var(--bg-alt);padding:14px 16px;margin:22px 0}
+.ws-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ws-h .ws-t{color:var(--cyan);font-size:11.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase}
+.ws-h .ws-t::before{content:"🦈 "}
+.ws-dl{display:inline-block;max-width:100%;font-family:var(--mono);font-size:11px;color:var(--text-3);
+  border:1px solid var(--line-soft);border-radius:20px;padding:3px 12px;line-height:1.7;word-break:break-word}
+.ws-h .ws-dl{margin-left:auto;white-space:nowrap}
+@media (max-width:620px){.ws-h .ws-dl{margin-left:0;white-space:normal;word-break:break-all}}
+.ws-dl:hover{color:var(--cyan);border-color:var(--cyan);text-decoration:none;background:rgba(34,211,238,.08)}
+.ws-filter{font-family:var(--mono);font-size:12.5px;background:#0a0d13;border:1px solid var(--line);
+  border-radius:6px;padding:8px 12px;margin-bottom:10px;overflow-x:auto;white-space:nowrap}
+.ws-filter::before{content:"filter";display:inline-block;color:var(--text-4);font-size:10px;letter-spacing:.8px;
+  text-transform:uppercase;margin-right:10px;border-right:1px solid var(--line-soft);padding-right:10px}
+.ws-filter code{color:var(--green);background:none;padding:0;font-size:12.5px}
+.ws-pkt{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px;margin:0 0 10px;
+  display:block;overflow-x:auto;white-space:nowrap}
+.ws-pkt tr{border-bottom:1px solid var(--line)}
+.ws-pkt tr:last-child{border-bottom:none}
+.ws-pkt th{color:var(--text-4);font-size:10px;letter-spacing:.7px;text-transform:uppercase;text-align:left;
+  padding:5px 10px 5px 0;font-weight:600}
+.ws-pkt td{padding:4px 10px 4px 0;color:var(--text-2);vertical-align:top}
+.ws-pkt td:first-child{color:var(--text-4);width:34px}
+.ws-pkt tr.p-out td{color:#ffb59f}       /* attacker → target */
+.ws-pkt tr.p-in  td{color:#8ee7f5}       /* target → attacker */
+.ws-pkt tr.p-none td{color:var(--text-4);font-style:italic}
+.ws-soc{margin:0;padding-top:9px;border-top:1px dashed var(--line-soft);font-size:13.5px;color:var(--text-2);max-width:none}
+.ws-soc b{color:var(--green)}
+.ws-soc .ws-sig{font-family:var(--mono);color:var(--green);font-size:12.5px}
+
+/* capture bar — download every pcap for the session */
+.pcap-bar{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));margin:20px 0}
+.pcap-bar>*{min-width:0}
+.pcap-card{display:block;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-alt);
+  padding:11px 14px;text-decoration:none}
+.pcap-card:hover{border-color:var(--cyan);background:var(--panel-2);text-decoration:none}
+.pcap-card .pc-n{display:block;font-family:var(--mono);font-size:12.5px;color:var(--cyan);margin-bottom:2px;
+  overflow:hidden;text-overflow:ellipsis}
+.pcap-card .pc-d{display:block;font-size:12px;color:var(--text-3);line-height:1.5}
+
+/* ---------- 4. protocol-first page furniture ---------- */
+.proto-hd{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line-soft);
+  border-left:3px solid var(--red);border-radius:var(--radius-sm);
+  background:linear-gradient(120deg,rgba(230,57,70,.1),transparent 60%);padding:14px 18px;margin:0 0 20px}
+.proto-hd .ph-abbr{font-family:var(--mono);font-size:26px;font-weight:700;color:#fff;letter-spacing:1px;line-height:1}
+.proto-hd .ph-txt{min-width:0}
+.proto-hd .ph-full{display:block;color:var(--text);font-size:15px;font-weight:600}
+.proto-hd .ph-one{display:block;color:var(--text-3);font-size:13px;margin-top:2px}
+.proto-hd .ph-ports{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap}
+.ph-port{font-family:var(--mono);font-size:11.5px;color:var(--cyan);border:1px solid rgba(34,211,238,.45);
+  background:rgba(34,211,238,.08);border-radius:20px;padding:3px 11px;white-space:nowrap}
+.ph-port.udp{color:var(--purple);border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.08)}
+
+.proto-facts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,168px),1fr));margin:18px 0}
+.proto-facts>*{min-width:0}
+.pf-fact{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-alt);padding:10px 13px}
+.pf-fact .pff-k{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--text-4);margin-bottom:3px}
+.pf-fact .pff-v{display:block;font-size:13.5px;color:var(--text);line-height:1.5}
+.pf-fact.good .pff-v{color:var(--green)}
+.pf-fact.bad .pff-v{color:var(--orange)}
+
+/* "if you see this port, you can…" — attacker value ladder */
+.gain{border:1px solid var(--line-soft);border-left:3px solid var(--orange);border-radius:var(--radius-sm);
+  background:rgba(255,112,67,.05);padding:15px 18px;margin:22px 0}
+.gain .g-t{display:block;color:var(--orange);font-size:11.5px;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;margin-bottom:11px}
+.gain .g-t::before{content:"⚔ "}
+.gain ol{list-style:none;counter-reset:gn;padding:0;margin:0}
+.gain ol>li{counter-increment:gn;position:relative;padding:0 0 11px 34px;margin:0;font-size:13.5px;color:var(--text-2)}
+.gain ol>li:last-child{padding-bottom:0}
+.gain ol>li::before{content:counter(gn);position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;
+  background:rgba(255,112,67,.15);border:1px solid rgba(255,112,67,.5);color:var(--orange);
+  font-family:var(--mono);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.gain ol>li b{color:#fff}
+.gain ol>li .g-att{font-family:var(--mono);font-size:11px;color:var(--text-4);letter-spacing:.3px}
+
+/* ---------- inline highlighter (added 2026-09-09) ----------
+   Marker-pen emphasis for the ONE thing on a page a student must leave with.
+   Rides on an existing <strong>/<b> so nothing re-flows. Three tints, and the
+   tint carries meaning — do not use them decoratively:
+     .hl      amber  · the fact to remember / the rule
+     .hl-d    green  · the defender / SOC fact
+     .hl-w    red    · the danger, the legal line, the thing that bites
+   Budget: 2-3 per page. More than that and none of them are highlights.      */
+.hl{background:rgba(251,191,36,.14);box-shadow:inset 0 -2px 0 rgba(251,191,36,.85);
+  color:#fff;font-weight:700;padding:1px 5px;border-radius:3px;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hl-d{background:rgba(74,222,128,.13);box-shadow:inset 0 -2px 0 rgba(74,222,128,.85)}
+.hl-w{background:rgba(230,57,70,.15);box-shadow:inset 0 -2px 0 rgba(230,57,70,.9)}
+/* a highlight inside an already-tinted box keeps only its underline, so two
+   washes never stack into mud */
+.box .hl,.leads-to .hl,.gain .hl,.verify .hl,.practice .hl{background:transparent;padding:1px 2px}
+@media print{.hl{background:rgba(251,191,36,.5)!important;box-shadow:none!important;color:#000!important}
+  .hl-d{background:rgba(74,222,128,.45)!important}.hl-w{background:rgba(230,57,70,.4)!important}}
+
+/* ==========================================================================
+   SIM SCREEN — simulated tool / terminal windows (animated by session.js)
+   A window with a title bar and a mono body whose lines reveal in sequence,
+   so a tool run reads as something you watch, not a static dump.
+   Without JS every line just shows (graceful fallback).
+   ========================================================================== */
+.sim{background:#0b0f16;border:1px solid var(--line-soft);border-radius:var(--radius);
+  box-shadow:var(--depth,0 2px 12px rgba(0,0,0,.42));margin:22px 0;overflow:hidden}
+.sim-bar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#161b24;border-bottom:1px solid var(--line)}
+.sim-bar .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+.sim-bar .dot.r{background:#ff5f56}.sim-bar .dot.y{background:#ffbd2e}.sim-bar .dot.g{background:#27c93f}
+.sim-bar .sim-title{margin-left:8px;font-family:var(--mono);font-size:12px;color:var(--text-2);letter-spacing:.3px}
+.sim-bar .sim-tool{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text-4);text-transform:uppercase;letter-spacing:1.2px}
+.sim-body{padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.65;color:#c9d1d9;
+  background:#0b0f16;overflow-x:auto}
+.sim-body .l{display:block;white-space:pre;min-height:1.1em}
+.sim-body .cmd{color:#e4e8ee}
+.sim-body .cmd::before{content:"$ ";color:#4ade80;font-weight:700}
+.sim-body .cmd.root::before{content:"# ";color:#ff6b7a;font-weight:700}
+.sim-body .ok{color:#4ade80}
+.sim-body .crit{color:#ff6b7a;font-weight:600}
+.sim-body .warn{color:#ff7043}
+.sim-body .info{color:#22d3ee}
+.sim-body .dim{color:#768290}
+.sim-body .hl{color:#fbbf24;font-weight:700}
+.sim-body b{color:#fff;font-weight:700}
+/* animated reveal — only when session.js has marked the sim (.anim); else lines show */
+/* visible by default (never a blank terminal); JS adds .playing to animate */
+.sim.playing .sim-body .l{opacity:0}
+.sim.playing .sim-body .l.shown{opacity:1;animation:simline .16s ease-out}
+@keyframes simline{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.sim-cursor{display:inline-block;width:8px;height:1em;background:#4ade80;vertical-align:-3px;margin-left:1px;animation:simblink 1.05s steps(1) infinite}
+@keyframes simblink{50%{opacity:0}}
+.sim-cta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:9px 14px;background:#0d1218;border-top:1px solid var(--line)}
+.sim-replay{font-family:var(--mono);font-size:11.5px;color:var(--cyan);background:transparent;border:1px solid var(--cyan);
+  border-radius:20px;padding:4px 14px;cursor:pointer}
+.sim-replay:hover{background:rgba(34,211,238,.1)}
+.sim-note{font-size:12px;color:var(--text-3)}
+.sim-note b{color:var(--text-2)}
+/* GUI-panel variant (scanner findings etc.) */
+.sim-gui .sim-body{white-space:normal;padding:0}
+.sim-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line)}
+.sim-row:last-child{border-bottom:none}
+.sim-sev{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  padding:3px 9px;border-radius:5px;flex:0 0 auto;min-width:64px;text-align:center}
+.sim-sev.crit{color:#ff6b7a;background:rgba(230,57,70,.14);border:1px solid rgba(230,57,70,.4)}
+.sim-sev.high{color:#ff7043;background:rgba(255,112,67,.12);border:1px solid rgba(255,112,67,.4)}
+.sim-sev.med{color:#fbbf24;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.4)}
+.sim-sev.low{color:#768290;background:var(--panel-2);border:1px solid var(--line-soft)}
+.sim-row .sim-find{font-size:13.5px;color:var(--text)}
+.sim-row .sim-cve{font-family:var(--mono);font-size:11.5px;color:var(--text-3);margin-left:auto;white-space:nowrap}
+@media(max-width:640px){.sim-row{flex-wrap:wrap}.sim-row .sim-cve{margin-left:0}}
+
+/* sim screens sit as medium, centered screenshots (not full-bleed) */
+.sim{max-width:1040px;margin-left:auto;margin-right:auto}
+/* Event Viewer variant — a tabular "screenshot" that always renders */
+.sim-evt .sim-body{padding:0;white-space:normal;overflow-x:auto}
+.sim-evt table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;min-width:560px}
+.sim-evt th{background:#161b24;color:var(--text-3);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;font-weight:700}
+.sim-evt td{padding:7px 12px;border-bottom:1px solid #171d29;color:#c9d1d9;white-space:nowrap}
+.sim-evt tr:last-child td{border-bottom:none}
+.sim-evt .lvl-f{color:#ff6b7a;font-weight:700}
+.sim-evt .lvl-i{color:#22d3ee}
+.sim-evt .hlrow td{background:rgba(230,57,70,.07)}
+.sim-evt .k{color:#fbbf24;font-weight:700}
+
+/* ==========================================================================
+   Tool card — original tool badge + goal/how/example (S4 tools; reusable)
+   Original themed icons (NOT vendor logos). Accent via data-accent.
+   ========================================================================== */
+.toolcard{--tc:var(--orange);display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;
+  border:1px solid var(--line);border-left:3px solid var(--tc);border-radius:var(--radius-sm);
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+  padding:14px 18px;margin:22px 0 10px;box-shadow:var(--depth)}
+.toolcard[data-accent="orange"]{--tc:var(--orange)}
+.toolcard[data-accent="green"]{--tc:var(--green)}
+.toolcard[data-accent="cyan"]{--tc:var(--cyan)}
+.toolcard[data-accent="purple"]{--tc:var(--purple)}
+.toolcard[data-accent="amber"]{--tc:var(--amber)}
+.toolcard[data-accent="red"]{--tc:var(--red)}
+.tool-badge{display:flex;align-items:center;gap:13px;min-width:210px}
+.tool-ico{width:46px;height:46px;flex:0 0 46px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line-soft);padding:7px;display:block}
+.tool-ico svg{width:100%;height:100%;display:block}
+.tool-id{display:flex;flex-direction:column;line-height:1.15}
+.tool-name{font-family:var(--mono);font-weight:800;font-size:20px;color:var(--tc);letter-spacing:.3px}
+.tool-tag{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3);margin-top:3px}
+.tool-meta{flex:1 1 320px;min-width:0;font-size:14px}
+.tool-meta p{margin:0 0 6px}
+.tool-meta p:last-child{margin-bottom:0}
+.tm-k{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--tc);background:rgba(255,255,255,.05);
+  border:1px solid var(--line-soft);border-radius:5px;padding:1px 7px;margin-right:8px;vertical-align:1px}
+/* how-to steps + example under a toolcard */
+.tool-how{margin:6px 0 4px;padding-left:0;list-style:none;counter-reset:th}
+.tool-how li{position:relative;padding:5px 0 5px 30px;font-size:14px;border-bottom:1px solid var(--line)}
+.tool-how li:last-child{border-bottom:0}
+.tool-how li::before{counter-increment:th;content:counter(th);position:absolute;left:0;top:5px;
+  width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--line-soft);
+  color:var(--text-2);font-family:var(--mono);font-size:11px;font-weight:700;display:grid;place-items:center}
+.tool-eg{margin:4px 0 0}
+.tool-eg .eg-k{font-family:var(--mono);font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--text-3);display:block;margin:10px 0 4px}
+
+</style>
+<link rel="icon" href="https://ceh-diploma.vercel.app/assets/img/itgate-logo.jpg">
+<style>
+  /* ---- CTF-specific bits, built on the ceh.css design tokens ---- */
+  .mems{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .mem-row{display:flex;gap:8px;align-items:center}
+  .mem-row input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    border-radius:var(--radius-sm);padding:9px 12px;font-size:14px;font-family:var(--font)}
+  .mem-row input:focus{outline:none;border-color:var(--red)}
+  .ctf-machine{background:var(--bg-alt);border:1px solid var(--line);border-left:3px solid var(--red);
+    border-radius:var(--radius);padding:18px 18px 6px;margin:16px 0}
+  .ctf-mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .ctf-mhead h3{margin:0;font-size:17px;color:var(--text)}
+  .ctf-stage{border:1px solid var(--line);border-left:3px solid var(--line-soft);border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+    padding:12px 14px;margin:12px 0;background:var(--panel)}
+  .ctf-stage.recon{border-left-color:var(--green)}
+  .ctf-stage.user{border-left-color:var(--amber)}
+  .ctf-stage.root{border-left-color:var(--red)}
+  .ctf-stage h4{margin:0 0 8px;font-size:14px;display:flex;gap:10px;align-items:center;color:var(--text)}
+  .flagline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .flagline input{flex:1;min-width:180px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    border-radius:var(--radius-sm);padding:9px 12px;font-family:var(--mono);font-size:13.5px}
+  .flagline input:focus{outline:none;border-color:var(--cyan)}
+  .status{font-family:var(--mono);font-size:12px;font-weight:700;min-width:104px;text-align:center;
+    padding:8px 6px;border-radius:20px}
+  .status.idle{background:var(--panel-2);color:var(--text-3)}
+  .status.ok{background:rgba(74,222,128,.14);color:var(--green)}
+  .status.bad{background:rgba(230,57,70,.14);color:var(--red-soft)}
+  .ctf-lbl{font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:var(--text-3);font-weight:700;margin:12px 0 4px;display:block}
+  .ctf-in{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    border-radius:var(--radius-sm);padding:9px 12px;font-size:14px;font-family:var(--font)}
+  .ctf-in:focus{outline:none;border-color:var(--red)}
+  textarea.ctf-in{min-height:104px;resize:vertical;font-family:var(--mono);font-size:12.5px;line-height:1.7}
+  .ctf-score{display:flex;align-items:baseline;gap:8px}
+  .ctf-score .num{font-size:24px;font-weight:800;color:var(--green);font-family:var(--font)}
+  .ctf-score .lab{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.7px}
+  .btn-x{background:rgba(230,57,70,.10);border:1px solid rgba(230,57,70,.35);color:var(--red-soft);
+    border-radius:20px;padding:4px 11px;font-size:12px;cursor:pointer;font-family:var(--font)}
+  /* machines dashboard */
+  .ctf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;margin-top:14px}
+  .mach-card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--line-soft);
+    border-radius:var(--radius-sm);padding:14px 16px}
+  .mach-card.easy{border-left-color:var(--green)}
+  .mach-card.medium{border-left-color:var(--amber)}
+  .mach-card.hard{border-left-color:var(--red)}
+  .mach-card.privesc{border-left-color:var(--cyan)}
+  .mach-card h4{margin:0 0 6px;font-size:15px;color:var(--text);font-family:var(--mono)}
+  .mach-card p{margin:8px 0 0;color:var(--text-2);font-size:13px;line-height:1.55}
+  .mach-card .flags{color:var(--text-3);font-size:11.5px;font-family:var(--mono);margin-top:8px;display:block}
+  a.dl{display:inline-block;text-decoration:none}
+  a.dl:hover{text-decoration:none}
+  /* report output */
+  #reportView{display:none}
+  #reportView pre{white-space:pre-wrap;word-break:break-word}
+  @media print{
+    .ctf-form{display:none!important}
+    #reportView{display:block!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="../index.html">
+      <img src="https://ceh-diploma.vercel.app/assets/img/itgate-logo.jpg" alt="ITGate Academy">
+      <span class="brand-text">
+        <span class="brand-name">ITGate Academy</span>
+        <span class="brand-sub">CEH · Student CTF</span>
+      </span>
+    </a>
+    <nav class="topnav">
+      <a href="../index.html">All sessions</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap section">
+
+  <div class="page-head">
+    <div class="kicker"><span class="snum">CTF</span><span class="tag lab">Capture the Flag</span><span class="tag recall">team event</span></div>
+    <h1>Student CTF Portal</h1>
+    <p class="lede">Register your team, then for <strong>every machine you solve</strong> submit the three flags, note where you found each, and write <strong>how you did it</strong> — steps, commands, and research. Flags are <strong>graded instantly</strong> in this browser. When you finish, export your solution report.</p>
+  </div>
+
+  <!-- MACHINES DASHBOARD -->
+  <div class="rep-head">
+    <h2>Get the machines</h2>
+    <p>Download the vulnerable VMs, import them into VMware/VirtualBox, and start hacking. Each machine has <strong>3 flags</strong> — Recon → User → Root. Submit them below.</p>
+    <p style="margin-top:12px"><a class="dl" href="https://mega.nz/folder/upND1DjY#B4lnDu60yNXOtYdv-5J6HA" target="_blank" rel="noopener"><span class="rep-btn primary">⭳ Download all machines (MEGA)</span></a></p>
+    <div class="ctf-grid">
+      <div class="mach-card easy"><h4>gate-linux01</h4><span class="tag defensive">Easy</span> <span class="tag lab">Linux</span><p>Your first box. Many doors are left open — find any way in, then dig for root.</p><span class="flags">3 flags · recon / user / root</span></div>
+      <div class="mach-card medium"><h4>gate-win01</h4><span class="tag recall">Medium</span> <span class="tag lab">Windows</span><p>A Windows target. Land a shell through an exposed service, then climb to Administrator.</p><span class="flags">3 flags · recon / user / admin</span></div>
+      <div class="mach-card hard"><h4>Network Penetration Testing Project</h4><span class="tag theory">Hard</span> <span class="tag lab">Web / Linux</span><p>A full web-to-root engagement. Enumerate hard — the keys are hidden in plain sight.</p><span class="flags">3 flags · recon / user / root</span></div>
+      <div class="mach-card privesc"><h4>NULLGATE</h4><span class="tag recall">Medium</span> <span class="tag activity">Privesc</span><p>Foothold is only the start. Enumerate what you can run as root and turn it against the box.</p><span class="flags">3 flags · recon / user / root</span></div>
+      <div class="mach-card privesc"><h4>REVENANT</h4><span class="tag theory">Hard</span> <span class="tag activity">Privesc</span><p>This one makes you research. Nothing is just what it looks like — and root runs on a schedule.</p><span class="flags">3 flags · recon / user / root</span></div>
+    </div>
+  </div>
+
+  <div class="ctf-form">
+    <!-- TEAM -->
+    <div class="rep-head">
+      <h2>1 · Your team</h2>
+      <div class="rep-fields">
+        <div class="rep-field"><label>Team name</label><input id="team" placeholder="e.g. fsociety" autocomplete="off"></div>
+        <div class="rep-field"><label>Date</label><input id="date" placeholder="2026-09-20" autocomplete="off"></div>
+      </div>
+      <span class="ctf-lbl">Team members — one box per member</span>
+      <div class="mems" id="mems"></div>
+      <div style="margin-top:10px"><button class="rep-btn" onclick="addMember()">+ Add member</button></div>
+    </div>
+
+    <!-- MACHINES -->
+    <h3 class="rep-sec" style="margin-top:26px">2 · Machines you solved</h3>
+    <div id="machines"></div>
+    <div style="margin:14px 0"><button class="rep-btn primary" onclick="addMachine()">+ Add a machine</button></div>
+
+    <!-- STICKY BAR: score + actions -->
+    <div class="rep-bar">
+      <div class="rep-prog">
+        <div class="ctf-score"><span class="num" id="score">0</span><span class="lab">pts</span></div>
+        <span class="pbar"><span id="pbar" style="display:block;height:100%;width:0;border-radius:20px;background:linear-gradient(90deg,var(--red),var(--green));transition:width .3s"></span></span>
+        <b><span id="fcount">0</span> / 15 flags</b>
+      </div>
+      <div class="rep-actions">
+        <span class="rep-saved" id="saved">saved ✓</span>
+        <button class="rep-btn primary" onclick="generateReport()">⭳ Generate report</button>
+        <button class="rep-btn" onclick="printReport()">🖨 Print / PDF</button>
+        <button class="rep-btn" onclick="downloadReport()">Download HTML</button>
+        <button class="rep-btn ghost" onclick="saveDraft()">Save draft</button>
+      </div>
+    </div>
+
+    <div class="box tip" style="margin-top:22px">
+      <span class="box-t">How your team keeps this</span>
+      <p>Your progress saves automatically in <strong>this browser</strong> — reopen the page on the same machine and it's still here. To hand it in, use <strong>Generate report</strong> then <strong>Print / PDF</strong> or <strong>Download HTML</strong>. It does not sync between devices on its own.</p>
+    </div>
+  </div>
+
+  <!-- REPORT OUTPUT -->
+  <div id="reportView"></div>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>CEH Diploma · ITGate Academy · Student CTF</span>
+    <span><a href="../index.html">← All sessions</a></span>
+  </div>
+</footer>
+
+<script>
+const KNOWN = {
+ "e061a8e47f854124760ddc7d76c875e2646ba249c583d9bf43a707dadecaa6ee":100,
+ "80fdf24ab908089a5b231d371c80b83340f302a8908480e0961692e29511560a":150,
+ "a480d8dd56c00b921637fb3a1308fe3787cf1f27703b092beb64c544c01aa24a":200,
+ "5e19aa36308192b482f7e955f2bb9e92248ab636f790279b99bbc03f9ed2a6c3":150,
+ "403f9a0cf768706d681232fd0971cf25f0f36e48f1319cfd0987fe70ed46df4f":250,
+ "976e26e9dc75ce13dc9d51a534b812dc2b97cc22c2767e77fc4bd755d9631aba":350,
+ "04424bb16259c67c27ececa9cdfcfa3db8f9ae54d6f649966e3b3a0398c7d6fd":250,
+ "8e8fef57a89d926ad9f9a102bd2abc5f0c840406cf9b79c7fdd2f1a9568a1fda":400,
+ "15b2238dc5286df17796f5493a6d3e45d6dda85fb8284f5732a96b0a96939a08":600,
+ "d7fc35b3b6a830807f77d44dea9cdf5a7c59b2720ef5d704106ac44e34147863":150,
+ "28801fdae7aa9784b06ff3f1a4491e8928ca8c67acf4fd7480599263af16704d":250,
+ "2e6432aecf0dd22030296344119eece148b38657a2ebe1778f42227514ea218e":400,
+ "f8d30c8eb7be11bbc4d1fd8d860aa604d383518f7cc88a158af0dc6d2279f8c7":250,
+ "22e1040c6fa833689f5c16a29c5acb0515a3da24b1cb7d6272781fedc9636e60":400,
+ "2ef0968ce52c375082a4bf3aa066f6c0aa4722323f94e0263ff58850e8c01265":600
+};
+const TOTAL_FLAGS = Object.keys(KNOWN).length;
+const MAX_PTS = Object.values(KNOWN).reduce((a,b)=>a+b,0);
+const captured = {};
+let mCount = 0;
+
+async function sha256(t){
+  t=t.trim();
+  try{ if(window.crypto&&crypto.subtle){
+    const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");
+  }}catch(e){}
+  return sha256js(t);
+}
+function sha256js(ascii){
+  function rr(n,x){return (x>>>n)|(x<<(32-n));}
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const bytes=[]; for(let i=0;i<ascii.length;i++){let c=ascii.charCodeAt(i);
+    if(c<128)bytes.push(c); else if(c<2048){bytes.push(192|(c>>6),128|(c&63));}
+    else{bytes.push(224|(c>>12),128|((c>>6)&63),128|(c&63));}}
+  const l=bytes.length*8; bytes.push(0x80); while(bytes.length%64!=56)bytes.push(0);
+  for(let i=7;i>=0;i--)bytes.push((l/Math.pow(2,i*8))&255);
+  for(let j=0;j<bytes.length;j+=64){
+    const w=new Array(64);
+    for(let i=0;i<16;i++)w[i]=(bytes[j+i*4]<<24)|(bytes[j+i*4+1]<<16)|(bytes[j+i*4+2]<<8)|(bytes[j+i*4+3]);
+    for(let i=16;i<64;i++){const s0=rr(7,w[i-15])^rr(18,w[i-15])^(w[i-15]>>>3);
+      const s1=rr(17,w[i-2])^rr(19,w[i-2])^(w[i-2]>>>10); w[i]=(w[i-16]+s0+w[i-7]+s1)|0;}
+    let [a,b,c,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){const S1=rr(6,e)^rr(11,e)^rr(25,e);const ch=(e&f)^(~e&g);
+      const t1=(h+S1+ch+K[i]+w[i])|0;const S0=rr(2,a)^rr(13,a)^rr(22,a);
+      const mj=(a&b)^(a&c)^(b&c);const t2=(S0+mj)|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;}
+    H=[(H[0]+a)|0,(H[1]+b)|0,(H[2]+c)|0,(H[3]+d)|0,(H[4]+e)|0,(H[5]+f)|0,(H[6]+g)|0,(H[7]+h)|0];
+  }
+  return H.map(x=>((x>>>0).toString(16)).padStart(8,"0")).join("");
+}
+function esc(s){return String(s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function addMember(name){
+  const d=document.createElement("div"); d.className="mem-row";
+  d.innerHTML='<input class="mem-i" placeholder="Member name" value="'+esc(name||"")+'" oninput="scheduleSave()">'+
+    '<button class="btn-x" onclick="this.parentNode.remove();scheduleSave()">remove</button>';
+  document.getElementById("mems").appendChild(d);
+}
+
+const STAGES=[["Recon","recon","defensive"],["User","user","recall"],["Root","root","theory"]];
+function addMachine(data){
+  data=data||{}; mCount++;
+  const w=document.createElement("div"); w.className="ctf-machine";
+  let sh="";
+  STAGES.forEach(([lab,cls,tagcls],i)=>{
+    const sd=(data.stages&&data.stages[i])||{};
+    sh+='<div class="ctf-stage '+cls+'">'+
+      '<h4>'+lab+' flag <span class="tag '+tagcls+'">stage '+(i+1)+'</span></h4>'+
+      '<div class="flagline">'+
+        '<input class="stg-flag" placeholder="Flag{...}" value="'+esc(sd.flag||"")+'" oninput="scheduleSave()">'+
+        '<button class="rep-btn" onclick="checkFlag(this)">Check</button>'+
+        '<span class="status idle stg-status">not checked</span>'+
+      '</div>'+
+      '<span class="ctf-lbl">Where did you find it?</span>'+
+      '<input class="ctf-in stg-loc" placeholder="e.g. /home/user/user.txt  ·  http://IP/notes.txt" value="'+esc(sd.loc||"")+'" oninput="scheduleSave()">'+
+      '<span class="ctf-lbl">How did you do it? — steps, exact commands, research, method</span>'+
+      '<textarea class="ctf-in stg-writeup" placeholder="1) nmap ...\n2) command: ...\n3) I searched for ... and found ...\n4) technique used: ..." oninput="scheduleSave()">'+esc(sd.writeup||"")+'</textarea>'+
+    '</div>';
+  });
+  w.innerHTML='<div class="ctf-mhead"><h3>Machine <span class="mnum">'+mCount+'</span></h3>'+
+    '<button class="btn-x" onclick="this.closest(\'.ctf-machine\').remove();scheduleSave()">remove machine</button></div>'+
+    '<div class="rep-fields">'+
+      '<div class="rep-field"><label>Machine name (your codename)</label><input class="m-name" placeholder="e.g. NULLGATE" value="'+esc(data.name||"")+'" oninput="scheduleSave()"></div>'+
+      '<div class="rep-field"><label>Target IP</label><input class="m-ip" placeholder="e.g. 172.25.0.10" value="'+esc(data.ip||"")+'" style="font-family:var(--mono)" oninput="scheduleSave()"></div>'+
+    '</div>'+ sh;
+  document.getElementById("machines").appendChild(w);
+}
+
+async function checkFlag(btn){
+  const line=btn.parentNode, inp=line.querySelector(".stg-flag"), st=line.querySelector(".stg-status");
+  const val=inp.value.trim();
+  if(!val){ st.className="status idle stg-status"; st.textContent="empty"; return; }
+  const h=await sha256(val);
+  if(KNOWN[h]!==undefined){
+    if(captured[h]===undefined) captured[h]=KNOWN[h];
+    inp.setAttribute("data-h",h);
+    st.className="status ok stg-status"; st.textContent="✔ +"+KNOWN[h]+" pts";
+  }else{
+    inp.removeAttribute("data-h");
+    st.className="status bad stg-status"; st.textContent="✗ wrong flag";
+  }
+  refreshScore(); scheduleSave();
+}
+function refreshScore(){
+  let s=0; for(const k in captured) s+=captured[k];
+  document.getElementById("score").textContent=s;
+  document.getElementById("fcount").textContent=Object.keys(captured).length;
+  document.getElementById("pbar").style.width=(MAX_PTS?Math.round(s/MAX_PTS*100):0)+"%";
+}
+
+function collect(){
+  return {
+    team:val("team"), date:val("date"),
+    members:[...document.querySelectorAll(".mem-i")].map(i=>i.value).filter(Boolean),
+    machines:[...document.querySelectorAll(".ctf-machine")].map(m=>({
+      name:m.querySelector(".m-name").value, ip:m.querySelector(".m-ip").value,
+      stages:[...m.querySelectorAll(".ctf-stage")].map(s=>({
+        flag:s.querySelector(".stg-flag").value,
+        ok:!!s.querySelector(".stg-flag").getAttribute("data-h"),
+        loc:s.querySelector(".stg-loc").value,
+        writeup:s.querySelector(".stg-writeup").value
+      }))
+    }))
+  };
+}
+function val(id){return document.getElementById(id).value;}
+let saveT=null;
+function scheduleSave(){clearTimeout(saveT);saveT=setTimeout(saveDraft,600);}
+function saveDraft(){
+  const s=document.getElementById("saved");
+  try{ localStorage.setItem("itgate_ctf_v2",JSON.stringify(collect())); if(s){s.classList.add("show");setTimeout(()=>s.classList.remove("show"),1200);} }catch(e){}
+}
+function loadDraft(){
+  try{ const d=JSON.parse(localStorage.getItem("itgate_ctf_v2")); if(!d) return false;
+    document.getElementById("team").value=d.team||""; document.getElementById("date").value=d.date||"";
+    (d.members||[]).forEach(addMember); (d.machines||[]).forEach(addMachine);
+    setTimeout(()=>document.querySelectorAll(".ctf-stage").forEach(s=>{
+      const f=s.querySelector(".stg-flag"); if(f.value) checkFlag(f.parentNode.querySelector(".rep-btn"));
+    }),60);
+    return true;
+  }catch(e){return false;}
+}
+
+const SL=["Recon","User","Root"];
+function generateReport(){
+  const d=collect(); let pts=0; for(const k in captured) pts+=captured[k];
+  let h='<div class="page-head"><div class="kicker"><span class="snum">CTF</span>'+
+    '<span class="tag lab">Solution report</span></div><h1>'+esc(d.team||"(unnamed team)")+'</h1>'+
+    '<p class="lede">Members: '+(d.members.length?d.members.map(esc).join(", "):"—")+
+    (d.date?' · '+esc(d.date):'')+'</p></div>';
+  h+='<div class="box key-takeaway"><span class="box-t">Score</span><p><b style="color:var(--green);font-size:20px">'+pts+' pts</b> · '+Object.keys(captured).length+' / '+TOTAL_FLAGS+' flags captured</p></div>';
+  d.machines.forEach((m,mi)=>{
+    h+='<div class="ctf-machine"><div class="ctf-mhead"><h3>'+esc(m.name||("Machine "+(mi+1)))+
+      (m.ip?' <span style="color:var(--text-3);font-family:var(--mono);font-size:13px">('+esc(m.ip)+')</span>':'')+'</h3></div>';
+    m.stages.forEach((s,si)=>{
+      h+='<div class="ctf-stage '+STAGES[si][1]+'"><h4>'+SL[si]+' '+
+        (s.ok?'<span class="tag defensive">✔ flag correct</span>':'<span class="tag theory">not verified</span>')+'</h4>';
+      if(s.loc) h+='<p style="margin:2px 0;color:var(--text-2);font-size:13.5px"><b>Found at:</b> '+esc(s.loc)+'</p>';
+      if(s.writeup) h+='<pre style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 13px;color:var(--text);font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;word-break:break-word">'+esc(s.writeup)+'</pre>';
+      h+='</div>';
+    });
+    h+='</div>';
+  });
+  const rv=document.getElementById("reportView"); rv.innerHTML=h; rv.style.display="block";
+  rv.scrollIntoView({behavior:"smooth"});
+}
+function printReport(){ generateReport(); setTimeout(()=>window.print(),150); }
+function downloadReport(){
+  generateReport(); const d=collect();
+  const css=document.getElementById('ceh').textContent;
+  const doc='<!doctype html><html><head><meta charset="utf-8"><title>'+esc(d.team||"team")+
+    ' — CTF Report</title><style>'+css+'</style></head><body><main class="wrap section">'+
+    document.getElementById("reportView").innerHTML+'</main></body></html>';
+  const b=new Blob([doc],{type:"text/html"});const a=document.createElement("a");
+  a.href=URL.createObjectURL(b); a.download=(d.team||"team").replace(/[^a-z0-9_-]+/gi,"_")+"_CTF_report.html";
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+if(!loadDraft()){ addMember(); addMember(); addMachine(); }
+refreshScore();
+</script>
+</body>
+</html>
