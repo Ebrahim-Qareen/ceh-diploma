@@ -22,6 +22,7 @@
     wireInteractiveDiagrams();
     wireReplay();
     wireSims();
+    wireSimx();
     wirePacketFlows();
 
     var start = parseInt((location.hash || '').replace('#p', ''), 10);
@@ -346,6 +347,66 @@
       bNext && bNext.addEventListener('click', function () { stop(); if (cur < total) { cur++; render(true); } });
       bPlay && bPlay.addEventListener('click', play);
       render(false);
+    });
+  }
+
+
+  /* ---------- SimScreen (sx-) autoplay device — S07 malware "see it work" ----------
+     Markup: <div class="simx" data-phases="5"> ... phase state via [data-phase=0..N]
+       <ul class="sx-phases"><li data-badge="payload" data-cur="300,150" [data-flash] [data-cd]>caption</li>...</ul>
+       optional cursor .sx-cursor, ticker .sx-ticker (span.sx-badge + last span = caption),
+       dots .sx-dots (auto-filled), countdown .sx-cd, replay .sx-rep, indicators sibling .sx-iocs .sx-ioc[data-p].
+     Autoplays on view, loops, natural (no spotlight).                                   */
+  function wireSimx(){
+    document.querySelectorAll('.simx').forEach(function(sim){
+      var phases=Array.prototype.slice.call(sim.querySelectorAll('.sx-phases li'));
+      if(!phases.length) return;
+      var n=phases.length;
+      var cur=sim.querySelector('.sx-cursor');
+      var tick=sim.querySelector('.sx-ticker');
+      var badge=tick&&tick.querySelector('.sx-badge');
+      var cap=tick&&tick.querySelector('.sx-cap');
+      var cdEl=sim.querySelector('.sx-cd');
+      var dotsHost=sim.querySelector('.sx-dots');
+      var rep=sim.querySelector('.sx-rep');
+      var iocs=[];var sib=sim.nextElementSibling;
+      if(sib&&sib.classList.contains('sx-iocs')) iocs=Array.prototype.slice.call(sib.querySelectorAll('.sx-ioc'));
+      if(dotsHost&&!dotsHost.children.length){for(var d=0;d<n;d++)dotsHost.appendChild(document.createElement('i'));}
+      var dots=dotsHost?dotsHost.children:[];
+      var i=0,timer=null,cdT=null,secs=0,played=false;
+      function stopCd(){if(cdT){clearInterval(cdT);cdT=null;}}
+      function startCd(){stopCd();secs=86387;cdT=setInterval(function(){secs--;var h=Math.floor(secs/3600),m=Math.floor(secs%3600/60),sc=secs%60;if(cdEl)cdEl.textContent=(h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(sc<10?'0':'')+sc;},1000);}
+      function paintIocs(){iocs.forEach(function(el){el.classList.toggle('lit', i>=(n-1) && Number(el.getAttribute('data-p'))<=i);});}
+      function render(){
+        var ph=phases[i];
+        sim.setAttribute('data-phase',String(i));
+        if(cap) cap.textContent=ph.textContent; else if(tick){var last=tick.lastElementChild;if(last&&last!==badge)last.textContent=ph.textContent;}
+        if(badge){var b=ph.getAttribute('data-badge')||'ioc';badge.className='sx-badge '+b;badge.textContent=b;}
+        if(cur){var c=(ph.getAttribute('data-cur')||'').split(',');if(c.length===2){cur.style.left=c[0]+'px';cur.style.top=c[1]+'px';}}
+        for(var d=0;d<dots.length;d++)dots[d].className=(d<=i?'on':'');
+        paintIocs();
+      }
+      function reset(){clearTimeout(timer);stopCd();sim.classList.remove('flash');i=0;iocs.forEach(function(e){e.classList.remove('lit');});render();}
+      function toFlash(next){
+        sim.classList.add('flash');
+        setTimeout(function(){sim.classList.remove('flash');},110);
+        setTimeout(function(){sim.classList.add('flash');},230);
+        setTimeout(function(){sim.classList.remove('flash');i=next;render();if(phases[i].hasAttribute('data-cd'))startCd();
+          timer=setTimeout(function(){reset();schedule();},4200);},430);
+      }
+      function step(){
+        var ni=i+1;
+        if(ni>n-1){reset();schedule();return;}
+        if(phases[ni].hasAttribute('data-flash')){toFlash(ni);return;}
+        i=ni;render();if(phases[i].hasAttribute('data-cd'))startCd();schedule();
+      }
+      function schedule(){clearTimeout(timer);timer=setTimeout(step, i===0?2100:1900);}
+      function play(){reset();schedule();}
+      if(rep)rep.addEventListener('click',play);
+      render();
+      if('IntersectionObserver' in window){
+        new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!played){played=true;schedule();}});},{threshold:0.25}).observe(sim);
+      } else {schedule();}
     });
   }
 

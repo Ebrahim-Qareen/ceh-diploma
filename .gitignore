@@ -31,3 +31,7 @@ labs/Stapler*/
 
 # Cowork scratch output folder — not course material
 Claude outputs/
+
+# S7 build scratch + research notes (not site content)
+docs/_build.html
+docs/session-07/research/
