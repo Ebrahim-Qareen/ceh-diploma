@@ -330,3 +330,15 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 - Phishing email: moved the ①–⑤ markers right next to the elements they point at (were pushed to the far right); ADDED an attachment row (account-statement.html) with its own flag; emphasised that LINKS & ATTACHMENTS are the two things an analyst must analyse first (highlighted flags + a footer bar + triage line + figcaption). MITRE now T1566.001/.002.
 - QA (headless): 14 pages, 14 figures, 0 duplicate ids, 0 console errors, 0 overflow. All five reworked figures re-rendered and visually verified.
 - Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
+
+## 2026-10-01 — Session 9 figure fixes (review round 2)
+- Intro: (prior round) unchanged this round.
+- SE psychology: replaced the central target with a proper framed avatar (head/hair/face/bust) that fills the portrait; enlarged the "Why it works" box so its text no longer sits on the bottom border.
+- Phishing email: widened the vertical spacing so the Verify-Now button, the look-alike link row and the attachment row no longer crowd each other; moved the ③ marker off the button to the link's right end and pulled ④/⑤ next to the attachment and the tracking-pixel line.
+- SPF/DKIM/DMARC: made the "Spoofing sender" and "mx.acme.com" boxes compact and lifted them clear of the SPF lane (they used to overlap it); lanes now start below the top row with a clean gap.
+- Phishing family: enlarged the two bottom boxes ("The more targeted…", "Defence across all five") so the text sits with proper padding.
+- Credential harvesting: moved the attacker to the centre with a red "ATTACKER" frame (victim left, real site right); rewired the flow chips; enlarged the green "Why MFA breaks this" box so its text fits.
+- DoS taxonomy: spread the botnet zombies apart; moved the "harder to block / trace" badge off the target; both the DoS and DDoS targets now blink red "SERVER DOWN"; sped up the single-source DoS stream.
+- SYN flood: moved the Target server down to the vertical centre (was too high) and re-aimed the SYN / SYN-ACK packets at it.
+- QA (headless): 14 pages, 14 figures, 0 duplicate ids, 0 console errors, 0 overflow. All reworked figures re-rendered and verified.
+- Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
