@@ -377,3 +377,11 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
   All scoped to isolated labs / systems you own, with legal warnings, matching S10.
 - Added a "Free Labs to Practice" page (free only, verified via the THM API): Introductory Networking, Network Services, Phishing Analysis Fundamentals, Red Team Fundamentals (all freeToUse=true) + Wireshark sample captures, PhishTool community, MalwareBazaar, slowhttptest docs, Sigma, arpwatch, and the build-your-own lab from this session.
 - QA: 19 pages (14 + 4 labs + practice), 14 figures, 0 dup ids, 0 console errors, 0 overflow; sidebar groups each lab under its block. Device verified at 612953 bytes. NOT pushed.
+
+## 2026-10-01 — Session 9: Close block added — session now complete (22 pages)
+- Added the Close section: Capstone (Lab E) + Knowledge check + Takeaways, placed after Lab D and before the free-labs Practice page.
+  * Capstone: a single incident chaining all surfaces (ARP-MITM sniff -> SSL-strip -> phishing cred harvest -> SYN flood); reconstruct it from a pcap + the lure + server metrics (tshark, ss) and design the layered defence, mapping each stage to ATT&CK.
+  * Knowledge check: 6 interactive MCQs (.quiz / .q.mcq, handled by the shared session.js) with per-answer reasoning, across sniffing/ARP/HSTS/DMARC/DoS/MFA.
+  * Takeaways: 10 durable points + a bridge placing S9 between S8 (web) and S10 (sweep).
+- Full structure now: Intro -> Wire(+Lab A) -> Human(+Lab B) -> Availability(+Lab C) -> Defence(+Lab D) -> Close(Capstone, Knowledge check, Takeaways) -> Practice.
+- QA: 22 pages, 14 figures, 0 dup ids, 0 console errors, 0 overflow; quiz verified interactive (click reveals correct + why). Device verified at 625553 bytes. Session 9 is content-complete. NOT pushed.
