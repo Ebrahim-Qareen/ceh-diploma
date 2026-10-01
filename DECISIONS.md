@@ -280,3 +280,13 @@ add a new line that supersedes it and say so.
 - New page (sidebar section "Practice"): free, verified hands-on labs for every S10 block, plus the free MaharaTech "Wireless Networks Penetration Testing" course (Arabic, ITI) linked at the top.
 - All TryHackMe rooms verified free via the rooms API: Wifi Hacking 101, Cryptography for Dummies, Encryption-Crypto101, Crack the Hash (+Level 2), Android Hacking 101, Intro to IoT Pentesting, Red Team Fundamentals. Evasion rooms are premium on THM, so those slots use free DIY/legal-target labs (Nmap evasion vs scanme.nmap.org, beat-your-own-Snort). Plus CryptoHack, OverTheWire Krypton, flaws.cloud / flaws2.cloud.
 - Verified: 47 pages, 11 sidebar sections, 13 figures, 0 duplicate ids, 0 overflow, 0 console errors.
+
+## 2026-10-01 — Session 9 rebuilt from scratch: Block 1 (Wire) in S10 cinematic style
+- Replaced the old docs/session-09/index.html (edit in place) with a fresh build on the Session 10 design system: shared ../assets/css/ceh.css + ../assets/js/session.js, grouped `data-section` sidebar, `.page-head`/`.content` structure.
+- Block 1 pages: Intro (Cover + "Four surfaces" animated spine) and Wire — Sniffing, ARP→MITM, SSL-strip/HSTS.
+- Figures: realistic host/gateway/attacker icons inlined as base64 data-URIs (no external image files to 404). Each figure pairs a live network scene with a Wireshark packet grid / dual ARP-cache tables / fake browser window, plus side annotations telling the student what is happening. Labels sit above icons; chips rerouted so no line crosses text and no callout sits on a packet row. SSL-strip right panel uses <tspan font-weight> (not <b>) inside <text> — the earlier parse-spill bug stays fixed.
+- Scope: Session Hijacking is NOT in S9 (moved to Session 8); the Four-surfaces map shows the SESSION surface only to place it, pointing to S8.
+- Every attack mapped to MITRE: Sniffing T1040, ARP/MITM T1557.002, SSL-strip T1557.
+- QA (headless render): 4 pages, 0 duplicate ids, 0 console errors, 0 horizontal overflow (1100 & 1280), sidebar auto-groups Intro/Wire, page-nav cycles correctly.
+- Committed bd926dc (edited in place, old content deleted not archived). NOT pushed — Ebrahim pushes via GitHub Desktop.
+- Next: Block 2 (Human) — email anatomy + SPF/DKIM/DMARC, phishing types, SET (safe/fictional).
