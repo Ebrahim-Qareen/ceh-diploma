@@ -367,3 +367,13 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 
 ## 2026-10-01 — SE avatar: head lowered onto the shoulders
 - Lowered the avatar head and raised the shoulders so the head sits on the body (was floating with a gap). Verified on device. NOT pushed.
+
+## 2026-10-01 — Session 9: added hands-on labs + free-labs page (S10 style)
+- Added a step-by-step hands-on lab after every block, each with real tools and real commands and a per-step verification (same markup as the S10 "Lab A" pages: .box intro + .box warn + ol.steps + .verify):
+  * Lab A (Wire): arp-scan -> ip_forward -> bettercap/arpspoof ARP-MITM -> tcpdump/Wireshark cleartext capture -> arpwatch detection.
+  * Lab B (Human): export .eml -> read headers -> dig SPF/DMARC + Authentication-Results -> carve links/attachments (ripmime, sha256, sandbox) -> verdict + response.
+  * Lab C (Availability): curl baseline -> hping3 SYN flood (ss syn-recv) -> SYN cookies -> slowhttptest Slowloris -> mod_reqtimeout.
+  * Lab D (Defence/blue): arpwatch + Sentinel KQL + ss/NetFlow + a portable Sigma SYN-flood rule.
+  All scoped to isolated labs / systems you own, with legal warnings, matching S10.
+- Added a "Free Labs to Practice" page (free only, verified via the THM API): Introductory Networking, Network Services, Phishing Analysis Fundamentals, Red Team Fundamentals (all freeToUse=true) + Wireshark sample captures, PhishTool community, MalwareBazaar, slowhttptest docs, Sigma, arpwatch, and the build-your-own lab from this session.
+- QA: 19 pages (14 + 4 labs + practice), 14 figures, 0 dup ids, 0 console errors, 0 overflow; sidebar groups each lab under its block. Device verified at 612953 bytes. NOT pushed.
