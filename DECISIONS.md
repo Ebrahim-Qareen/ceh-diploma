@@ -308,3 +308,15 @@ add a new line that supersedes it and say so.
 - QA (headless render): 12 pages, 12 figures, 0 duplicate ids, 0 console errors, 0 horizontal overflow; sidebar auto-groups Intro/Wire/Human/Availability; page-nav cycles 1→12. Verified P11 (SYN flood) in full ceh.css chrome.
 - Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
 - Remaining for S9: Defence block (4-surface detection + controls) and Close (capstone + assessment).
+
+## 2026-10-01 — Session 9 Block 4 (Defence) + session-hijacking fully removed
+- Added the Defence section to docs/session-09/index.html (edit in place): 2 pages — Detection map (SOC view: 4-surface indicator → tool → ATT&CK matrix + a sample Sentinel KQL phishing hunt + the analyst loop) and Defence in depth (prevent/detect/respond controls matrix per surface).
+- Per instructor decision, REMOVED every trace of Session Hijacking from Session 9 (it belongs to the web stack in Session 8):
+  * Intro "surfaces" figure reworked from FOUR surfaces to THREE (Wire / Human / Availability) — retitled, re-laid-out 3 wider cards, fixed flow dot + figcaption.
+  * Detection matrix: dropped the Session row (now Wire / Human / Availability only), rebalanced row heights.
+  * Cover: removed the "session hijacking lives in S8 / connection surface shown only to place it" sentence and the two "four surfaces" references (lede + hero) → "three surfaces".
+  * Zero occurrences of hijack / T1563 / "four surface" remain (grep-verified).
+- Detection figures map to MITRE T1040/T1557 (wire), T1566 (human), T1498/T1499 (availability).
+- QA (headless render): 14 pages, 14 figures, 0 duplicate ids, 0 console errors, 0 horizontal overflow; sidebar auto-groups Intro/Wire/Human/Availability/Defence; page-nav cycles 1→14. Verified Cover (3-surface figure) + P13 (Detection map) in full ceh.css chrome.
+- Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
+- Remaining for S9: Close block (capstone exercise + assessment).
