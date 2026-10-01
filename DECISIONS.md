@@ -349,3 +349,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 
 ## 2026-10-01 — SET: fixed "Why MFA breaks this" box overflow
 - The MFA bullet text was wider than the green box (right-edge overflow). Wrapped the long bullets to fit the box width and enlarged the box a touch; text now sits inside with margins. Committed in place. NOT pushed.
+
+## 2026-10-01 — SYN flood: server goes red+blinking when the backlog fills
+- Target server now starts cyan (healthy) and, once the SYN flood fills the backlog (~60% through the loop), fades to a red rack that blinks on/off and shows "DOWN — refusing all requests" (it rejects the real user, whose SYN then times out). Lowered the server toward the vertical centre and re-aimed the SYN / SYN-ACK / real-user packets at the new position. Committed in place. NOT pushed.
