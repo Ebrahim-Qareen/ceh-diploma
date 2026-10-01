@@ -299,3 +299,12 @@ add a new line that supersedes it and say so.
 - QA (headless render): 9 pages, 9 figures, 0 duplicate ids, 0 console errors, 0 horizontal overflow; sidebar auto-groups Intro/Wire/Human; page-nav cycles 1→9. Verified P05 + P09 in full ceh.css chrome.
 - Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
 - Next: Block 3 (Availability) — DoS/DDoS taxonomy, SYN flood, Slow HTTP.
+
+## 2026-10-01 — Session 9 Block 3 (Availability) added
+- Appended the Availability section to docs/session-09/index.html (edit in place): 3 pages — DoS taxonomy (the three families), SYN flood (state exhaustion), Slow HTTP / Slowloris (the trickle attack).
+- Three new cinematic SVGs in the S10 style. DoS-taxonomy: DoS vs DDoS (botnet) + 3 category cards (volumetric / protocol-state / application) mapped to OSI layer and defence. SYN-flood: normal 3-way handshake reference, spoofed SYN flood filling a SYN_RECV backlog table, "backlog full", real user refused, SYN-cookies defence. Slow-HTTP: partial-request panel dripping headers, worker-pool grid all "held", pool exhausted, timeouts/reverse-proxy defence.
+- Overlap fixes applied during build: Slowloris "POOL EXHAUSTED" badge moved below the worker grid (was over the bottom row).
+- MITRE: T1498 (volumetric DDoS), T1499 / T1499.002 (resource/endpoint DoS — SYN flood, Slowloris).
+- QA (headless render): 12 pages, 12 figures, 0 duplicate ids, 0 console errors, 0 horizontal overflow; sidebar auto-groups Intro/Wire/Human/Availability; page-nav cycles 1→12. Verified P11 (SYN flood) in full ceh.css chrome.
+- Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
+- Remaining for S9: Defence block (4-surface detection + controls) and Close (capstone + assessment).
