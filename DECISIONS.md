@@ -320,3 +320,13 @@ add a new line that supersedes it and say so.
 - QA (headless render): 14 pages, 14 figures, 0 duplicate ids, 0 console errors, 0 horizontal overflow; sidebar auto-groups Intro/Wire/Human/Availability/Defence; page-nav cycles 1→14. Verified Cover (3-surface figure) + P13 (Detection map) in full ceh.css chrome.
 - Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
 - Remaining for S9: Close block (capstone exercise + assessment).
+
+## 2026-10-01 — Session 9 figure fixes (review round 1)
+Instructor review of the live page; fixed in the generators and rebuilt in place:
+- Intro (three-surfaces): removed the moving green flow dot; widened spacing between the three cards; lengthened the connector arrows.
+- ARP→MITM: centered the "every packet detours through you" annotation over the attacker; showed the FULL attacker MAC (a4:5e:3c:9d:11:07); added each node's MAC under its IP (Victim cc:dd:ee:f0:00:23, Gateway 1a:2b:3c:d4:00:01) and made the ARP-cache tables use the same MACs so the before/after change is explicit.
+- SSL-strip: straightened the red HTTP segment (was slightly sloped → now horizontal, matches the green HTTPS one); aligned the two HSTS boxes to the same top/height; nudged the "LOGIN CAPTURED" badge up so it no longer touches the HSTS box.
+- SE psychology: replaced the crude central icon with a framed portrait of "the target" (head + face + bust); added a distinct icon to each of the six levers (authority/urgency/fear/greed/curiosity/familiarity); curved + colored the connector lines to the portrait; enlarged the Defence box so its text no longer overflows.
+- Phishing email: moved the ①–⑤ markers right next to the elements they point at (were pushed to the far right); ADDED an attachment row (account-statement.html) with its own flag; emphasised that LINKS & ATTACHMENTS are the two things an analyst must analyse first (highlighted flags + a footer bar + triage line + figcaption). MITRE now T1566.001/.002.
+- QA (headless): 14 pages, 14 figures, 0 duplicate ids, 0 console errors, 0 overflow. All five reworked figures re-rendered and visually verified.
+- Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
