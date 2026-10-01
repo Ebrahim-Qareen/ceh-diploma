@@ -352,3 +352,9 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 
 ## 2026-10-01 — SYN flood: server goes red+blinking when the backlog fills
 - Target server now starts cyan (healthy) and, once the SYN flood fills the backlog (~60% through the loop), fades to a red rack that blinks on/off and shows "DOWN — refusing all requests" (it rejects the real user, whose SYN then times out). Lowered the server toward the vertical centre and re-aimed the SYN / SYN-ACK / real-user packets at the new position. Committed in place. NOT pushed.
+
+## 2026-10-01 — three box-fit fixes (slow HTTP, detection KQL, controls matrix)
+- Slow HTTP: enlarged (and slightly widened) the "one connection's request" panel so the trickled headers + the waiting lines fit with margin.
+- Detection: enlarged the "phishing hunt (Sentinel KQL)" card and the analyst-loop card so the full KQL (7 lines) sits inside with margin.
+- Defence in depth: shortened the three surface rows and dropped the "Assume one layer fails" strip so there is a clear gap between the Availability cells and the green strip (they used to touch).
+- QA: 14 pages, 14 figures, 0 dup ids, 0 console errors, 0 overflow. Committed in place. NOT pushed.
