@@ -290,3 +290,12 @@ add a new line that supersedes it and say so.
 - QA (headless render): 4 pages, 0 duplicate ids, 0 console errors, 0 horizontal overflow (1100 & 1280), sidebar auto-groups Intro/Wire, page-nav cycles correctly.
 - Committed bd926dc (edited in place, old content deleted not archived). NOT pushed — Ebrahim pushes via GitHub Desktop.
 - Next: Block 2 (Human) — email anatomy + SPF/DKIM/DMARC, phishing types, SET (safe/fictional).
+
+## 2026-10-01 — Session 9 Block 2 (Human) added
+- Appended the Human section to docs/session-09/index.html (edit in place): 5 pages — Why it works (SE psychology / 6 levers), Phishing email anatomy, Email authentication (SPF/DKIM/DMARC), The phishing family (phishing/spear/whaling/vishing/smishing), Credential harvesting (cloned login page).
+- All 5 figures are new cinematic SVGs in the S10 style (appear/flash/chip helpers, side panels + annotations). Reworked layouts to avoid overlaps: phishing-email red-flags moved to their own column with numbered markers; SE gauge needle stops clear of the ACT NOW label; phishing-types note trimmed to fit; "pixel-perfect clone" tag moved above the cloned browser so it doesn't cover the form title.
+- Credential-harvesting figure is defensive/fictional only: look-alike domains, fictional accounts, explicit "lab only" banner; teaches detection + why phishing-resistant MFA (FIDO2/passkeys) breaks it. No working attack steps.
+- MITRE: T1566 (phishing) + .001 spear / .002 link, T1598 (vishing/pretext), T1056.003 (web portal capture).
+- QA (headless render): 9 pages, 9 figures, 0 duplicate ids, 0 console errors, 0 horizontal overflow; sidebar auto-groups Intro/Wire/Human; page-nav cycles 1→9. Verified P05 + P09 in full ceh.css chrome.
+- Committed (edit in place). NOT pushed — Ebrahim pushes via GitHub Desktop.
+- Next: Block 3 (Availability) — DoS/DDoS taxonomy, SYN flood, Slow HTTP.
