@@ -364,3 +364,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 - SYN flood: moved the Target server to the vertical centre, between the attacker (above) and the real user (below), so both the attacker flood and the real user's SYN visibly reach it; the SYN-ACK now travels back up-left toward the (spoofed) source with a "to spoofed IPs — no ACK ever returns" note instead of dropping downward; server still starts cyan and turns red + blinks "DOWN — refusing all requests" once the backlog fills.
 - Confirmed the SE psychology avatar is the clean faceless user/employee icon (the scary drawn face was only visible because the device file was stale).
 - QA: 14 pages, 14 figures, 0 dup ids, 0 console errors, 0 overflow. Device file verified at 590463 bytes with all markers. NOT pushed.
+
+## 2026-10-01 — SE avatar: head lowered onto the shoulders
+- Lowered the avatar head and raised the shoulders so the head sits on the body (was floating with a gap). Verified on device. NOT pushed.
