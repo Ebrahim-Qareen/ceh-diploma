@@ -346,3 +346,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 ## 2026-10-01 — SE psychology: replaced drawn face with a clean user avatar
 - The hand-drawn face read as creepy. Swapped it for a clean flat user-avatar icon (circular badge, head + shoulders silhouette, subtle shirt collar, NO facial features) — the standard "person / employee" placeholder. Self-contained inline SVG, no external image.
 - QA: 14 pages, 14 figures, 0 duplicate ids, 0 console errors, 0 overflow. Committed in place. NOT pushed.
+
+## 2026-10-01 — SET: fixed "Why MFA breaks this" box overflow
+- The MFA bullet text was wider than the green box (right-edge overflow). Wrapped the long bullets to fit the box width and enlarged the box a touch; text now sits inside with margins. Committed in place. NOT pushed.
