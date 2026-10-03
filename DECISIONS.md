@@ -614,3 +614,8 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 ## 2026-10-03 — Session 8 / Phase B follow-up 3: status-code widget grouped by class.
 ## User: didn't like the status codes sitting in two flat rows; wanted them grouped 1xx/2xx/3xx/4xx/5xx. Rebuilt .stx #statuscodes: .stx-grid is now a column of 5 .stx-row's, each with a colored family label (1xx info / 2xx success / 3xx redirect / 4xx your side / 5xx server side) + that family's codes in a flex-wrap. Removed the now-redundant top legend. Click-to-reveal detail panel unchanged and still works.
 ## Verified: 5 rows (1xx:1, 2xx:3, 3xx:3, 4xx:6, 5xx:3), click 404 updates panel, 0 errors, 0 overflow, 62 pages. File 831504 bytes.
+
+## 2026-10-03 — Session 8 / Phase B follow-up 4: fix "You work here" intro bars (text was stacking in columns).
+## User: the intro/instruction bars broke the sentence into columns stacked on two lines; wanted the text to flow next to each other as one sentence. Cause: every .XX-work bar was display:flex;align-items:center;gap:8px, so each text run between the bold keywords became a separate flex column that wrapped on its own.
+## Fix (scoped strictly to -work rules): 30 .XX-work bars flex -> display:block (normal text flow); all 47 .XX-work .dot markers -> display:inline-block;vertical-align:middle;margin-right:8px so the status dot stays inline at the sentence start. Long sentences now wrap naturally as prose (not columns); very long ones may still take 2 lines (kept the enlarged font rather than shrinking to force one line).
+## Verified: cache-poisoning + IDOR bars now read as single flowing sentences; 62 pages, 0 dup ids, 0 console/page errors, 0 overflow. File 833544 bytes.
