@@ -2672,8 +2672,14 @@
 .stx-legend{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
 .stx-leg{font:700 11.5px/1.2 var(--mono,monospace);padding:5px 10px;border-radius:999px;border:1px solid var(--lc);color:var(--lc)}
 .stx-leg.f1{--lc:#8b98a9}.stx-leg.f2{--lc:var(--green)}.stx-leg.f3{--lc:var(--cyan)}.stx-leg.f4{--lc:var(--orange)}.stx-leg.f5{--lc:var(--red)}
-.stx-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-bottom:13px}
-.stx-code{appearance:none;border:1.5px solid var(--cc,var(--line));background:color-mix(in srgb,var(--cc) 8%,transparent);color:var(--cc);font:800 15.5px/1 var(--mono,monospace);padding:11px 4px;border-radius:7px;cursor:pointer;transition:.15s}
+.stx-grid{display:flex;flex-direction:column;gap:9px;margin-bottom:13px}
+.stx-row{display:flex;align-items:stretch;gap:10px}
+.stx-rl{flex:none;width:78px;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:7px 9px;border:1px solid var(--rc,var(--line));border-left:3px solid var(--rc,var(--line));border-radius:7px;background:color-mix(in srgb,var(--rc) 8%,transparent)}
+.stx-rl b{font:800 16px/1 var(--mono,monospace);color:var(--rc)}
+.stx-rl small{font:700 10px/1.2 var(--mono,monospace);letter-spacing:.2px;text-transform:uppercase;color:var(--rc);opacity:.88}
+.stx-codes{display:flex;flex-wrap:wrap;gap:7px;flex:1;align-content:center}
+.stx-row.f1{--rc:#8b98a9}.stx-row.f2{--rc:var(--green)}.stx-row.f3{--rc:var(--cyan)}.stx-row.f4{--rc:var(--orange)}.stx-row.f5{--rc:var(--red)}
+.stx-code{appearance:none;flex:0 0 auto;min-width:78px;text-align:center;border:1.5px solid var(--cc,var(--line));background:color-mix(in srgb,var(--cc) 8%,transparent);color:var(--cc);font:800 15.5px/1 var(--mono,monospace);padding:11px 12px;border-radius:7px;cursor:pointer;transition:.15s}
 .stx-code:hover{background:color-mix(in srgb,var(--cc) 18%,transparent)}
 .stx-code.sel{box-shadow:0 0 0 3px color-mix(in srgb,var(--cc) 30%,transparent)}
 .stx-code.f1{--cc:#8b98a9}.stx-code.f2{--cc:var(--green)}.stx-code.f3{--cc:var(--cyan)}.stx-code.f4{--cc:var(--orange)}.stx-code.f5{--cc:var(--red)}
@@ -3326,13 +3332,6 @@ table.dbx-table{width:100%;border-collapse:collapse;font:600 14px/1.4 var(--mono
 
       <div class="stx" id="statuscodes">
         <div class="stx-body">
-          <div class="stx-legend">
-            <span class="stx-leg f1">1xx info</span>
-            <span class="stx-leg f2">2xx success</span>
-            <span class="stx-leg f3">3xx redirect</span>
-            <span class="stx-leg f4">4xx your side</span>
-            <span class="stx-leg f5">5xx server side</span>
-          </div>
           <div class="stx-grid" id="stx-grid"></div>
           <div class="stx-panel" id="stx-panel"><div class="stx-empty">Click any status code &mdash; see what it means and when you&rsquo;ll meet it.</div></div>
         </div>
@@ -9338,9 +9337,17 @@ window.addEventListener("load",function(){
     ['503','f5','Service Unavailable','The server is overloaded or down for maintenance.']
   ];
   var FAM={f1:['info','1xx'],f2:['success','2xx'],f3:['redirect','3xx'],f4:['your side','4xx'],f5:['server side','5xx']};
-  C.forEach(function(c){
-    var btn=document.createElement('button');btn.className='stx-code '+c[1];btn.textContent=c[0];btn.setAttribute('data-c',c[0]);
-    grid.appendChild(btn);
+  ['f1','f2','f3','f4','f5'].forEach(function(fam){
+    var row=document.createElement('div');row.className='stx-row '+fam;
+    var lbl=document.createElement('span');lbl.className='stx-rl';
+    lbl.innerHTML='<b>'+FAM[fam][1]+'</b><small>'+FAM[fam][0]+'</small>';
+    var codes=document.createElement('div');codes.className='stx-codes';
+    C.filter(function(x){return x[1]===fam;}).forEach(function(c){
+      var btn=document.createElement('button');btn.className='stx-code '+c[1];btn.textContent=c[0];btn.setAttribute('data-c',c[0]);
+      codes.appendChild(btn);
+    });
+    row.appendChild(lbl);row.appendChild(codes);
+    grid.appendChild(row);
   });
   function sel(code){
     var c=C.filter(function(x){return x[0]===code;})[0];if(!c)return;
