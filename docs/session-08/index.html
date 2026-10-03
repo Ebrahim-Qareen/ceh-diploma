@@ -2944,6 +2944,38 @@ table.dbx-table{width:100%;border-collapse:collapse;font:600 14px/1.4 var(--mono
 .flow3-d{font:600 12px/1.4 var(--mono,monospace);color:var(--text-4);margin-top:4px}
 .flow3-ar{display:flex;align-items:center;color:var(--text-4);font:800 17px/1 var(--mono,monospace);padding:0 7px}
 @media(max-width:640px){.cmp2,.tls2{grid-template-columns:1fr}.flow3-ar{display:none}}
+
+/* ===== THE STACK — layered tiers, rebuilt (P15) ===== */
+.stk{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,var(--panel),var(--panel-2));overflow:hidden;margin:22px 0;box-shadow:var(--depth)}
+.stk-body{padding:16px}
+.stk-intro{display:block;font:600 14px/1.55 var(--mono,monospace);color:var(--text-3);background:var(--bg-alt);border:1px dashed var(--line);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:14px}
+.stk-intro .dot{display:inline-block;vertical-align:middle;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);margin-right:9px}
+.stk-intro b{color:var(--text)}
+.stk-layers{display:flex;flex-direction:column;gap:0}
+.stk-sep{height:20px;display:flex;align-items:center;justify-content:center;color:var(--text-4);font:800 14px/1 var(--mono,monospace)}
+.stk-layer{appearance:none;text-align:left;width:100%;display:grid;grid-template-columns:292px 1fr auto;align-items:center;column-gap:16px;row-gap:8px;border:1.5px solid var(--tc);border-left-width:5px;background:color-mix(in srgb,var(--tc) 8%,transparent);border-radius:11px;padding:14px 16px;cursor:pointer;transition:.18s}
+.stk-layer:hover{background:color-mix(in srgb,var(--tc) 15%,transparent)}
+.stk-layer.sel{box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 26%,transparent)}
+.stk-l-main{display:flex;align-items:center;gap:12px}
+.stk-ico{font-size:25px;line-height:1;flex:none}
+.stk-nm{min-width:0}
+.stk-name{font:800 17px/1.1 var(--mono,monospace);color:var(--tc);white-space:nowrap}
+.stk-sub{font:600 12.5px/1.3 var(--mono,monospace);color:var(--text-3);margin-top:5px;white-space:nowrap}
+.stk-tier{font:700 9px/1 var(--mono,monospace);letter-spacing:.4px;text-transform:uppercase;color:var(--tc);border:1px solid color-mix(in srgb,var(--tc) 45%,var(--line));border-radius:5px;padding:2px 6px;margin-right:8px}
+.stk-chips{display:flex;flex-wrap:wrap;gap:7px}
+.stk-chip{font:700 12px/1 var(--mono,monospace);color:var(--tc);border:1px solid color-mix(in srgb,var(--tc) 45%,var(--line));background:color-mix(in srgb,var(--tc) 10%,transparent);padding:6px 9px;border-radius:999px;white-space:nowrap}
+.stk-caret{font:800 16px/1 var(--mono,monospace);color:var(--tc);transition:transform .2s;flex:none}
+.stk-layer.sel .stk-caret{transform:rotate(90deg)}
+.stk-detail{display:none;border:1px solid var(--tc);border-left:5px solid var(--tc);border-radius:0 0 11px 11px;background:var(--bg);padding:14px 17px;margin:-6px 0 0 0}
+.stk-detail.show{display:block}
+.stk-drow{display:flex;gap:11px;align-items:flex-start;font:600 14px/1.6 var(--mono,monospace);color:var(--text-3)}
+.stk-drow+.stk-drow{margin-top:9px}
+.stk-dk{flex:none;font:800 10px/1.3 var(--mono,monospace);letter-spacing:.3px;text-transform:uppercase;color:var(--tc);border:1px solid var(--tc);border-radius:7px;padding:4px 9px;min-width:112px;text-align:center}
+.stk-dv b{color:var(--text)}
+.stk-cap{margin-top:15px;padding-top:12px;border-top:1px solid var(--line);font:600 14px/1.55 var(--mono,monospace);color:var(--text-3);text-align:center}
+.stk-cap b{color:var(--text-2)}
+.stk-t1{--tc:#ff7043}.stk-t2{--tc:#22d3ee}.stk-t3{--tc:#a78bfa}
+@media(max-width:720px){.stk-layer{grid-template-columns:1fr}.stk-caret{display:none}}
 </style>
 </head>
 <body data-session="s08">
@@ -3494,44 +3526,13 @@ table.dbx-table{width:100%;border-collapse:collapse;font:600 14px/1.4 var(--mono
     <div class="content">
       <div class="box intro"><span class="box-t">Where we are</span><p>Foundations done. Before tooling, one picture to file everything under: the three tiers, and the attack families that break each one&rsquo;s trust.</p></div>
 
-      <figure class="dgm interactive">
-        <svg viewBox="0 0 940 230" role="img" aria-label="Interactive three-tier stack: presentation tier in the browser, application tier on the server, and data and services tier behind it. Click a tier to list the attacks that live there.">
-          <g class="node" data-node="pres" tabindex="0">
-            <rect x="20" y="40" width="280" height="150" rx="12" fill="#1a1f2a" stroke="#ff7043" stroke-width="1.3"/>
-            <text x="160" y="96" text-anchor="middle" class="d-title" fill="#ff7043" font-weight="700">Presentation</text>
-            <text x="160" y="122" text-anchor="middle" class="d-sub" fill="#e4e8ee">browser &middot; client-side</text>
-            <text x="160" y="150" text-anchor="middle" class="d-sub" fill="#768290">click to open</text>
-          </g>
-          <g class="node" data-node="app" tabindex="0">
-            <rect x="330" y="40" width="280" height="150" rx="12" fill="#1a1f2a" stroke="#22d3ee" stroke-width="1.3"/>
-            <text x="470" y="96" text-anchor="middle" class="d-title" fill="#22d3ee" font-weight="700">Application</text>
-            <text x="470" y="122" text-anchor="middle" class="d-sub" fill="#e4e8ee">server-side logic</text>
-            <text x="470" y="150" text-anchor="middle" class="d-sub" fill="#768290">click to open</text>
-          </g>
-          <g class="node" data-node="data" tabindex="0">
-            <rect x="640" y="40" width="280" height="150" rx="12" fill="#1a1f2a" stroke="#a78bfa" stroke-width="1.3"/>
-            <text x="780" y="96" text-anchor="middle" class="d-title" fill="#a78bfa" font-weight="700">Data &amp; services</text>
-            <text x="780" y="122" text-anchor="middle" class="d-sub" fill="#e4e8ee">DB &middot; files &middot; internal</text>
-            <text x="780" y="150" text-anchor="middle" class="d-sub" fill="#768290">click to open</text>
-          </g>
-          <path d="M300 115 H328" stroke="#768290" stroke-width="2" fill="none" marker-end="url(#ar-g)"/>
-          <path d="M610 115 H638" stroke="#768290" stroke-width="2" fill="none" marker-end="url(#ar-g)"/>
-        </svg>
-        <div class="dgm-hint">Click each tier &mdash; the attacks we&rsquo;ll prove all hang off one of these three.</div>
-        <div class="dgm-detail" data-detail="pres">
-          <h5><span class="dd-tag">PRESENTATION &middot; client-side</span>The browser trusts what it renders and sends</h5>
-          <p><b>Lives here:</b> XSS (reflected / stored / DOM), CSRF, CORS &amp; SOP abuse, clickjacking, WebSockets. <b>Broken trust:</b> data reaches an executable browser context, or the browser is made to act with your credentials. <b>SOC visibility:</b> often thin &mdash; much happens only in the victim&rsquo;s browser.</p>
+      <div class="stk" id="thestack">
+        <div class="stk-body">
+          <div class="stk-intro"><span class="dot"></span>One request enters at the <b>top</b> layer and only travels <b>deeper</b> &mdash; every attack in this session lives on exactly one of these three tiers. Click a tier to see its broken trust and how visible it is.</div>
+          <div class="stk-layers" id="stk-layers"></div>
+          <div class="stk-cap"><b>One stack, three tiers.</b> When we meet an attack, first place it here &mdash; the tier tells you the broken trust and how visible it is.</div>
         </div>
-        <div class="dgm-detail" data-detail="app">
-          <h5><span class="dd-tag">APPLICATION &middot; server-side</span>The gatekeeper trusts input or skips a check</h5>
-          <p><b>Lives here:</b> authentication, access control / IDOR, business logic, SSRF, file upload, path traversal, command injection, SSTI, and the injection family entering here. <b>Broken trust:</b> input treated as code, or &ldquo;may you?&rdquo; never asked. <b>SOC visibility:</b> good &mdash; app and server logs see these.</p>
-        </div>
-        <div class="dgm-detail" data-detail="data">
-          <h5><span class="dd-tag">DATA &amp; SERVICES</span>The tier the app reaches on your behalf</h5>
-          <p><b>Lives here:</b> SQL / NoSQL / LDAP / ORM injection landing in the query, XXE reaching files, deserialization rebuilding objects, internal services hit via SSRF. <b>Broken trust:</b> the query or parser can&rsquo;t tell your data from its own syntax. <b>SOC visibility:</b> DB and egress telemetry &mdash; if it&rsquo;s collected.</p>
-        </div>
-        <figcaption><b>One stack, three tiers.</b> When we meet an attack, first place it here &mdash; the tier tells you the broken trust and how visible it is.</figcaption>
-      </figure>
+      </div>
 
       <h2>The two root causes, mapped</h2>
       <p>Almost every web flaw is one of two mistakes. Filing each family under its root cause is how you reason about a bug you&rsquo;ve never seen before:</p>
@@ -9687,6 +9688,47 @@ window.addEventListener("load",function(){
   }
   document.querySelectorAll('.dbx-chip').forEach(function(c){c.addEventListener('click',function(){run(c.getAttribute('data-c'));});});
   run('all');
+})();
+</script>
+<script>
+(function(){
+  var root=document.getElementById('stk-layers');
+  if(!root) return;
+  var T=[
+    {k:'pres',cls:'stk-t1',ico:'&#127760;',name:'Presentation',tier:'tier 1',sub:'browser &middot; client-side',
+      chips:['XSS','DOM XSS','CSRF','CORS &amp; SOP','Clickjacking','WebSockets'],
+      trust:'Data reaches an executable browser context, or the browser is made to act with your credentials.',
+      soc:'Often thin &mdash; much of it happens only in the victim&rsquo;s browser.'},
+    {k:'app',cls:'stk-t2',ico:'&#9881;&#65039;',name:'Application',tier:'tier 2',sub:'server-side logic',
+      chips:['Authentication','Access control / IDOR','Business logic','SSRF','File upload','Path traversal','Command injection','SSTI','Injection entry'],
+      trust:'Input is treated as code, or &ldquo;may you?&rdquo; is never asked.',
+      soc:'Good &mdash; application and server logs see these.'},
+    {k:'data',cls:'stk-t3',ico:'&#128451;&#65039;',name:'Data &amp; services',tier:'tier 3',sub:'DB &middot; files &middot; internal',
+      chips:['SQL / NoSQL / LDAP / ORM injection','XXE','Deserialization','Internal services (SSRF target)'],
+      trust:'The query or parser can&rsquo;t tell your data from its own syntax.',
+      soc:'DB and egress telemetry &mdash; if it&rsquo;s collected.'}
+  ];
+  T.forEach(function(t,i){
+    var btn=document.createElement('button');btn.className='stk-layer '+t.cls;btn.setAttribute('data-k',t.k);btn.setAttribute('aria-expanded','false');
+    btn.innerHTML='<div class="stk-l-main"><span class="stk-ico">'+t.ico+'</span><div class="stk-nm"><div class="stk-name">'+t.name+'</div><div class="stk-sub"><span class="stk-tier">'+t.tier+'</span>'+t.sub+'</div></div></div>'+
+      '<div class="stk-chips">'+t.chips.map(function(c){return '<span class="stk-chip">'+c+'</span>';}).join('')+'</div>'+
+      '<span class="stk-caret">&#9656;</span>';
+    root.appendChild(btn);
+    var det=document.createElement('div');det.className='stk-detail '+t.cls;det.setAttribute('data-for',t.k);
+    det.innerHTML='<div class="stk-drow"><span class="stk-dk">Broken trust</span><span class="stk-dv">'+t.trust+'</span></div>'+
+      '<div class="stk-drow"><span class="stk-dk">SOC visibility</span><span class="stk-dv">'+t.soc+'</span></div>';
+    root.appendChild(det);
+    if(i<T.length-1){var sep=document.createElement('div');sep.className='stk-sep';sep.innerHTML='&#8595;';root.appendChild(sep);}
+  });
+  function toggle(k){
+    var btn=root.querySelector('.stk-layer[data-k="'+k+'"]');
+    var det=root.querySelector('.stk-detail[data-for="'+k+'"]');
+    var open=det.classList.contains('show');
+    root.querySelectorAll('.stk-detail').forEach(function(d){d.classList.remove('show');});
+    root.querySelectorAll('.stk-layer').forEach(function(b){b.classList.remove('sel');b.setAttribute('aria-expanded','false');});
+    if(!open){det.classList.add('show');btn.classList.add('sel');btn.setAttribute('aria-expanded','true');}
+  }
+  root.querySelectorAll('.stk-layer').forEach(function(b){b.addEventListener('click',function(){toggle(b.getAttribute('data-k'));});});
 })();
 </script>
 </body>
