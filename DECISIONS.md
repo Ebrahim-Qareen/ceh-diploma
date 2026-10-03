@@ -638,3 +638,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 
 ## 2026-10-03 — Filled the remaining 10 practical-application slots with PortSwigger labs.
 ## The 10 vulns with no GateShop lab (OAuth, JWT, NoSQL, LDAP, race, web cache deception, WebSockets, prototype pollution, web cache poisoning, request smuggling) now point to a free hosted PortSwigger Web Security Academy lab each: link + goal + solution steps + why, kept simple. All 32 practical boxes filled, 0 reserved. Verified render: 62 pages, 0 dup ids, 0 console/page errors, 0 overflow.
+
+## 2026-10-03 — GateShop runnable on GitHub via Codespaces (no local VM).
+## GitHub Pages can't run PHP/MySQL, so added .devcontainer/devcontainer.json at repo root: Create Codespace on main -> docker-in-docker builds + runs docker compose (port 8080 auto-forwarded). Added labs/gateshop/RUN-ON-GITHUB.md with the create/share steps. Forwarded port stays Private by default; instructor sets it Public to the class. Deliberately-vulnerable app -> never leave the public URL up long-term.
