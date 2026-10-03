@@ -641,3 +641,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 
 ## 2026-10-03 — GateShop runnable on GitHub via Codespaces (no local VM).
 ## GitHub Pages can't run PHP/MySQL, so added .devcontainer/devcontainer.json at repo root: Create Codespace on main -> docker-in-docker builds + runs docker compose (port 8080 auto-forwarded). Added labs/gateshop/RUN-ON-GITHUB.md with the create/share steps. Forwarded port stays Private by default; instructor sets it Public to the class. Deliberately-vulnerable app -> never leave the public URL up long-term.
+
+## 2026-10-03 - GateShop live on GitHub Codespaces (PHP+SQLite, no Docker).
+## docker-in-docker build failed in Codespaces (recovery mode); switched devcontainer to mcr php:8.2 image running the app with PHP built-in server + SQLite (DB_DRIVER=sqlite, devrouter.php). Port 8080 forwarded, set to PUBLIC via gh. Verified: home renders, products seeded. Note: gd extension not in image (one image-processing lab may need it); vulnerable app - stop codespace when not in use.
