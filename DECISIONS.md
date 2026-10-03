@@ -644,3 +644,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 
 ## 2026-10-03 - GateShop live on GitHub Codespaces (PHP+SQLite, no Docker).
 ## docker-in-docker build failed in Codespaces (recovery mode); switched devcontainer to mcr php:8.2 image running the app with PHP built-in server + SQLite (DB_DRIVER=sqlite, devrouter.php). Port 8080 forwarded, set to PUBLIC via gh. Verified: home renders, products seeded. Note: gd extension not in image (one image-processing lab may need it); vulnerable app - stop codespace when not in use.
+
+## 2026-10-03 — Session 8 practical slots: GateShop labs now clickable links to the live site.
+## Each GateShop practical card's Open-step path (and the /instructor console link) is now an <a class="gs-link"> pointing to the live Codespaces URL, so students open the exact vulnerable page from the explanation. 45 links across 22 cards. Base URL kept in ONE place: a page-local GATESHOP_BASE_SCRIPT before </body> — if the Codespace URL changes, edit that one line and re-publish. Pre-existing interactive widgets (pv-chip buttons) untouched. PortSwigger cards already carry their own links.
