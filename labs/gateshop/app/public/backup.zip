@@ -1,0 +1,5 @@
+Not a real zip — a leftover "backup" for recon practice.
+DB_USER=gateshop
+DB_PASS=gateshop
+ADMIN_PORTAL=/admin-portal
+NOTE: migrate admin password out of source before launch!

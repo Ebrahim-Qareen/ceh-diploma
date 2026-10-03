@@ -1,0 +1,37 @@
+# GateShop — intentionally vulnerable training lab. KEEP OFF THE PUBLIC INTERNET.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_DRIVER: mysql
+      DB_HOST: db
+      DB_NAME: gateshop
+      DB_USER: gateshop
+      DB_PASS: ${MYSQL_PASSWORD:-gateshop}
+      REMEMBER_KEY: ${REMEMBER_KEY:-change-me}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+    ports:
+      # Reachable from the class LAN. To lock it to the VM only, use "127.0.0.1:8080:80".
+      - "8080:80"
+    depends_on:
+      - db
+    networks: [gatenet]
+  db:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: gateshop
+      MYSQL_USER: gateshop
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-gateshop}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-super-secret-root}
+    networks: [gatenet]
+    volumes:
+      - dbdata:/var/lib/mysql
+networks:
+  gatenet: {}
+volumes:
+  dbdata: {}

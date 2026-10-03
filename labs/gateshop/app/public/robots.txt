@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /admin-portal
+Disallow: /dev
+Disallow: /old
+Disallow: /backup.zip
+Disallow: /config.php.bak
+Disallow: /phpinfo
+Disallow: /api
+Sitemap: /sitemap.xml

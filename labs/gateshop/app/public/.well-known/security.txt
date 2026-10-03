@@ -1,0 +1,3 @@
+Contact: mailto:security@gateshop.test
+Policy: /terms
+# Hint for recon practice: a lot was left exposed. Try /dev, /old, /phpinfo, /admin-portal, /backup.zip

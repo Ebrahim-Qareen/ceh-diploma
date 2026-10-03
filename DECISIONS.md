@@ -632,3 +632,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 ## Filled: Authentication, IDOR, mass assignment, business logic, SQLi (query/UNION/sqlmap), OS command, XXE, SSTI, deserialization, path traversal, file upload, SSRF, info disclosure, XSS, DOM XSS, CSRF, CORS, clickjacking, web-LLM, host header.
 ## Left RESERVED (no GateShop lab yet — phase 2): OAuth, JWT, NoSQL, LDAP, race conditions, web cache deception, WebSockets, prototype pollution, web cache poisoning, request smuggling.
 ## Verified rendered: 62 pages, 0 dup ids, 0 console/page errors, 0 overflow. File 843133 bytes.
+
+## 2026-10-03 — Added the GateShop lab to the repo for publishing.
+## Placed the deliberately-vulnerable PHP+MySQL lab under labs/gateshop/ (own folder, per rules). Added .gitignore (excludes .env, data/, uploads/*) and .env.example (placeholders only); scanned — no real secrets. GitHub serves it as SOURCE only (Pages builds from docs/, so the PHP app is not executed/served); it runs on the instructor VM via docker compose. Source on GitHub lets the Session-8 "The bug" steps link to the exact vulnerable file/line.
