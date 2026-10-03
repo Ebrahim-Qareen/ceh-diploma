@@ -601,3 +601,7 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 ## Visual pass: inspected all 62 rendered pages — figures/boxes clean (no overflow, overlap, misalignment, ugly drawings, or SVG-text bugs found). "hijack"/WebSocket-hijacking/session-hijacking correctly belong to Session 8 (not removed).
 ## Automated checks all PASS: 62 pages render, 0 duplicate ids, 0 pageerrors, 0 console errors, 0 horizontal overflow (real-nav measured), sidebar groups by data-section, nav cycles all pages, MCQ interactive (click reveals correct answer + reasoning + score).
 ## File 830503 bytes. Committed to device, verified on disk (byte size + changed strings). NOT pushed — user pushes from GitHub Desktop.
+
+## 2026-10-03 — Session 8 / Phase B follow-up: DNS figure label fix.
+## User: "THE DNS HIERARCHY" caption on the DNS page (P06) was hidden behind the top border of the Root box. Cause: .dnw-hlbl had margin-bottom:-2px, pulling the hierarchy boxes up over the label's lower edge. Fix: .dnw-hlbl margin-bottom -2px -> 7px and line-height 1 -> 1.3 (page-local CSS). Verified rendered: 7px clear gap, label fully visible.
+## Also inspected the Stack page (P15) three-tier SVG + its click-to-open detail panels — clean, no hidden/overlapping text. Swept all page-local CSS for negative vertical margins (overlap risk): only .dnw-hlbl (fixed) and .bl-flag (an animated height:0->auto result flag, not a hidden-caption case). Automated checks still pass (62 pages, 0 dup ids, 0 errors, 0 overflow). File 830504 bytes.
