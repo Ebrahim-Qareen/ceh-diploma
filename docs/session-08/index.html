@@ -2983,6 +2983,12 @@ table.dbx-table{width:100%;border-collapse:collapse;font:600 14px/1.4 var(--mono
 .as-steps li{margin:5px 0}.as-steps code{white-space:pre-wrap;word-break:break-word}
 .as-k{display:inline-block;min-width:70px;font-weight:800;color:var(--text-2)}
 .as-badge.ok{background:color-mix(in srgb,var(--green) 16%,transparent);border:1px solid var(--green);color:var(--green)}
+
+/* PortSwigger practical slots */
+.appslot.pslab{border-left-color:var(--cyan)}.appslot.pslab.guided{border-left-color:var(--orange)}
+.as-badge.ps{background:color-mix(in srgb,var(--cyan) 15%,transparent);border:1px solid var(--cyan);color:var(--cyan)}
+.as-free{font:700 9px/1 var(--mono,monospace);text-transform:uppercase;color:var(--green);border:1px solid var(--green);border-radius:4px;padding:1px 5px;margin-left:4px}
+.as-steps a{color:var(--cyan)}
 </style>
 </head>
 <body data-session="s08">
@@ -3881,11 +3887,7 @@ table.dbx-table{width:100%;border-collapse:collapse;font:600 14px/1.4 var(--mono
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/oauth/lab-oauth-authentication-bypass-via-oauth-implicit-flow" target="_blank" rel="noopener">Authentication bypass via OAuth implicit flow</a> <span class="as-free">free</span> &mdash; log in as Carlos.</li><li><span class="as-k">Steps</span> 1) Proxy the login and find POST /authenticate (it carries your email + token).  2) In Repeater change the email to carlos@carlos-montoya.net.  3) Use 'Request in browser', open that URL — you're logged in as Carlos.</li><li><span class="as-k">Why</span> The app trusts the client-supplied email in the implicit-flow token instead of verifying it with the provider.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -3972,11 +3974,7 @@ table.dbx-table{width:100%;border-collapse:collapse;font:600 14px/1.4 var(--mono
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/jwt/lab-jwt-authentication-bypass-via-unverified-signature" target="_blank" rel="noopener">JWT authentication bypass via unverified signature</a> <span class="as-free">free</span> &mdash; reach /admin and delete carlos.</li><li><span class="as-k">Steps</span> 1) Log in as wiener and find the session JWT.  2) In Burp Inspector change the sub claim to administrator (leave the signature).  3) Request /admin, then /admin/delete?username=carlos.</li><li><span class="as-k">Why</span> The server decodes the token but never verifies its signature, so a tampered payload is accepted.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -4623,11 +4621,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/nosql-injection/lab-nosql-injection-bypass-authentication" target="_blank" rel="noopener">Exploiting NoSQL operator injection to bypass authentication</a> <span class="as-free">free</span> &mdash; log in as administrator.</li><li><span class="as-k">Steps</span> 1) In POST /login set username to {"$regex":"admin.*"}.  2) Set password to {"$ne":""}.  3) Submit — you are logged in as admin.</li><li><span class="as-k">Why</span> MongoDB operators inside JSON input rewrite the query, so no real password is needed.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -4705,11 +4699,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab guided"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; guided exercise</div><ol class="as-steps"><li><span class="as-k">Note</span> bypass an LDAP login / dump an attribute (guided).</li><li><span class="as-k">Steps</span> 1) PortSwigger has no LDAP lab — try it by hand on any LDAP login or search.  2) On a filter (&amp;(uid=USER)(userPassword=PASS)) send * for both -&gt; (&amp;(uid=*)(userPassword=*)) logs you in.  3) Inject *)(userPassword=*) to pull an attribute that was never meant to be searchable.</li><li><span class="as-k">Why</span> User input is concatenated into the LDAP filter, so * and ) change its logic.</li></ol><span class="as-badge ps">guided &middot; no hosted lab yet</span></div>
 
     </div>
   </section>
@@ -5497,11 +5487,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/race-conditions/lab-race-conditions-limit-overrun" target="_blank" rel="noopener">Limit overrun race conditions</a> <span class="as-free">free</span> &mdash; apply one coupon many times and buy the jacket cheap (needs Burp).</li><li><span class="as-k">Steps</span> 1) Add an item and apply the coupon once ('already applied').  2) Send POST /cart/coupon ~20x in parallel (Burp: send group in parallel).  3) The discount stacks — buy once it is within your store credit.</li><li><span class="as-k">Why</span> The 'already applied?' check and the save race; parallel requests all pass the check before it is written.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -5698,11 +5684,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/web-cache-deception/lab-wcd-exploiting-path-mapping" target="_blank" rel="noopener">Exploiting path mapping for web cache deception</a> <span class="as-free">free</span> &mdash; steal Carlos's API key from the cache.</li><li><span class="as-k">Steps</span> 1) /my-account returns your API key; /my-account/abc.js gets cached (X-Cache: hit).  2) Via the exploit server make Carlos visit /my-account/wcd.js.  3) Open the same /my-account/wcd.js yourself — read his cached key.</li><li><span class="as-k">Why</span> The cache stores a static-looking path that actually returned private content.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -6265,11 +6247,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/websockets/lab-manipulating-messages-to-exploit-vulnerabilities" target="_blank" rel="noopener">Manipulating WebSocket messages to exploit vulnerabilities</a> <span class="as-free">free</span> &mdash; pop XSS in the support agent via live chat.</li><li><span class="as-k">Steps</span> 1) Open live chat and watch the WebSocket traffic in Burp.  2) Intercept a chat message.  3) Replace it with &lt;img src=1 onerror='alert(1)'&gt; — it fires in the agent's browser.</li><li><span class="as-k">Why</span> Chat messages are not sanitised before they are shown to the support agent.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -6430,11 +6408,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/prototype-pollution/client-side/lab-prototype-pollution-dom-xss-via-client-side-prototype-pollution" target="_blank" rel="noopener">DOM XSS via client-side prototype pollution</a> <span class="as-free">free</span> &mdash; run alert() through prototype pollution.</li><li><span class="as-k">Steps</span> 1) Test: /?__proto__[foo]=bar then check Object.prototype.foo in the console.  2) In searchLogger.js find the gadget transport_url.  3) /?__proto__[transport_url]=data:,alert(1);</li><li><span class="as-k">Why</span> Polluting Object.prototype injects a property the page later uses as a script source.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -6596,11 +6570,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/web-cache-poisoning/exploiting-design-flaws/lab-web-cache-poisoning-with-an-unkeyed-header" target="_blank" rel="noopener">Web cache poisoning with an unkeyed header</a> <span class="as-free">free</span> &mdash; make every visitor run alert(document.cookie).</li><li><span class="as-k">Steps</span> 1) Add X-Forwarded-Host: &lt;exploit-server&gt; to GET / — it is reflected into a script src (unkeyed).  2) Host alert(document.cookie) at /resources/js/tracking.js on the exploit server.  3) Send the poisoned request until you see X-Cache: hit.</li><li><span class="as-k">Why</span> The cache ignores X-Forwarded-Host but the origin uses it, so one poisoned response is served to everyone.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>
@@ -6792,11 +6762,7 @@ sqlmap -r request.txt --random-agent --delay 1 --level 2 --risk 2</pre></div>
         </div>
       </div>
 
-      <div class="appslot">
-        <div class="as-t"><span class="as-dot"></span>Practical application &mdash; on our lab app</div>
-        <p>This slot is reserved for the hands-on exercise against <strong>our own vulnerable app</strong> &mdash; the challenge you&rsquo;ll run live in class for this vulnerability. We&rsquo;ll build and wire it here together. Until then, use the public labs at the end of this section.</p>
-        <span class="as-badge">reserved &middot; built with the instructor</span>
-      </div>
+      <div class="appslot pslab"><div class="as-t"><span class="as-dot"></span>Practical application &mdash; free PortSwigger lab</div><ol class="as-steps"><li><span class="as-k">Open</span> <a href="https://portswigger.net/web-security/request-smuggling/lab-basic-cl-te" target="_blank" rel="noopener">HTTP request smuggling, basic CL.TE vulnerability</a> <span class="as-free">free</span> &mdash; smuggle bytes so the next request breaks.</li><li><span class="as-k">Steps</span> 1) In Repeater craft a POST with both Content-Length and Transfer-Encoding: chunked.  2) Body: 0, then a blank line, then G.  3) Send it twice — the second response says 'Unrecognized method GPOST'.</li><li><span class="as-k">Why</span> Front-end uses Transfer-Encoding, back-end uses Content-Length; the leftover G prepends the next request.</li></ol><span class="as-badge ps">PortSwigger Academy</span></div>
 
     </div>
   </section>

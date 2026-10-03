@@ -635,3 +635,6 @@ Instructor review of the live page; fixed in the generators and rebuilt in place
 
 ## 2026-10-03 — Added the GateShop lab to the repo for publishing.
 ## Placed the deliberately-vulnerable PHP+MySQL lab under labs/gateshop/ (own folder, per rules). Added .gitignore (excludes .env, data/, uploads/*) and .env.example (placeholders only); scanned — no real secrets. GitHub serves it as SOURCE only (Pages builds from docs/, so the PHP app is not executed/served); it runs on the instructor VM via docker compose. Source on GitHub lets the Session-8 "The bug" steps link to the exact vulnerable file/line.
+
+## 2026-10-03 — Filled the remaining 10 practical-application slots with PortSwigger labs.
+## The 10 vulns with no GateShop lab (OAuth, JWT, NoSQL, LDAP, race, web cache deception, WebSockets, prototype pollution, web cache poisoning, request smuggling) now point to a free hosted PortSwigger Web Security Academy lab each: link + goal + solution steps + why, kept simple. All 32 practical boxes filled, 0 reserved. Verified render: 62 pages, 0 dup ids, 0 console/page errors, 0 overflow.
